@@ -1,0 +1,8 @@
+screenshots/
+sfx/
+old_stuff/
+min/
+*_old*
+*_debug*
+*.txt
+*.py
