@@ -79,8 +79,8 @@ Game.prototype.start = function() {
 	this.height_map = null;
 	this.world_map = null;
 	this.map_positions = null;
-	//this.stage = new Intro(); // DEBUG
-	this.stage = new Survival(); // DEBUG
+	this.stage = new Intro(); // DEBUG
+	//this.stage = new Survival(); // DEBUG
 	this.stagemanager = new Stagemanager();
 	this.stage.initialize();
 	this.last_time = Date.now();
@@ -98,7 +98,8 @@ Game.prototype.next_player = function() {
 		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
 			this.current_player_num = i;
 			this.current_player = this.players[i];
-			return false;
+			console.log('There is another player.');
+			return true;
 		}
 	}
 
@@ -106,12 +107,13 @@ Game.prototype.next_player = function() {
 		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
 			this.current_player_num = i;
 			this.current_player = this.players[i];
-			return true;
+			console.log('This was the last player.');
+			return false;
 		}
 	}
 
 	console.warn('All players are dead or inactive!!!');
-	return true;
+	return false;
 };
 
 
@@ -318,6 +320,7 @@ resources.load([
 	'gfx/dummy_outro.png'
 ]);
 resources.onReady(() => game.start());
+
 
 /*
 // DEBUG: Next frame event listener

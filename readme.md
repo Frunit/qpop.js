@@ -12,3 +12,5 @@ Please keep in mind that this is a hobby project, so it will only be updated eve
 The licensing is a bit complicated. I did not decide on a license for the code, but it will be an open license. The images and sounds are taken straight from the game and just reformated to a modern format. I managed to contact two of the three original creators of the game (Karl-L. von Wendt and Lars Hammer) and both allowed me to use any game resources for fair and non-profit use. I could not reach the third member of the team, Stefan Beyer, who did the wonderful graphics. Stefan, if you read this, please contact me (qpop¤frunit.de).
 
 I made an own repository for the original graphics here: [github.com/Frunit/qpop-ressourcen](https://github.com/Frunit/qpop-ressourcen)
+
+The current version can be played here: [frunit.de/qpop/play](https://frunit.de/qpop/play). Many things work, but many things don't (yet). There is no sound whatsoever, no animations and the survival part is ... very rudimental.
