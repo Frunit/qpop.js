@@ -158,7 +158,7 @@ Level.prototype.populate = function() {
 
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
 
-	this.mobmap[49][49] = this.character;
+	this.mobmap[this.character.tile[1]][this.character.tile[0]] = this.character;
 	this.mobmap[50][49] = new Predator(PRED_DINO, [50, 49]);
 	this.predators.push(this.mobmap[50][49]);
 };

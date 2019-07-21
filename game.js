@@ -79,8 +79,8 @@ Game.prototype.start = function() {
 	this.height_map = null;
 	this.world_map = null;
 	this.map_positions = null;
-	this.stage = new Intro(); // DEBUG
-	//this.stage = new Survival(); // DEBUG
+	//this.stage = new Intro(); // DEBUG
+	this.stage = new Survival(); // DEBUG
 	this.stagemanager = new Stagemanager();
 	this.stage.initialize();
 	this.last_time = Date.now();

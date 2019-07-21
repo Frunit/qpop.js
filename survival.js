@@ -158,15 +158,22 @@ Survival.prototype.draw_minimap = function() {
 	let range = game.current_player.stats[ATT_PERCEPTION]; // TODO
 	let draw = false;
 	let sym = 0;
+	let real_x, real_y;
 
 	for(let x = -range; x < range; x++) {
+		real_x = this.level.character.tile[0] + x;
 		for(let y = -range; y < range; y++) {
+			real_y = this.level.character.tile[1] + y;
 			draw = false;
 			if(x === 0 && y === 0) {
 				draw = true;
 				sym = 0;
 			}
-			// Test for Positions on the map (enemies, predators, females, food)
+			else if(this.level.mobmap[real_x][real_y] !== null) {
+				draw = true;
+				sym = 3;
+			}
+			// Test for Positions on the map (enemies, females, food) in this order
 
 
 
@@ -226,6 +233,8 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	case SOUTH:
 		if(obj.rel_pos[1] + speed > this.tile_dim[1]) {
 			obj.tile[1]++;
+			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]-1][obj.tile[0]];
+			this.level.mobmap[obj.tile[1]-1][obj.tile[0]] = null;
 			finished_move = true;
 		}
 		else {
@@ -235,6 +244,8 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	case NORTH:
 		if(Math.abs(obj.rel_pos[1] - speed) > this.tile_dim[1]) {
 			obj.tile[1]--;
+			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]+1][obj.tile[0]];
+			this.level.mobmap[obj.tile[1]+1][obj.tile[0]] = null;
 			finished_move = true;
 		}
 		else {
@@ -244,6 +255,8 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	case WEST:
 		if(Math.abs(obj.rel_pos[0] - speed) > this.tile_dim[0]) {
 			obj.tile[0]--;
+			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]+1];
+			this.level.mobmap[obj.tile[1]][obj.tile[0]+1] = null;
 			finished_move = true;
 		}
 		else {
@@ -253,6 +266,8 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	case EAST:
 		if(obj.rel_pos[0] + speed > this.tile_dim[0]) {
 			obj.tile[0]++;
+			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]-1];
+			this.level.mobmap[obj.tile[1]][obj.tile[0]-1] = null;
 			finished_move = true;
 		}
 		else {
