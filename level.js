@@ -170,6 +170,7 @@ Level.prototype.populate = function() {
 	// Place the player as close to the center as possible
 	this.put_player(free_tiles, [49, 49]);
 
+	// TODO: Predators may not be placed within 2 fields (dx or dy) of the starting position; Females and Enemies not within 3 fields
 	let pos, type;
 	for(let i = 0; i < num_predators; i++) {
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
@@ -276,28 +277,29 @@ Level.prototype.start_movement = function(dir) {
 		case SOUTH:
 			this.character.rel_pos[1] += speed;
 			this.character.sprite = this.character.sprite_south;
-			this.mobmap[pos[1] + 1][pos[0]] = 1; // Block the position, the player wants to go, so no other predator will go there in the same moment
+			this.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
 			break;
 		case NORTH:
 			this.character.rel_pos[1] -= speed;
 			this.character.sprite = this.character.sprite_north;
-			this.mobmap[pos[1] - 1][pos[0]] = 1;
+			this.mobmap[pos[1] - 1][pos[0]] = placeholder;
 			break;
 		case EAST:
 			this.character.rel_pos[0] += speed;
 			this.character.sprite = this.character.sprite_east;
-			this.mobmap[pos[1]][pos[0] + 1] = 1;
+			this.mobmap[pos[1]][pos[0] + 1] = placeholder;
 			break;
 		case WEST:
 			this.character.rel_pos[0] -= speed;
 			this.character.sprite = this.character.sprite_west;
-			this.mobmap[pos[1]][pos[0] - 1] = 1;
+			this.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
 	}
 };
 
 
 function Character(species, tile) {
+	this.type = SM_PLAYER;
 	this.tile = tile;
 	this.rel_pos = [0, 0];
 	this.movement = 0;
@@ -314,7 +316,8 @@ function Character(species, tile) {
 }
 
 
-function Predator(type, tile) {
+function Predator(species, tile) {
+	this.type = SM_PREDATOR;
 	this.tile = tile;
 	this.rel_pos = [0, 0];
 	this.movement = 0;       // current movement direction
@@ -328,7 +331,7 @@ function Predator(type, tile) {
 	this.sprite_west = new Sprite('gfx/pred1.png', [64, 64], [320, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 	this.sprite = this.sprite_still;
 
-	switch(type) {
+	switch(species) {
 		case PRED_DINO:
 			this.attack = 250;
 			this.scent = 100;
@@ -346,6 +349,7 @@ function Predator(type, tile) {
 
 
 function Female(species) {
+	this.type = SM_FEMALE;
 	this.has_offspring = false;
 
 	// TODO: Need the right coords
@@ -358,6 +362,7 @@ function Female(species) {
 
 
 function Enemy(species) {
+	this.type = SM_ENEMY;
 	this.lost = false;
 
 	// TODO: Need the right coords

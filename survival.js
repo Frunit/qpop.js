@@ -317,22 +317,22 @@ Survival.prototype.init_predator_movement = function(dt) {
 			case NORTH:
 				predator.rel_pos[1] -= speed;
 				predator.sprite = predator.sprite_north;
-				this.level.mobmap[pos[1] - 1][pos[0]] = 1; // Block the spot on the map to prevent others from going there
+				this.level.mobmap[pos[1] - 1][pos[0]] = placeholder; // Block the spot on the map to prevent others from going there
 				break;
 			case SOUTH:
 				predator.rel_pos[1] += speed;
 				predator.sprite = predator.sprite_south;
-				this.level.mobmap[pos[1] + 1][pos[0]] = 1;
+				this.level.mobmap[pos[1] + 1][pos[0]] = placeholder;
 				break;
 			case WEST:
 				predator.rel_pos[0] -= speed;
 				predator.sprite = predator.sprite_west;
-				this.level.mobmap[pos[1]][pos[0] - 1] = 1;
+				this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 				break;
 			case EAST:
 				predator.rel_pos[0] += speed;
 				predator.sprite = predator.sprite_east;
-				this.level.mobmap[pos[1]][pos[0] + 1] = 1;
+				this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 				break;
 		}
 	}
