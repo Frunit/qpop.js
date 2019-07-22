@@ -127,7 +127,7 @@ Survival.prototype.redraw = function() {
 	});*/
 
 	// Minimap
-	this.draw_minimap();
+	this.camera.draw_minimap();
 
 	// Steps
 	ctx.drawImage(this.gui_pics,
@@ -147,48 +147,6 @@ Survival.prototype.redraw = function() {
 
 	// Symbols
 	// TODO: one or more own functions for the symbols
-
-};
-
-
-Survival.prototype.draw_minimap = function() {
-	// TODO: Fill minimap with life
-	draw_black_rect(this.minimap_offset, this.minimap_dim, '#000000');
-
-	let range = game.current_player.stats[ATT_PERCEPTION]; // TODO
-	let draw = false;
-	let sym = 0;
-	let real_x, real_y;
-
-	for(let x = -range; x < range; x++) {
-		real_x = this.level.character.tile[0] + x;
-		for(let y = -range; y < range; y++) {
-			real_y = this.level.character.tile[1] + y;
-			draw = false;
-			if(x === 0 && y === 0) {
-				draw = true;
-				sym = 0;
-			}
-			else if(this.level.mobmap[real_y][real_x] !== null) {
-				draw = true;
-				sym = 3;
-			}
-			// Test for Positions on the map (enemies, females, food) in this order
-
-
-
-			if(draw) {
-				ctx.drawImage(this.gui_pics,
-					this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
-					this.minimap_sym_soffset[1],
-					this.minimap_sym_dim[0], this.minimap_sym_dim[1],
-					this.minimap_offset[0] + (this.center + x) * this.minimap_sym_dim[0],
-					this.minimap_offset[1] + (this.center + y) * this.minimap_sym_dim[1],
-					this.minimap_sym_dim[0], this.minimap_sym_dim[1]);
-			}
-		}
-	}
-
 
 };
 

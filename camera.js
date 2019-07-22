@@ -99,6 +99,52 @@ Camera.prototype.update_visible_level = function(dt) {
 };
 
 
+Camera.prototype.draw_minimap = function() {
+	// TODO: Fill minimap with life
+	draw_black_rect(this.minimap_offset, this.minimap_dim, '#000000');
+
+	const MM_PLAYER = 0;
+	const MM_FOOD = 1;
+	const MM_LOVE = 2;
+	const MM_PREDATOR = 3;
+	const MM_ENEMY = 4;
+
+	let range = game.current_player.stats[ATT_PERCEPTION]; // TODO
+	let draw = false;
+	let sym, real_x, real_y;
+
+	for(let y = -range; y < range; y++) {
+		real_y = this.level.character.tile[1] + y;
+		for(let x = -range; x < range; x++) {
+			real_x = this.level.character.tile[0] + x;
+
+			draw = false;
+			if(x === 0 && y === 0) {
+				draw = true;
+				sym = MM_PLAYER;
+			}
+			else if(this.level.mobmap[real_y][real_x] !== null) {
+				draw = true;
+				sym = MM_PREDATOR;
+			}
+			// Test for Positions on the map (enemies, females, food) in this order
+
+
+
+			if(draw) {
+				ctx.drawImage(this.gui_pics,
+					this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
+					this.minimap_sym_soffset[1],
+					this.minimap_sym_dim[0], this.minimap_sym_dim[1],
+					this.minimap_offset[0] + (this.center + x) * this.minimap_sym_dim[0],
+					this.minimap_offset[1] + (this.center + y) * this.minimap_sym_dim[1],
+					this.minimap_sym_dim[0], this.minimap_sym_dim[1]);
+			}
+		}
+	}
+};
+
+
 Camera.prototype.render = function() {
 	ctx.save();
 	ctx.translate(this.offset[0], this.offset[1]);
@@ -130,6 +176,7 @@ Camera.prototype.render = function() {
 
 	ctx.restore();
 
+	this.draw_minimap();
 	this._pos_changed = false;
 	this._tiles_to_render.clear();
 	this._movs_to_render = [];
