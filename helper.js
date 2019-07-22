@@ -29,13 +29,13 @@ const ATT_SPEED = 10;
 const ATT_PERCEPTION = 11;
 const ATT_INTELLIGENCE = 12;
 
-// Richtungen
+// Directions
 const NORTH = 1;
 const EAST = 2;
 const SOUTH = 3;
 const WEST = 4;
 
-// Spielertypen
+// Player types
 const HUMAN = 1;
 const COMPUTER = 2;
 const NOBODY = 3;
