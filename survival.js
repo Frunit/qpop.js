@@ -11,8 +11,6 @@ function Survival() {
 	this.left_rect_dim = [460, 460];
 	this.right_rect_dim = [181, 439];
 	this.next_dim = [181, 22];
-	this.minimap_dim = [168, 168];
-	this.minimap_sym_dim = [8, 8];
 	this.time_dim = [122, 25];
 	this.steps_dim = [122, 25];
 	this.icon_dim = [20, 20];
@@ -21,7 +19,6 @@ function Survival() {
 	this.left_rect_offset = [0, 20];
 	this.right_rect_offset = [459, 20];
 	this.next_offset = [459, 458];
-	this.minimap_offset = [465, 26];
 	this.steps_offset = [508, 205];
 	this.time_offset = [508, 240];
 	this.icon_steps_offset = [470, 243];
@@ -30,19 +27,13 @@ function Survival() {
 	this.sym_love_offset = [465, 347];
 	this.sym_dead_offset = [465, 408];
 
-	this.minimap_sym_soffset = [0, 16];
 	this.sym_food_soffset = [0, 0];
 	this.sym_love_soffset = [16, 0];
 	this.sym_dead_soffset = [32, 0];
-	this.minispec_soffset = [0, 24];
 	this.icon_steps_soffset = [48, 0];
 	this.icon_time_soffset = [68, 0];
 	this.icon_dy = 25;
 	this.food_dx = 8;
-
-	this.minimap_width = 21;
-	this.center = 10; // === (this.minimap_width - 1) / 2
-
 	// CONST_END
 
 	this.ai_active = false;
@@ -63,8 +54,6 @@ function Survival() {
 	this.cam_rightclickpos = null;
 
 	this.timer = 100;
-
-	this.initialize();
 }
 
 
@@ -256,7 +245,7 @@ Survival.prototype.init_predator_movement = function(dt) {
 
 		dx = Math.abs(pos[0] - player_pos[0]);
 		dy = Math.abs(pos[1] - player_pos[1]);
-		dist = Math.min(dx, dy);
+		dist = Math.max(dx, dy);
 		switch(dist) {
 			case 1: scent_chance = -1; break;
 			case 2: scent_chance = 10; break;
@@ -486,7 +475,7 @@ Survival.prototype.handle_input = function(dt) {
 		if(input.isDown('DOWN')) {
 			input.reset('DOWN');
 			if(this.level.is_unblocked(this.level.character.tile, SOUTH)) {
-				this.level.start_movement(SOUTH);
+				this.level.start_movement(SOUTH, speed);
 				new_movement = true;
 			}
 		}
@@ -494,7 +483,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('UP')) {
 			input.reset('UP');
 			if(this.level.is_unblocked(this.level.character.tile, NORTH)) {
-				this.level.start_movement(NORTH);
+				this.level.start_movement(NORTH, speed);
 				new_movement = true;
 			}
 		}
@@ -502,7 +491,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('LEFT')) {
 			input.reset('LEFT');
 			if(this.level.is_unblocked(this.level.character.tile, WEST)) {
-				this.level.start_movement(WEST);
+				this.level.start_movement(WEST, speed);
 				new_movement = true;
 			}
 		}
@@ -510,7 +499,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('RIGHT')) {
 			input.reset('RIGHT');
 			if(this.level.is_unblocked(this.level.character.tile, EAST)) {
-				this.level.start_movement(EAST);
+				this.level.start_movement(EAST, speed);
 				new_movement = true;
 			}
 		}

@@ -2,6 +2,17 @@
 
 function Camera(level, tile_dim, window_dim, offset) {
 	this.level = level;
+	this.gui_pics = resources.get('gfx/survival_gui.png');
+
+	// CONST_START
+	this.minimap_dim = [168, 168];
+	this.minimap_sym_dim = [8, 8];
+	this.minimap_offset = [465, 26];
+	this.minimap_sym_soffset = [0, 16];
+	this.minispec_soffset = [0, 24];
+	this.minimap_width = 21;
+	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
+
 	this.tile_dim = tile_dim;
 	this.cwidth = window_dim[0];
 	this.cheight = window_dim[1];
@@ -11,8 +22,9 @@ function Camera(level, tile_dim, window_dim, offset) {
 	this._movs_to_render = [];
 	this.x_tiles = [];
 	this.y_tiles = [];
+	// CONST_END
 
-	this.cpos = [0, 0]; // Camera position
+	this.cpos = [0, 0]; // Camera position in pixel
 
 	this.move_to(level.character);
 	//this.update_tiles(); Already done in move_to()
@@ -73,7 +85,7 @@ Camera.prototype.update_visible_level = function(dt) {
 				}
 			}
 
-			if(this.level.mobmap[y][x] !== null) {
+			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SM_PLACEHOLDER) {
 				this.level.mobmap[y][x].sprite.update(dt);
 				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
 					this._movs_to_render.push(this.level.mobmap[y][x]);
@@ -108,7 +120,7 @@ Camera.prototype.draw_minimap = function() {
 	const MM_PREDATOR = 3;
 	const MM_ENEMY = 4;
 
-	const range = (game.current_player.stats[ATT_PERCEPTION] * 7 + game.current_player.stats[ATT_INTELLIGENCE]) / 10;
+	const range = (game.current_player.stats[ATT_PERCEPTION] * 7 + game.current_player.stats[ATT_INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
 	let draw = false;
 	let sym, real_x, real_y, dist, threshold;
 
@@ -169,8 +181,8 @@ Camera.prototype.draw_minimap = function() {
 					this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
 					this.minimap_sym_soffset[1],
 					this.minimap_sym_dim[0], this.minimap_sym_dim[1],
-					this.minimap_offset[0] + (this.center + x) * this.minimap_sym_dim[0],
-					this.minimap_offset[1] + (this.center + y) * this.minimap_sym_dim[1],
+					this.minimap_offset[0] + (this.minimap_center + x) * this.minimap_sym_dim[0],
+					this.minimap_offset[1] + (this.minimap_center + y) * this.minimap_sym_dim[1],
 					this.minimap_sym_dim[0], this.minimap_sym_dim[1]);
 			}
 		}
@@ -185,11 +197,12 @@ Camera.prototype.render = function() {
 	ctx.rect(0, 0, this.cwidth, this.cheight);
 	ctx.clip();
 
-	if(this._tiles_to_render.size || this._movs_to_render.length)
+	if(this._tiles_to_render.size || this._movs_to_render.length) {
 		debug1.value = this._tiles_to_render.size + ' ' + this._movs_to_render.length;
-	if(this._tiles_to_render.size === 2) {
-		console.log(this._movs_to_render);
 	}
+	/*if(this._tiles_to_render.size === 2) {
+		console.log(this._movs_to_render);
+	}*/
 	let pos, x, y, sprite;
 	for(let coord of this._tiles_to_render) {
 		pos = JSON.parse(coord);
@@ -203,8 +216,14 @@ Camera.prototype.render = function() {
 	}
 
 	for(let mov of this._movs_to_render) {
+		try {
 		mov.sprite.render(ctx, [Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.cpos[0]),
-		Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.cpos[1])]);
+			Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.cpos[1])]);
+		}
+		catch(e) {
+			console.log(mov);
+			throw e;
+		}
 	}
 
 	ctx.restore();

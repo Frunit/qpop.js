@@ -146,13 +146,13 @@ Level.prototype.populate = function() {
 	// More predators for higher difficulty and more individuals on world map.
 	// (More individuals attract more predators.)
 	let num_predators = 30 + (5 - game.current_player.iq) * this.individuals;
-	if(num_predators > 240) {
+	if(true || num_predators > 240) { // DEBUG
 		num_predators = 240;
 	}
 
 	// More females at a higher population density.
 	let num_females = 20 + 10 * this.density
-	if(num_females > 200) {
+	if(true || num_females > 200) { // DEBUG
 		num_females = 200;
 	}
 
@@ -162,6 +162,8 @@ Level.prototype.populate = function() {
 	if(this.enemies.length > 0) {
 		num_enemies = 100;
 	}
+
+	console.log('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
 	let pos, species;
@@ -194,7 +196,7 @@ Level.prototype.populate = function() {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-		this.mobmap[pos[1]][pos[0]] = new Female(1);
+		this.mobmap[pos[1]][pos[0]] = new Female(1, pos);
 	};
 
 	for(let i = 0; i < num_enemies; i++) {
@@ -203,8 +205,8 @@ Level.prototype.populate = function() {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-		type = random_element(this.enemies);
-		this.mobmap[pos[1]][pos[0]] = new Enemy(type);
+		species = random_element(this.enemies);
+		this.mobmap[pos[1]][pos[0]] = new Enemy(species, pos);
 	};
 };
 
@@ -265,7 +267,7 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 	for(y = min_size-1; y < search_size; y++) {
 		for(x = min_size-1; x < search_size; x++) {
 			if(left_counts[y][x] >= min_size && left_counts[y-1][x] >= min_size && left_counts[y-2][x] >= min_size) {
-				good_positions.push([x-1, y-1]); // I want to have the center of the square
+				good_positions.push([x + pos[0] - 1, y + pos[1] - 1]); // I want to have the center of the square
 			}
 		}
 	}
@@ -287,16 +289,16 @@ Level.prototype.get_dirs = function(pos, last_movement=0) {
 	const y = pos[1];
 
 	let dirs = [];
-	if(last_movement != EAST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
+	if(last_movement != WEST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
 		dirs.push(EAST);
 	}
-	if(last_movement != WEST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
+	if(last_movement != EAST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
 		dirs.push(WEST);
 	}
-	if(last_movement != SOUTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
+	if(last_movement != NORTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
 		dirs.push(SOUTH);
 	}
-	if(last_movement != NORTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
+	if(last_movement != SOUTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
 		dirs.push(NORTH);
 	}
 
@@ -318,7 +320,7 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 };
 
 
-Level.prototype.start_movement = function(dir) {
+Level.prototype.start_movement = function(dir, speed) {
 	this.character.movement = dir;
 	const pos = this.character.tile;
 
@@ -359,7 +361,7 @@ function Character(species, tile) {
 	this.sprite_still = new Sprite('gfx/spec1.png', [64, 64]);
 	this.sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
 	this.sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]);
-	this.sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+	this.sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[64, 0], [0, 0], [128, 0], [0, 0]]);
 	this.sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 	this.sprite = this.sprite_still;
 }
@@ -397,27 +399,29 @@ function Predator(species, tile) {
 }
 
 
-function Female(species) {
+function Female(species, tile) {
 	this.type = SM_FEMALE;
+	this.tile = tile;
+	this.rel_pos = [0, 0];
 	this.has_offspring = false;
 
-	// TODO: Need the right coords
 	// TODO: sprites must be defined by species
-	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
-	this.sprite_during = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]], true);
-	this.sprite_after = new Sprite('gfx/spec1.png', [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [0, 256], [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]]);
+	this.sprite_during = null;
+	this.sprite_after = new Sprite('gfx/spec1.png', [64, 64], [256, 256], [[0, 0], [64, 0], [0, 0], [128, 0]]);
 	this.sprite = this.sprite_before;
 }
 
 
-function Enemy(species) {
+function Enemy(species, tile) {
 	this.type = SM_ENEMY;
+	this.tile = tile;
+	this.rel_pos = [0, 0];
 	this.lost = false;
 
 	// TODO: Need the right coords
 	// TODO: sprites must be defined by species
-	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
-	this.sprite_boasting = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]], true);
-	this.sprite_after = new Sprite('gfx/spec1.png', [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_before = new Sprite('gfx/enemies.png', [64, 64], [0, 0], [[0, 0], [320, 0], [384, 0], [0, 0]], true);
+	this.sprite_after = new Sprite('gfx/enemies.png', [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 	this.sprite = this.sprite_before;
 }

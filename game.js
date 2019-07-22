@@ -164,10 +164,10 @@ function Player(num) {
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 	this.survival = { // TODO!!!  Sprite(url, size, offset=[0,0], frames=[[0,0]])
 		sprite_still: new Sprite('gfx/spriteanim.png', [64, 64]),
-		sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
-		sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]);
-		sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [64, 0]]);
-		sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+		sprite_north: new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]),
+		sprite_east: new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]),
+		sprite_south: new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [64, 0]]),
+		sprite_west: new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]),
 		sprite: null
 	};
 	this.survival.sprite = this.survival.sprite_still;
@@ -300,6 +300,7 @@ let game = new Game();
 resources.load([
 	'gfx/dummy_intro.png',
 	'gfx/init.png',
+	'gfx/enemies.png',
 	'gfx/spec1.png',
 	'gfx/pred1.png',
 	'gfx/dark_bg.png',
