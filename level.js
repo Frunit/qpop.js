@@ -232,21 +232,21 @@ Level.prototype.request_sprite = function(x, y) {
 };
 
 
-Level.prototype.get_dirs = function(pos) {
+Level.prototype.get_dirs = function(pos, last_movement=0) {
 	const x = pos[0];
 	const y = pos[1];
 
 	let dirs = [];
-	if(this.blocking[this.map[y][x+1]] === '0') {
+	if(last_movement != EAST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
 		dirs.push(EAST);
 	}
-	if(this.blocking[this.map[y][x-1]] === '0') {
+	if(last_movement != WEST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
 		dirs.push(WEST);
 	}
-	if(this.blocking[this.map[y+1][x]] === '0') {
+	if(last_movement != SOUTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
 		dirs.push(SOUTH);
 	}
-	if(this.blocking[this.map[y-1][x]] === '0') {
+	if(last_movement != NORTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
 		dirs.push(NORTH);
 	}
 
@@ -317,7 +317,8 @@ function Character(species, tile) {
 function Predator(type, tile) {
 	this.tile = tile;
 	this.rel_pos = [0, 0];
-	this.movement = 0;
+	this.movement = 0;       // current movement direction
+	this.last_movement = 0;  // last movement direction
 
 	// TODO: sprites must be defined by species
 	this.sprite_still = new Sprite('gfx/pred1.png', [64, 64]);

@@ -236,6 +236,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 
 	if(finished_move) {
 		obj.rel_pos = [0, 0]
+		obj.last_movement = obj.movement;
 		obj.movement = 0;
 		obj.sprite = obj.sprite_still;
 		this.move_active = false;
@@ -244,19 +245,79 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 
 
 Survival.prototype.init_predator_movement = function(dt) {
+	const player_pos = this.level.character.tile;
+	const speed = options.surv_move_speed * dt;
+	const evasion = game.current_player.stats[ATT_CAMOUFLAGE] * 4 + game.current_player.stats[ATT_SPEED] * 2 +  game.current_player.stats[ATT_INTELLIGENCE];
+
+	let pos, dirs, dx, dy, dist, scent_chance, target_dirs;
+
 	for(let predator of this.level.predators) {
-		// TODO: Predator must try to follow the player!
-		const new_dir = random_element(this.level.get_dirs(predator.tile));
+		pos = predator.tile;
 
-		predator.movement = new_dir;
-		const speed = options.surv_move_speed * dt;
-		const pos = predator.tile;
+		dx = Math.abs(pos[0] - player_pos[0]);
+		dy = Math.abs(pos[1] - player_pos[1]);
+		dist = Math.min(dx, dy);
+		switch(dist) {
+			case 1: scent_chance = -1; break;
+			case 2: scent_chance = 10; break;
+			case 3: scent_chance = 5; break;
+			default: scent_chance = 0;
+		}
+		scent_chance *= predator.scent;
 
-		switch(new_dir) {
+		// Open directions. Note, that a predator may not go backwards!
+		dirs = this.level.get_dirs(predator.tile, predator.last_movement);
+		target_dirs = [0, 0];
+
+		// If the predator scents the player, try to get closer or don't move at all.
+		// If possible, move closer on the axis where the predator is further away.
+		// If not, move close on the other axis.
+		// If both axes are equally close, prefer NORTH/SOUTH over EAST/WEST.
+		// If a move would put the predator further away from the player, don't move (that's not very smart, but the original behaviour).
+		if(scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance-1) > evasion)) {
+			if(pos[1] - player_pos[1] > 0) {
+				target_dirs[0] = NORTH;
+			}
+			else {
+				target_dirs[0] = SOUTH;
+			}
+
+			if(pos[0] - player_pos[0] > 0) {
+				target_dirs[1] = WEST;
+			}
+			else {
+				target_dirs[1] = EAST;
+			}
+
+			if(dx > dy) {
+				target_dirs.reverse();
+			}
+
+			if(dirs.includes(target_dirs[0])) {
+				predator.movement = target_dirs[0];
+			}
+			else if(dirs.includes(target_dirs[1])) {
+				predator.movement = target_dirs[1];
+			}
+			else {
+				predator.movement = 0;
+			}
+		}
+		// Otherwise move to a random position, if possible.
+		else {
+			if(dirs.length) {
+				predator.movement = random_element(dirs);
+			}
+			else {
+				predator.movement = 0;
+			}
+		}
+
+		switch(predator.movement) {
 			case NORTH:
 				predator.rel_pos[1] -= speed;
 				predator.sprite = predator.sprite_north;
-				this.level.mobmap[pos[1] - 1][pos[0]] = 1; // Block the spot on the map to prevent others from goind there
+				this.level.mobmap[pos[1] - 1][pos[0]] = 1; // Block the spot on the map to prevent others from going there
 				break;
 			case SOUTH:
 				predator.rel_pos[1] += speed;
