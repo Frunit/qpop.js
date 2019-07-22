@@ -49,29 +49,30 @@ Level.prototype.listToMap = function(mainpart, border) {
 
 
 Level.prototype.count_wm_neighbours = function() {
-	return [5, new Set()]; // DEBUG
+	return [5, new Set([4, 5])]; // DEBUG
 	/*let num_neighbours = 0;
 	let enemies = new Set();
 	const wm_width = game.map_positions[0].length;
 	const wm_height = game.map_positions.length;
 	const player = game.current_player_num;
-	for(let x = 1; x < width - 1; x++) {
-		for(let y = 1; y < height - 1; y++) {
-			if(game.map_positions[y][x] !== game.current_player_num &&
-				(game.map_positions[y][x-1] === player ||
-				game.map_positions[y][x+1] === player ||
-				game.map_positions[y-1][x] === player ||
-				game.map_positions[y+1][x] === player))
+	for(let x = 1; x < wm_width - 1; x++) {
+		for(let y = 1; y < wm_height - 1; y++) {
+			if(game.map_positions[y][x]	>= 0 &&
+				game.map_positions[y][x] !== player)
 			{
-				num_neighbours++;
+				if(game.map_positions[y][x-1] === player ||
+					game.map_positions[y][x+1] === player ||
+					game.map_positions[y-1][x] === player ||
+					game.map_positions[y+1][x] === player)
+				{
+					num_neighbours++;
+				}
 			}
-
-			if(game.map_positions[y][x] === game.current_player_num)
-			{
+			else {
 				for(let xx = x-1; x <= x+1; x++) {
-					for(let y = y-1; y <= y+1; y++) {
-						if(game.map_positions[yy][xx] !== 0 &&
-							game.map_positions[yy][xx] !== game.current_player_num)
+					for(let yy = y-1; y <= y+1; y++) {
+						if(game.map_positions[yy][xx] >= 0 &&
+							game.map_positions[yy][xx] !== player)
 						{
 							enemies.add(game.map_positions[yy][xx]);
 						}
@@ -81,7 +82,7 @@ Level.prototype.count_wm_neighbours = function() {
 		}
 	}
 
-	return num_neighbours, enemies;*/
+	return num_neighbours, [...enemies];*/
 };
 
 
@@ -101,9 +102,10 @@ Level.prototype.generate_map = function() {
 	this.density = 10 * this.individuals / this.neighbourfields;
 	const mod_density = 50 + 10 * this.density;
 	const wfactor = 2500/this.individuals;
-	const wtable = Array(6).fill(0); // wtable[n]+=wfactor for each own individual on plant n in world map
+	const wtable = Array(6).fill(0); // TODO: wtable[n]+=wfactor for each own individual on plant n in world map
 	wtable[2] = 10*wfactor; // DEBUG Should be determined by the positions on the world map
 
+	// Add food to the map
 	let factor;
 	for(let i = 0; i < 5; i++) {
 		if(wtable[i] > 0) {
@@ -117,18 +119,18 @@ Level.prototype.generate_map = function() {
 		}
 	}
 
+	// Fill with empty fields
 	for(let i = mainpart.length; i < 8836; i++) {
 		mainpart.push(74); // TODO: Should be the real empty fields!
 	}
 
+	// Shuffle everything and create the actual map
 	shuffle(mainpart);
 	shuffle(border);
-
 	this.map = this.listToMap(mainpart, border);
 
+	// If humans are present, a base is created at fixed coordinates, overwriting what ever is there
 	if(game.humans_present) {
-		// If humans are present, a base is created at fixed coordinates
-
 		for(let x = 47; x <= 51; x++) {
 			for(let y = 37; y <= 41; y++) {
 				if(Math.random() <= 0.7) {
@@ -141,16 +143,21 @@ Level.prototype.generate_map = function() {
 
 
 Level.prototype.populate = function() {
+	// More predators for higher difficulty and more individuals on world map.
+	// (More individuals attract more predators.)
 	let num_predators = 30 + (5 - game.current_player.iq) * this.individuals;
 	if(num_predators > 240) {
 		num_predators = 240;
 	}
 
+	// More females at a higher population density.
 	let num_females = 20 + 10 * this.density
 	if(num_females > 200) {
 		num_females = 200;
 	}
 
+	// Fixed number of enemies, iff enemies are in neighbourhood on world map.
+	// If more enemies are in the neighbourhood, they have to share the 100 spots.
 	let num_enemies = 0;
 	if(this.enemies.length > 0) {
 		num_enemies = 100;
@@ -158,9 +165,62 @@ Level.prototype.populate = function() {
 
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
 
-	this.mobmap[this.character.tile[1]][this.character.tile[0]] = this.character;
-	this.mobmap[50][49] = new Predator(PRED_DINO, [50, 49]);
-	this.predators.push(this.mobmap[50][49]);
+	let free_tiles = this.find_free_tiles();
+
+	// Place the player as close to the center as possible
+	this.put_player(free_tiles, [49, 49]);
+
+	let pos, type;
+	for(let i = 0; i < num_predators; i++) {
+		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		type = random_int(0, 1 + game.humans_present);
+		this.mobmap[pos[1]][pos[0]] = new Predator(type, pos);
+		this.predators.push(this.mobmap[pos[1]][pos[0]]);
+	};
+
+	for(let i = 0; i < num_females; i++) {
+		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		this.mobmap[pos[1]][pos[0]] = new Female(1);
+	};
+
+	for(let i = 0; i < num_enemies; i++) {
+		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		type = random_element(this.enemies);
+		this.mobmap[pos[1]][pos[0]] = new Enemy(type);
+	};
+};
+
+
+Level.prototype.find_free_tiles = function() {
+	let free_tiles = [];
+	// Go through all fields in the map (disregarding the border) and check if
+	// it is non-blocking.
+	for(let y = 3; y < 97; y++) {
+		for(let x = 3; x < 97; x++) {
+			if(this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null)
+			{
+				free_tiles.push([x, y]);
+			}
+		}
+	}
+
+	return free_tiles;
+};
+
+
+// TODO: Try to find how this is done in the real game
+Level.prototype.put_player = function(free_tiles, pos) {
+	this.mobmap[pos[1]][pos[0]] = this.character;
+	this.character.tile = pos;
+
+	// DEBUG/TODO: all of the following is just some makeshift stuff
+	let tile_pos = free_tiles.indexOf(pos);
+	if(tile_pos === -1) {
+		this.map[pos[1]][pos[0]] = 74;
+	}
+	else {
+		free_tiles.splice(tile_pos, 1);
+	}
 };
 
 
@@ -199,11 +259,40 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 	const y = pos[1];
 
 	switch(dir) {
-		case SOUTH: return this.blocking[this.map[y+1][x]] === '0';
-		case NORTH: return this.blocking[this.map[y-1][x]] === '0';
-		case EAST: return this.blocking[this.map[y][x+1]] === '0';
-		case WEST: return this.blocking[this.map[y][x-1]] === '0';
-		default: return this.blocking[this.map[y][x]] === '0';
+		case SOUTH: return this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null;
+		case NORTH: return this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null;
+		case EAST: return this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null;
+		case WEST: return this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null;
+		default: return this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null;
+	}
+};
+
+
+Level.prototype.start_movement = function(dir) {
+	this.character.movement = dir;
+	const pos = this.character.tile;
+
+	switch(dir) {
+		case SOUTH:
+			this.character.rel_pos[1] += speed;
+			this.character.sprite = this.character.sprite_south;
+			this.mobmap[pos[1] + 1][pos[0]] = 1; // Block the position, the player wants to go, so no other predator will go there in the same moment
+			break;
+		case NORTH:
+			this.character.rel_pos[1] -= speed;
+			this.character.sprite = this.character.sprite_north;
+			this.mobmap[pos[1] - 1][pos[0]] = 1;
+			break;
+		case EAST:
+			this.character.rel_pos[0] += speed;
+			this.character.sprite = this.character.sprite_east;
+			this.mobmap[pos[1]][pos[0] + 1] = 1;
+			break;
+		case WEST:
+			this.character.rel_pos[0] -= speed;
+			this.character.sprite = this.character.sprite_west;
+			this.mobmap[pos[1]][pos[0] - 1] = 1;
+			break;
 	}
 };
 
@@ -252,4 +341,28 @@ function Predator(type, tile) {
 			this.scent = 150;
 			break;
 	}
+}
+
+
+function Female(species) {
+	this.has_offspring = false;
+
+	// TODO: Need the right coords
+	// TODO: sprites must be defined by species
+	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+	this.sprite_during = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]], true);
+	this.sprite_after = new Sprite('gfx/spec1.png', [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite = this.sprite_before;
+}
+
+
+function Enemy(species) {
+	this.lost = false;
+
+	// TODO: Need the right coords
+	// TODO: sprites must be defined by species
+	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+	this.sprite_boasting = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]], true);
+	this.sprite_after = new Sprite('gfx/spec1.png', [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite = this.sprite_before;
 }
