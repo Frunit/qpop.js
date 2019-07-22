@@ -290,9 +290,10 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.left_answer_offset = [0, 128];
 	this.right_answer_offset = [179, 128];
 
-	this.sprite = new Sprite('gfx/species.png', this.spec_dim, [0, 0], 2, this.spec_positions[image]);
+	this.sprite = new Sprite('gfx/species.png', this.spec_dim, [0, 0], this.spec_positions[image]);
 
 	this.clickareas = [];
+	this.timer = 0;
 }
 
 
@@ -380,8 +381,16 @@ Popup.prototype.render = function() {
 
 
 Popup.prototype.update = function(dt) {
-	this.sprite.update(dt);
 	this.handle_input(dt);
+
+	this.timer += dt;
+	if(this.timer < 0.1) {
+		return;
+	}
+
+	this.sprite.update(dt);
+
+	this.timer = 0;
 };
 
 

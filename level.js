@@ -217,10 +217,10 @@ function Character(species, tile) {
 
 	// TODO: sprites must be defined by species
 	this.sprite_still = new Sprite('gfx/spec1.png', [64, 64]);
-	this.sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], 9, [[0, 0], [64, 0], [128, 0], [64, 0]]);
-	this.sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], 9, [[512, 0], [576, 0], [0, 64], [64, 64]]);
-	this.sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], 9, [[0, 0], [64, 0], [128, 0], [64, 0]]);
-	this.sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], 9, [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+	this.sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]);
+	this.sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+	this.sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 	this.sprite = this.sprite_still;
 }
 
@@ -232,10 +232,10 @@ function Predator(type, tile) {
 
 	// TODO: sprites must be defined by species
 	this.sprite_still = new Sprite('gfx/pred1.png', [64, 64]);
-	this.sprite_north = new Sprite('gfx/pred1.png', [64, 64], [0, 0], 9, [[576, 0], [0, 64], [64, 64], [128, 64]]);
-	this.sprite_east = new Sprite('gfx/pred1.png', [64, 64], [64, 0], 9, [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite_south = new Sprite('gfx/pred1.png', [64, 64], [192, 64], 9, [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite_west = new Sprite('gfx/pred1.png', [64, 64], [320, 0], 9, [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_north = new Sprite('gfx/pred1.png', [64, 64], [0, 0], [[576, 0], [0, 64], [64, 64], [128, 64]]);
+	this.sprite_east = new Sprite('gfx/pred1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_south = new Sprite('gfx/pred1.png', [64, 64], [192, 64], [[0, 0], [64, 0], [128, 0], [192, 0]]);
+	this.sprite_west = new Sprite('gfx/pred1.png', [64, 64], [320, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 	this.sprite = this.sprite_still;
 
 	switch(type) {

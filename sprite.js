@@ -1,66 +1,42 @@
 'use strict';
-// https://github.com/jlongster/canvas-game-bootstrap
 
-function Sprite(url, size, offset=[0,0], speed=0, frames=[[0,0]], once=false, callback=null) {
+
+function Sprite(url, size, offset=[0,0], frames=[[0,0]], once=false, callback=null) {
 	this.pic = resources.get(url);
 	this.offset = offset;
 	this.size = size;
-	this.speed = speed;
-	this.active_speed = speed;
 	this.frames = frames;
 	this.once = once;
 	this.callback = callback;
-	this._index = 0;
-	this._last_frame = 0;
-	this.done = false;
+	this.idx = 0;
+	this.finished = false;
 }
 
 
-Sprite.prototype.update = function(dt) {
-	this._index += this.speed*dt;
+Sprite.prototype.update = function() {
+	if(!this.finished) {
+		this.idx++;
+	}
 };
 
 
 Sprite.prototype.reset = function() {
-	this._index = 0;
-};
-
-
-Sprite.prototype.stop = function() {
-	this.speed = 0;
-};
-
-
-Sprite.prototype.start = function() {
-	this.speed = this.active_speed;
+	this.idx = 0;
+	this.finished = false;
 };
 
 
 Sprite.prototype.is_new_frame = function() {
-	if(this.speed) {
-		return Math.floor(this._index) % this.frames.length !== this._last_frame;
-	}
-	return false;
+	return !this.finished || this.frames.length > 1;
 };
 
 
 Sprite.prototype.render = function(ctx, pos) {
-	let frame;
+	let real_idx = this.idx % this.frames.length;
+	let frame = this.frames[real_idx];
 
-	if(this.speed) {
-		const max = this.frames.length;
-		const idx = Math.floor(this._index);
-		frame = this.frames[idx % max];
-		if(idx % max !== this._last_frame) {
-			this._last_frame = idx % max;
-		}
-
-		if(this.once && idx >= max - 1) {
-			this.done = true;
-		}
-	}
-	else {
-		frame = this.frames[0];
+	if(this.once && real_idx === this.frames.length - 1) {
+		this.finished = true;
 	}
 
 	ctx.drawImage(this.pic,

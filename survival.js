@@ -169,7 +169,7 @@ Survival.prototype.draw_minimap = function() {
 				draw = true;
 				sym = 0;
 			}
-			else if(this.level.mobmap[real_x][real_y] !== null) {
+			else if(this.level.mobmap[real_y][real_x] !== null) {
 				draw = true;
 				sym = 3;
 			}
@@ -311,7 +311,6 @@ Survival.prototype.init_predator_movement = function(dt) {
 				predator.sprite = predator.sprite_east;
 				break;
 		}
-		predator.sprite.start();
 	}
 };
 
@@ -501,7 +500,6 @@ Survival.prototype.handle_input = function(dt) {
 		}
 
 		if(new_movement) {
-			this.level.character.sprite.start();
 			this.init_predator_movement(dt);
 			this.move_active = true;
 		}

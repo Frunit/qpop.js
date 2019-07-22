@@ -162,12 +162,12 @@ function Player(num) {
 	this.evolutionspunkte = 100;
 	this.total_punkte = 230;
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-	this.survival = { // TODO!!!
-		sprite_still: new Sprite('gfx/spriteanim.png', [64, 64], [0, 0]),
-		sprite_north: new Sprite('gfx/spriteanim.png', [64, 64], [512, 0], 10, [0, 1, 2, 1]),
-		sprite_east: new Sprite('gfx/spriteanim.png', [64, 64], [704, 0], 10, [0, 1, 2, 3]),
-		sprite_south: new Sprite('gfx/spriteanim.png', [64, 64], [320, 0], 10, [0, 1, 2, 1]),
-		sprite_west: new Sprite('gfx/spriteanim.png', [64, 64], [64, 0], 10, [0, 1, 2, 3]),
+	this.survival = { // TODO!!!  Sprite(url, size, offset=[0,0], frames=[[0,0]])
+		sprite_still: new Sprite('gfx/spriteanim.png', [64, 64]),
+		sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+		sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]);
+		sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [64, 0]]);
+		sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
 		sprite: null
 	};
 	this.survival.sprite = this.survival.sprite_still;

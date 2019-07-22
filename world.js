@@ -61,6 +61,7 @@ function World() {
 
 	this.clickareas = [];
 	this.rightclickareas = [];
+	this.timer = 0;
 
 	// [Ideal_Humid, Ideal_Temp] for Rangones, Blueleaf, ...
 	this.ideal = [[65, 60], [72, 50], [85, 90], [50, 30], [70, 75], [40, 40]];
@@ -228,18 +229,26 @@ World.prototype.render = function() {
 
 
 World.prototype.update = function(dt) {
+	this.handle_input(dt);
+	// TODO: All functions that act upon input that should not act when AI or animation is active, need respective checks in themselves! The check could be done here, but then option menus would be unresponsive.
+
+	if(this.ai_active) {
+		this.ai_step(dt);
+	}
+
+	this.timer += dt;
+	if(this.timer < 0.1) {
+		return;
+	}
+
 	if(this.animation) {
 		this.animation.update(dt);
 		if(this.animation.done) {
 			this.animation.callback();
 		}
 	}
-	else if(this.ai_active) {
-		this.ai_step(dt);
-	}
-	else {
-		this.handle_input(dt);
-	}
+
+	this.timer = 0;
 };
 
 
@@ -420,7 +429,7 @@ World.prototype.exec_catastrophe = function(type) {
 		game.world_map[y][x] = WM_CRATER;
 
 		// Big Explosion
-		this.animation = new Sprite('gfx/world.png', [48, 48], [0, 32], 5,
+		this.animation = new Sprite('gfx/world.png', [48, 48], [0, 32],
 		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0]],
 		true, () => this.catastrophe_finished());
 		break;
@@ -542,7 +551,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 	}
 
 	// TODO: Check if frames and speed are correct
-	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16], 5,
+	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
 };
@@ -579,7 +588,7 @@ World.prototype.fight = function(x, y) {
 
 	let winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player_num : game.map_positions[y][x];
 
-	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16], 5,
+	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.fight_end(winner, enemy, x, y));
 
@@ -742,6 +751,10 @@ World.prototype.ai = function() {
 
 
 World.prototype.ai_step = function(dt) {
+	if(this.animation) {
+		return;
+	}
+
 	this.ai_dt += dt;
 	if(this.ai_dt < this.ai_last_move + options.wm_ai_delay) {
 		return;
