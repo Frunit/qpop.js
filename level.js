@@ -178,20 +178,30 @@ Level.prototype.populate = function() {
 
 	let free_tiles = this.find_free_tiles();
 
-	// TODO: Predators may not be placed within 2 fields (dx or dy) of the starting position; Females and Enemies not within 3 fields
 	for(let i = 0; i < num_predators; i++) {
-		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		// Predators may not be placed with 2 fields of the player
+		do {
+			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		} while(Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
 		species = random_int(0, 1 + game.humans_present);
 		this.mobmap[pos[1]][pos[0]] = new Predator(species, pos);
 		this.predators.push(this.mobmap[pos[1]][pos[0]]);
 	};
 
 	for(let i = 0; i < num_females; i++) {
+		// Females may not be placed with 2 fields of the player
+		do {
+			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		this.mobmap[pos[1]][pos[0]] = new Female(1);
 	};
 
 	for(let i = 0; i < num_enemies; i++) {
+		// Enemies may not be placed with 2 fields of the player
+		do {
+			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		type = random_element(this.enemies);
 		this.mobmap[pos[1]][pos[0]] = new Enemy(type);
