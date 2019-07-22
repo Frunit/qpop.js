@@ -164,18 +164,20 @@ Level.prototype.populate = function() {
 	}
 
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
+	let pos, species;
+
+	// Place the player somewhere around the center
+	pos = random_element(this.find_free_player_tiles([44, 44], 3, 11));
+	this.mobmap[pos[1]][pos[0]] = this.character;
+	this.character.tile = pos;
 
 	let free_tiles = this.find_free_tiles();
 
-	// Place the player as close to the center as possible
-	this.put_player(free_tiles, [49, 49]);
-
 	// TODO: Predators may not be placed within 2 fields (dx or dy) of the starting position; Females and Enemies not within 3 fields
-	let pos, type;
 	for(let i = 0; i < num_predators; i++) {
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-		type = random_int(0, 1 + game.humans_present);
-		this.mobmap[pos[1]][pos[0]] = new Predator(type, pos);
+		species = random_int(0, 1 + game.humans_present);
+		this.mobmap[pos[1]][pos[0]] = new Predator(species, pos);
 		this.predators.push(this.mobmap[pos[1]][pos[0]]);
 	};
 
@@ -209,19 +211,38 @@ Level.prototype.find_free_tiles = function() {
 };
 
 
-// TODO: Try to find how this is done in the real game
-Level.prototype.put_player = function(free_tiles, pos) {
-	this.mobmap[pos[1]][pos[0]] = this.character;
-	this.character.tile = pos;
+Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
+	let left_counts = Array.from(Array(search_size), _ => Array(search_size).fill(0));
+	let good_positions = [];
+	let count, x, y;
 
-	// DEBUG/TODO: all of the following is just some makeshift stuff
-	let tile_pos = free_tiles.indexOf(pos);
-	if(tile_pos === -1) {
-		this.map[pos[1]][pos[0]] = 74;
+	for(y = 0; y < search_size; y++) {
+		for(x = 0; x < search_size; x++) {
+			if(this.blocking[this.map[y + pos[1]][x + pos[0]]] === '0' && this.mobmap[y + pos[1]][x + pos[0]] === null)
+			{
+				if(x > 0) {
+					count = left_counts[y][x-1] + 1;
+				}
+				else {
+					count = 1;
+				}
+				left_counts[y][x] = count;
+			}
+			else {
+				left_counts[y][x] = 0;
+			}
+		}
 	}
-	else {
-		free_tiles.splice(tile_pos, 1);
+
+	for(y = min_size-1; y < search_size; y++) {
+		for(x = min_size-1; x < search_size; x++) {
+			if(left_counts[y][x] >= min_size && left_counts[y-1][x] >= min_size && left_counts[y-2][x] >= min_size) {
+				good_positions.push([x-1, y-1]); // I want to have the center of the square
+			}
+		}
 	}
+
+	return good_positions;
 };
 
 
