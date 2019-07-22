@@ -166,10 +166,15 @@ Level.prototype.populate = function() {
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
 	let pos, species;
 
-	// Place the player somewhere around the center
+	// Place the player somewhere around the center. If no empty space is there, it will be made empty.
 	pos = random_element(this.find_free_player_tiles([44, 44], 3, 11));
-	this.mobmap[pos[1]][pos[0]] = this.character;
-	this.character.tile = pos;
+	if(pos === null) {
+		this.force_place_player([49, 49]);
+	}
+	else {
+		this.mobmap[pos[1]][pos[0]] = this.character;
+		this.character.tile = pos;
+	}
 
 	let free_tiles = this.find_free_tiles();
 
@@ -191,6 +196,19 @@ Level.prototype.populate = function() {
 		type = random_element(this.enemies);
 		this.mobmap[pos[1]][pos[0]] = new Enemy(type);
 	};
+};
+
+
+Level.prototype.force_place_player = function(pos) {
+	this.mobmap[pos[1]][pos[0]] = this.character;
+	this.character.tile = pos;
+
+	for(let y = pos[1] -1; y <= pos[1] + 1; y++) {
+		for(let x = pos[0] -1; x <= pos[0] + 1; x++) {
+			this.mobmap[y][x] = null;
+			this.map[y][x] = 74;  // TODO: Should probably use some random empty tiles
+		}
+	}
 };
 
 
