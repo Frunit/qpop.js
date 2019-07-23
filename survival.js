@@ -227,7 +227,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 		obj.rel_pos = [0, 0]
 		obj.last_movement = obj.movement;
 		obj.movement = 0;
-		obj.sprite = obj.sprite_still;
+		obj.sprite = new Sprite(obj.url, [64, 64], obj.anims.still.offset, obj.anims.still.frames);
 		this.move_active = false;
 	}
 };
@@ -305,22 +305,22 @@ Survival.prototype.init_predator_movement = function(dt) {
 		switch(predator.movement) {
 			case NORTH:
 				predator.rel_pos[1] -= speed;
-				predator.sprite = predator.sprite_north;
+				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.north.offset, predator.anims.north.frames);
 				this.level.mobmap[pos[1] - 1][pos[0]] = placeholder; // Block the spot on the map to prevent others from going there
 				break;
 			case SOUTH:
 				predator.rel_pos[1] += speed;
-				predator.sprite = predator.sprite_south;
+				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.south.offset, predator.anims.south.frames);
 				this.level.mobmap[pos[1] + 1][pos[0]] = placeholder;
 				break;
 			case WEST:
 				predator.rel_pos[0] -= speed;
-				predator.sprite = predator.sprite_west;
+				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.west.offset, predator.anims.west.frames);
 				this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 				break;
 			case EAST:
 				predator.rel_pos[0] += speed;
-				predator.sprite = predator.sprite_east;
+				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.east.offset, predator.anims.east.frames);
 				this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 				break;
 		}

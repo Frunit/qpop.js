@@ -327,22 +327,22 @@ Level.prototype.start_movement = function(dir, speed) {
 	switch(dir) {
 		case SOUTH:
 			this.character.rel_pos[1] += speed;
-			this.character.sprite = this.character.sprite_south;
+			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.south.offset, this.character.anims.south.frames);
 			this.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
 			break;
 		case NORTH:
 			this.character.rel_pos[1] -= speed;
-			this.character.sprite = this.character.sprite_north;
+			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.north.offset, this.character.anims.north.frames);
 			this.mobmap[pos[1] - 1][pos[0]] = placeholder;
 			break;
 		case EAST:
 			this.character.rel_pos[0] += speed;
-			this.character.sprite = this.character.sprite_east;
+			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.east.offset, this.character.anims.east.frames);
 			this.mobmap[pos[1]][pos[0] + 1] = placeholder;
 			break;
 		case WEST:
 			this.character.rel_pos[0] -= speed;
-			this.character.sprite = this.character.sprite_west;
+			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.west.offset, this.character.anims.west.frames);
 			this.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
 	}
@@ -357,13 +357,10 @@ function Character(species, tile) {
 	this.steps = 40 + game.current_player.iq * 10;
 	this.time = 0; // TODO: How much time do you have for one turn?
 
-	// TODO: sprites must be defined by species
-	this.sprite_still = new Sprite('gfx/spec1.png', [64, 64]);
-	this.sprite_north = new Sprite('gfx/spec1.png', [64, 64], [128, 64], [[0, 0], [64, 0], [128, 0], [64, 0]]);
-	this.sprite_east = new Sprite('gfx/spec1.png', [64, 64], [0, 0], [[512, 0], [576, 0], [0, 64], [64, 64]]);
-	this.sprite_south = new Sprite('gfx/spec1.png', [64, 64], [64, 0], [[64, 0], [0, 0], [128, 0], [0, 0]]);
-	this.sprite_west = new Sprite('gfx/spec1.png', [64, 64], [256, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite = this.sprite_still;
+	this.url = 'gfx/spec' + (species+1) + '.png';
+	this.anims = anims_players[species];
+
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.offset, this.anims.still.frames);
 }
 
 
@@ -372,30 +369,17 @@ function Predator(species, tile) {
 	this.tile = tile;
 	this.rel_pos = [0, 0];
 	this.movement = 0;       // current movement direction
-	this.last_movement = 0;  // last movement direction
+	this.last_movement = 0;  // last movement direction (important, because they can't move back)
 
-	// TODO: sprites must be defined by species
-	this.sprite_still = new Sprite('gfx/pred1.png', [64, 64]);
-	this.sprite_north = new Sprite('gfx/pred1.png', [64, 64], [0, 0], [[576, 0], [0, 64], [64, 64], [128, 64]]);
-	this.sprite_east = new Sprite('gfx/pred1.png', [64, 64], [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite_south = new Sprite('gfx/pred1.png', [64, 64], [192, 64], [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite_west = new Sprite('gfx/pred1.png', [64, 64], [320, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite = this.sprite_still;
+	this.url = 'gfx/pred' + (species+1) + '.png';
+	this.anims = anims_predators[species];
+	this.defeated = random_element(this.anims.defeated);
 
-	switch(species) {
-		case PRED_DINO:
-			this.attack = 250;
-			this.scent = 100;
-			break;
-		case PRED_MUSHROOM:
-			this.attack = 350;
-			this.scent = 70;
-			break;
-		case PRED_HUMAN:
-			this.attack = 150;
-			this.scent = 150;
-			break;
-	}
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.offset, this.anims.still.frames);
+
+	//             dino, mushroom, human
+	this.attack = [250 ,   350   ,  150][species];
+	this.scent =  [100 ,    70   ,  150][species];
 }
 
 
@@ -405,11 +389,10 @@ function Female(species, tile) {
 	this.rel_pos = [0, 0];
 	this.has_offspring = false;
 
-	// TODO: sprites must be defined by species
-	this.sprite_before = new Sprite('gfx/spec1.png', [64, 64], [0, 256], [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]]);
-	this.sprite_during = null;
-	this.sprite_after = new Sprite('gfx/spec1.png', [64, 64], [256, 256], [[0, 0], [64, 0], [0, 0], [128, 0]]);
-	this.sprite = this.sprite_before;
+	this.url = 'gfx/spec' + (species+1) + '.png';
+	this.anims = anims_players[species];
+
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.female.offset, this.anims.female.frames);
 }
 
 
@@ -419,9 +402,8 @@ function Enemy(species, tile) {
 	this.rel_pos = [0, 0];
 	this.lost = false;
 
-	// TODO: Need the right coords
-	// TODO: sprites must be defined by species
-	this.sprite_before = new Sprite('gfx/enemies.png', [64, 64], [0, 0], [[0, 0], [320, 0], [384, 0], [0, 0]], true);
-	this.sprite_after = new Sprite('gfx/enemies.png', [64, 0], [[0, 0], [64, 0], [128, 0], [192, 0]]);
-	this.sprite = this.sprite_before;
+	this.url = 'gfx/enemies.png';
+	this.anims = anims_players[species];
+
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_still.offset, this.anims.enem_still.frames);
 }
