@@ -173,6 +173,36 @@ Survival.prototype.render = function() {
 };
 
 
+Survival.prototype.start_movement = function(dir, speed) {
+	this.level.character.movement = dir;
+	const char = this.level.character;
+	const pos = char.tile;
+
+	switch(dir) {
+		case SOUTH:
+			char.rel_pos[1] += speed;
+			char.sprite = new Sprite(char.url, [64, 64], char.anims.south.offset, char.anims.south.frames);
+			this.level.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
+			break;
+		case NORTH:
+			char.rel_pos[1] -= speed;
+			char.sprite = new Sprite(char.url, [64, 64], char.anims.north.offset, char.anims.north.frames);
+			this.level.mobmap[pos[1] - 1][pos[0]] = placeholder;
+			break;
+		case EAST:
+			char.rel_pos[0] += speed;
+			char.sprite = new Sprite(char.url, [64, 64], char.anims.east.offset, char.anims.east.frames);
+			this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
+			break;
+		case WEST:
+			char.rel_pos[0] -= speed;
+			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.offset, char.anims.west.frames);
+			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
+			break;
+	}
+};
+
+
 Survival.prototype.resolve_movement = function(obj, dt) {
 	const speed = options.surv_move_speed * dt;
 	let finished_move = false;
@@ -475,7 +505,7 @@ Survival.prototype.handle_input = function(dt) {
 		if(input.isDown('DOWN')) {
 			input.reset('DOWN');
 			if(this.level.is_unblocked(this.level.character.tile, SOUTH)) {
-				this.level.start_movement(SOUTH, speed);
+				this.start_movement(SOUTH, speed);
 				new_movement = true;
 			}
 		}
@@ -483,7 +513,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('UP')) {
 			input.reset('UP');
 			if(this.level.is_unblocked(this.level.character.tile, NORTH)) {
-				this.level.start_movement(NORTH, speed);
+				this.start_movement(NORTH, speed);
 				new_movement = true;
 			}
 		}
@@ -491,7 +521,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('LEFT')) {
 			input.reset('LEFT');
 			if(this.level.is_unblocked(this.level.character.tile, WEST)) {
-				this.level.start_movement(WEST, speed);
+				this.start_movement(WEST, speed);
 				new_movement = true;
 			}
 		}
@@ -499,7 +529,7 @@ Survival.prototype.handle_input = function(dt) {
 		else if(input.isDown('RIGHT')) {
 			input.reset('RIGHT');
 			if(this.level.is_unblocked(this.level.character.tile, EAST)) {
-				this.level.start_movement(EAST, speed);
+				this.start_movement(EAST, speed);
 				new_movement = true;
 			}
 		}

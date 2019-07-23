@@ -320,35 +320,6 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 };
 
 
-Level.prototype.start_movement = function(dir, speed) {
-	this.character.movement = dir;
-	const pos = this.character.tile;
-
-	switch(dir) {
-		case SOUTH:
-			this.character.rel_pos[1] += speed;
-			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.south.offset, this.character.anims.south.frames);
-			this.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
-			break;
-		case NORTH:
-			this.character.rel_pos[1] -= speed;
-			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.north.offset, this.character.anims.north.frames);
-			this.mobmap[pos[1] - 1][pos[0]] = placeholder;
-			break;
-		case EAST:
-			this.character.rel_pos[0] += speed;
-			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.east.offset, this.character.anims.east.frames);
-			this.mobmap[pos[1]][pos[0] + 1] = placeholder;
-			break;
-		case WEST:
-			this.character.rel_pos[0] -= speed;
-			this.character.sprite = new Sprite(this.character.url, [64, 64], this.character.anims.west.offset, this.character.anims.west.frames);
-			this.mobmap[pos[1]][pos[0] - 1] = placeholder;
-			break;
-	}
-};
-
-
 function Character(species, tile) {
 	this.type = SM_PLAYER;
 	this.tile = tile;
