@@ -41,9 +41,9 @@ function Survival() {
 	this.ai_dt = 0;
 	this.ai_own_individuals = [];
 
-	this.fight_active = false;
-	this.fight_animation = null;
-	this.fight_pos = [0, 0];
+	this.action_active = false;
+	this.action_sprite = null;
+	this.action_tile = [0, 0];
 
 	this.move_active = false;
 
@@ -173,10 +173,39 @@ Survival.prototype.render = function() {
 };
 
 
-Survival.prototype.start_movement = function(dir, speed) {
+Survival.prototype.finish_movement = function() {
+	const char = this.level.character;
+	char.rel_pos = [0, 0];
+
+	const surroundings = this.get_surroundings();
+	if(surroundings.length) {
+		this.move_active = false;
+		this.action_active = true;
+		// TODO: Initiate action :)
+	}
+
+	this.test_movement_input();
+
+	// TODO: Test for quicksand and electro plant
+
+	// Nothing happened, end movement
+	char.movement = 0;
+	char.sprite = new Sprite(obj.url, [64, 64], char.anims.still.offset, char.anims.still.frames);
+	this.move_active = false;
+};
+
+
+Survival.prototype.get_surroundings = function() {
+	// TODO!!!
+	return [];
+};
+
+
+Survival.prototype.start_movement = function(dir, dt) {
 	this.level.character.movement = dir;
 	const char = this.level.character;
 	const pos = char.tile;
+	const speed = options.surv_move_speed * dt;
 
 	switch(dir) {
 		case SOUTH:
@@ -199,7 +228,15 @@ Survival.prototype.start_movement = function(dir, speed) {
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.offset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
+		/*
+		case 0: // Feeding/waiting
+			char.sprite = new Sprite(char.url, [64, 64], char.anims.feeding.offset, char.anims.feeding.frames);
+			break;
+		*/
 	}
+
+	this.start_predator_movement(dt);
+	this.move_active = true;
 };
 
 
@@ -254,16 +291,20 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	}
 
 	if(finished_move) {
-		obj.rel_pos = [0, 0]
-		obj.last_movement = obj.movement;
-		obj.movement = 0;
-		obj.sprite = new Sprite(obj.url, [64, 64], obj.anims.still.offset, obj.anims.still.frames);
-		this.move_active = false;
+		if(obj.type === SM_PLAYER) {
+			this.finish_movement();
+		}
+		else {
+			obj.rel_pos = [0, 0]
+			obj.last_movement = obj.movement;
+			obj.movement = 0;
+			obj.sprite = new Sprite(obj.url, [64, 64], obj.anims.still.offset, obj.anims.still.frames);
+		}
 	}
 };
 
 
-Survival.prototype.init_predator_movement = function(dt) {
+Survival.prototype.start_predator_movement = function(dt) {
 	const player_pos = this.level.character.tile;
 	const speed = options.surv_move_speed * dt;
 	const evasion = game.current_player.stats[ATT_CAMOUFLAGE] * 4 + game.current_player.stats[ATT_SPEED] * 2 +  game.current_player.stats[ATT_INTELLIGENCE];
@@ -489,55 +530,51 @@ Survival.prototype.handle_input = function(dt) {
 		}
 	}
 
-	if(!this.move_active) {
-
-		let new_movement = false;
-		const speed = options.surv_move_speed * dt;
-
-		// TODO: Player movement must start after predator movement, because a
-		// predator may attack the player in which case the player may not move.
-
+	if(!this.move_active && !this.action_active) {
 		if(input.isDown('ENTER')) {
 			input.reset('ENTER');
 			this.next();
 		}
 
-		if(input.isDown('DOWN')) {
-			input.reset('DOWN');
-			if(this.level.is_unblocked(this.level.character.tile, SOUTH)) {
-				this.start_movement(SOUTH, speed);
-				new_movement = true;
-			}
-		}
+		this.test_movement_input();
+	}
+};
 
-		else if(input.isDown('UP')) {
-			input.reset('UP');
-			if(this.level.is_unblocked(this.level.character.tile, NORTH)) {
-				this.start_movement(NORTH, speed);
-				new_movement = true;
-			}
-		}
 
-		else if(input.isDown('LEFT')) {
-			input.reset('LEFT');
-			if(this.level.is_unblocked(this.level.character.tile, WEST)) {
-				this.start_movement(WEST, speed);
-				new_movement = true;
-			}
-		}
+Survival.prototype.test_movement_input() {
+	// TODO: Also test for SPACE for feeding (What does space do when standing on inedible ground?)
 
-		else if(input.isDown('RIGHT')) {
-			input.reset('RIGHT');
-			if(this.level.is_unblocked(this.level.character.tile, EAST)) {
-				this.start_movement(EAST, speed);
-				new_movement = true;
-			}
+	if(input.isDown('DOWN')) {
+		//input.reset('DOWN');
+		if(this.level.is_unblocked(this.level.character.tile, SOUTH)) {
+			this.start_movement(SOUTH, dt);
 		}
+	}
 
-		if(new_movement) {
-			this.init_predator_movement(dt);
-			this.move_active = true;
+	else if(input.isDown('UP')) {
+		//input.reset('UP');
+		if(this.level.is_unblocked(this.level.character.tile, NORTH)) {
+			this.start_movement(NORTH, dt);
 		}
+	}
+
+	else if(input.isDown('LEFT')) {
+		//input.reset('LEFT');
+		if(this.level.is_unblocked(this.level.character.tile, WEST)) {
+			this.start_movement(WEST, dt);
+		}
+	}
+
+	else if(input.isDown('RIGHT')) {
+		//input.reset('RIGHT');
+		if(this.level.is_unblocked(this.level.character.tile, EAST)) {
+			this.start_movement(EAST, dt);
+		}
+	}
+
+	else if(input.isDown('SPACE')) {
+		//input.reset('SPACE');
+		this.start_movement(0, dt);
 	}
 };
 
