@@ -158,9 +158,9 @@ function Player(num) {
 	this.is_dead = false;
 	this.eaten = 0;
 	this.experience = 0;
-	this.gestorben = 0;
-	this.evolutionspunkte = 100;
-	this.total_punkte = 230;
+	this.deaths = 0;
+	this.evo_score = 100;
+	this.total_score = 230;
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 };
 

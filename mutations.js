@@ -68,7 +68,7 @@ Mutations.prototype.next_player = function() {
 	}
 	else {
 		this.draw_avatar();
-		this.draw_evopunkte();
+		this.draw_evo_score();
 		for(let i = 0; i < 13; i++) {
 			this.draw_bar(i);
 		}
@@ -157,7 +157,7 @@ Mutations.prototype.redraw = function() {
 
 	write_text(lang.evo_points, this.evo_pts_text_offset, 'white', 'black', 'left');
 
-	this.draw_evopunkte();
+	this.draw_evo_score();
 };
 
 
@@ -251,7 +251,7 @@ Mutations.prototype.draw_bar = function(num) {
 };
 
 
-Mutations.prototype.draw_evopunkte = function() {
+Mutations.prototype.draw_evo_score = function() {
 	// Number
 	ctx.drawImage(this.bg_pic,
 		this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
@@ -259,7 +259,7 @@ Mutations.prototype.draw_evopunkte = function() {
 		this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
 		this.evo_pts_numdel_dim[0], this.evo_pts_numdel_dim[1]);
 
-	write_text(game.current_player.evolutionspunkte, this.evo_pts_num_offset, 'white', 'black', 'left');
+	write_text(game.current_player.evo_score, this.evo_pts_num_offset, 'white', 'black', 'left');
 
 	// Bar
 	ctx.drawImage(this.pics,
@@ -268,7 +268,7 @@ Mutations.prototype.draw_evopunkte = function() {
 		this.evobar_offset[0], this.evobar_offset[1],
 		this.bar_dim[0], this.bar_dim[1]);
 
-	let length = game.current_player.evolutionspunkte * 3 - 3;
+	let length = game.current_player.evo_score * 3 - 3;
 	// Main bar
 	if(length) {
 		ctx.drawImage(this.pics,
@@ -380,25 +380,25 @@ Mutations.prototype.add = function(attribute, value) {
 		}
 
 		if(value !== 0) {
-			game.current_player.evolutionspunkte -= value;
+			game.current_player.evo_score -= value;
 			this.stats[attribute] += value;
 		}
 	}
-	else if(game.current_player.evolutionspunkte) {
-		if(value > game.current_player.evolutionspunkte) {
-			value = game.current_player.evolutionspunkte;
+	else if(game.current_player.evo_score) {
+		if(value > game.current_player.evo_score) {
+			value = game.current_player.evo_score;
 		}
 
 		if(this.stats[attribute] + value > 100) {
 			value = 100 - this.stats[attribute];
 		}
 
-		game.current_player.evolutionspunkte -= value;
+		game.current_player.evo_score -= value;
 		this.stats[attribute] += value;
 	}
 
 	this.draw_bar(attribute);
-	this.draw_evopunkte();
+	this.draw_evo_score();
 };
 
 
@@ -428,7 +428,7 @@ Mutations.prototype.ai = function() {
 		}
 	}
 
-	for(let i = 0; i < game.current_player.evolutionspunkte; i++) {
+	for(let i = 0; i < game.current_player.evo_score; i++) {
 		if(choosable_plants.length === 0 && choosable_nonplants.length === 0) {
 			return;  // All values are at 100 already
 		}
@@ -451,7 +451,7 @@ Mutations.prototype.ai = function() {
 		}
 	}
 
-	game.current_player.evolutionspunkte = 0;
+	game.current_player.evo_score = 0;
 	this.stats = game.current_player.stats;
 
 	this.redraw();
@@ -461,7 +461,7 @@ Mutations.prototype.ai = function() {
 Mutations.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
-	if(game.current_player.evolutionspunkte > 0) {
+	if(game.current_player.evo_score > 0) {
 		// TODO: Which image? Which answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}

@@ -168,13 +168,13 @@ Ranking.prototype.redraw = function() {
 			ctx.textAlign = 'center';
 			ctx.fillStyle = '#ffffff';
 			ctx.fillText(game.players[i].individuals, this.text_spec_offset[0] + i*this.sign_dx, this.text_spec_offset[1]-1);
-			ctx.fillText(game.players[i].evolutionspunkte, this.text_dna_offset[0] + i*this.sign_dx, this.text_dna_offset[1]-1);
-			ctx.fillText(game.players[i].total_punkte, this.text_total_offset[0] + i*this.sign_dx, this.text_total_offset[1]-1);
+			ctx.fillText(game.players[i].evo_score, this.text_dna_offset[0] + i*this.sign_dx, this.text_dna_offset[1]-1);
+			ctx.fillText(game.players[i].total_score, this.text_total_offset[0] + i*this.sign_dx, this.text_total_offset[1]-1);
 
 			ctx.fillStyle = '#000000';
 			ctx.fillText(game.players[i].individuals, this.text_spec_offset[0] + i*this.sign_dx, this.text_spec_offset[1]);
-			ctx.fillText(game.players[i].evolutionspunkte, this.text_dna_offset[0] + i*this.sign_dx, this.text_dna_offset[1]);
-			ctx.fillText(game.players[i].total_punkte, this.text_total_offset[0] + i*this.sign_dx, this.text_total_offset[1]);
+			ctx.fillText(game.players[i].evo_score, this.text_dna_offset[0] + i*this.sign_dx, this.text_dna_offset[1]);
+			ctx.fillText(game.players[i].total_score, this.text_total_offset[0] + i*this.sign_dx, this.text_total_offset[1]);
 			ctx.restore();
 		}
 	}
