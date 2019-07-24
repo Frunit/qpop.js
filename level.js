@@ -168,15 +168,8 @@ Level.prototype.populate = function() {
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
 	let pos, species;
 
-	// Place the player somewhere around the center. If no empty space is there, it will be made empty.
-	pos = random_element(this.find_free_player_tiles([44, 44], 3, 11));
-	if(pos === null) {
-		this.force_place_player([49, 49]);
-	}
-	else {
-		this.mobmap[pos[1]][pos[0]] = this.character;
-		this.character.tile = pos;
-	}
+	// Place the player somewhere around the center
+	this.place_player([49, 49]);
 
 	let free_tiles = this.find_free_tiles();
 
@@ -211,15 +204,24 @@ Level.prototype.populate = function() {
 };
 
 
-Level.prototype.force_place_player = function(pos) {
-	this.mobmap[pos[1]][pos[0]] = this.character;
-	this.character.tile = pos;
+Level.prototype.place_player = function(ideal_pos) {
+	// Place the player somewhere around the ideal position. If there is no empty space, it will be made empty.
 
-	for(let y = pos[1] -1; y <= pos[1] + 1; y++) {
-		for(let x = pos[0] -1; x <= pos[0] + 1; x++) {
-			this.mobmap[y][x] = null;
-			this.map[y][x] = 74;  // TODO: Should probably use some random empty tiles
+	const pos = random_element(this.find_free_player_tiles([ideal_pos[0] - 5, ideal_pos[1] - 5], 3, 11));
+	if(pos === null) {
+		this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
+		this.character.tile = ideal_pos;
+
+		for(let y = ideal_pos[1] -1; y <= ideal_pos[1] + 1; y++) {
+			for(let x = ideal_pos[0] -1; x <= ideal_pos[0] + 1; x++) {
+				this.mobmap[y][x] = null;
+				this.map[y][x] = 74;  // TODO: Should use some random empty tiles
+			}
 		}
+	}
+	else {
+		this.mobmap[pos[1]][pos[0]] = this.character;
+		this.character.tile = pos;
 	}
 };
 
@@ -325,17 +327,19 @@ function Character(species, tile) {
 	this.tile = tile;
 	this.rel_pos = [0, 0];
 	this.movement = 0;
+	this.invincible = false;
 	this.steps = 40 + game.current_player.iq * 10;
-	this.time = 0; // TODO: How much time do you have for one turn?
+	this.time = 2000; // ms per turn TODO: Is this correct?
 
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.offset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.soffset, this.anims.still.frames);
 }
 
 
 function Predator(species, tile) {
+	species = 0; // DEBUG
 	this.type = SM_PREDATOR;
 	this.tile = tile;
 	this.rel_pos = [0, 0];
@@ -346,7 +350,7 @@ function Predator(species, tile) {
 	this.anims = anims_predators[species];
 	this.defeated = random_element(this.anims.defeated);
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.offset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.soffset, this.anims.still.frames);
 
 	//             dino, mushroom, human
 	this.attack = [250 ,   350   ,  150][species];
@@ -355,6 +359,7 @@ function Predator(species, tile) {
 
 
 function Female(species, tile) {
+	species = 0; // DEBUG
 	this.type = SM_FEMALE;
 	this.tile = tile;
 	this.rel_pos = [0, 0];
@@ -363,11 +368,12 @@ function Female(species, tile) {
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.female.offset, this.anims.female.frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.female.soffset, this.anims.female.frames);
 }
 
 
 function Enemy(species, tile) {
+	species = 0; // DEBUG
 	this.type = SM_ENEMY;
 	this.tile = tile;
 	this.rel_pos = [0, 0];
@@ -376,5 +382,5 @@ function Enemy(species, tile) {
 	this.url = 'gfx/enemies.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_still.offset, this.anims.enem_still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }

@@ -291,6 +291,7 @@ let game = new Game();
 resources.load([
 	'gfx/dummy_intro.png',
 	'gfx/init.png',
+	'gfx/clouds.png',
 	'gfx/enemies.png',
 	'gfx/spec1.png',
 	'gfx/pred1.png',

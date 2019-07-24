@@ -51,6 +51,7 @@ const SM_PLAYER = 1;
 const SM_PREDATOR = 2;
 const SM_ENEMY = 3;
 const SM_FEMALE = 4;
+const SM_UNRESPONSIVE = 5; // For defeated entities, offspring, etc.
 
 const placeholder = {
 	type: SM_PLACEHOLDER

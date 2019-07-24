@@ -1,397 +1,397 @@
 const anims_players = [
 	{   // Purplus
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [128, 64],
+			soffset: [128, 64],
 			frames: [[0, 0], [64, 0], [128, 0], [64, 0]],
 		},
 		south: {
-			offset: [64, 0],
+			soffset: [64, 0],
 			frames: [[64, 0], [0, 0], [128, 0], [0, 0]],
 		},
 		east: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[512, 0], [576, 0], [0, 64], [64, 64]],
 		},
 		west: {
-			offset: [256, 0],
+			soffset: [256, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		/*feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]], // 11232323
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]], //
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]], // 123232323232
 		},*/
 		female: {
-			offset: [0, 256],
+			soffset: [0, 256],
 			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]],
 		},
 		offspring: {
-			offset: [256, 256],
+			soffset: [256, 256],
 			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [128, 0], [128, 0], [0, 0], [0, 0], [128, 0], [128, 0]],
 		},
 		/*quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]], // 1212121212121212
 		},*/
 		enem_still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		enem_boasting: {
-			offset: [320, 0],
+			soffset: [320, 0],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 0],
+			soffset: [64, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},
 	/*{   // Kiwiopteryx
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		female: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		offspring: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		enem_still: {
-			offset: [0, 64],
+			soffset: [0, 64],
 			frames: [[0, 0]],
 		},
 		enem_boasting: {
-			offset: [320, 64],
+			soffset: [320, 64],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 64],
+			soffset: [64, 64],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},
 	{   // Pesciodyphus
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		female: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		offspring: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		enem_still: {
-			offset: [0, 128],
+			soffset: [0, 128],
 			frames: [[0, 0]],
 		},
 		enem_boasting: {
-			offset: [320, 128],
+			soffset: [320, 128],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 128],
+			soffset: [64, 128],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},
 	{   // Isnobug
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		female: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		offspring: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		enem_still: {
-			offset: [0, 192],
+			soffset: [0, 192],
 			frames: [[0, 0]],
 		},
 		enem_boasting: {
-			offset: [320, 192],
+			soffset: [320, 192],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 192],
+			soffset: [64, 192],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},
 	{   // Amorph
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		female: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		offspring: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		enem_boasting: {
-			offset: [0, 256],
+			soffset: [0, 256],
 			frames: [[0, 0]],
 		},
 		enem_still: {
-			offset: [320, 256],
+			soffset: [320, 256],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 256],
+			soffset: [64, 256],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},
 	{   // Chuck Berry
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		feeding: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		power_food: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		poisoned: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		female: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		offspring: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		quicksand: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		zapped: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		enem_still: {
-			offset: [0, 320],
+			soffset: [0, 320],
 			frames: [[0, 0]],
 		},
 		enem_boasting: {
-			offset: [320, 320],
+			soffset: [320, 320],
 			frames: [[0, 0], [0, 64]],
 		},
 		enem_defeated: {
-			offset: [64, 320],
+			soffset: [64, 320],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 	},*/
@@ -400,134 +400,161 @@ const anims_players = [
 const anims_predators = [
 	{   // Dino
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[576, 0], [0, 64], [64, 64], [128, 64]],
 		},
 		south: {
-			offset: [192, 64],
+			soffset: [192, 64],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		east: {
-			offset: [64, 0],
+			soffset: [64, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		west: {
-			offset: [320, 0],
+			soffset: [320, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		attack: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[128, 64], [0, 192], [64, 192], [128, 192]],  // N E S W
 		},
 		winner: {
-			offset: [0, 64],
+			soffset: [0, 64],
 			frames: [[448, 0], [512, 0], [576, 0], [0, 64], [576, 0]],
 		},
 		defeated: [
 			{  // Stars
-				offset: [64, 128],
+				soffset: [64, 128],
 				frames: [[0, 0], [0, 64], [0, 128], [0, 192]],
 			},
 			{  // Crying
-				offset: [320, 128],
+				soffset: [320, 128],
 				frames: [[0, 0], [0, 64], [0, 128], [0, 192]],
 			},
 			{  // Skeleton
-				offset: [576, 128],
+				soffset: [576, 128],
 				frames: [[0, 0]],
 			},
 		],
 	},
 	/*{   // Mushroom
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		attack: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		defeated: [
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 		],
 	},
 	{   // Human
 		still: {
-			offset: [0, 0],
+			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		south: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		east: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		west: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		attack: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		winner: {
-			offset: [, ],
+			soffset: [, ],
 			frames: [[, ]],
 		},
 		defeated: [
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 			{
-				offset: [, ],
+				soffset: [, ],
 				frames: [[, ]],
 			},
 		],
 	},*/
 ];
+
+const anims_clouds = {
+	fight_hor: {
+		size: [100, 64],
+		offset: [14, 0],
+		soffset: [0, 0],
+		frames: [[100, 0], [200, 0], [300, 0], [0, 64], [0, 0], [100, 0], [200, 0], [300, 0], [0, 64], [0, 0], [100, 64], [200, 64]], // 234512345167
+	},
+	fight_vert: {
+		size: [64, 100],
+		offset: [0, 14],
+		soffset: [0, 128],
+		frames: [[64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [320, 0], [384, 0]], // 234512345167
+	},
+	love_hor: {
+		size: [100, 64],
+		offset: [14, 0],
+		soffset: [0, 228],
+		frames: [[100, 0], [200, 0], [300, 0], [0, 64], [0, 0], [100, 0], [200, 0], [300, 0], [0, 64], [0, 0], [100, 64], [200, 64]], // 234512345167
+	},
+	love_vert: {
+		size: [64, 100],
+		offset: [0, 14],
+		soffset: [0, 356],
+		frames: [[64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [320, 0], [384, 0]], // 234512345167
+	},
+};
