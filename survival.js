@@ -150,8 +150,7 @@ Survival.prototype.redraw = function() {
 	this.draw_time();
 
 	// Symbols
-	// TODO: one or more own functions for the symbols
-
+	this.draw_symbols();
 };
 
 
