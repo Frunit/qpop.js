@@ -1,3 +1,5 @@
+'use strict'
+
 const anims_players = [
 	{   // Purplus
 		still: {

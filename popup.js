@@ -1,3 +1,5 @@
+'use strict'
+
 function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.line_height = 18;
 	this.max_text_width = 260;
