@@ -16,6 +16,8 @@ function Survival() {
 	this.time_dim = [122, 25];
 	this.steps_dim = [122, 25];
 	this.icon_dim = [20, 20];
+	this.minimap_dim = [168, 168];
+	this.minimap_sym_dim = [8, 8];
 
 	this.camera_offset = [6, 26];
 	this.left_rect_offset = [0, 20];
@@ -28,14 +30,21 @@ function Survival() {
 	this.sym_food_offset = [465, 286];
 	this.sym_love_offset = [465, 347];
 	this.sym_dead_offset = [465, 408];
+	this.minimap_offset = [465, 26];
+	this.minimap_sym_soffset = [0, 16];
 
 	this.sym_food_soffset = [0, 0];
 	this.sym_love_soffset = [16, 0];
 	this.sym_dead_soffset = [32, 0];
 	this.icon_steps_soffset = [48, 0];
 	this.icon_time_soffset = [68, 0];
+	this.minispec_soffset = [0, 24];
+
 	this.icon_dy = 25;
 	this.food_dx = 8;
+
+	this.minimap_width = 21;
+	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
 	// CONST_END
 
 	this.ai_active = false;
@@ -140,6 +149,85 @@ Survival.prototype.redraw = function() {
 	// Symbols
 	// TODO: one or more own functions for the symbols
 
+};
+
+
+Survival.prototype.draw_minimap = function() {
+	draw_black_rect(this.minimap_offset, this.minimap_dim, '#000000');
+
+	const MM_PLAYER = 0;
+	const MM_FOOD = 1;
+	const MM_LOVE = 2;
+	const MM_PREDATOR = 3;
+	const MM_ENEMY = 4;
+
+	const range = (game.current_player.stats[ATT_PERCEPTION] * 7 + game.current_player.stats[ATT_INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
+	let draw = false;
+	let sym, real_x, real_y, dist, threshold;
+
+	for(let y = -range; y < range; y++) {
+		real_y = this.level.character.tile[1] + y;
+		for(let x = -range; x < range; x++) {
+			real_x = this.level.character.tile[0] + x;
+
+			// If the range is too low, don't show anything here
+			if(range <= Math.sqrt(y**2 + x**2) * 10 - 30) {
+				continue;
+			}
+
+			draw = false;
+			if(x === 0 && y === 0) {
+				draw = true;
+				sym = MM_PLAYER;
+			}
+			else if(this.level.mobmap[real_y][real_x] !== null) {
+				switch(this.level.mobmap[real_y][real_x].type) {
+					case SM_PREDATOR:
+						draw = true;
+						sym = MM_PREDATOR;
+						break;
+					case SM_ENEMY:
+						draw = true;
+						sym = MM_ENEMY;
+						break;
+					case SM_FEMALE:
+						draw = true;
+						sym = MM_LOVE;
+						break;
+				}
+			}
+			else if(this.level.map[real_y][real_x] < 36) {
+				switch(this.level.map[real_y][real_x] % 6) {
+					case 3:
+						threshold = 75;
+						break;
+					case 4:
+						threshold = 50;
+						break;
+					case 5:
+						threshold = 25;
+						break;
+					default:
+						threshold = 110;
+				}
+
+				if(game.current_player.stats[Math.floor(this.level.map[real_y][real_x] / 6)] > threshold) {
+					draw = true;
+					sym = MM_FOOD;
+				}
+			}
+
+			if(draw) {
+				ctx.drawImage(this.gui_pics,
+					this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
+					this.minimap_sym_soffset[1],
+					this.minimap_sym_dim[0], this.minimap_sym_dim[1],
+					this.minimap_offset[0] + (this.minimap_center + x) * this.minimap_sym_dim[0],
+					this.minimap_offset[1] + (this.minimap_center + y) * this.minimap_sym_dim[1],
+					this.minimap_sym_dim[0], this.minimap_sym_dim[1]);
+			}
+		}
+	}
 };
 
 
