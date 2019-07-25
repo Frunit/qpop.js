@@ -112,7 +112,7 @@ function Feeding(character, map, callback) {
 
 	this.tiles = [[this.character.tile]];
 
-	this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].feeding, soffset, anims_players[character.species].feeding.frames, true);
+	this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
 }
 
 

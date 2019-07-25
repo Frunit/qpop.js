@@ -319,6 +319,7 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 
 
 function Character(species, tile) {
+	species = 0; // DEBUG
 	this.type = SM_PLAYER;
 	this.tile = tile;
 	this.species = species;
