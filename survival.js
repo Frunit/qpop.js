@@ -2,7 +2,6 @@
 
 function Survival() {
 	this.bg_pic = resources.get('gfx/dark_bg.png');
-	//this.tiles_pics = resources.get('gfx/back_tiles.png');
 	this.gui_pics = resources.get('gfx/survival_gui.png');
 
 	// CONST_START
@@ -46,6 +45,8 @@ function Survival() {
 
 	this.minimap_width = 21;
 	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
+
+	this.eating_div = 37;
 	// CONST_END
 
 	this.ai_active = false;
@@ -71,6 +72,11 @@ function Survival() {
 
 
 Survival.prototype.initialize = function() {
+	game.current_player.loved = 0;
+	game.current_player.eaten = 0;
+	game.current_player.experience = 0;
+	game.current_player.deaths = 0;
+
 	if(game.current_player.type === COMPUTER) {
 		//this.ai();
 	}
@@ -270,7 +276,7 @@ Survival.prototype.draw_symbols = function() {
 		w, h);
 
 	// Food
-	for(let i = 0; i < Math.floor(game.current_player.eaten / 37); i++){
+	for(let i = 0; i < Math.floor(game.current_player.eaten / this.eating_div); i++){
 		ctx.drawImage(this.gui_pics,
 			this.sym_food_soffset[0], this.sym_food_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
@@ -824,15 +830,49 @@ Survival.prototype.test_movement_input = function() {
 };
 
 
-Survival.prototype.next = function() {
-	draw_rect(this.next_offset, this.next_dim);
+Survival.prototype.calc_outcome = function() {
+	let death_prob = game.current_player.deaths * 0.05;
+	if(game.current_player.eaten < 20 * this.eating_div) {
+		death_prob += (20 * this.eating_div - game.current_player.eaten) * 0.05 / this.eating_div;
+	}
+	if(death_prob > 0.9) {
+		death_prob = 0.9;
+	}
 
-	// TODO: Test if movement points left
-	// TODO: Run calculations on outcome. Test if player is still alive.
-	game.next_stage();
+	// TODO: Go through each own individual on the world map and if Math.random < death_prob, kill the individual
+
+	let loved = game.current_player.loved;
+	// A little bonus if you have eaten alot
+	if(game.current_player.eaten >= 20 * this.eating_div) {
+		loved += Math.floor((game.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
+	}
+
+	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATT_REPRODUCTION] / 20);
+	if(game.current_player.toplace > 20) {
+		game.current_player.toplace = 20;
+	}
+	else if(game.current_player.toplace < loved) {
+		game.current_player.toplace = loved;
+	}
 };
 
 
-Survival.prototype.next_player = function() {
-	// TODO: Next player
+Survival.prototype.next = function() {
+	draw_rect(this.next_offset, this.next_dim);
+
+	if(this.level.character.steps > 0) {
+		// TODO RESEARCH: Which text, image, answers?
+		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
+	}
+	else {
+		this.calc_outcome();
+		game.next_stage();
+	}
+};
+
+
+Survival.prototype.next_popup = function(answer) {
+	if(answer === 1) {
+		game.next_stage();
+	}
 };

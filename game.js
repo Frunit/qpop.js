@@ -8,7 +8,6 @@ const debug4 = document.getElementById('debug4');
 // Master-TODO:
 /* - All sounds
  * - Background music
- * - Survival (mostly)
  * - *All* animations (Intro, Catastrophes, Outro)
  * - All options
  */
@@ -251,7 +250,7 @@ Stagemanager.prototype.next = function() {
 		break;
 	case 10: // Survival
 		if(game.next_player()) {
-			game.stage.next_player();
+			game.stage.initialize();
 		} else {
 			this.stage = 3;
 			game.stage = new Transition('gfx/transition_world.png', lang.transition_survival);
