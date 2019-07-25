@@ -402,7 +402,7 @@ Mutations.prototype.add = function(attribute, value) {
 };
 
 
-// TODO: Check if this fits to the behaviour in Q-Pop savegames
+// TODO RESEARCH: Check if this fits to the behaviour in Q-Pop savegames
 Mutations.prototype.ai = function() {
 	let choosable_plants = [];
 	let choosable_nonplants = [];
@@ -462,7 +462,7 @@ Mutations.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
 	if(game.current_player.evo_score > 0) {
-		// TODO: Which image? Which answers?
+		// TODO RESEARCH: Which image? Which answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {

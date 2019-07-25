@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: All values have to be checked (dims, offsets, ...)
+// TODO RESEARCH: All values have to be checked (dims, offsets, ...)
 // TODO: The catastrophe should be animation, not only show a image.
 
 function Catastrophe() {

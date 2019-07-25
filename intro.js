@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: Check values. The pic is too big for the window.
+// TODO RESEARCH: Check values. The pic is too big for the window.
 
 function Intro() {
 	this.pic = resources.get('gfx/dummy_intro.png');

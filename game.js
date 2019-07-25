@@ -130,7 +130,7 @@ Game.prototype.is_last_player = function() {
 
 // TODO: This should ask if the single human player wants to continue alone
 // TODO: Should also give some feedback, whether the game has finished.
-// TODO: Does it really directly jump to the outro? Maybe rather set some variable to true and let the stagemanager handle it!
+// TODO RESEARCH: Does it really directly jump to the outro? Maybe rather set some variable to true and let the stagemanager handle it!
 Game.prototype.test_finished = function() {
 	let humans_alive = 0;
 	let pcs_alive = 0;

@@ -82,7 +82,7 @@ Level.prototype.count_wm_neighbours = function() {
 };
 
 
-// TODO: Make maps more similar to the original maps
+// TODO RESEARCH: Make maps more similar to the original maps
 Level.prototype.generate_map = function() {
 	// Border is based on RAM analysis. It looks like the border components are actually partly dependent on the worldmap situation.
 	// As it is now, the (0-based) tiles 44, 51, 52, 53, 54, 61 make 14.3% each and 80, 84, 99 make 4.8% each
@@ -117,7 +117,7 @@ Level.prototype.generate_map = function() {
 
 	// Fill with empty fields
 	for(let i = mainpart.length; i < 8836; i++) {
-		mainpart.push(74); // TODO: Should be the real empty fields!
+		mainpart.push(74); // TODO RESEARCH: Should be the real empty fields!
 	}
 
 	// Shuffle everything and create the actual map
@@ -211,7 +211,7 @@ Level.prototype.place_player = function(ideal_pos) {
 		for(let y = ideal_pos[1] -1; y <= ideal_pos[1] + 1; y++) {
 			for(let x = ideal_pos[0] -1; x <= ideal_pos[0] + 1; x++) {
 				this.mobmap[y][x] = null;
-				this.map[y][x] = 74;  // TODO: Should use some random empty tiles
+				this.map[y][x] = 74;  // TODO RESEARCH: Should use some random empty tiles
 			}
 		}
 	}
@@ -326,7 +326,7 @@ function Character(species, tile) {
 	this.movement = 0;
 	this.invincible = false;
 	this.steps = 40 + game.current_player.iq * 10;
-	this.time = 2000; // ms per turn TODO: Is this correct?
+	this.time = 2000; // ms per turn TODO RESEARCH: Is this correct?
 
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];

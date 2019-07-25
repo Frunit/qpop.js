@@ -1,7 +1,5 @@
 'use strict';
 
-// TODO: Actions must be rendered!
-
 function Survival() {
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	//this.tiles_pics = resources.get('gfx/back_tiles.png');
@@ -31,7 +29,7 @@ function Survival() {
 	this.sym_food_offset = [465, 286];
 	this.sym_love_offset = [465, 347];
 	this.sym_dead_offset = [465, 408];
-	this.sym_won_offset = [465, 469]; // TODO: Is this correct?
+	this.sym_won_offset = [465, 469]; // TODO RESEARCH: Is this correct?
 	this.minimap_offset = [465, 26];
 	this.minimap_sym_soffset = [0, 16];
 
@@ -44,7 +42,7 @@ function Survival() {
 
 	this.icon_dy = 25;
 	this.food_dx = 8;
-	this.sym_delta = [20, 20]; // TODO: Is this correct?
+	this.sym_delta = [20, 20]; // TODO RESEARCH: Is this correct?
 
 	this.minimap_width = 21;
 	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
@@ -332,7 +330,7 @@ Survival.prototype.finish_movement = function() {
 		return;
 	}
 
-	// TODO: Test for electric flower
+	// TODO RESEARCH: Test for electric flower
 
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {

@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: Compare animation speed and frames with original for both animations
+// TODO RESEARCH: Compare animation speed and frames with original for both animations
 
 function Turnselection() {
 	this.bg = resources.get('gfx/light_bg.png');

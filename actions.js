@@ -34,7 +34,7 @@ function Love(dir, character, partner, callback) {
 
 Love.prototype.update = function(dt) {
 	this.time += dt;
-	// TODO: The time values are examples; correct them!
+	// TODO RESEARCH: The time values are examples; correct them!
 	if(this.time < 200) {} // Do nothing
 	else if(this.time < 900) {} // Remove partner and character and show cloud
 	else if(this.time < 1000) {} // Show offspring and character and the last two frames of the cloud
@@ -84,7 +84,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 
 Fight.prototype.update = function(dt) {
 	this.time += dt;
-	// TODO: The time values are examples; correct them!
+	// TODO RESEARCH: The time values are examples; correct them!
 	if(this.time < 200) {} // Do nothing
 	else if(this.time < 800) {} // Show attack face if predator
 	else if(this.time < 900) {} // Remove opponent and character and show cloud

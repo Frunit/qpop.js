@@ -26,7 +26,7 @@ function World() {
 	this.hygro_offset = [545, 26];
 	this.temp_offset = [585, 26];
 	this.spec_offset = [465, 70];
-	this.calendar_text_offset = [490, 59]; // TODO: checken!
+	this.calendar_text_offset = [490, 59]; // TODO RESEARCH: check this!
 	this.bar_icon_offset = [465, 146];
 	this.bar_offset = [485, 150];
 	this.toplace_offset = [465, 286];
@@ -365,7 +365,7 @@ World.prototype.next = function() {
 		open_popup(lang.popup_title, 'dino', lang.where_to_live, () => {}, lang.next);
 	}
 	else {
-		// TODO: Which image? Which answers?
+		// TODO RESEARCH: Which image? Which answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 };
@@ -475,7 +475,7 @@ World.prototype.exec_catastrophe = function(type) {
 	case 6: // Earthquake
 		game.height_map = this.create_height_map();
 		game.world_map = this.create_world_map();
-		// TODO: Are humans removed by an earthquake? I.e. is also the flag removed from the save?
+		// TODO RESEARCH: Are humans removed by an earthquake? I.e. is also the flag removed from the save?
 		this.catastrophe_finished();
 		break;
 	case 7: // Humans
@@ -490,7 +490,7 @@ World.prototype.exec_catastrophe = function(type) {
 
 		[x, y] = random_element(land);
 		game.world_map[y][x] = WM_HUMANS;
-		// TODO: Is there an explosion? Otherwise: this.catastrophe_finished();
+		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finished();
 		game.humans_present = true;
 		break;
 	case 8: // Cosmic rays
@@ -550,7 +550,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 		}
 	}
 
-	// TODO: Check if frames and speed are correct
+	// TODO RESEARCH: Check if frames and speed are correct
 	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
