@@ -13,9 +13,6 @@ function Level() {
 
 	this.character = new Character(game.current_player.id, [49, 49]);
 
-	this.eaten = 0;
-	this.bred = 0;
-	this.died = 0;
 	this.victories = [];
 
 	this.generate_map();

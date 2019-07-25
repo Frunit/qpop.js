@@ -1040,7 +1040,7 @@ World.prototype.draw_minispec = function() {
 		ctx.drawImage(this.map_pics,
 			this.minispec_soffset[0] + this.tile_dim[0]*game.current_player_num, this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
-			this.toplace_offset[0] + this.minispec_delta[0] * i, this.toplace_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
+			this.toplace_offset[0] + this.minispec_delta[0] * (i%10), this.toplace_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
 			this.tile_dim[0], this.tile_dim[1]);
 	}
 
@@ -1048,7 +1048,7 @@ World.prototype.draw_minispec = function() {
 		ctx.drawImage(this.map_pics,
 			this.minispec_soffset[0] + this.tile_dim[0]*(game.current_player_num + 6), this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
-			this.tomove_offset[0] + this.minispec_delta[0] * i, this.tomove_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
+			this.tomove_offset[0] + this.minispec_delta[0] * (i%10), this.tomove_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
 			this.tile_dim[0], this.tile_dim[1]);
 	}
 };

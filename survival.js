@@ -16,6 +16,7 @@ function Survival() {
 	this.time_dim = [122, 25];
 	this.steps_dim = [122, 25];
 	this.icon_dim = [20, 20];
+	this.sym_dim = [16, 16];
 	this.minimap_dim = [168, 168];
 	this.minimap_sym_dim = [8, 8];
 
@@ -30,6 +31,7 @@ function Survival() {
 	this.sym_food_offset = [465, 286];
 	this.sym_love_offset = [465, 347];
 	this.sym_dead_offset = [465, 408];
+	this.sym_won_offset = [465, 469]; // TODO: Is this correct?
 	this.minimap_offset = [465, 26];
 	this.minimap_sym_soffset = [0, 16];
 
@@ -42,6 +44,7 @@ function Survival() {
 
 	this.icon_dy = 25;
 	this.food_dx = 8;
+	this.sym_delta = [20, 20]; // TODO: Is this correct?
 
 	this.minimap_width = 21;
 	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
@@ -256,6 +259,54 @@ Survival.prototype.draw_time = function() {
 	ctx.restore();
 
 	draw_black_rect(this.time_offset, this.time_dim);
+};
+
+
+Survival.prototype.draw_symbols = function() {
+	// Delete earlier drawings
+	const w = this.sym_delta[0] * 10;
+	const h = this.sym_won_offset[1] - this.sym_food_offset[1] + this.sym_delta[1] * 2;
+	ctx.drawImage(this.bg_pic,
+		this.sym_food_offset[0], this.sym_food_offset[1],
+		w, h,
+		this.sym_food_offset[0], this.sym_food_offset[1],
+		w, h);
+
+	// Food
+	for(let i = 0; i < game.current_player.eaten; i++){
+		ctx.drawImage(this.gui_pics,
+			this.sym_food_soffset[0], this.sym_food_soffset[1],
+			this.sym_dim[0], this.sym_dim[1],
+			this.sym_food_offset[0] + this.food_dx * (i%20), this.sym_food_offset[1] + this.sym_delta[1] * Math.floor(i/20),
+			this.sym_dim[0], this.sym_dim[1]);
+	}
+
+	// Love
+	for(let i = 0; i < game.current_player.loved; i++){
+		ctx.drawImage(this.gui_pics,
+			this.sym_love_soffset[0], this.sym_love_soffset[1],
+			this.sym_dim[0], this.sym_dim[1],
+			this.sym_love_offset[0] + this.sym_delta[0] * (i%10), this.sym_love_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_dim[0], this.sym_dim[1]);
+	}
+
+	// Deaths
+	for(let i = 0; i < game.current_player.deaths; i++){
+		ctx.drawImage(this.gui_pics,
+			this.sym_dead_soffset[0], this.sym_dead_soffset[1],
+			this.sym_dim[0], this.sym_dim[1],
+			this.sym_dead_offset[0] + this.sym_delta[0] * (i%10), this.sym_dead_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_dim[0], this.sym_dim[1]);
+	}
+
+	// Wins
+	for(let i = 0; i < this.level.victories.length; i++){
+		ctx.drawImage(this.gui_pics,
+			this.sym_won_soffset[0] + sym_dim[0]*this.level.victories[i], this.sym_won_soffset[1],
+			this.sym_dim[0], this.sym_dim[1],
+			this.sym_won_offset[0] + this.sym_delta[0] * (i%10), this.sym_won_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_dim[0], this.sym_dim[1]);
+	}
 };
 
 

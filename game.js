@@ -156,6 +156,7 @@ function Player(num) {
 	this.toplace = 10;
 	this.tomove = 0;
 	this.is_dead = false;
+	this.loved = 0;
 	this.eaten = 0;
 	this.experience = 0;
 	this.deaths = 0;
