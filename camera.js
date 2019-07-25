@@ -64,11 +64,11 @@ Camera.prototype.update_tiles = function() {
 
 Camera.prototype.update_visible_level = function(dt) {
 	if(this.survival.action_active) {
-		for(let tile of this.survival.action_tiles) {
+		for(let tile of this.survival.action.tiles) {
 			this._tiles_to_render.add(JSON.stringify(tile));
 		}
 
-		this.survival.action_sprite.update(dt);
+		this.survival.action.update(dt);
 	}
 
 	for(let y of this.y_tiles) {
@@ -143,9 +143,9 @@ Camera.prototype.render = function() {
 	}
 
 	if(this.survival.action_active) {
-		this.survival.action_sprite.render(ctx,
-			[Math.round(this.survival.action_tiles[0][0] * this.tile_dim[0] - this.cpos[0] + this.survival.action_offset[0]),
-			Math.round(this.survival.action_tiles[0][1] * this.tile_dim[1] - this.cpos[1] + this.survival.action_offset[1])]);
+		this.survival.action.render(ctx,
+			[Math.round(this.survival.action.tiles[0][0] * this.tile_dim[0] - this.cpos[0] + this.survival.action.offset[0]),
+			Math.round(this.survival.action.tiles[0][1] * this.tile_dim[1] - this.cpos[1] + this.survival.action.offset[1])]);
 	}
 
 	ctx.restore();

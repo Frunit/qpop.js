@@ -55,9 +55,7 @@ function Survival() {
 	this.ai_own_individuals = [];
 
 	this.action_active = false;
-	this.action_sprite = null;
-	this.action_tiles = [[0, 0]];
-	this.action_offset = [0, 0];
+	this.action = null;
 
 	this.move_active = false;
 
@@ -135,7 +133,7 @@ Survival.prototype.redraw = function() {
 	});*/
 
 	// Minimap
-	this.camera.draw_minimap();
+	this.draw_minimap();
 
 	// Steps
 	ctx.drawImage(this.gui_pics,
@@ -333,7 +331,7 @@ Survival.prototype.ai = function() {
 		food = 40;
 	}
 
-	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5)
+	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5
 	let saved = 0;
 	for(let i = 0; i < death; i++) {
 		if(random_int(0, 600) < game.current_player.stats[ATT_SPEED] ||
@@ -714,8 +712,8 @@ Survival.prototype.update_entities = function(dt) {
 	// Update background sprites
 	this.camera.update_visible_level(dt);
 
-	if(this.action_active && this.action_sprite.finished) {
-		this.action_sprite.callback();
+	if(this.action_active && this.action.finished) {
+		this.action.callback();
 	}
 };
 
