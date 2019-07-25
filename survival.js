@@ -78,7 +78,7 @@ Survival.prototype.initialize = function() {
 	game.current_player.deaths = 0;
 
 	if(game.current_player.type === COMPUTER) {
-		//this.ai();
+		this.ai();
 	}
 
 	this.level = new Level();
@@ -315,6 +315,66 @@ Survival.prototype.draw_symbols = function() {
 
 Survival.prototype.render = function() {
 	this.camera.render();
+};
+
+
+Survival.prototype.ai = function() {
+	const iq = 5 - game.current_player.iq;
+	game.current_player.experience = random_int(0, iq);
+
+	let food = 0;
+	// TODO: Go through each individual on the world map. For each individual:
+	// food += (20 + iq*20 + game.current_player.stats[ATT_PERCEPTION] / 5 + game.current_player.stats[ATT_INTELLIGENCE] / 10) * game.current_player.stats[___FOOD_ON_FIELD___] / (3 * this.eating_div);
+	// then:
+	// food = Math.floor(food / game.current_player.individuals);
+	// This does not include the density that affects human players. For human players: Higher density -> less food
+
+	if(food > 40) {
+		food = 40;
+	}
+
+	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5)
+	let saved = 0;
+	for(let i = 0; i < death; i++) {
+		if(random_int(0, 600) < game.current_player.stats[ATT_SPEED] ||
+				random_int(0, 300) < game.current_player.stats[ATT_CAMOUFLAGE] ||
+				random_int(0, 1000) < game.current_player.stats[ATT_INTELLIGENCE] ||
+				random_int(0, 600) < game.current_player.stats[ATT_DEFENSE] ||
+				random_int(0, 6) < iq)
+		{
+			saved++;
+		}
+	}
+
+	death -= saved;
+	let death_prob = death * 0.05;
+	if(food < 20) {
+		death_prob += (20 - food) * 0.05;
+	}
+	if(death_prob > 0.9) {
+		death_prob = 0.9;
+	}
+
+	// TODO: Go through each own individual on the world map and if Math.random < death_prob, kill the individual
+
+	// This does not take into account density. For a human player: Higher density > more females
+	let loved = random_int(0, iq * 2 + 2);
+	if(food > 20) {
+		loved += Math.floor((food - 20) / 10);
+	}
+
+	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATT_REPRODUCTION] / 20);
+	if(game.current_player.toplace > 20) {
+		game.current_player.toplace = 20;
+	}
+	else if(game.current_player.toplace < loved) {
+		game.current_player.toplace = loved;
+	}
+
+	game.current_player.toplace = 0;
+	game.current_player.tomove = Math.floor(game.current_player.stats[ATT_SPEED] / 5);
+
+	game.next_stage();
 };
 
 
@@ -854,6 +914,8 @@ Survival.prototype.calc_outcome = function() {
 	else if(game.current_player.toplace < loved) {
 		game.current_player.toplace = loved;
 	}
+
+	game.current_player.tomove = Math.floor(game.current_player.stats[ATT_SPEED] / 5);
 };
 
 
