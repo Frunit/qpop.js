@@ -8,12 +8,11 @@ function Level() {
 	this.individuals = game.current_player.individuals;
 	this.density = 0;
 	this.blocking = '000000000000000000000000000000000000111111111111111111111110011110111100000000001111111100000000000111111111111111111100001111111111111';
+	this.edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000011111100000000000000000000000010100000000000000';
 	this.height = 100;
 	this.width = 100;
 
 	this.character = new Character(game.current_player.id, [49, 49]);
-
-	this.victories = [];
 
 	this.generate_map();
 	this.populate();
@@ -322,6 +321,7 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 function Character(species, tile) {
 	this.type = SM_PLAYER;
 	this.tile = tile;
+	this.species = species;
 	this.rel_pos = [0, 0];
 	this.movement = 0;
 	this.invincible = false;
@@ -331,6 +331,8 @@ function Character(species, tile) {
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
+	this.victories = [];
+
 	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.soffset, this.anims.still.frames);
 }
 
@@ -339,6 +341,7 @@ function Predator(species, tile) {
 	species = 0; // DEBUG
 	this.type = SM_PREDATOR;
 	this.tile = tile;
+	this.species = species;
 	this.rel_pos = [0, 0];
 	this.movement = 0;       // current movement direction
 	this.last_movement = 0;  // last movement direction (important, because they can't move back)
@@ -355,10 +358,18 @@ function Predator(species, tile) {
 }
 
 
+Predator.prototype.defeat = function() {
+	this.type = SM_UNRESPONSIVE;
+	const def = random_int(0, 2);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.defeated[def].soffset, this.anims.defeated[def].frames);
+};
+
+
 function Female(species, tile) {
 	species = 0; // DEBUG
 	this.type = SM_FEMALE;
 	this.tile = tile;
+	this.species = species;
 	this.rel_pos = [0, 0];
 	this.has_offspring = false;
 
@@ -369,10 +380,17 @@ function Female(species, tile) {
 }
 
 
+Female.prototype.offspring = function() {
+	this.type = SM_UNRESPONSIVE;
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.offspring.soffset, this.anims.offspring.frames);
+};
+
+
 function Enemy(species, tile) {
 	species = 0; // DEBUG
 	this.type = SM_ENEMY;
 	this.tile = tile;
+	this.species = species;
 	this.rel_pos = [0, 0];
 	this.lost = false;
 
@@ -381,3 +399,10 @@ function Enemy(species, tile) {
 
 	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
+
+
+Enemy.prototype.defeat = function() {
+	this.type = SM_UNRESPONSIVE;
+	const def = random_int(0, 2);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
+};

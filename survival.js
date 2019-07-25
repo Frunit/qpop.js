@@ -272,7 +272,7 @@ Survival.prototype.draw_symbols = function() {
 		w, h);
 
 	// Food
-	for(let i = 0; i < game.current_player.eaten; i++){
+	for(let i = 0; i < Math.floor(game.current_player.eaten / 37); i++){
 		ctx.drawImage(this.gui_pics,
 			this.sym_food_soffset[0], this.sym_food_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
@@ -299,9 +299,9 @@ Survival.prototype.draw_symbols = function() {
 	}
 
 	// Wins
-	for(let i = 0; i < this.level.victories.length; i++){
+	for(let i = 0; i < this.level.character.victories.length; i++){
 		ctx.drawImage(this.gui_pics,
-			this.sym_won_soffset[0] + sym_dim[0]*this.level.victories[i], this.sym_won_soffset[1],
+			this.sym_won_soffset[0] + sym_dim[0]*this.level.character.victories[i], this.sym_won_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
 			this.sym_won_offset[0] + this.sym_delta[0] * (i%10), this.sym_won_offset[1] + this.sym_delta[1] * Math.floor(i/10),
 			this.sym_dim[0], this.sym_dim[1]);
@@ -321,15 +321,13 @@ Survival.prototype.finish_movement = function() {
 
 	if(Math.random <= 0.001 &&
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
-			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT')))
+			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
 		this.action_active = true;
 		this.move_active = false;
 
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
-		this.action_sprite = new Sprite(char.url, [64, 64], char.anims.quicksand.soffset, char.anims.quicksand.frames, true, () => this.player_death());
-		this.action_tiles = [char.tile];
-		this.action_offset = [0, 0];
+		this.action = new Quicksand(char, () => this.player_death(true));
 
 		return;
 	}
@@ -341,57 +339,12 @@ Survival.prototype.finish_movement = function() {
 		this.action_active = true;
 		this.move_active = false;
 
-		switch(adjacent.type) {
-			case SM_FEMALE:
-				switch(dir) {
-					case NORTH:
-						this.action_tiles = [[char.tile[0], char.tile[1] - 1], char.tile];
-						this.action_offset = anims_clouds.love_vert.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, true, () => this.love_finished());
-						break;
-					case SOUTH:
-						this.action_tiles = [[char.tile[0], char.tile[1] + 1], char.tile];
-						this.action_offset = anims_clouds.love_vert.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, true, () => this.love_finished());
-						break;
-					case EAST:
-						this.action_tiles = [[char.tile[0] + 1, char.tile[1]], char.tile];
-						this.action_offset = anims_clouds.love_hor.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, true, () => this.love_finished());
-						break;
-					case WEST:
-						this.action_tiles = [[char.tile[0] - 1, char.tile[1]], char.tile];
-						this.action_offset = anims_clouds.love_hor.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, true, () => this.love_finished());
-						break;
-				}
-				break;
-			default:
-				// TODO: There is a short "pre-attack phase" where the predator opens its mouth.
-				let player_wins = this.does_player_win(adjacent);
-				switch(dir) {
-					case NORTH:
-						this.action_tiles = [[char.tile[0], char.tile[1] - 1], char.tile];
-						this.action_offset = anims_clouds.fight_vert.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, true, () => this.fight_finished(player_wins));
-						break;
-					case SOUTH:
-						this.action_tiles = [[char.tile[0], char.tile[1] + 1], char.tile];
-						this.action_offset = anims_clouds.fight_vert.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, true, () => this.fight_finished(player_wins));
-						break;
-					case EAST:
-						this.action_tiles = [[char.tile[0] + 1, char.tile[1]], char.tile];
-						this.action_offset = anims_clouds.fight_hor.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, true, () => this.fight_finished(player_wins));
-						break;
-					case WEST:
-						this.action_tiles = [[char.tile[0] - 1, char.tile[1]], char.tile];
-						this.action_offset = anims_clouds.fight_hor.offset;
-						this.action_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, true, () => this.fight_finished(player_wins));
-						break;
-				}
-				break;
+		if(adjacent.type === SM_FEMALE) {
+			this.action = new Love(dir, char, adjacent, () => this.love_finished(adjacent));
+		}
+		else {
+			const player_wins = this.does_player_win(adjacent);
+			this.action = new Fight(dir, char, adjacent, player_wins, () => this.fight_finished(player_wins, adjacent));
 		}
 
 		return;
@@ -404,7 +357,9 @@ Survival.prototype.finish_movement = function() {
 	// Nothing happened, end movement
 	char.movement = 0;
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
+	this.action = null;
 	this.move_active = false;
+	this.action_active = false;
 };
 
 
@@ -416,11 +371,57 @@ Survival.prototype.does_player_win = function(opponent) {
 };
 
 
+Survival.prototype.eating_finished = function(food) {
+	// Power food
+	if(food >= 118) {
+		this.level.character.invincible = true;
+	}
+	// Normal food
+	else if(food < 36) {
+		game.current_player.eaten += game.current_player.stats[Math.floor(food / 6)];
+		this.draw_symbols();
+	}
+
+	// Nothing happens with poison (it just steals your time by the lengthy animation)
+
+	this.finish_movement();
+};
+
+
+Survival.prototype.love_finished = function(partner) {
+	partner.offspring();
+	game.current_player.loved++;
+	this.draw_symbols();
+	this.finish_movement();
+};
+
+
+Survival.prototype.fight_finished = function(player_wins, opponent) {
+	if(player_wins) {
+		// Only enemies are shown, although also predators count towards experience
+		if(opponent.type === SM_ENEMY) {
+			this.level.character.victories.push(opponent.species);
+		}
+		game.current_player.experience++;
+
+		opponent.defeat();
+		this.draw_symbols();
+		this.finish_movement();
+	}
+	else {
+		const tile = this.level.character.tile;
+		this.mobmap[tile[1]][tile[0]] = new Enemy();
+		this.mobmap[tile[1]][tile[0]].defeat();
+		this.player_death();
+	}
+};
+
+
 Survival.prototype.get_adjacent = function() {
 	const x = this.level.character.tile[0];
 	const y = this.level.character.tile[1];
 
-	// TODO: Are females prioritized? What is the order of checking?
+	// TODO RESEARCH: Are females prioritized? What is the order of checking?
 	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SM_UNRESPONSIVE && this.level.mobmap[y-1][x].type !== SM_PLACEHOLDER) {
 		return [NORTH, this.level.mobmap[y-1][x]];
 	}
@@ -463,11 +464,15 @@ Survival.prototype.start_movement = function(dir) {
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
-		/*
 		case 0: // Feeding/waiting
-			char.sprite = new Sprite(char.url, [64, 64], char.anims.feeding.soffset, char.anims.feeding.frames);
+			if(this.level.edible[this.level.map[pos[1]][pos[0]]] === '1') {
+				this.action = new Feeding(char, this.level.map, () => this.eating_finished(this.level.map[pos[1]][pos[0]]));
+				this.action_active = true;
+			}
+			else {
+				// TODO RESEARCH: Waiting; What happens here?
+			}
 			break;
-		*/
 	}
 
 	this.start_predator_movement();
@@ -629,12 +634,15 @@ Survival.prototype.start_predator_movement = function() {
 };
 
 
-Survival.prototype.player_death = function(sprite = null) {
+Survival.prototype.player_death = function(delete_sprite = false) {
 	game.current_player.deaths++;
-	// TODO: Update the death icons
-	this.level.mobmap[this.level.character.tile[1]][this.level.character.tile[0]] = sprite;
+	this.draw_symbols();
+	if(delete_sprite) {
+		this.level.mobmap[this.level.character.tile[1]][this.level.character.tile[0]] = sprite;
+	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
 	this.action_active = false;
+	this.move_active = false;
 };
 
 
