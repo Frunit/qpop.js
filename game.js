@@ -73,8 +73,7 @@ Game.prototype.start = function() {
 	this.water_level = 20;
 	this.mountain_level = 80;
 	this.humans_present = false;
-	this.current_player_num = 0;
-	this.current_player = this.players[this.current_player_num];
+	this.current_player = this.players[0];
 	this.height_map = null;
 	this.world_map = null;
 	this.map_positions = null;
@@ -93,9 +92,9 @@ Game.prototype.next_stage = function() {
 
 
 Game.prototype.next_player = function() {
-	for(let i = this.current_player_num + 1; i < 6; i++) {
+	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
-			this.current_player_num = i;
+			this.current_player.id = i;
 			this.current_player = this.players[i];
 			console.log('There is another player.');
 			return true;
@@ -104,7 +103,7 @@ Game.prototype.next_player = function() {
 
 	for(let i = 0; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
-			this.current_player_num = i;
+			this.current_player.id = i;
 			this.current_player = this.players[i];
 			console.log('This was the last player.');
 			return false;
@@ -118,7 +117,7 @@ Game.prototype.next_player = function() {
 
 // TODO: Is this ever used?
 Game.prototype.is_last_player = function() {
-	for(let i = this.current_player_num + 1; i < 6; i++) {
+	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
 			return false;
 		}

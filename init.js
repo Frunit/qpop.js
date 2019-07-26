@@ -309,7 +309,6 @@ Init.prototype.next = function() {
 		if(!known_first_player && game.players[i].type !== NOBODY) {
 			known_first_player = true;
 			game.current_player = game.players[i];
-			game.current_player_num = i;
 		}
 
 		if(game.players[i].type === HUMAN) {

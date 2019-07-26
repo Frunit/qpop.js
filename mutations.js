@@ -198,7 +198,7 @@ Mutations.prototype.draw_minusdown = function(pos) {
 
 
 Mutations.prototype.draw_avatar = function() {
-	let soffset = this.spec_soffsets[game.current_player_num];
+	const soffset = this.spec_soffsets[game.current_player.id];
 
 	ctx.drawImage(this.bg_pic,
 		this.spec_offset[0], this.spec_offset[1],
@@ -420,7 +420,7 @@ Mutations.prototype.ai = function() {
 	let own_plants = [];
 	for(let x = 1; x < game.map_positions[0].length - 1; x++) {
 		for(let y = 1; y < game.map_positions.length - 1; y++) {
-			if(game.map_positions[y][x] === game.current_player_num &&
+			if(game.map_positions[y][x] === game.current_player.id &&
 					choosable_plants.includes(game.world_map[y][x] - 1))
 			{
 				own_plants.push(game.world_map[y][x] - 1);

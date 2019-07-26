@@ -584,9 +584,9 @@ World.prototype.fight = function(x, y) {
 	let enemy = game.players[game.map_positions[y][x]];
 	let defense = enemy.stats[ATT_DEFENSE] + enemy.stats[ATT_INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WM_RANGONES];
 
-	//console.log("Attacker:", game.map_positions[y][x], " with attack ", attack, "; Defender: ", game.current_player_num, " with defense ", defense)
+	//console.log("Attacker:", game.map_positions[y][x], " with attack ", attack, "; Defender: ", game.current_player.id, " with defense ", defense)
 
-	let winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player_num : game.map_positions[y][x];
+	let winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
 	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
@@ -597,9 +597,9 @@ World.prototype.fight = function(x, y) {
 
 
 World.prototype.fight_end = function(winner, enemy, x, y) {
-	if(winner === game.current_player_num) {
+	if(winner === game.current_player.id) {
 		enemy.individuals--;
-		game.map_positions[y][x] = game.current_player_num;
+		game.map_positions[y][x] = game.current_player.id;
 		game.current_player.individuals++;
 	}
 	game.current_player.toplace--;
@@ -629,7 +629,7 @@ World.prototype.set_individual = function(x, y) {
 	}
 
 	// Normal click in the neighborhood
-	game.map_positions[y][x] = game.current_player_num;
+	game.map_positions[y][x] = game.current_player.id;
 	game.current_player.toplace--;
 	game.current_player.individuals++;
 	this.draw_bar();
@@ -682,7 +682,7 @@ World.prototype.wm_click = function(x, y, raw = true) {
 	this.wm_clickpos = [x, y];
 
 	// Clicked on own individual -> take it
-	if(game.map_positions[y][x] === game.current_player_num) {
+	if(game.map_positions[y][x] === game.current_player.id) {
 		// But only, if you still can move individuals
 		if(game.current_player.tomove && game.current_player.toplace < 20 && game.current_player.individuals > 1 && this.wm_set_mode !== 1) {
 			this.take_individual(x, y);
@@ -692,7 +692,7 @@ World.prototype.wm_click = function(x, y, raw = true) {
 	else if(game.current_player.toplace &&
 			game.world_map[y][x] >= WM_DESERT &&
 			game.world_map[y][x] <= WM_FIREGRASS &&
-			this.is_neighbour(game.current_player_num, x, y) &&
+			this.is_neighbour(game.current_player.id, x, y) &&
 			this.wm_set_mode !== 2)
 	{
 		this.set_individual(x, y);
@@ -742,7 +742,7 @@ World.prototype.ai = function() {
 	this.ai_own_individuals = [];
 	for(let x = 1; x < this.dim[0] - 1; x++) {
 		for(let y = 1; y < this.dim[1] - 1; y++) {
-			if(game.map_positions[y][x] === game.current_player_num) {
+			if(game.map_positions[y][x] === game.current_player.id) {
 				this.ai_own_individuals.push([x, y]);
 			}
 		}
@@ -833,7 +833,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 			if(game.world_map[yy][xx] === WM_WATER) {
 				value -= 20 * weight;
 			}
-			else if(game.map_positions[yy][xx] >= 0 && game.map_positions[yy][xx] !== game.current_player_num) {
+			else if(game.map_positions[yy][xx] >= 0 && game.map_positions[yy][xx] !== game.current_player.id) {
 				// In the first turn, the players should be placed with some distance to each other
 				if(game.turn === 0) {
 					value -= 100 * weight;
@@ -849,7 +849,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 				}
 			}
 			else if(game.world_map[yy][xx] > WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
-				value += game.players[game.current_player_num].stats[game.world_map[yy][xx] - WM_RANGONES] * weight;
+				value += game.players[game.current_player.id].stats[game.world_map[yy][xx] - WM_RANGONES] * weight;
 			}
 		}
 	}
@@ -877,7 +877,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 			for(let pos of [[x-1, y], [x+1, y], [x, y-1], [x, y+1]]) {
 				xx = pos[0];
 				yy = pos[1];
-				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player_num && game.world_map[yy][xx] >= WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
+				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
 					possible_moves.push(pos);
 				}
 			}
@@ -977,7 +977,7 @@ World.prototype.find_tile = function(height, y) {
 
 
 World.prototype.draw_avatar = function() {
-	let soffset = this.spec_soffsets[game.current_player_num];
+	let soffset = this.spec_soffsets[game.current_player.id];
 
 	ctx.drawImage(this.bg_pic,
 		this.spec_offset[0], this.spec_offset[1],
@@ -1038,7 +1038,7 @@ World.prototype.draw_minispec = function() {
 
 	for(let i = 0; i < game.current_player.toplace; i++){
 		ctx.drawImage(this.map_pics,
-			this.minispec_soffset[0] + this.tile_dim[0]*game.current_player_num, this.minispec_soffset[1],
+			this.minispec_soffset[0] + this.tile_dim[0]*game.current_player.id, this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
 			this.toplace_offset[0] + this.minispec_delta[0] * (i%10), this.toplace_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
 			this.tile_dim[0], this.tile_dim[1]);
@@ -1046,7 +1046,7 @@ World.prototype.draw_minispec = function() {
 
 	for(let i = 0; i < game.current_player.tomove; i++){
 		ctx.drawImage(this.map_pics,
-			this.minispec_soffset[0] + this.tile_dim[0]*(game.current_player_num + 6), this.minispec_soffset[1],
+			this.minispec_soffset[0] + this.tile_dim[0]*(game.current_player.id + 6), this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
 			this.tomove_offset[0] + this.minispec_delta[0] * (i%10), this.tomove_offset[1] + this.minispec_delta[1] * Math.floor(i/10),
 			this.tile_dim[0], this.tile_dim[1]);
