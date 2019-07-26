@@ -231,10 +231,11 @@ Mutations.prototype.draw_bar = function(num) {
 		this.bar_offset[0], this.bar_offset[1] + this.deltay*num,
 		this.bar_dim[0], this.bar_dim[1]);
 
-	let length = this.stats[num] * 3 - 3;
-	let soffset = this.bar_soffsets[Math.min(9, Math.floor(this.stats[num]/10))];
+	const length = this.stats[num] * 3 - 3;
 
 	if(length > 0) {
+		const soffset = this.bar_soffsets[Math.min(9, Math.floor(this.stats[num]/10))];
+
 		// Main bar
 		ctx.drawImage(this.pics,
 			soffset[0], soffset[1],
@@ -268,7 +269,7 @@ Mutations.prototype.draw_evo_score = function() {
 		this.evobar_offset[0], this.evobar_offset[1],
 		this.bar_dim[0], this.bar_dim[1]);
 
-	let length = game.current_player.evo_score * 3 - 3;
+	const length = game.current_player.evo_score * 3 - 3;
 	// Main bar
 	if(length) {
 		ctx.drawImage(this.pics,
@@ -404,8 +405,8 @@ Mutations.prototype.add = function(attribute, value) {
 
 // TODO RESEARCH: Check if this fits to the behaviour in Q-Pop savegames
 Mutations.prototype.ai = function() {
-	let choosable_plants = [];
-	let choosable_nonplants = [];
+	const choosable_plants = [];
+	const choosable_nonplants = [];
 	for(let i = 0; i < 6; i++) {
 		if(game.current_player.stats[i] < 100) {
 			choosable_plants.push(i);
@@ -417,7 +418,7 @@ Mutations.prototype.ai = function() {
 		}
 	}
 
-	let own_plants = [];
+	const own_plants = [];
 	for(let x = 1; x < game.map_positions[0].length - 1; x++) {
 		for(let y = 1; y < game.map_positions.length - 1; y++) {
 			if(game.map_positions[y][x] === game.current_player.id &&

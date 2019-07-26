@@ -148,7 +148,7 @@ World.prototype.redraw = function() {
 	});
 
 	// Calendar
-	let soffset = (game.turn === 0) ? this.calendar_soffsets[1] : this.calendar_soffsets[0];
+	const soffset = (game.turn === 0) ? this.calendar_soffsets[1] : this.calendar_soffsets[0];
 	ctx.drawImage(this.gui_pics,
 		soffset[0], soffset[1],
 		this.calendar_dim[0], this.calendar_dim[1],
@@ -178,7 +178,7 @@ World.prototype.redraw = function() {
 
 	ctx.save();
 	ctx.fillStyle = '#0000ff';
-	let height = Math.floor((this.hygro_bar_dim[1] * game.humid) / 100) + 2;
+	const height = Math.floor((this.hygro_bar_dim[1] * game.humid) / 100) + 2;
 	ctx.beginPath();
 	ctx.fillRect(this.hygro_bar_offset[0], this.hygro_bar_offset[1] - height, this.hygro_bar_dim[0], height);
 	ctx.restore();
@@ -391,8 +391,7 @@ World.prototype.test_if_dead = function() {
 
 World.prototype.exec_catastrophe = function(type) {
 	this.redraw();
-	let x;
-	let y;
+	let x, y;
 	switch(type) {
 	case 0: // Warming
 		game.temp += 10;
@@ -409,7 +408,7 @@ World.prototype.exec_catastrophe = function(type) {
 		game.temp -= 10;
 		game.water_level -= 3;
 
-		let impactable = [];
+		const impactable = [];
 		for(x = 10; x <= 18; x++) {
 			for(y = 10; y <= 18; y++) {
 				if(game.world_map[y][x] !== WM_WATER) {
@@ -434,7 +433,7 @@ World.prototype.exec_catastrophe = function(type) {
 		true, () => this.catastrophe_finished());
 		break;
 	case 3: // Plague
-		let creatures = [];
+		const creatures = [];
 		for(x = 3; x <= 24; x++) {
 			for(y = 3; y <= 24; y++) {
 				if(game.map_positions[y][x] >= 0) {
@@ -444,12 +443,11 @@ World.prototype.exec_catastrophe = function(type) {
 		}
 
 		[x, y] = random_element(creatures);
-		let player_num;
 
 		// TODO: This could be animated such that not all creatures disappear simultaneously but one after the other
 		for(let xx = x - 3; xx <= x + 3; xx++) {
 			for(let yy = y - 3; yy <= y + 3; yy++) {
-				player_num = game.map_positions[yy][xx];
+				const player_num = game.map_positions[yy][xx];
 				if(player_num >= 0 && random_int(0, 1)) {
 					this.kill_individual(xx, zz);
 				}
@@ -457,7 +455,7 @@ World.prototype.exec_catastrophe = function(type) {
 		}
 		break;
 	case 4: // Volcano
-		let volcanos = [];
+		const volcanos = [];
 		for(x = 3; x <= 24; x++) {
 			for(y = 3; y <= 24; y++) {
 				if(game.world_map[y][x] === WM_MOUNTAIN) {
@@ -479,7 +477,7 @@ World.prototype.exec_catastrophe = function(type) {
 		this.catastrophe_finished();
 		break;
 	case 7: // Humans
-		let land = [];
+		const land = [];
 		for(x = 10; x <= 18; x++) {
 			for(y = 10; y <= 18; y++) {
 				if(game.world_map[y][x] !== WM_WATER) {
@@ -494,10 +492,9 @@ World.prototype.exec_catastrophe = function(type) {
 		game.humans_present = true;
 		break;
 	case 8: // Cosmic rays
-		let stats;
 		for(let player of game.players) {
 			if(player.type !== NOBODY && !player.is_dead) {
-				stats = player.stats.slice();
+				const stats = player.stats.slice();
 				for(let i = 0; i < stats.length; i++) {
 					player.stats[i] = stats.splice(stats.length * Math.random() | 0, 1)[0];
 				}
@@ -541,8 +538,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 		this.catastrophe_finished();
 	}
 
-	let [x, y] = random_element(positions);
-	let player_num;
+	const [x, y] = random_element(positions);
 
 	for(let xx = x - 1; xx <= x + 1; xx++) {
 		for(let yy = y - 1; yy <= y + 1; yy++) {
@@ -558,7 +554,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 
 
 World.prototype.kill_individual = function(x, y) {
-	let player_num = game.map_positions[y][x];
+	const player_num = game.map_positions[y][x];
 	if(player_num >= 0) {
 		game.map_positions[y][x] = -1;
 		game.players[player_num].individuals--;
@@ -579,14 +575,14 @@ World.prototype.take_individual = function(x, y) {
 
 World.prototype.fight = function(x, y) {
 	this.fight_active = true;
-	let attack = game.current_player.stats[ATT_ATTACK] + game.current_player.stats[ATT_INTELLIGENCE]/2 + game.current_player.experience * 10 + game.current_player.stats[game.world_map[y][x] - WM_RANGONES];
+	const attack = game.current_player.stats[ATT_ATTACK] + game.current_player.stats[ATT_INTELLIGENCE]/2 + game.current_player.experience * 10 + game.current_player.stats[game.world_map[y][x] - WM_RANGONES];
 
-	let enemy = game.players[game.map_positions[y][x]];
-	let defense = enemy.stats[ATT_DEFENSE] + enemy.stats[ATT_INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WM_RANGONES];
+	const enemy = game.players[game.map_positions[y][x]];
+	const defense = enemy.stats[ATT_DEFENSE] + enemy.stats[ATT_INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WM_RANGONES];
 
 	//console.log("Attacker:", game.map_positions[y][x], " with attack ", attack, "; Defender: ", game.current_player.id, " with defense ", defense)
 
-	let winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
+	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
 	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
@@ -654,7 +650,7 @@ World.prototype.wm_rightclick = function(x, y, raw = true) {
 
 
 World.prototype.wm_rightclickup = function() {
-	let [x, y] = this.wm_rightclickpos;
+	const [x, y] = this.wm_rightclickpos;
 	this.wm_rightclickpos = null;
 
 	// Show the individual again
@@ -823,7 +819,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 	let value = 0;
 	let weight = 0;
 	let winning_chance = 0;
-	let player, enemy;
+
 	for(let xx = Math.max(1, x - depth); xx < Math.min(this.dim[0] - 1, x + depth); xx++) {
 		for(let yy = Math.max(1, y - depth); yy < Math.min(this.dim[1] - 1, y + depth); yy++) {
 			// Closer fields are more important
@@ -839,8 +835,8 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 					value -= 100 * weight;
 				}
 				else {
-					player = game.current_player;
-					enemy = game.players[game.map_positions[yy][xx]];
+					const player = game.current_player;
+					const enemy = game.players[game.map_positions[yy][xx]];
 					winning_chance = player.stats[game.world_map[yy][xx] - WM_RANGONES] +
 						player.stats[ATT_ATTACK] + player.stats[ATT_INTELLIGENCE]/4 -
 						enemy.stats[game.world_map[yy][xx] - WM_RANGONES] -
@@ -859,7 +855,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 
 
 World.prototype.ai_possible_moves = function(individuals) {
-	let possible_moves = [];
+	const possible_moves = [];
 	if(individuals.length === 0) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
 			for(let y = 1; y < this.dim[1] - 1; y++) {
@@ -870,13 +866,12 @@ World.prototype.ai_possible_moves = function(individuals) {
 		}
 	}
 	else {
-		let x, y, xx, yy;
 		for(let ind of individuals) {
-			x = ind[0];
-			y = ind[1];
+			const x = ind[0];
+			const y = ind[1];
 			for(let pos of [[x-1, y], [x+1, y], [x, y-1], [x, y+1]]) {
-				xx = pos[0];
-				yy = pos[1];
+				const xx = pos[0];
+				const yy = pos[1];
 				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
 					possible_moves.push(pos);
 				}
@@ -889,12 +884,12 @@ World.prototype.ai_possible_moves = function(individuals) {
 
 
 World.prototype.create_height_map = function() {
-	let map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
+	const map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
 
 	// Mountains
 	for(let i = 0; i < 20; i++) {
-		let x = random_int(4, 23);
-		let y = random_int(4, 23);
+		const x = random_int(4, 23);
+		const y = random_int(4, 23);
 
 		for(let xx = x - 2; xx <= x + 2; xx++) {
 			for(let yy = y - 2; yy <= y + 2; yy++) {
@@ -912,13 +907,11 @@ World.prototype.create_height_map = function() {
 	}
 
 	// Basemap
-	let dx = 0;
-	let dy = 0;
-	let half = Math.floor(this.dim[0] / 2);
-	for(let y = 1; y < this.dim[1] - 1; y++) {
-		for(let x = 1; x < this.dim[0] - 1; x++) {
-			dx = Math.abs(half - x);
-			dy = Math.abs(half - y);
+	const half = Math.floor(this.dim[0] / 2);
+	for(y = 1; y < this.dim[1] - 1; y++) {
+		for(x = 1; x < this.dim[0] - 1; x++) {
+			const dx = Math.abs(half - x);
+			const dy = Math.abs(half - y);
 			map[y][x] += random_int(0, Math.floor(((half - Math.max(dx, dy)) * 100) / half));
 			if(map[y][x] > 100) {
 				map[y][x] = 100;
@@ -931,7 +924,7 @@ World.prototype.create_height_map = function() {
 
 
 World.prototype.create_world_map = function() {
-	let map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
+	const map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
@@ -963,9 +956,8 @@ World.prototype.find_tile = function(height, y) {
 
 	let delta = Infinity;
 	let tile = 0;
-	let d = 0;
 	for(let i = 0; i < this.ideal.length; i++) {
-		d = Math.max(Math.abs(this.ideal[i][0] - humid), Math.abs(this.ideal[i][1] - temp));
+		const d = Math.max(Math.abs(this.ideal[i][0] - humid), Math.abs(this.ideal[i][1] - temp));
 		if(d < delta) {
 			delta = d;
 			tile = i;
@@ -977,7 +969,7 @@ World.prototype.find_tile = function(height, y) {
 
 
 World.prototype.draw_avatar = function() {
-	let soffset = this.spec_soffsets[game.current_player.id];
+	const soffset = this.spec_soffsets[game.current_player.id];
 
 	ctx.drawImage(this.bg_pic,
 		this.spec_offset[0], this.spec_offset[1],
@@ -994,8 +986,8 @@ World.prototype.draw_avatar = function() {
 
 
 World.prototype.draw_bar = function() {
-	let w = this.bar_offset[0] - this.bar_icon_offset[0] + this.bar_dim[0];
-	let h = this.bar_dy * game.players.length;
+	const w = this.bar_offset[0] - this.bar_icon_offset[0] + this.bar_dim[0];
+	const h = this.bar_dy * game.players.length;
 	ctx.drawImage(this.bg_pic,
 		this.bar_icon_offset[0], this.bar_icon_offset[1],
 		w, h,
@@ -1028,8 +1020,8 @@ World.prototype.draw_bar = function() {
 
 
 World.prototype.draw_minispec = function() {
-	let w = this.minispec_delta[0] * 10;
-	let h = this.tomove_offset[1] - this.toplace_offset[1] + this.minispec_delta[1] * 2;
+	const w = this.minispec_delta[0] * 10;
+	const h = this.tomove_offset[1] - this.toplace_offset[1] + this.minispec_delta[1] * 2;
 	ctx.drawImage(this.bg_pic,
 		this.toplace_offset[0], this.toplace_offset[1],
 		w, h,
@@ -1055,8 +1047,6 @@ World.prototype.draw_minispec = function() {
 
 
 World.prototype.draw_worldmap = function() {
-	let tile = 0;
-	let soffset = [0, 0];
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
 			this.redraw_wm_part(x, y, true);
@@ -1073,7 +1063,7 @@ World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 		tile = game.world_map[y][x] + 47;
 	}
 
-	let soffset = [(tile % 41) * this.tile_dim[0], Math.floor(tile / 40) * this.tile_dim[0]];
+	const soffset = [(tile % 41) * this.tile_dim[0], Math.floor(tile / 40) * this.tile_dim[0]];
 
 	ctx.drawImage(this.map_pics,
 		soffset[0], soffset[1],

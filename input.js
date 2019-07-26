@@ -6,7 +6,7 @@
 	let mousePos = [0, 0];
 
 	function setKey(event, status) {
-		let code = event.code || event.key;
+		const code = event.code || event.key;
 		let key;
 
 		switch(code) {

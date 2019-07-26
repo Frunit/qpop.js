@@ -99,7 +99,7 @@ Ranking.prototype.redraw = function() {
 	});
 
 	// Draw wreath only if the game is finished
-	if(game.turn == game.max_turns) {
+	if(game.turn === game.max_turns) {
 		ctx.drawImage(this.wreath_pic, this.wreath_offset[0], this.wreath_offset[1]);
 	}
 

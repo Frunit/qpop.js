@@ -35,8 +35,8 @@ function Game() {
 
 // The main game loop
 Game.prototype.main = function() {
-	let now = Date.now();
-	let dt = (now - this.last_time) / 1000;
+	const now = Date.now();
+	const dt = (now - this.last_time) / 1000;
 
 	this.update_fps(now);
 

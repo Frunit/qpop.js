@@ -63,7 +63,7 @@ Popup.prototype.initialize = function() {
 	this.sprite.render(ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
 
 	// Text
-	let line_correction = this.line_height * this.text.length / 2;
+	const line_correction = this.line_height * this.text.length / 2;
 	for(let i = 0; i < this.text.length; i++){
 		write_text(this.text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] - line_correction + this.line_height * i], 'white', 'black');
 	}

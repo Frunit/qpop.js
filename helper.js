@@ -94,7 +94,7 @@ function range(start, end) {
 
 function remove_from_array(arr, element) {
 	// Remove element from arr
-	let idx = arr.indexOf(element);
+	const idx = arr.indexOf(element);
 	if(idx !== -1) {
 		arr.splice(idx, 1);
 	}
@@ -104,13 +104,13 @@ function remove_from_array(arr, element) {
 function multiline(text, maxwidth) {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
-	let words = text.split(' ');
+	const words = text.split(' ');
+	const lines = [];
 	let line = words[0];
-	let lines = [];
 
 	for(let n = 1; n < words.length; n++) {
-		let test_line = line + ' ' + words[n];
-		let width = ctx.measureText(test_line).width;
+		const test_line = line + ' ' + words[n];
+		const width = ctx.measureText(test_line).width;
 		if(width > maxwidth) {
 			lines.push(line);
 			line = words[n];
@@ -142,7 +142,7 @@ function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
 }
 
 function draw_base() {
-	let bg = resources.get('gfx/dark_bg.png');
+	const bg = resources.get('gfx/dark_bg.png');
 	ctx.drawImage(bg, 0, 0);
 	ctx.save();
 	ctx.beginPath();

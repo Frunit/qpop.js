@@ -167,12 +167,12 @@ Survival.prototype.draw_minimap = function() {
 
 	const range = (game.current_player.stats[ATT_PERCEPTION] * 7 + game.current_player.stats[ATT_INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
 	let draw = false;
-	let sym, real_x, real_y, dist, threshold;
 
 	for(let y = -range; y < range; y++) {
-		real_y = this.level.character.tile[1] + y;
+		const real_y = this.level.character.tile[1] + y;
 		for(let x = -range; x < range; x++) {
-			real_x = this.level.character.tile[0] + x;
+			const real_x = this.level.character.tile[0] + x;
+			let sym;
 
 			// If the range is too low, don't show anything here
 			if(range <= Math.sqrt(y**2 + x**2) * 10 - 30) {
@@ -201,6 +201,7 @@ Survival.prototype.draw_minimap = function() {
 				}
 			}
 			else if(this.level.map[real_y][real_x] < 36) {
+				let threshold;
 				switch(this.level.map[real_y][real_x] % 6) {
 					case 3:
 						threshold = 75;
@@ -236,7 +237,7 @@ Survival.prototype.draw_minimap = function() {
 
 
 Survival.prototype.draw_steps = function() {
-	let width = 40; // TODO
+	const width = 40; // TODO
 
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
@@ -250,7 +251,7 @@ Survival.prototype.draw_steps = function() {
 
 
 Survival.prototype.draw_time = function() {
-	let width = 40; // TODO
+	const width = 40; // TODO
 
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
@@ -610,14 +611,15 @@ Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
 	const evasion = game.current_player.stats[ATT_CAMOUFLAGE] * 4 + game.current_player.stats[ATT_SPEED] * 2 +  game.current_player.stats[ATT_INTELLIGENCE];
 
-	let pos, dirs, dx, dy, dist, scent_chance, target_dirs;
-
 	for(let predator of this.level.predators) {
-		pos = predator.tile;
+		const pos = predator.tile;
 
-		dx = Math.abs(pos[0] - player_pos[0]);
-		dy = Math.abs(pos[1] - player_pos[1]);
-		dist = Math.max(dx, dy);
+		const dx = Math.abs(pos[0] - player_pos[0]);
+		const dy = Math.abs(pos[1] - player_pos[1]);
+		const dist = Math.max(dx, dy);
+
+		let scent_chance;
+
 		switch(dist) {
 			case 1: scent_chance = -1; break;
 			case 2: scent_chance = 10; break;
@@ -627,8 +629,8 @@ Survival.prototype.start_predator_movement = function() {
 		scent_chance *= predator.scent;
 
 		// Open directions. Note, that a predator may not go backwards!
-		dirs = this.level.get_dirs(predator.tile, predator.last_movement);
-		target_dirs = [0, 0];
+		const dirs = this.level.get_dirs(predator.tile, predator.last_movement);
+		const target_dirs = [0, 0];
 
 		// If the predator scents the player, try to get closer or don't move at all.
 		// If possible, move closer on the axis where the predator is further away.

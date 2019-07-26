@@ -82,7 +82,7 @@ Init.prototype.redraw = function() {
 	const right_line_from = this.text_iq_offset[0] + distance;
 
 	for(let playernum = 0; playernum < this.panel_offsets.length; playernum++) {
-		let panel_offset = this.panel_offsets[playernum];
+		const panel_offset = this.panel_offsets[playernum];
 		ctx.drawImage(this.bg,						// Panel
 			this.panel_soffset[0], this.panel_soffset[1],
 			this.panel_dim[0], this.panel_dim[1],
@@ -277,8 +277,8 @@ Init.prototype.handle_input = function(dt) {
 
 Init.prototype.change_type = function(num, value) {
 	game.players[num].type = (game.players[num].type + value) % 3 + 1;
-	let soffset = this.type_soffsets[game.players[num].type];
-	let panel_offset = this.panel_offsets[num];
+	const soffset = this.type_soffsets[game.players[num].type];
+	const panel_offset = this.panel_offsets[num];
 	ctx.drawImage(this.bg,						// Player symbol
 		soffset[0], soffset[1],
 		this.type_dim[0], this.type_dim[1],
@@ -289,9 +289,10 @@ Init.prototype.change_type = function(num, value) {
 
 Init.prototype.change_iq = function(num, iq) {
 	game.players[num].iq = iq;
-	let panel_offset = this.panel_offsets[num];
+	const panel_offset = this.panel_offsets[num];
+
 	for(let i = 1; i <= 4; i++) {
-		let soffset = (i === iq) ? this.iq_soffsets[iq] : this.iq_soffsets[0];
+		const soffset = (i === iq) ? this.iq_soffsets[iq] : this.iq_soffsets[0];
 		ctx.drawImage(this.bg,						// IQ symbol
 			soffset[0], soffset[1],
 			this.iq_dim[0], this.iq_dim[1],
@@ -305,6 +306,7 @@ Init.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 	let no_human = true;
 	let known_first_player = false;
+
 	for(let i = 0; i < game.players.length; i++) {
 		if(!known_first_player && game.players[i].type !== NOBODY) {
 			known_first_player = true;

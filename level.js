@@ -21,15 +21,14 @@ function Level() {
 
 
 Level.prototype.listToMap = function(mainpart, border) {
-	let matrix = Array(100);
-	let j;
+	const matrix = Array(100);
 
 	for(let i = 0; i < 3; i++) {
 		matrix[i] = border.slice(i*100, (i+1)*100);
 	}
 
 	for(let i = 0; i < 94; i++) {
-		j = i+3;
+		const j = i+3;
 		matrix[j] = [];
 		matrix[j].push(...border.slice(300+i*6, 303+i*6));
 		matrix[j].push(...mainpart.slice(i*94, (i+1)*94));
@@ -47,7 +46,7 @@ Level.prototype.listToMap = function(mainpart, border) {
 Level.prototype.count_wm_neighbours = function() {
 	return [5, new Set([4, 5])]; // DEBUG
 	/*let num_neighbours = 0;
-	let enemies = new Set();
+	const enemies = new Set();
 	const wm_width = game.map_positions[0].length;
 	const wm_height = game.map_positions.length;
 	const player = game.current_player.id;
@@ -102,10 +101,9 @@ Level.prototype.generate_map = function() {
 	wtable[2] = 10*wfactor; // DEBUG Should be determined by the positions on the world map
 
 	// Add food to the map
-	let factor;
 	for(let i = 0; i < 5; i++) {
 		if(wtable[i] > 0) {
-			factor = wtable[i]/mod_density;
+			const factor = wtable[i]/mod_density;
 			mainpart.push(...Array(4*factor|0).fill(plant_offsets[i]+5));
 			mainpart.push(...Array(7*factor|0).fill(plant_offsets[i]+4));
 			mainpart.push(...Array(10*factor|0).fill(plant_offsets[i]+3));
@@ -162,7 +160,7 @@ Level.prototype.populate = function() {
 	console.log('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
 	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
-	let pos, species;
+	let pos;
 
 	// Place the player somewhere around the center
 	this.place_player([49, 49]);
@@ -174,7 +172,7 @@ Level.prototype.populate = function() {
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
-		species = random_int(0, 1 + game.humans_present);
+		const species = random_int(0, 1 + game.humans_present);
 		this.mobmap[pos[1]][pos[0]] = new Predator(species, pos);
 		this.predators.push(this.mobmap[pos[1]][pos[0]]);
 	};
@@ -194,7 +192,7 @@ Level.prototype.populate = function() {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-		species = random_element(this.enemies);
+		const species = random_element(this.enemies);
 		this.mobmap[pos[1]][pos[0]] = new Enemy(species, pos);
 	};
 };
@@ -223,7 +221,7 @@ Level.prototype.place_player = function(ideal_pos) {
 
 
 Level.prototype.find_free_tiles = function() {
-	let free_tiles = [];
+	const free_tiles = [];
 	// Go through all fields in the map (disregarding the border) and check if
 	// it is non-blocking.
 	for(let y = 3; y < 97; y++) {
@@ -240,12 +238,12 @@ Level.prototype.find_free_tiles = function() {
 
 
 Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
-	let left_counts = Array.from(Array(search_size), _ => Array(search_size).fill(0));
-	let good_positions = [];
-	let count, x, y;
+	const left_counts = Array.from(Array(search_size), _ => Array(search_size).fill(0));
+	const good_positions = [];
 
-	for(y = 0; y < search_size; y++) {
-		for(x = 0; x < search_size; x++) {
+	for(let y = 0; y < search_size; y++) {
+		for(let x = 0; x < search_size; x++) {
+			let count;
 			if(this.blocking[this.map[y + pos[1]][x + pos[0]]] === '0' && this.mobmap[y + pos[1]][x + pos[0]] === null)
 			{
 				if(x > 0) {
@@ -262,8 +260,8 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 		}
 	}
 
-	for(y = min_size-1; y < search_size; y++) {
-		for(x = min_size-1; x < search_size; x++) {
+	for(let y = min_size-1; y < search_size; y++) {
+		for(let x = min_size-1; x < search_size; x++) {
 			if(left_counts[y][x] >= min_size && left_counts[y-1][x] >= min_size && left_counts[y-2][x] >= min_size) {
 				good_positions.push([x + pos[0] - 1, y + pos[1] - 1]); // I want to have the center of the square
 			}
@@ -275,9 +273,9 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 
 
 Level.prototype.request_sprite = function(x, y) {
-	let type = this.map[y][x];
-	let xx = Math.floor(type % 10);
-	let yy = Math.floor(type / 10);
+	const type = this.map[y][x];
+	const xx = Math.floor(type % 10);
+	const yy = Math.floor(type / 10);
 	this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], [xx*64, yy*64]);
 };
 
@@ -286,17 +284,17 @@ Level.prototype.get_dirs = function(pos, last_movement=0) {
 	const x = pos[0];
 	const y = pos[1];
 
-	let dirs = [];
-	if(last_movement != WEST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
+	const dirs = [];
+	if(last_movement !== WEST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
 		dirs.push(EAST);
 	}
-	if(last_movement != EAST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
+	if(last_movement !== EAST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
 		dirs.push(WEST);
 	}
-	if(last_movement != NORTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
+	if(last_movement !== NORTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
 		dirs.push(SOUTH);
 	}
-	if(last_movement != SOUTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
+	if(last_movement !== SOUTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
 		dirs.push(NORTH);
 	}
 

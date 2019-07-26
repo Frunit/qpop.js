@@ -32,8 +32,8 @@ Sprite.prototype.is_new_frame = function() {
 
 
 Sprite.prototype.render = function(ctx, pos) {
-	let real_idx = this.idx % this.frames.length;
-	let frame = this.frames[real_idx];
+	const real_idx = this.idx % this.frames.length;
+	const frame = this.frames[real_idx];
 
 	if(this.once && real_idx === this.frames.length - 1) {
 		this.finished = true;
