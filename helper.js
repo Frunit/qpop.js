@@ -122,19 +122,19 @@ function download(data, filename, type) {
 
 
 function upload_dialog() {
-	let input = document.createElement('input');
+	const input = document.createElement('input');
 	input.type = 'file';
 	input.accept = '.qpp';
 
-	input.onchange = (event) => {
-		let file = event.target.files[0];
-		let reader = new FileReader();
+	input.addEventListener('change', (event) => {
+		const file = event.target.files[0];
+		const reader = new FileReader();
 		reader.readAsArrayBuffer(file);
 
-		reader.onload = readerEvent => {
+		reader.addEventListener('load', readerEvent => {
 			game.load_game(readerEvent.target.result);
-		}
-	};
+		});
+	});
 
 	input.click();
 };
