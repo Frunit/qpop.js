@@ -8,6 +8,8 @@
 	let resourceCache = {};
 	let loading = [];
 	let readyCallback = null;
+	let progressCallback = null;
+	let loaded = 0;
 
 	// Load an array of sound urls
 	function load(Arr) {
@@ -24,6 +26,9 @@
 			request.onload = function() => {
 				context.decodeAudioData(request.response, (buffer) => {
 					resourceCache[url] = buffer;
+
+					loaded++;
+					progressCallback(loaded);
 
 					if(isReady()) {
 						readyCallback();
@@ -51,10 +56,17 @@
 		readyCallback = func;
 	}
 
+	function onProgress(func) {
+		progressCallback = func;
+	}
+
+
+
 	window.audio = {
 		load: load,
 		get: get,
 		onReady: onReady,
-		isReady: isReady
+		onProgress: onProgress,
+		isReady: isReady,
 	};
 })();

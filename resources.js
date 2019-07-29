@@ -4,6 +4,8 @@
 (function() {
 	let resourceCache = {};
 	let readyCallback = null;
+	let progressCallback = null;
+	let loaded = 0;
 
 	// Load an image url or an array of image urls
 	function load(Arr) {
@@ -15,6 +17,9 @@
 			let img = new Image();
 			img.onload = function() {
 				resourceCache[url] = img;
+
+				loaded++;
+				progressCallback(loaded);
 
 				if(isReady()) {
 					readyCallback();
@@ -42,10 +47,15 @@
 		readyCallback = func;
 	}
 
+	function onProgress(func) {
+		progressCallback = func;
+	}
+
 	window.resources = {
 		load: load,
 		get: get,
 		onReady: onReady,
-		isReady: isReady
+		onProgress: onProgress,
+		isReady: isReady,
 	};
 })();
