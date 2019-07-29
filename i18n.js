@@ -28,9 +28,8 @@ const de = {
 	transition_mutations: '', // Monstren und Mutationen
 	transition_survival: '',  // Fressen und gefressen werden
 	transition_world: '',     // Der Krieg der Arten
-	debug_no_loading: 'Laden ist leider noch nicht möglich.',
-	debug_no_saving: 'Speichern ist leider noch nicht möglich.',
-	debug_too_bad: 'Schade'
+	not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
+	debug_too_bad: 'Schade',
 };
 
 const en = {
@@ -61,7 +60,6 @@ const en = {
 	transition_mutations: 'Monsters and Mutants',
 	transition_survival: 'Eat and Be Eaten',
 	transition_world: 'The War of the Species',
-	debug_no_loading: 'Unfortunately, it is currently not possible to load a game.',
-	debug_no_saving: 'Unfortunately, it is currently not possible to save a game.',
-	debug_too_bad: 'Too bad!'
+	not_a_savegame: 'The file is not a valid Q-Pop save game.',
+	debug_too_bad: 'Too bad!',
 };

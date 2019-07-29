@@ -270,15 +270,11 @@ Ranking.prototype.next = function() {
 
 Ranking.prototype.load_game = function() {
 	draw_rect(this.load_offset, this.load_dim);
-	open_popup(lang.popup_title, 'dino_cries', lang.debug_no_loading, () => {}, lang.debug_too_bad);
-
-	// TODO → Load game
+	upload_dialog();
 };
 
 
 Ranking.prototype.save_game = function() {
 	draw_rect(this.load_offset, this.load_dim);
-	open_popup(lang.popup_title, 'dino_cries', lang.debug_no_saving, () => {}, lang.debug_too_bad);
-
-	// TODO → Save game
+	game.save_game();
 };

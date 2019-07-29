@@ -331,7 +331,5 @@ Init.prototype.next = function() {
 
 Init.prototype.load_game = function() {
 	draw_rect(this.load_offset, this.load_dim);
-	open_popup(lang.popup_title, 'dino_cries', lang.debug_no_loading, () => {}, lang.debug_too_bad);
-
-	// TODO → Load game
+	upload_dialog();
 };

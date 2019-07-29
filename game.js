@@ -225,7 +225,7 @@ Game.prototype.load_game = function(save_file) {
 	const content = new DataView(save_file);
 
 	if(save_file.size !== 4171 || new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
-		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.ok);
+		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.next);
 		return;
 	}
 
