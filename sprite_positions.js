@@ -444,47 +444,47 @@ const anims_predators = [
 			},
 		],
 	},
-	/*{   // Mushroom
+	{   // Mushroom
 		still: {
 			soffset: [0, 0],
 			frames: [[0, 0]],
 		},
 		north: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [384, 0],
+			frames: [[0, 0], [0, 64], [0, 64], [0, 0], [0, 0], [0, 64], [0, 64], [0, 0]],
 		},
 		south: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [0, 0],
+			frames: [[128, 64], [128, 64], [320, 0], [320, 0], [128, 64], [128, 64], [320, 0], [320, 0]],
 		},
 		east: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [0, 0],
+			frames: [[64, 0], [0, 64], [0, 64], [128, 0], [64, 0], [0, 64], [0, 64], [128, 0]],
 		},
 		west: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [0, 0],
+			frames: [[192, 0], [64, 64], [64, 64], [256, 0], [192, 0], [64, 64], [64, 64], [256, 0]],
 		},
 		attack: {
-			soffset: [, ],
-			frames: [[, ]],  // N E S W
+			soffset: [0, 0],
+			frames: [[384, 0], [0, 64], [128, 64], [64, 64]],  // N E S W; TODO RESEARCH: North unclear
 		},
 		winner: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [0, 0],
+			frames: [[0, 0], [320, 64], [384, 64], [448, 64], [512, 64]],
 		},
 		defeated: [
-			{
-				soffset: [, ],
-				frames: [[, ]],
+			{ // Soup
+				soffset: [576, 64],
+				frames: [[0, 0]],
+			},
+			{ // Plaster
+				soffset: [0, 128],
+				frames: [[0, 0]],
 			},
 			{
-				soffset: [, ],
-				frames: [[, ]],
-			},
-			{
-				soffset: [, ],
-				frames: [[, ]],
+				soffset: [64, 128],
+				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 			},
 		],
 	},
@@ -494,44 +494,44 @@ const anims_predators = [
 			frames: [[0, 0]],
 		},
 		north: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [192, 64],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		south: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [0, 0],
+			frames: [[576, 0], [0, 64], [64, 64], [128, 64]],
 		},
 		east: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [64, 0],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		west: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [320, 0],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 		},
 		attack: {
-			soffset: [, ],
-			frames: [[, ]],  // N E S W
+			soffset: [0, 0],
+			frames: [[192, 64], [64, 0], [576, 0], [320, 0]],  // N E S W; TODO RESEARCH: All unclear
 		},
 		winner: {
-			soffset: [, ],
-			frames: [[, ]],
+			soffset: [448, 64],
+			frames: [[0, 0]],
 		},
 		defeated: [
-			{
-				soffset: [, ],
-				frames: [[, ]],
+			{ // Stars
+				soffset: [0, 64],
+				frames: [[512, 0], [576, 0], [0, 64], [64, 64]],
 			},
-			{
-				soffset: [, ],
-				frames: [[, ]],
+			{ // Naked
+				soffset: [128, 128],
+				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 			},
-			{
-				soffset: [, ],
-				frames: [[, ]],
+			{ // RIP
+				soffset: [384, 128],
+				frames: [[0, 0]],
 			},
 		],
-	},*/
+	},
 ];
 
 const anims_clouds = {

@@ -337,7 +337,6 @@ function Character(species, tile) {
 
 
 function Predator(species, tile) {
-	species = 0; // DEBUG
 	this.type = SM_PREDATOR;
 	this.tile = tile;
 	this.species = species;
