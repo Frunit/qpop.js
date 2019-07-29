@@ -18,6 +18,10 @@ let options = {
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
 	transition_delay: 0.5, // How many seconds to show the transition screens
 	surv_move_speed: 80, // Speed of the player figure in survival (TODO: what unit?? Pixel per second?)
+	music_on: true,
+	music: 255, // Music volume (0 - 255)
+	sound_on: true,
+	sound: 255, // Sound volume (0 - 255)
 };
 
 
@@ -143,6 +147,162 @@ Game.prototype.test_finished = function() {
 
 	this.stage = new Outro();
 }
+
+
+Game.prototype.save_game = function() {
+	const save_file = new ArrayBuffer(4171);
+	const content = new DataView(save_file);
+
+	const qpopstring = 'Q-POP Savegame';
+	for(let i = 0; i < qpopstring.length, i++) {
+		content.setUint8(i, qpopstring.charCodeAt(i));
+	}
+
+	content.setUint8(0x10, options.music_on);
+	content.setUint8(0x11, options.music);
+	content.setUint8(0x12, options.sound_on);
+	content.setUint8(0x13, options.sound);
+
+	for(let i = 0; i < game.players.length; i++) {
+		const p = game.players[i];
+		content.setUint8(0x14 + 2*i, p.type);
+		content.setUint8(0x15 + 2*i, p.iq);
+
+		const offset = 0x17 * i;
+		content.setUint8(0x20 + offset, p.stats[ATT_ATTACK]);
+		content.setUint8(0x21 + offset, p.stats[ATT_DEFENSE]);
+		content.setUint8(0x22 + offset, p.stats[ATT_REPRODUCTION]);
+		content.setUint8(0x23 + offset, p.stats[ATT_CAMOUFLAGE]);
+		content.setUint8(0x24 + offset, p.stats[ATT_SPEED]);
+		content.setUint8(0x25 + offset, p.stats[ATT_PERCEPTION]);
+		content.setUint8(0x26 + offset, p.stats[ATT_INTELLIGENCE]);
+
+		content.setUint8(0x27 + offset, p.deaths);  // Unused
+		content.setUint8(0x28 + offset, p.experience);  // Unused
+		content.setUint8(0x29 + offset, Math.floor(p.eaten / 37));  // Unused
+		content.setUint8(0x2a + offset, p.individuals);  // Unused (counted on map)
+		content.setUint8(0x2b + offset, p.evo_score);
+		content.setUint8(0x2c + offset, p.tomove);
+		content.setUint8(0x2d + offset, p.toplace);
+		content.setUint16(0x2e + offset, p.total_score, true);
+
+		content.setUint8(0x30 + offset, p.stats[ATT_RANGONES]);
+		content.setUint8(0x31 + offset, p.stats[ATT_BLUELEAF]);
+		content.setUint8(0x32 + offset, p.stats[ATT_HUSHROOMS]);
+		content.setUint8(0x33 + offset, p.stats[ATT_STINKBALLS]);
+		content.setUint8(0x34 + offset, p.stats[ATT_SNAKEROOTS]);
+		content.setUint8(0x35 + offset, p.stats[ATT_FIREGRASS]);
+		content.setUint8(0x36 + offset, !p.is_dead);
+		content.setUint8(0x1042 + i, p.is_dead);
+	}
+
+	content.setUint16(0xaa, game.turn, true);
+	content.setUint8(0xac, game.max_turns);
+	content.setUint8(0xad, game.humans_present);
+	content.setUint16(0xb1, game.water_level, true);
+	content.setUint16(0xb3, game.humid, true);
+	content.setUint16(0xb5, game.temp, true);
+
+	const size = 28;
+
+	for(let y = 0; y < size; y++) {
+		for(let x = 0; x < size; x++) {
+			const i = x + y*size;
+			const j = y + x*size; // x and y are exchanged in the heightmap for some reason
+
+			content.setUint8(0xb7 + i, game.world_map[y][x]);
+			content.setUint8(0x3c7 + j, game.height_map[y][x]);
+			content.setUint8(0x6d7 + i, game.map_positions[y][x]);
+		}
+	}
+
+	// TODO: The following two options:
+	//content.setUint8(); // Set when the game is infinite (not in the mechanics yet)
+	//content.setUint8(); // Set when the all enemies are dead and the player continues alone (not in the mechanics yet)
+	content.setUint8(0x104b, 1);
+
+	download(save_file, 'qpop_save.qpp', 'application/octet-stream');
+};
+
+
+Game.prototype.load_game = function(save_file) {
+	// NB! Except for a simple test for the right file type, I do not do any sanity checks. The file will only be processed on the client side with data provided by the client, so at worst, the game will freeze when using a manipulated file.
+
+	const content = new DataView(save_file);
+
+	if(save_file.size !== 4171 || new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
+		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.ok);
+		return;
+	}
+
+	options.music_on = !!content.getUint8(0x10);
+	options.music = content.getUint8(0x11);
+	options.sound_on = !!content.getUint8(0x12);
+	options.sound = content.getUint8(0x13);
+
+	for(let i = 0; i < game.players.length; i++) {
+		const p = game.players[i];
+		p.type = content.getUint8(0x14 + 2*i);
+		p.iq = content.getUint8(0x15 + 2*i);
+
+		const offset = 0x17 * i;
+		p.stats[ATT_ATTACK] = content.getUint8(0x20 + offset);
+		p.stats[ATT_DEFENSE] = content.getUint8(0x21 + offset);
+		p.stats[ATT_REPRODUCTION] = content.getUint8(0x22 + offset);
+		p.stats[ATT_CAMOUFLAGE] = content.getUint8(0x23 + offset);
+		p.stats[ATT_SPEED] = content.getUint8(0x24 + offset);
+		p.stats[ATT_PERCEPTION] = content.getUint8(0x25 + offset);
+		p.stats[ATT_INTELLIGENCE] = content.getUint8(0x26 + offset);
+
+		p.evo_score = content.getUint8(0x2b + offset);
+		p.tomove = content.getUint8(0x2c + offset);
+		p.toplace = content.getUint8(0x2d + offset);
+		p.total_score = content.getUint16(0x2e + offset, true);
+
+		p.stats[ATT_RANGONES] = content.getUint8(0x30 + offset);
+		p.stats[ATT_BLUELEAF] = content.getUint8(0x31 + offset);
+		p.stats[ATT_HUSHROOMS] = content.getUint8(0x32 + offset);
+		p.stats[ATT_STINKBALLS] = content.getUint8(0x33 + offset);
+		p.stats[ATT_SNAKEROOTS] = content.getUint8(0x34 + offset);
+		p.stats[ATT_FIREGRASS] = content.getUint8(0x35 + offset);
+		p.is_dead = !content.getUint8(0x36 + offset);
+
+		p.individuals = 0;
+	}
+
+	game.turn = content.getUint16(0xaa, true);
+	game.max_turns = content.getUint8(0xac);
+	game.humans_present = content.getUint8(0xad);
+	game.water_level = content.getUint16(0xb1, true);
+	game.humid = content.getUint16(0xb3, true);
+	game.temp = content.getUint16(0xb5, true);
+
+	const size = 28;
+
+	game.world_map = Array.from(Array(size), _ => Array(size).fill(0));
+	game.height_map = Array.from(Array(size), _ => Array(size).fill(0));
+	game.map_positions = Array.from(Array(size), _ => Array(size).fill(0));
+
+
+	for(let y = 0; y < size; y++) {
+		for(let x = 0; x < size; x++) {
+			const i = x + y*size;
+			const j = y + x*size; // x and y are exchanged in the heightmap for some reason
+
+			game.world_map[y][x] = content.getUint8(0xb7 + i);
+			game.height_map[y][x] = content.getUint8(0x3c7 + j);
+
+			const map_pos = content.getUint8(0x6d7 + i);
+			game.map_positions[y][x] = map_pos;
+			if(map_pos > 0) {
+				game.players[map_pos].individuals++;
+			}
+		}
+	}
+
+	game.stage = new Survival();
+	game.stage.initialize();
+};
 
 
 function Player(num) {

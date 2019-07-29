@@ -101,6 +101,45 @@ function remove_from_array(arr, element) {
 }
 
 
+function download(data, filename, type) {
+	// https://stackoverflow.com/a/30832210
+
+	const file = new Blob([data], {type: type});
+	if(window.navigator.msSaveOrOpenBlob) // IE10+
+		window.navigator.msSaveOrOpenBlob(file, filename);
+	else { // Other browsers
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(file);
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		setTimeout(function() {
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
+		}, 0);
+	}
+}
+
+
+function upload_dialog() {
+	let input = document.createElement('input');
+	input.type = 'file';
+	input.accept = '.qpp';
+
+	input.onchange = (event) => {
+		let file = event.target.files[0];
+		let reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+
+		reader.onload = readerEvent => {
+			game.load_game(readerEvent.target.result);
+		}
+	};
+
+	input.click();
+};
+
+
 function multiline(text, maxwidth) {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
