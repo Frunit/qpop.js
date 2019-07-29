@@ -1,6 +1,7 @@
 'use strict';
 
-function Transition(pic) {
+function Transition(pic, id) {
+	this.id = id;
 	this.pic = resources.get(pic);
 
 	// CONST_START

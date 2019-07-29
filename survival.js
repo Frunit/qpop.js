@@ -1,6 +1,7 @@
 'use strict';
 
 function Survival() {
+	this.id = 10;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.gui_pics = resources.get('gfx/survival_gui.png');
 

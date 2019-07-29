@@ -83,15 +83,9 @@ Game.prototype.start = function() {
 	this.map_positions = null;
 	//this.stage = new Intro(); // DEBUG
 	this.stage = new Survival(); // DEBUG
-	this.stagemanager = new Stagemanager();
 	this.stage.initialize();
 	this.last_time = Date.now();
 	this.main();
-};
-
-
-Game.prototype.next_stage = function() {
-	this.stagemanager.next();
 };
 
 
@@ -305,35 +299,8 @@ Game.prototype.load_game = function(save_file) {
 };
 
 
-function Player(num) {
-	this.id = num;
-	this.iq = 2;
-	this.type = (num === 1) ? HUMAN : NOBODY;  // DEBUG
-	//this.type = (num === 0) ? HUMAN : COMPUTER;
-	this.individuals = 0;
-	this.toplace = 10;
-	this.tomove = 0;
-	this.is_dead = false;
-	this.loved = 0;
-	this.eaten = 0;
-	this.experience = 0;
-	this.deaths = 0;
-	this.evo_score = 100;
-	this.total_score = 230;
-	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-};
-
-
-function Stagemanager(stage) {
-	this.stage = stage ? stage : 0;
-};
-
-// #####################################################################
-// TODO: If the next scene is not available, the current one will update for the
-// first player after game.next_player() is called.
-// #####################################################################
-Stagemanager.prototype.next = function() {
-	switch(this.stage) {
+Game.prototype.next_stage = function() {
+	switch(this.stage.id) {
 	case 0: // Intro
 		this.stage = 1;
 		game.stage = new Init(game.players);
@@ -346,7 +313,7 @@ Stagemanager.prototype.next = function() {
 		break;
 	case 2: // Choose game length
 		this.stage = 3;
-		game.stage = new Transition('gfx/transition_world.png', lang.transition_world);
+		game.stage = new Transition('gfx/transition_world.png', 3);
 		game.stage.initialize();
 		break;
 	case 3: // Transition screen
@@ -360,7 +327,7 @@ Stagemanager.prototype.next = function() {
 		} else {
 			if(game.turn === 0) {
 				this.stage = 7;
-				game.stage = new Transition('gfx/transition_mutations.png', lang.transition_world);
+				game.stage = new Transition('gfx/transition_mutations.png', 7);
 				game.stage.initialize();
 			}
 			else {
@@ -383,7 +350,7 @@ Stagemanager.prototype.next = function() {
 		}
 		else {
 			this.stage = 7;
-			game.stage = new Transition('gfx/transition_mutations.png', lang.transition_world);
+			game.stage = new Transition('gfx/transition_mutations.png', 7);
 		}
 		game.stage.initialize();
 		break;
@@ -398,7 +365,7 @@ Stagemanager.prototype.next = function() {
 			game.stage.next_player();
 		} else {
 			this.stage = 9;
-			game.stage = new Transition('gfx/transition_survival.png', lang.transition_survival);
+			game.stage = new Transition('gfx/transition_survival.png', 9);
 			game.stage.initialize();
 		}
 		break;
@@ -412,7 +379,7 @@ Stagemanager.prototype.next = function() {
 			game.stage.initialize();
 		} else {
 			this.stage = 3;
-			game.stage = new Transition('gfx/transition_world.png', lang.transition_survival);
+			game.stage = new Transition('gfx/transition_world.png', 3);
 			game.stage.initialize();
 		}
 		break;
@@ -421,6 +388,25 @@ Stagemanager.prototype.next = function() {
 	default:
 		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!', () => {}, 'Oh no!');
 	}
+};
+
+
+function Player(num) {
+	this.id = num;
+	this.iq = 2;
+	this.type = (num === 1) ? HUMAN : NOBODY;  // DEBUG
+	//this.type = (num === 0) ? HUMAN : COMPUTER;
+	this.individuals = 0;
+	this.toplace = 10;
+	this.tomove = 0;
+	this.is_dead = false;
+	this.loved = 0;
+	this.eaten = 0;
+	this.experience = 0;
+	this.deaths = 0;
+	this.evo_score = 100;
+	this.total_score = 230;
+	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 };
 
 

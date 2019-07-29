@@ -5,6 +5,7 @@
 // TODO: All animations (walking in, moving up, cheering)
 
 function Ranking() {
+	this.id = 6;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.pics = resources.get('gfx/ranking.png');
 	this.wreath_pic = resources.get('gfx/wreath.png');

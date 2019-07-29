@@ -3,6 +3,7 @@
 // TODO RESEARCH: Compare animation speed and frames with original for both animations
 
 function Turnselection() {
+	this.id = 2;
 	this.bg = resources.get('gfx/light_bg.png');
 	this.pics = resources.get('gfx/turns.png');
 

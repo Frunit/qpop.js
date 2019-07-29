@@ -2,6 +2,7 @@
 
 
 function Mutations() {
+	this.id = 8;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.pics = resources.get('gfx/mutations.png');
 	this.spec_pics = resources.get('gfx/species.png');

@@ -3,6 +3,7 @@
 // TODO RESEARCH: Check values. The pic is too big for the window.
 
 function Intro() {
+	this.id = 0;
 	this.pic = resources.get('gfx/dummy_intro.png');
 
 	// CONST_START

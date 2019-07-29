@@ -1,6 +1,7 @@
 'use strict';
 
 function World() {
+	this.id = 4;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.map_pics = resources.get('gfx/world.png');
 	this.spec_pics = resources.get('gfx/species.png');
