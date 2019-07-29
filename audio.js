@@ -4,11 +4,13 @@
 // https://css-tricks.com/introduction-web-audio-api/
 
 (function() {
-	let context = AudioContext();
+	let context = new AudioContext();
+	let music_node = context.createGain();
+	let sound_node = context.createGain();
 	let resourceCache = {};
 	let loading = [];
-	let readyCallback = null;
-	let progressCallback = null;
+	let readyCallback = () => {};
+	let progressCallback = () => {};
 	let loaded = 0;
 
 	// Load an array of sound urls
@@ -23,18 +25,18 @@
 			request.open('GET', url, true);
 			request.responseType = 'arraybuffer';
 
-			request.onload = function() => {
+			request.onload = () => {
 				context.decodeAudioData(request.response, (buffer) => {
 					resourceCache[url] = buffer;
+				}, (e) => {console.log('Error: ' + e.err)});
 
-					loaded++;
-					progressCallback(loaded);
+				loaded++;
+				progressCallback(loaded);
 
-					if(isReady()) {
-						readyCallback();
-					}
-				}, onError);
-			}
+				if(isReady()) {
+					readyCallback();
+				}
+			};
 			request.send();
 		}
 	}
@@ -60,11 +62,17 @@
 		progressCallback = func;
 	}
 
-
+	function play(file) {
+		const bufferSource = context.createBufferSource();
+		bufferSource.buffer = get(file);
+		bufferSource.connect(sound_node).connect(context.destination);
+		bufferSource.start();
+	};
 
 	window.audio = {
 		load: load,
 		get: get,
+		play: play,
 		onReady: onReady,
 		onProgress: onProgress,
 		isReady: isReady,

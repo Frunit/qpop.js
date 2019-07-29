@@ -3,8 +3,8 @@
 
 (function() {
 	let resourceCache = {};
-	let readyCallback = null;
-	let progressCallback = null;
+	let readyCallback = () => {};
+	let progressCallback = () => {};
 	let loaded = 0;
 
 	// Load an image url or an array of image urls
