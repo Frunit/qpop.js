@@ -317,7 +317,6 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 
 
 function Character(species, tile) {
-	species = 0; // DEBUG
 	this.type = SM_PLAYER;
 	this.tile = tile;
 	this.species = species;
@@ -364,7 +363,6 @@ Predator.prototype.defeat = function() {
 
 
 function Female(species, tile) {
-	species = 0; // DEBUG
 	this.type = SM_FEMALE;
 	this.tile = tile;
 	this.species = species;
@@ -385,7 +383,6 @@ Female.prototype.offspring = function() {
 
 
 function Enemy(species, tile) {
-	species = 0; // DEBUG
 	this.type = SM_ENEMY;
 	this.tile = tile;
 	this.species = species;
