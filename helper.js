@@ -2,62 +2,92 @@
 
 
 // World
-const WM_WATER = 0;
-const WM_DESERT = 1;
-const WM_RANGONES = 2;
-const WM_BLUELEAF = 3;
-const WM_HUSHROOMS = 4;
-const WM_STINKBALLS = 5;
-const WM_SNAKEROOTS = 6;
-const WM_FIREGRASS = 7;
-const WM_MOUNTAIN = 8;
-const WM_CRATER = 9;
-const WM_HUMANS = 10;
+const WORLD_MAP = Object.freeze({
+	WATER:      0,
+	DESERT:     1,
+	RANGONES:   2,
+	BLUELEAF:   3,
+	HUSHROOMS:  4,
+	STINKBALLS: 5,
+	SNAKEROOTS: 6,
+	FIREGRASS:  7,
+	MOUNTAIN:   8,
+	CRATER:     9,
+	HUMANS:    10,
+});
 
 // Attribute
-const ATT_RANGONES = 0;
-const ATT_BLUELEAF = 1;
-const ATT_HUSHROOMS = 2;
-const ATT_STINKBALLS = 3;
-const ATT_SNAKEROOTS = 4;
-const ATT_FIREGRASS = 5;
-const ATT_REPRODUCTION = 6;
-const ATT_ATTACK = 7;
-const ATT_DEFENSE = 8;
-const ATT_CAMOUFLAGE = 9;
-const ATT_SPEED = 10;
-const ATT_PERCEPTION = 11;
-const ATT_INTELLIGENCE = 12;
+const ATTR = Object.freeze({
+	RANGONES:      0,
+	BLUELEAF:      1,
+	HUSHROOMS:     2,
+	STINKBALLS:    3,
+	SNAKEROOTS:    4,
+	FIREGRASS:     5,
+	REPRODUCTION:  6,
+	ATTACK:        7,
+	DEFENSE:       8,
+	CAMOUFLAGE:    9,
+	SPEED:        10,
+	PERCEPTION:   11,
+	INTELLIGENCE: 12,
+});
 
 // Directions
-const NORTH = 1;
-const EAST = 2;
-const SOUTH = 3;
-const WEST = 4;
+const DIR = Object.freeze({
+	N: 1,
+	E: 2,
+	S: 3,
+	W: 4,
+});
 
 // Player types
-const HUMAN = 1;
-const COMPUTER = 2;
-const NOBODY = 3;
+const PLAYER_TYPE = Object.freeze({
+	HUMAN:    1,
+	COMPUTER: 2,
+	NOBODY:   3,
+});
 
 // Predators
-const PRED_DINO = 0;
-const PRED_MUSHROOM = 1;
-const PRED_HUMAN = 2;
+const PRED = Object.freeze({
+	DINO:     0,
+	MUSHROOM: 1,
+	HUMAN:    2,
+});
 
 // Living objects on survival map
-const SM_PLACEHOLDER = 0;
-const SM_PLAYER = 1;
-const SM_PREDATOR = 2;
-const SM_ENEMY = 3;
-const SM_FEMALE = 4;
-const SM_UNRESPONSIVE = 5; // For defeated entities, offspring, etc.
+const SURV_MAP = Object.freeze({
+	PLACEHOLDER:  0,
+	PLAYER:       1,
+	PREDATOR:     2,
+	ENEMY:        3,
+	FEMALE:       4,
+	UNRESPONSIVE: 5, // For defeated entities, offspring, etc.
+});
 
-const placeholder = {
-	type: SM_PLACEHOLDER
-};
 
-const correct_world_tile = [0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 41, 17, 41, 37, 45, 37, 45, 28, 41, 17, 41, 37, 45, 37, 45, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 41, 17, 41, 37, 45, 37, 45, 28, 41, 17, 41, 37, 45, 37, 45, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 41, 24, 41, 33, 45, 33, 45, 16, 41, 24, 41, 33, 45, 33, 45, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 41, 24, 41, 33, 45, 33, 45, 16, 41, 24, 41, 33, 45, 33, 45, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47];
+const SCENE = Object.freeze({
+	LOADING:         1,
+	INTRO:           2,
+	INIT:            3,
+	TURN_SELECTION:  4,
+	TRANS_WORLD:     5,
+	WORLD:           6,
+	CATASTROPHE:     7,
+	RANKING:         8,
+	TRANS_MUTATION:  9,
+	MUTATION:       10,
+	TRANS_SURVIVAL: 11,
+	SURVIVAL:       12,
+	OUTRO:          13,
+	POPUP:          -1,
+});
+
+const placeholder = Object.freeze({
+	type: SURV_MAP.PLACEHOLDER
+});
+
+const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 41, 17, 41, 37, 45, 37, 45, 28, 41, 17, 41, 37, 45, 37, 45, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 41, 17, 41, 37, 45, 37, 45, 28, 41, 17, 41, 37, 45, 37, 45, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 41, 24, 41, 33, 45, 33, 45, 16, 41, 24, 41, 33, 45, 33, 45, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 41, 24, 41, 33, 45, 33, 45, 16, 41, 24, 41, 33, 45, 33, 45, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47, 31, 39, 22, 39, 42, 46, 42, 46, 19, 35, 27, 35, 42, 46, 42, 46, 36, 43, 32, 43, 44, 47, 44, 47, 36, 43, 32, 43, 44, 47, 44, 47]);
 
 
 function random_element(arr) {

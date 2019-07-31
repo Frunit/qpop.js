@@ -5,7 +5,7 @@
 // TODO: All animations (walking in, moving up, cheering)
 
 function Ranking() {
-	this.id = 6;
+	this.id = SCENE.RANKING;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.pics = resources.get('gfx/ranking.png');
 	this.wreath_pic = resources.get('gfx/wreath.png');
@@ -134,7 +134,7 @@ Ranking.prototype.redraw = function() {
 
 	// Draw symbols in pillar signs
 	for(let i = 0; i < 6; i++) {
-		if(game.players[i].type === NOBODY) { // Out of order
+		if(game.players[i].type === PLAYER_TYPE.NOBODY) { // Out of order
 			ctx.drawImage(this.pics,
 				this.outoforder_soffset[0], this.outoforder_soffset[1],
 				this.species_dim[0], this.species_dim[1],

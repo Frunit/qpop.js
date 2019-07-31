@@ -2,7 +2,7 @@
 
 
 function Mutations() {
-	this.id = 8;
+	this.id = SCENE.MUTATION;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.pics = resources.get('gfx/mutations.png');
 	this.spec_pics = resources.get('gfx/species.png');
@@ -53,7 +53,7 @@ Mutations.prototype.initialize = function() {
 
 	this.redraw();
 
-	if(game.current_player.type === COMPUTER) {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 		this.next_popup(1);
 	}
@@ -63,7 +63,7 @@ Mutations.prototype.initialize = function() {
 Mutations.prototype.next_player = function() {
 	this.stats = game.current_player.stats.slice();
 
-	if(game.current_player.type === COMPUTER) {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 		this.next_popup(1);
 	}

@@ -47,7 +47,7 @@
 
 	function isReady() {
 		for(let k in loading) {
-			if(!resourceCache[k]) {
+			if(resourceCache.hasOwnProperty(k) && !resourceCache[k]) {
 				return false;
 			}
 		}

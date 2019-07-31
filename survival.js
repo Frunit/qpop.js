@@ -1,7 +1,7 @@
 'use strict';
 
 function Survival() {
-	this.id = 10;
+	this.id = SCENE.SURVIVAL;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.gui_pics = resources.get('gfx/survival_gui.png');
 
@@ -76,7 +76,7 @@ Survival.prototype.initialize = function() {
 	game.current_player.experience = 0;
 	game.current_player.deaths = 0;
 
-	if(game.current_player.type === COMPUTER) {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 	}
 
@@ -166,7 +166,7 @@ Survival.prototype.draw_minimap = function() {
 	const MM_PREDATOR = 3;
 	const MM_ENEMY = 4;
 
-	const range = (game.current_player.stats[ATT_PERCEPTION] * 7 + game.current_player.stats[ATT_INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
+	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
 	let draw = false;
 
 	for(let y = -range; y < range; y++) {
@@ -187,15 +187,15 @@ Survival.prototype.draw_minimap = function() {
 			}
 			else if(this.level.mobmap[real_y][real_x] !== null) {
 				switch(this.level.mobmap[real_y][real_x].type) {
-					case SM_PREDATOR:
+					case SURV_MAP.PREDATOR:
 						draw = true;
 						sym = MM_PREDATOR;
 						break;
-					case SM_ENEMY:
+					case SURV_MAP.ENEMY:
 						draw = true;
 						sym = MM_ENEMY;
 						break;
-					case SM_FEMALE:
+					case SURV_MAP.FEMALE:
 						draw = true;
 						sym = MM_LOVE;
 						break;
@@ -324,7 +324,7 @@ Survival.prototype.ai = function() {
 
 	let food = 0;
 	// TODO: Go through each individual on the world map. For each individual:
-	// food += (20 + iq*20 + game.current_player.stats[ATT_PERCEPTION] / 5 + game.current_player.stats[ATT_INTELLIGENCE] / 10) * game.current_player.stats[___FOOD_ON_FIELD___] / (3 * this.eating_div);
+	// food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[___FOOD_ON_FIELD___] / (3 * this.eating_div);
 	// then:
 	// food = Math.floor(food / game.current_player.individuals);
 	// This does not include the density that affects human players. For human players: Higher density -> less food
@@ -336,10 +336,10 @@ Survival.prototype.ai = function() {
 	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5
 	let saved = 0;
 	for(let i = 0; i < death; i++) {
-		if(random_int(0, 600) < game.current_player.stats[ATT_SPEED] ||
-				random_int(0, 300) < game.current_player.stats[ATT_CAMOUFLAGE] ||
-				random_int(0, 1000) < game.current_player.stats[ATT_INTELLIGENCE] ||
-				random_int(0, 600) < game.current_player.stats[ATT_DEFENSE] ||
+		if(random_int(0, 600) < game.current_player.stats[ATTR.SPEED] ||
+				random_int(0, 300) < game.current_player.stats[ATTR.CAMOUFLAGE] ||
+				random_int(0, 1000) < game.current_player.stats[ATTR.INTELLIGENCE] ||
+				random_int(0, 600) < game.current_player.stats[ATTR.DEFENSE] ||
 				random_int(0, 6) < iq)
 		{
 			saved++;
@@ -363,7 +363,7 @@ Survival.prototype.ai = function() {
 		loved += Math.floor((food - 20) / 10);
 	}
 
-	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATT_REPRODUCTION] / 20);
+	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATTR.REPRODUCTION] / 20);
 	if(game.current_player.toplace > 20) {
 		game.current_player.toplace = 20;
 	}
@@ -372,7 +372,7 @@ Survival.prototype.ai = function() {
 	}
 
 	game.current_player.toplace = 0;
-	game.current_player.tomove = Math.floor(game.current_player.stats[ATT_SPEED] / 5);
+	game.current_player.tomove = Math.floor(game.current_player.stats[ATTR.SPEED] / 5);
 
 	game.next_stage();
 };
@@ -403,7 +403,7 @@ Survival.prototype.finish_movement = function() {
 		this.action_active = true;
 		this.move_active = false;
 
-		if(adjacent.type === SM_FEMALE) {
+		if(adjacent.type === SURV_MAP.FEMALE) {
 			this.action = new Love(dir, char, adjacent, () => this.love_finished(adjacent));
 		}
 		else {
@@ -430,8 +430,8 @@ Survival.prototype.finish_movement = function() {
 Survival.prototype.does_player_win = function(opponent) {
 	// The player wins if the character is invincible, fights against an enemy, or has a high defense.
 	return this.level.character.invincible ||
-		opponent.type === SM_ENEMY ||
-		random_int(0, opponent.attack) <= game.current_player.stats[ATT_DEFENSE];
+		opponent.type === SURV_MAP.ENEMY ||
+		random_int(0, opponent.attack) <= game.current_player.stats[ATTR.DEFENSE];
 };
 
 
@@ -463,7 +463,7 @@ Survival.prototype.love_finished = function(partner) {
 Survival.prototype.fight_finished = function(player_wins, opponent) {
 	if(player_wins) {
 		// Only enemies are shown, although also predators count towards experience
-		if(opponent.type === SM_ENEMY) {
+		if(opponent.type === SURV_MAP.ENEMY) {
 			this.level.character.victories.push(opponent.species);
 		}
 		game.current_player.experience++;
@@ -486,20 +486,20 @@ Survival.prototype.get_adjacent = function() {
 	const y = this.level.character.tile[1];
 
 	// TODO RESEARCH: Are females prioritized? What is the order of checking?
-	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SM_UNRESPONSIVE && this.level.mobmap[y-1][x].type !== SM_PLACEHOLDER) {
-		return [NORTH, this.level.mobmap[y-1][x]];
+	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y-1][x].type !== SURV_MAP.PLACEHOLDER) {
+		return [DIR.N, this.level.mobmap[y-1][x]];
 	}
 
-	if(this.level.mobmap[y][x+1] !== null && this.level.mobmap[y][x+1].type !== SM_UNRESPONSIVE && this.level.mobmap[y][x+1].type !== SM_PLACEHOLDER) {
-		return [EAST, this.level.mobmap[y][x+1]];
+	if(this.level.mobmap[y][x+1] !== null && this.level.mobmap[y][x+1].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y][x+1].type !== SURV_MAP.PLACEHOLDER) {
+		return [DIR.E, this.level.mobmap[y][x+1]];
 	}
 
-	if(this.level.mobmap[y+1][x] !== null && this.level.mobmap[y+1][x].type !== SM_UNRESPONSIVE && this.level.mobmap[y+1][x].type !== SM_PLACEHOLDER) {
-		return [SOUTH, this.level.mobmap[y+1][x]];
+	if(this.level.mobmap[y+1][x] !== null && this.level.mobmap[y+1][x].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y+1][x].type !== SURV_MAP.PLACEHOLDER) {
+		return [DIR.S, this.level.mobmap[y+1][x]];
 	}
 
-	if(this.level.mobmap[y][x-1] !== null && this.level.mobmap[y][x-1].type !== SM_UNRESPONSIVE && this.level.mobmap[y][x-1].type !== SM_PLACEHOLDER) {
-		return [WEST, this.level.mobmap[y][x-1]];
+	if(this.level.mobmap[y][x-1] !== null && this.level.mobmap[y][x-1].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y][x-1].type !== SURV_MAP.PLACEHOLDER) {
+		return [DIR.W, this.level.mobmap[y][x-1]];
 	}
 
 	return [0, null];
@@ -512,19 +512,19 @@ Survival.prototype.start_movement = function(dir) {
 	const pos = char.tile;
 
 	switch(dir) {
-		case SOUTH:
+		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.south.soffset, char.anims.south.frames);
 			this.level.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
 			break;
-		case NORTH:
+		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.north.soffset, char.anims.north.frames);
 			this.level.mobmap[pos[1] - 1][pos[0]] = placeholder;
 			break;
-		case EAST:
+		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.east.soffset, char.anims.east.frames);
 			this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 			break;
-		case WEST:
+		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
@@ -548,7 +548,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	const speed = options.surv_move_speed * dt;
 	let finished_move = false;
 	switch (obj.movement) {
-	case SOUTH:
+	case DIR.S:
 		if(obj.rel_pos[1] + speed > this.tile_dim[1]) {
 			obj.tile[1]++;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]-1][obj.tile[0]];
@@ -559,7 +559,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 			obj.rel_pos[1] += speed;
 		}
 		break;
-	case NORTH:
+	case DIR.N:
 		if(Math.abs(obj.rel_pos[1] - speed) > this.tile_dim[1]) {
 			obj.tile[1]--;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]+1][obj.tile[0]];
@@ -570,7 +570,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 			obj.rel_pos[1] -= speed;
 		}
 		break;
-	case WEST:
+	case DIR.W:
 		if(Math.abs(obj.rel_pos[0] - speed) > this.tile_dim[0]) {
 			obj.tile[0]--;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]+1];
@@ -581,7 +581,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 			obj.rel_pos[0] -= speed;
 		}
 		break;
-	case EAST:
+	case DIR.E:
 		if(obj.rel_pos[0] + speed > this.tile_dim[0]) {
 			obj.tile[0]++;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]-1];
@@ -595,7 +595,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 	}
 
 	if(finished_move) {
-		if(obj.type === SM_PLAYER) {
+		if(obj.type === SURV_MAP.PLAYER) {
 			this.finish_movement();
 		}
 		else {
@@ -610,7 +610,7 @@ Survival.prototype.resolve_movement = function(obj, dt) {
 
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
-	const evasion = game.current_player.stats[ATT_CAMOUFLAGE] * 4 + game.current_player.stats[ATT_SPEED] * 2 +  game.current_player.stats[ATT_INTELLIGENCE];
+	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {
 		const pos = predator.tile;
@@ -636,21 +636,21 @@ Survival.prototype.start_predator_movement = function() {
 		// If the predator scents the player, try to get closer or don't move at all.
 		// If possible, move closer on the axis where the predator is further away.
 		// If not, move close on the other axis.
-		// If both axes are equally close, prefer NORTH/SOUTH over EAST/WEST.
+		// If both axes are equally close, prefer DIR.N/DIR.S over DIR.E/DIR.W.
 		// If a move would put the predator further away from the player, don't move (that's not very smart, but the original behaviour).
 		if(scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance-1) > evasion)) {
 			if(pos[1] - player_pos[1] > 0) {
-				target_dirs[0] = NORTH;
+				target_dirs[0] = DIR.N;
 			}
 			else {
-				target_dirs[0] = SOUTH;
+				target_dirs[0] = DIR.S;
 			}
 
 			if(pos[0] - player_pos[0] > 0) {
-				target_dirs[1] = WEST;
+				target_dirs[1] = DIR.W;
 			}
 			else {
-				target_dirs[1] = EAST;
+				target_dirs[1] = DIR.E;
 			}
 
 			if(dx > dy) {
@@ -678,19 +678,19 @@ Survival.prototype.start_predator_movement = function() {
 		}
 
 		switch(predator.movement) {
-			case NORTH:
+			case DIR.N:
 				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.north.soffset, predator.anims.north.frames);
 				this.level.mobmap[pos[1] - 1][pos[0]] = placeholder; // Block the spot on the map to prevent others from going there
 				break;
-			case SOUTH:
+			case DIR.S:
 				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.south.soffset, predator.anims.south.frames);
 				this.level.mobmap[pos[1] + 1][pos[0]] = placeholder;
 				break;
-			case WEST:
+			case DIR.W:
 				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.west.soffset, predator.anims.west.frames);
 				this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 				break;
-			case EAST:
+			case DIR.E:
 				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.east.soffset, predator.anims.east.frames);
 				this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 				break;
@@ -852,29 +852,29 @@ Survival.prototype.handle_input = function(dt) {
 Survival.prototype.test_movement_input = function() {
 	if(input.isDown('DOWN')) {
 		//input.reset('DOWN');
-		if(this.level.is_unblocked(this.level.character.tile, SOUTH)) {
-			this.start_movement(SOUTH);
+		if(this.level.is_unblocked(this.level.character.tile, DIR.S)) {
+			this.start_movement(DIR.S);
 		}
 	}
 
 	else if(input.isDown('UP')) {
 		//input.reset('UP');
-		if(this.level.is_unblocked(this.level.character.tile, NORTH)) {
-			this.start_movement(NORTH);
+		if(this.level.is_unblocked(this.level.character.tile, DIR.N)) {
+			this.start_movement(DIR.N);
 		}
 	}
 
 	else if(input.isDown('LEFT')) {
 		//input.reset('LEFT');
-		if(this.level.is_unblocked(this.level.character.tile, WEST)) {
-			this.start_movement(WEST);
+		if(this.level.is_unblocked(this.level.character.tile, DIR.W)) {
+			this.start_movement(DIR.W);
 		}
 	}
 
 	else if(input.isDown('RIGHT')) {
 		//input.reset('RIGHT');
-		if(this.level.is_unblocked(this.level.character.tile, EAST)) {
-			this.start_movement(EAST);
+		if(this.level.is_unblocked(this.level.character.tile, DIR.E)) {
+			this.start_movement(DIR.E);
 		}
 	}
 
@@ -908,7 +908,7 @@ Survival.prototype.calc_outcome = function() {
 		loved += Math.floor((game.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
 	}
 
-	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATT_REPRODUCTION] / 20);
+	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATTR.REPRODUCTION] / 20);
 	if(game.current_player.toplace > 20) {
 		game.current_player.toplace = 20;
 	}
@@ -916,7 +916,7 @@ Survival.prototype.calc_outcome = function() {
 		game.current_player.toplace = loved;
 	}
 
-	game.current_player.tomove = Math.floor(game.current_player.stats[ATT_SPEED] / 5);
+	game.current_player.tomove = Math.floor(game.current_player.stats[ATTR.SPEED] / 5);
 };
 
 

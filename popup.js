@@ -1,7 +1,7 @@
 'use strict';
 
 function Popup(title, image, callback, text, right_answer, left_answer) {
-	this.id = -1;
+	this.id = SCENE.POPUP;
 	this.line_height = 18;
 	this.max_text_width = 260;
 

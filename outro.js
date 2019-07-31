@@ -4,7 +4,7 @@
 // TODO: This must also know, which player won and whether it was a human player.
 
 function Outro() {
-	this.id = 11;
+	this.id = SCENE.OUTRO;
 	this.pic = resources.get('gfx/dummy_outro.png');
 
 	// CONST_START

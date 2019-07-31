@@ -91,7 +91,7 @@ Game.prototype.start = function() {
 
 Game.prototype.next_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
-		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
+		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player.id = i;
 			this.current_player = this.players[i];
 			console.log('There is another player.');
@@ -100,7 +100,7 @@ Game.prototype.next_player = function() {
 	}
 
 	for(let i = 0; i < 6; i++) {
-		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
+		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player.id = i;
 			this.current_player = this.players[i];
 			console.log('This was the last player.');
@@ -116,7 +116,7 @@ Game.prototype.next_player = function() {
 // TODO: Is this ever used?
 Game.prototype.is_last_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
-		if(!this.players[i].is_dead && this.players[i].type !== NOBODY) {
+		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			return false;
 		}
 	}
@@ -131,10 +131,10 @@ Game.prototype.test_finished = function() {
 	let humans_alive = 0;
 	let pcs_alive = 0;
 	for(let player of this.players) {
-		if(player.type === MENSCH) {
+		if(player.type === PLAYER_TYPE.HUMAN) {
 			humans_alive++;
 		}
-		else if(player.type === COMPUTER) {
+		else if(player.type === PLAYER_TYPE.COMPUTER) {
 			pcs_alive++;
 		}
 	}
@@ -148,7 +148,7 @@ Game.prototype.save_game = function() {
 	const content = new DataView(save_file);
 
 	const qpopstring = 'Q-POP Savegame';
-	for(let i = 0; i < qpopstring.length, i++) {
+	for(let i = 0; i < qpopstring.length; i++) {
 		content.setUint8(i, qpopstring.charCodeAt(i));
 	}
 
@@ -163,13 +163,13 @@ Game.prototype.save_game = function() {
 		content.setUint8(0x15 + 2*i, p.iq);
 
 		const offset = 0x17 * i;
-		content.setUint8(0x20 + offset, p.stats[ATT_ATTACK]);
-		content.setUint8(0x21 + offset, p.stats[ATT_DEFENSE]);
-		content.setUint8(0x22 + offset, p.stats[ATT_REPRODUCTION]);
-		content.setUint8(0x23 + offset, p.stats[ATT_CAMOUFLAGE]);
-		content.setUint8(0x24 + offset, p.stats[ATT_SPEED]);
-		content.setUint8(0x25 + offset, p.stats[ATT_PERCEPTION]);
-		content.setUint8(0x26 + offset, p.stats[ATT_INTELLIGENCE]);
+		content.setUint8(0x20 + offset, p.stats[ATTR.ATTACK]);
+		content.setUint8(0x21 + offset, p.stats[ATTR.DEFENSE]);
+		content.setUint8(0x22 + offset, p.stats[ATTR.REPRODUCTION]);
+		content.setUint8(0x23 + offset, p.stats[ATTR.CAMOUFLAGE]);
+		content.setUint8(0x24 + offset, p.stats[ATTR.SPEED]);
+		content.setUint8(0x25 + offset, p.stats[ATTR.PERCEPTION]);
+		content.setUint8(0x26 + offset, p.stats[ATTR.INTELLIGENCE]);
 
 		content.setUint8(0x27 + offset, p.deaths);  // Unused
 		content.setUint8(0x28 + offset, p.experience);  // Unused
@@ -180,12 +180,12 @@ Game.prototype.save_game = function() {
 		content.setUint8(0x2d + offset, p.toplace);
 		content.setUint16(0x2e + offset, p.total_score, true);
 
-		content.setUint8(0x30 + offset, p.stats[ATT_RANGONES]);
-		content.setUint8(0x31 + offset, p.stats[ATT_BLUELEAF]);
-		content.setUint8(0x32 + offset, p.stats[ATT_HUSHROOMS]);
-		content.setUint8(0x33 + offset, p.stats[ATT_STINKBALLS]);
-		content.setUint8(0x34 + offset, p.stats[ATT_SNAKEROOTS]);
-		content.setUint8(0x35 + offset, p.stats[ATT_FIREGRASS]);
+		content.setUint8(0x30 + offset, p.stats[ATTR.RANGONES]);
+		content.setUint8(0x31 + offset, p.stats[ATTR.BLUELEAF]);
+		content.setUint8(0x32 + offset, p.stats[ATTR.HUSHROOMS]);
+		content.setUint8(0x33 + offset, p.stats[ATTR.STINKBALLS]);
+		content.setUint8(0x34 + offset, p.stats[ATTR.SNAKEROOTS]);
+		content.setUint8(0x35 + offset, p.stats[ATTR.FIREGRASS]);
 		content.setUint8(0x36 + offset, !p.is_dead);
 		content.setUint8(0x1042 + i, p.is_dead);
 	}
@@ -240,25 +240,25 @@ Game.prototype.load_game = function(save_file) {
 		p.iq = content.getUint8(0x15 + 2*i);
 
 		const offset = 0x17 * i;
-		p.stats[ATT_ATTACK] = content.getUint8(0x20 + offset);
-		p.stats[ATT_DEFENSE] = content.getUint8(0x21 + offset);
-		p.stats[ATT_REPRODUCTION] = content.getUint8(0x22 + offset);
-		p.stats[ATT_CAMOUFLAGE] = content.getUint8(0x23 + offset);
-		p.stats[ATT_SPEED] = content.getUint8(0x24 + offset);
-		p.stats[ATT_PERCEPTION] = content.getUint8(0x25 + offset);
-		p.stats[ATT_INTELLIGENCE] = content.getUint8(0x26 + offset);
+		p.stats[ATTR.ATTACK] = content.getUint8(0x20 + offset);
+		p.stats[ATTR.DEFENSE] = content.getUint8(0x21 + offset);
+		p.stats[ATTR.REPRODUCTION] = content.getUint8(0x22 + offset);
+		p.stats[ATTR.CAMOUFLAGE] = content.getUint8(0x23 + offset);
+		p.stats[ATTR.SPEED] = content.getUint8(0x24 + offset);
+		p.stats[ATTR.PERCEPTION] = content.getUint8(0x25 + offset);
+		p.stats[ATTR.INTELLIGENCE] = content.getUint8(0x26 + offset);
 
 		p.evo_score = content.getUint8(0x2b + offset);
 		p.tomove = content.getUint8(0x2c + offset);
 		p.toplace = content.getUint8(0x2d + offset);
 		p.total_score = content.getUint16(0x2e + offset, true);
 
-		p.stats[ATT_RANGONES] = content.getUint8(0x30 + offset);
-		p.stats[ATT_BLUELEAF] = content.getUint8(0x31 + offset);
-		p.stats[ATT_HUSHROOMS] = content.getUint8(0x32 + offset);
-		p.stats[ATT_STINKBALLS] = content.getUint8(0x33 + offset);
-		p.stats[ATT_SNAKEROOTS] = content.getUint8(0x34 + offset);
-		p.stats[ATT_FIREGRASS] = content.getUint8(0x35 + offset);
+		p.stats[ATTR.RANGONES] = content.getUint8(0x30 + offset);
+		p.stats[ATTR.BLUELEAF] = content.getUint8(0x31 + offset);
+		p.stats[ATTR.HUSHROOMS] = content.getUint8(0x32 + offset);
+		p.stats[ATTR.STINKBALLS] = content.getUint8(0x33 + offset);
+		p.stats[ATTR.SNAKEROOTS] = content.getUint8(0x34 + offset);
+		p.stats[ATTR.FIREGRASS] = content.getUint8(0x35 + offset);
 		p.is_dead = !content.getUint8(0x36 + offset);
 
 		p.individuals = 0;
@@ -301,89 +301,76 @@ Game.prototype.load_game = function(save_file) {
 
 Game.prototype.next_stage = function() {
 	switch(this.stage.id) {
-	case 0: // Intro
-		this.stage = 1;
+	case SCENE.INTRO: // Intro
 		game.stage = new Init(game.players);
 		game.stage.initialize();
 		break;
-	case 1: // Init screen (choose players)
-		this.stage = 2;
+	case SCENE.INIT: // Init screen (choose players)
 		game.stage = new Turnselection();
 		game.stage.initialize();
 		break;
-	case 2: // Choose game length
-		this.stage = 3;
-		game.stage = new Transition('gfx/transition_world.png', 3);
+	case SCENE.TURN_SELECTION: // Choose game length
+		game.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
 		game.stage.initialize();
 		break;
-	case 3: // Transition screen
-		this.stage = 4;
+	case SCENE.TRANS_WORLD: // Transition screen
 		game.stage = new World();
 		game.stage.initialize();
 		break;
-	case 4: // World map
+	case SCENE.WORLD: // World map
 		if(game.next_player()) {
 			game.stage.next_player();
 		} else {
 			if(game.turn === 0) {
-				this.stage = 7;
-				game.stage = new Transition('gfx/transition_mutations.png', 7);
+				game.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				game.stage.initialize();
 			}
 			else {
-				this.stage = 5;
 				game.backstage.push(game.stage);
 				game.stage = new Catastrophe();
 				game.stage.initialize();
 			}
 		}
 		break;
-	case 5: // Catastrophe
-		this.stage = 6;
+	case SCENE.CATASTROPHE: // Catastrophe
 		game.stage = new Ranking();
 		game.stage.initialize();
 		break;
-	case 6: // Ranking
+	case SCENE.RANKING: // Ranking
 		if(game.turn === game.max_turns) {
-			this.stage = 11;
 			game.stage = new Outro();
 		}
 		else {
-			this.stage = 7;
-			game.stage = new Transition('gfx/transition_mutations.png', 7);
+			game.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 		}
 		game.stage.initialize();
 		break;
-	case 7: // Transition screen
-		this.stage = 8;
+	case SCENE.TRANS_MUTATION: // Transition screen
 		game.turn++;
 		game.stage = new Mutations();
 		game.stage.initialize();
 		break;
-	case 8: // Mutations
+	case SCENE.MUTATION: // Mutations
 		if(game.next_player()) {
 			game.stage.next_player();
 		} else {
-			this.stage = 9;
-			game.stage = new Transition('gfx/transition_survival.png', 9);
+			game.stage = new Transition('gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
 			game.stage.initialize();
 		}
 		break;
-	case 9: // Transition screen
-		this.stage = 10;
+	case SCENE.TRANS_SURVIVAL: // Transition screen
 		game.stage = new Survival();
 		game.stage.initialize();
 		break;
-	case 10: // Survival
+	case SCENE.SURVIVAL: // Survival
 		if(game.next_player()) {
 			game.stage.initialize();
 		} else {
-			this.stage = 3;
-			game.stage = new Transition('gfx/transition_world.png', 3);
+			game.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
 			game.stage.initialize();
 		}
 		break;
-	case 11: // Outro
+	case SCENE.OUTRO: // Outro
 		// This should never happen
 	default:
 		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!', () => {}, 'Oh no!');
@@ -394,8 +381,8 @@ Game.prototype.next_stage = function() {
 function Player(num) {
 	this.id = num;
 	this.iq = 2;
-	this.type = (num === 1) ? HUMAN : NOBODY;  // DEBUG
-	//this.type = (num === 0) ? HUMAN : COMPUTER;
+	this.type = (num === 1) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
+	//this.type = (num === 0) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
 	this.individuals = 0;
 	this.toplace = 10;
 	this.tomove = 0;
@@ -439,7 +426,14 @@ resources.load([
 	'gfx/clouds.png',
 	'gfx/enemies.png',
 	'gfx/spec1.png',
+	'gfx/spec2.png',
+	'gfx/spec3.png',
+	'gfx/spec4.png',
+	'gfx/spec5.png',
+	'gfx/spec6.png',
 	'gfx/pred1.png',
+	'gfx/pred2.png',
+	'gfx/pred3.png',
 	'gfx/dark_bg.png',
 	'gfx/light_bg.png',
 	'gfx/species.png',

@@ -83,22 +83,22 @@ Camera.prototype.update_visible_level = function(dt) {
 				}
 			}
 
-			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SM_PLACEHOLDER) {
+			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
 				this.level.mobmap[y][x].sprite.update(dt);
 				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
 					this._movs_to_render.push(this.level.mobmap[y][x]);
 					this._tiles_to_render.add(JSON.stringify([x, y]));
 					switch(this.level.mobmap[y][x].movement) {
-						case NORTH:
+						case DIR.N:
 							this._tiles_to_render.add(JSON.stringify([x, y-1]));
 							break;
-						case SOUTH:
+						case DIR.S:
 							this._tiles_to_render.add(JSON.stringify([x, y+1]));
 							break;
-						case WEST:
+						case DIR.W:
 							this._tiles_to_render.add(JSON.stringify([x-1, y]));
 							break;
-						case EAST:
+						case DIR.E:
 							this._tiles_to_render.add(JSON.stringify([x+1, y]));
 							break;
 					}

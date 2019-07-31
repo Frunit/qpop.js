@@ -1,7 +1,7 @@
 'use strict';
 
 function Init(players) {
-	this.id = 1;
+	this.id = SCENE.INIT;
 	this.bg = resources.get('gfx/init.png');
 	this.spec_pics = resources.get('gfx/species.png');
 
@@ -309,12 +309,12 @@ Init.prototype.next = function() {
 	let known_first_player = false;
 
 	for(let i = 0; i < game.players.length; i++) {
-		if(!known_first_player && game.players[i].type !== NOBODY) {
+		if(!known_first_player && game.players[i].type !== PLAYER_TYPE.NOBODY) {
 			known_first_player = true;
 			game.current_player = game.players[i];
 		}
 
-		if(game.players[i].type === HUMAN) {
+		if(game.players[i].type === PLAYER_TYPE.HUMAN) {
 			no_human = false;
 			break;
 		}

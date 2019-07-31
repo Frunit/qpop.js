@@ -12,19 +12,19 @@ function Love(dir, character, partner, callback) {
 	this.sprites = [];
 
 	switch(dir) {
-		case NORTH:
+		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
 			break;
-		case SOUTH:
+		case DIR.S:
 			this.tiles = [[character.tile[0], character.tile[1] + 1], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
 			break;
-		case WEST:
+		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
 			break;
-		case EAST:
+		case DIR.E:
 			this.tiles = [[character.tile[0] + 1, character.tile[1]], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
 			break;
@@ -62,19 +62,19 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.sprites = [];
 
 	switch(dir) {
-		case NORTH:
+		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
-		case SOUTH:
+		case DIR.S:
 			this.tiles = [[character.tile[0], character.tile[1] + 1], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
-		case WEST:
+		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;
-		case EAST:
+		case DIR.E:
 			this.tiles = [[character.tile[0] + 1, character.tile[1]], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;

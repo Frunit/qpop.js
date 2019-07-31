@@ -285,17 +285,17 @@ Level.prototype.get_dirs = function(pos, last_movement=0) {
 	const y = pos[1];
 
 	const dirs = [];
-	if(last_movement !== WEST && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
-		dirs.push(EAST);
+	if(last_movement !== DIR.W && this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null) {
+		dirs.push(DIR.E);
 	}
-	if(last_movement !== EAST && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
-		dirs.push(WEST);
+	if(last_movement !== DIR.E && this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null) {
+		dirs.push(DIR.W);
 	}
-	if(last_movement !== NORTH && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
-		dirs.push(SOUTH);
+	if(last_movement !== DIR.N && this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null) {
+		dirs.push(DIR.S);
 	}
-	if(last_movement !== SOUTH && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
-		dirs.push(NORTH);
+	if(last_movement !== DIR.S && this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null) {
+		dirs.push(DIR.N);
 	}
 
 	return dirs;
@@ -307,17 +307,17 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 	const y = pos[1];
 
 	switch(dir) {
-		case SOUTH: return this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null;
-		case NORTH: return this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null;
-		case EAST: return this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null;
-		case WEST: return this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null;
+		case DIR.S: return this.blocking[this.map[y+1][x]] === '0' && this.mobmap[y+1][x] === null;
+		case DIR.N: return this.blocking[this.map[y-1][x]] === '0' && this.mobmap[y-1][x] === null;
+		case DIR.E: return this.blocking[this.map[y][x+1]] === '0' && this.mobmap[y][x+1] === null;
+		case DIR.W: return this.blocking[this.map[y][x-1]] === '0' && this.mobmap[y][x-1] === null;
 		default: return this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null;
 	}
 };
 
 
 function Character(species, tile) {
-	this.type = SM_PLAYER;
+	this.type = SURV_MAP.PLAYER;
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
@@ -336,7 +336,7 @@ function Character(species, tile) {
 
 
 function Predator(species, tile) {
-	this.type = SM_PREDATOR;
+	this.type = SURV_MAP.PREDATOR;
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
@@ -356,14 +356,14 @@ function Predator(species, tile) {
 
 
 Predator.prototype.defeat = function() {
-	this.type = SM_UNRESPONSIVE;
+	this.type = SURV_MAP.UNRESPONSIVE;
 	const def = random_int(0, 2);
 	this.sprite = new Sprite(this.url, [64, 64], this.anims.defeated[def].soffset, this.anims.defeated[def].frames);
 };
 
 
 function Female(species, tile) {
-	this.type = SM_FEMALE;
+	this.type = SURV_MAP.FEMALE;
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
@@ -377,13 +377,13 @@ function Female(species, tile) {
 
 
 Female.prototype.offspring = function() {
-	this.type = SM_UNRESPONSIVE;
+	this.type = SURV_MAP.UNRESPONSIVE;
 	this.sprite = new Sprite(this.url, [64, 64], this.anims.offspring.soffset, this.anims.offspring.frames);
 };
 
 
 function Enemy(species, tile) {
-	this.type = SM_ENEMY;
+	this.type = SURV_MAP.ENEMY;
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
@@ -397,7 +397,7 @@ function Enemy(species, tile) {
 
 
 Enemy.prototype.defeat = function() {
-	this.type = SM_UNRESPONSIVE;
+	this.type = SURV_MAP.UNRESPONSIVE;
 	const def = random_int(0, 2);
 	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
 };

@@ -1,7 +1,7 @@
 'use strict';
 
 function World() {
-	this.id = 4;
+	this.id = SCENE.WORLD;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
 	this.map_pics = resources.get('gfx/world.png');
 	this.spec_pics = resources.get('gfx/species.png');
@@ -85,7 +85,7 @@ World.prototype.initialize = function() {
 
 	this.redraw();
 
-	if(game.current_player.type === COMPUTER) {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 	}
 };
@@ -95,7 +95,7 @@ World.prototype.next_player = function() {
 	this.draw_avatar();
 	this.draw_minispec();
 
-	if(game.current_player.type === COMPUTER) {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 	}
 };
@@ -382,7 +382,7 @@ World.prototype.next_popup = function(answer) {
 
 World.prototype.test_if_dead = function() {
 	for(let player of game.players) {
-		if(player.type !== NOBODY && !player.is_dead && player.individuals === 0) {
+		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
 			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
 			player.is_dead = true;
 		}
@@ -412,7 +412,7 @@ World.prototype.exec_catastrophe = function(type) {
 		const impactable = [];
 		for(x = 10; x <= 18; x++) {
 			for(y = 10; y <= 18; y++) {
-				if(game.world_map[y][x] !== WM_WATER) {
+				if(game.world_map[y][x] !== WORLD_MAP.WATER) {
 					impactable.push([x, y]);
 				}
 			}
@@ -423,10 +423,10 @@ World.prototype.exec_catastrophe = function(type) {
 		for(let xx = x - 1; xx <= x + 1; xx++) {
 			for(let yy = y - 1; yy <= y + 1; yy++) {
 				game.height_map[yy][xx] = 100;
-				game.world_map[yy][xx] = WM_MOUNTAIN;
+				game.world_map[yy][xx] = WORLD_MAP.MOUNTAIN;
 			}
 		}
-		game.world_map[y][x] = WM_CRATER;
+		game.world_map[y][x] = WORLD_MAP.CRATER;
 
 		// Big Explosion
 		this.animation = new Sprite('gfx/world.png', [48, 48], [0, 32],
@@ -459,7 +459,7 @@ World.prototype.exec_catastrophe = function(type) {
 		const volcanos = [];
 		for(x = 3; x <= 24; x++) {
 			for(y = 3; y <= 24; y++) {
-				if(game.world_map[y][x] === WM_MOUNTAIN) {
+				if(game.world_map[y][x] === WORLD_MAP.MOUNTAIN) {
 					volcanos.push([x, y]);
 				}
 			}
@@ -481,20 +481,20 @@ World.prototype.exec_catastrophe = function(type) {
 		const land = [];
 		for(x = 10; x <= 18; x++) {
 			for(y = 10; y <= 18; y++) {
-				if(game.world_map[y][x] !== WM_WATER) {
+				if(game.world_map[y][x] !== WORLD_MAP.WATER) {
 					land.push([x, y]);
 				}
 			}
 		}
 
 		[x, y] = random_element(land);
-		game.world_map[y][x] = WM_HUMANS;
+		game.world_map[y][x] = WORLD_MAP.HUMANS;
 		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finished();
 		game.humans_present = true;
 		break;
 	case 8: // Cosmic rays
 		for(let player of game.players) {
-			if(player.type !== NOBODY && !player.is_dead) {
+			if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead) {
 				const stats = player.stats.slice();
 				for(let i = 0; i < stats.length; i++) {
 					player.stats[i] = stats.splice(stats.length * Math.random() | 0, 1)[0];
@@ -517,14 +517,14 @@ World.prototype.catastrophe_finished = function() {
 
 	for(let y = 1; y < this.dim[1] - 1; y++) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
-			if((!game.world_map[y][x] || game.world_map >= WM_MOUNTAIN) && game.map_positions[y][x] >= 0) {
+			if((!game.world_map[y][x] || game.world_map >= WORLD_MAP.MOUNTAIN) && game.map_positions[y][x] >= 0) {
 				this.kill_individual(x, y);
 			}
 		}
 	}
 
 	for(let player of game.players) {
-		if(player.type !== NOBODY && !player.is_dead && player.individuals === 0) {
+		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
 			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
 			player.is_dead = true;
 		}
@@ -576,10 +576,10 @@ World.prototype.take_individual = function(x, y) {
 
 World.prototype.fight = function(x, y) {
 	this.fight_active = true;
-	const attack = game.current_player.stats[ATT_ATTACK] + game.current_player.stats[ATT_INTELLIGENCE]/2 + game.current_player.experience * 10 + game.current_player.stats[game.world_map[y][x] - WM_RANGONES];
+	const attack = game.current_player.stats[ATTR.ATTACK] + game.current_player.stats[ATTR.INTELLIGENCE]/2 + game.current_player.experience * 10 + game.current_player.stats[game.world_map[y][x] - WORLD_MAP.RANGONES];
 
 	const enemy = game.players[game.map_positions[y][x]];
-	const defense = enemy.stats[ATT_DEFENSE] + enemy.stats[ATT_INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WM_RANGONES];
+	const defense = enemy.stats[ATTR.DEFENSE] + enemy.stats[ATTR.INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WORLD_MAP.RANGONES];
 
 	//console.log("Attacker:", game.map_positions[y][x], " with attack ", attack, "; Defender: ", game.current_player.id, " with defense ", defense)
 
@@ -687,8 +687,8 @@ World.prototype.wm_click = function(x, y, raw = true) {
 		}
 	}
 	else if(game.current_player.toplace &&
-			game.world_map[y][x] >= WM_DESERT &&
-			game.world_map[y][x] <= WM_FIREGRASS &&
+			game.world_map[y][x] >= WORLD_MAP.DESERT &&
+			game.world_map[y][x] <= WORLD_MAP.FIREGRASS &&
 			this.is_neighbour(game.current_player.id, x, y) &&
 			this.wm_set_mode !== 2)
 	{
@@ -827,7 +827,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 			weight = depth + 1 - Math.max(Math.abs(xx - x), Math.abs(yy - y));
 
 			// Not too close to water to protect from catastrophes
-			if(game.world_map[yy][xx] === WM_WATER) {
+			if(game.world_map[yy][xx] === WORLD_MAP.WATER) {
 				value -= 20 * weight;
 			}
 			else if(game.map_positions[yy][xx] >= 0 && game.map_positions[yy][xx] !== game.current_player.id) {
@@ -838,15 +838,15 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 				else {
 					const player = game.current_player;
 					const enemy = game.players[game.map_positions[yy][xx]];
-					winning_chance = player.stats[game.world_map[yy][xx] - WM_RANGONES] +
-						player.stats[ATT_ATTACK] + player.stats[ATT_INTELLIGENCE]/4 -
-						enemy.stats[game.world_map[yy][xx] - WM_RANGONES] -
-						enemy.stats[ATT_DEFENSE] - enemy.stats[ATT_INTELLIGENCE]/4;
+					winning_chance = player.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] +
+						player.stats[ATTR.ATTACK] + player.stats[ATTR.INTELLIGENCE]/4 -
+						enemy.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] -
+						enemy.stats[ATTR.DEFENSE] - enemy.stats[ATTR.INTELLIGENCE]/4;
 					value += winning_chance * weight;
 				}
 			}
-			else if(game.world_map[yy][xx] > WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
-				value += game.players[game.current_player.id].stats[game.world_map[yy][xx] - WM_RANGONES] * weight;
+			else if(game.world_map[yy][xx] > WORLD_MAP.DESERT && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
+				value += game.players[game.current_player.id].stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] * weight;
 			}
 		}
 	}
@@ -860,7 +860,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 	if(individuals.length === 0) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
 			for(let y = 1; y < this.dim[1] - 1; y++) {
-				if(game.map_positions[y][x] === -1 && game.world_map[y][x] >= WM_DESERT && game.world_map[y][x] <= WM_FIREGRASS) {
+				if(game.map_positions[y][x] === -1 && game.world_map[y][x] >= WORLD_MAP.DESERT && game.world_map[y][x] <= WORLD_MAP.FIREGRASS) {
 					possible_moves.push([x, y]);
 				}
 			}
@@ -873,7 +873,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 			for(let pos of [[x-1, y], [x+1, y], [x, y-1], [x, y+1]]) {
 				const xx = pos[0];
 				const yy = pos[1];
-				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WM_DESERT && game.world_map[yy][xx] <= WM_FIREGRASS) {
+				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WORLD_MAP.DESERT && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
 					possible_moves.push(pos);
 				}
 			}
@@ -929,7 +929,7 @@ World.prototype.create_world_map = function() {
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
-			if(!game.world_map || game.world_map[y][x] < WM_MOUNTAIN) {
+			if(!game.world_map || game.world_map[y][x] < WORLD_MAP.MOUNTAIN) {
 				map[y][x] = this.find_tile(game.height_map[y][x], y);
 			}
 		}
@@ -940,11 +940,11 @@ World.prototype.create_world_map = function() {
 
 World.prototype.find_tile = function(height, y) {
 	if(height <= game.water_level) {
-		return WM_WATER;
+		return WORLD_MAP.WATER;
 	}
 
 	if(height >= game.mountain_level) {
-		return WM_MOUNTAIN;
+		return WORLD_MAP.MOUNTAIN;
 	}
 
 	let temp = game.temp + (y - this.dim[1] / 2) * 3 - height + 50;
@@ -965,7 +965,7 @@ World.prototype.find_tile = function(height, y) {
 		}
 	}
 
-	return tile + WM_RANGONES;
+	return tile + WORLD_MAP.RANGONES;
 };
 
 
@@ -1057,7 +1057,7 @@ World.prototype.draw_worldmap = function() {
 
 World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 	let tile = 0;
-	if(game.world_map[y][x] === WM_WATER) {
+	if(game.world_map[y][x] === WORLD_MAP.WATER) {
 		tile = this.coast_tile(x, y);
 	}
 	else {

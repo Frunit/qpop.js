@@ -4,7 +4,7 @@
 // TODO: The catastrophe should be animation, not only show a image.
 
 function Catastrophe() {
-	this.id = 6;
+	this.id = SCENE.CATASTROPHE;
 	this.bg = resources.get('gfx/dark_bg.png');
 	this.cata_pic = resources.get('gfx/dummy_cata.png');
 
