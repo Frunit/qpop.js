@@ -144,7 +144,7 @@ Game.prototype.test_finished = function() {
 
 
 Game.prototype.save_game = function() {
-	const save_file = new ArrayBuffer(4171);
+	const save_file = new ArrayBuffer(4172);
 	const content = new DataView(save_file);
 
 	const qpopstring = 'Q-POP Savegame';
@@ -206,7 +206,7 @@ Game.prototype.save_game = function() {
 
 			content.setUint8(0xb7 + i, game.world_map[y][x]);
 			content.setUint8(0x3c7 + j, game.height_map[y][x]);
-			content.setUint8(0x6d7 + i, game.map_positions[y][x]);
+			content.setUint8(0x6d7 + i, game.map_positions[y][x] + 1);
 		}
 	}
 
@@ -224,7 +224,7 @@ Game.prototype.load_game = function(save_file) {
 
 	const content = new DataView(save_file);
 
-	if(save_file.size !== 4171 || new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
+	if(save_file.byteLength !== 4172 || new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
 		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.next);
 		return;
 	}
@@ -286,7 +286,7 @@ Game.prototype.load_game = function(save_file) {
 			game.world_map[y][x] = content.getUint8(0xb7 + i);
 			game.height_map[y][x] = content.getUint8(0x3c7 + j);
 
-			const map_pos = content.getUint8(0x6d7 + i);
+			const map_pos = content.getUint8(0x6d7 + i) - 1;
 			game.map_positions[y][x] = map_pos;
 			if(map_pos > 0) {
 				game.players[map_pos].individuals++;
@@ -294,7 +294,7 @@ Game.prototype.load_game = function(save_file) {
 		}
 	}
 
-	game.stage = new Survival();
+	game.stage = new World();
 	game.stage.initialize();
 };
 
