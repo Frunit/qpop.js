@@ -273,9 +273,9 @@ Game.prototype.load_game = function(save_file) {
 
 	const size = 28;
 
-	game.world_map = Array.from(Array(size), _ => Array(size).fill(0));
-	game.height_map = Array.from(Array(size), _ => Array(size).fill(0));
-	game.map_positions = Array.from(Array(size), _ => Array(size).fill(0));
+	game.world_map = Array.from(Array(size), () => Array(size).fill(0));
+	game.height_map = Array.from(Array(size), () => Array(size).fill(0));
+	game.map_positions = Array.from(Array(size), () => Array(size).fill(0));
 
 
 	for(let y = 0; y < size; y++) {
@@ -394,7 +394,7 @@ function Player(num) {
 	this.evo_score = 100;
 	this.total_score = 230;
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-};
+}
 
 
 // Create the canvas

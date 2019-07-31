@@ -145,7 +145,7 @@ function download(data, filename, type) {
 		a.click();
 		setTimeout(function() {
 			document.body.removeChild(a);
-			window.URL.revokeObjectURL(url);
+			window.URL.revokeObjectURL(file);
 		}, 0);
 	}
 }
@@ -167,7 +167,7 @@ function upload_dialog() {
 	});
 
 	input.click();
-};
+}
 
 
 function multiline(text, maxwidth) {
@@ -192,10 +192,10 @@ function multiline(text, maxwidth) {
 
 	if(line) {
 		lines.push(line);
-	};
+	}
 
 	return lines;
-};
+}
 
 
 function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {

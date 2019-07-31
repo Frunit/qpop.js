@@ -16,7 +16,7 @@ function Level() {
 
 	this.generate_map();
 	this.populate();
-	this.bg_sprites = Array.from(Array(100), _ => Array(100).fill(null));
+	this.bg_sprites = Array.from(Array(100), () => Array(100).fill(null));
 }
 
 
@@ -159,7 +159,7 @@ Level.prototype.populate = function() {
 
 	console.log('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
-	this.mobmap = Array.from(Array(100), _ => Array(100).fill(null));
+	this.mobmap = Array.from(Array(100), () => Array(100).fill(null));
 	let pos;
 
 	// Place the player somewhere around the center
@@ -175,7 +175,7 @@ Level.prototype.populate = function() {
 		const species = random_int(0, 1 + game.humans_present);
 		this.mobmap[pos[1]][pos[0]] = new Predator(species, pos);
 		this.predators.push(this.mobmap[pos[1]][pos[0]]);
-	};
+	}
 
 	for(let i = 0; i < num_females; i++) {
 		// Females may not be placed with 2 fields of the player
@@ -184,7 +184,7 @@ Level.prototype.populate = function() {
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		this.mobmap[pos[1]][pos[0]] = new Female(1, pos);
-	};
+	}
 
 	for(let i = 0; i < num_enemies; i++) {
 		// Enemies may not be placed with 2 fields of the player
@@ -194,7 +194,7 @@ Level.prototype.populate = function() {
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		const species = random_element(this.enemies);
 		this.mobmap[pos[1]][pos[0]] = new Enemy(species, pos);
-	};
+	}
 };
 
 
@@ -238,7 +238,7 @@ Level.prototype.find_free_tiles = function() {
 
 
 Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
-	const left_counts = Array.from(Array(search_size), _ => Array(search_size).fill(0));
+	const left_counts = Array.from(Array(search_size), () => Array(search_size).fill(0));
 	const good_positions = [];
 
 	for(let y = 0; y < search_size; y++) {
@@ -399,5 +399,5 @@ function Enemy(species, tile) {
 Enemy.prototype.defeat = function() {
 	this.type = SURV_MAP.UNRESPONSIVE;
 	const def = random_int(0, 2);
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated[def].soffset, this.anims.enem_defeated[def].frames);
 };

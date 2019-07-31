@@ -44,7 +44,7 @@ Love.prototype.update = function(dt) {
 
 
 Love.prototype.render = function(ctx, pos) {
-	for(sprite of this.sprites) {
+	for(let sprite of this.sprites) {
 		sprite.render(ctx, pos);
 	}
 };
@@ -96,7 +96,7 @@ Fight.prototype.update = function(dt) {
 
 
 Fight.prototype.render = function(ctx, pos) {
-	for(sprite of this.sprites) {
+	for(let sprite of this.sprites) {
 		sprite.render(ctx, pos);
 	}
 };
@@ -144,12 +144,12 @@ Feeding.prototype.update = function(dt) {
 		}
 		// Poison
 		else if(food_type >= 88 && food_type <= 93) {
-			this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].poisoned, soffset, anims_players[character.species].poisoned.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].poisoned, soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
 		}
 		// Power food
 		else if(food_type >= 118) {
-			this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].power_food, soffset, anims_players[character.species].power_food.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].power_food, soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
 		}
 	}
@@ -170,7 +170,7 @@ function Quicksand(character, callback) {
 
 	this.tiles = [[this.character.tile]];
 
-	this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].quicksand, soffset, anims_players[character.species].quicksand.frames, true);
+	this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].quicksand, soffset, anims_players[this.character.species].quicksand.frames, true);
 }
 
 

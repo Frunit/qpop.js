@@ -1,6 +1,6 @@
 'use strict';
 
-function Init(players) {
+function Init() {
 	this.id = SCENE.INIT;
 	this.bg = resources.get('gfx/init.png');
 	this.spec_pics = resources.get('gfx/species.png');

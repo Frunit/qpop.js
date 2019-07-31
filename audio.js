@@ -67,7 +67,7 @@
 		bufferSource.buffer = get(file);
 		bufferSource.connect(sound_node).connect(context.destination);
 		bufferSource.start();
-	};
+	}
 
 	window.audio = {
 		load: load,

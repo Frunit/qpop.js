@@ -40,8 +40,8 @@ Sprite.prototype.render = function(ctx, pos) {
 	}
 
 	ctx.drawImage(this.pic,
-				  this.offset[0] + frame[0], this.offset[1] + frame[1],
-				  this.size[0], this.size[1],
-				  pos[0], pos[1],
-				  this.size[0], this.size[1]);
+				this.offset[0] + frame[0], this.offset[1] + frame[1],
+				this.size[0], this.size[1],
+				pos[0], pos[1],
+				this.size[0], this.size[1]);
 };

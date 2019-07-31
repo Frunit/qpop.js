@@ -305,7 +305,7 @@ Survival.prototype.draw_symbols = function() {
 	// Wins
 	for(let i = 0; i < this.level.character.victories.length; i++){
 		ctx.drawImage(this.gui_pics,
-			this.sym_won_soffset[0] + sym_dim[0]*this.level.character.victories[i], this.sym_won_soffset[1],
+			this.sym_won_soffset[0] + this.sym_dim[0]*this.level.character.victories[i], this.sym_won_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
 			this.sym_won_offset[0] + this.sym_delta[0] * (i%10), this.sym_won_offset[1] + this.sym_delta[1] * Math.floor(i/10),
 			this.sym_dim[0], this.sym_dim[1]);
@@ -703,7 +703,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	game.current_player.deaths++;
 	this.draw_symbols();
 	if(delete_sprite) {
-		this.level.mobmap[this.level.character.tile[1]][this.level.character.tile[0]] = sprite;
+		this.level.mobmap[this.level.character.tile[1]][this.level.character.tile[0]] = null;
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
 	this.action_active = false;

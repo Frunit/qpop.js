@@ -111,7 +111,7 @@ Popup.prototype.render = function() {
 			this.spec_dim[0], this.spec_dim[1]);
 
 		this.sprite.render(ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
-	};
+	}
 };
 
 

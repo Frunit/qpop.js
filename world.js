@@ -80,7 +80,7 @@ World.prototype.initialize = function() {
 	}
 
 	if(game.map_positions === null) {
-		game.map_positions = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(-1));
+		game.map_positions = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(-1));
 	}
 
 	this.redraw();
@@ -143,8 +143,8 @@ World.prototype.redraw = function() {
 		x2: this.map_offset[0] + this.map_dim[0],
 		y2: this.map_offset[1] + this.map_dim[1],
 		down: (x, y) => this.wm_rightclick(x, y),
-		up: (x, y) => this.wm_rightclickup(),
-		blur: (x, y) => this.wm_rightclickup(),
+		up: () => this.wm_rightclickup(),
+		blur: () => this.wm_rightclickup(),
 		move: (x, y) => this.wm_rightmove(x, y)
 	});
 
@@ -179,7 +179,7 @@ World.prototype.redraw = function() {
 
 	ctx.save();
 	ctx.fillStyle = '#0000ff';
-	const height = Math.floor((this.hygro_bar_dim[1] * game.humid) / 100) + 2;
+	let height = Math.floor((this.hygro_bar_dim[1] * game.humid) / 100) + 2;
 	ctx.beginPath();
 	ctx.fillRect(this.hygro_bar_offset[0], this.hygro_bar_offset[1] - height, this.hygro_bar_dim[0], height);
 	ctx.restore();
@@ -405,7 +405,7 @@ World.prototype.exec_catastrophe = function(type) {
 		game.humid += 10;
 		this.catastrophe_finished();
 		break;
-	case 2: // Comet
+	case 2: { // Comet
 		game.temp -= 10;
 		game.water_level -= 3;
 
@@ -433,7 +433,8 @@ World.prototype.exec_catastrophe = function(type) {
 		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0]],
 		true, () => this.catastrophe_finished());
 		break;
-	case 3: // Plague
+		}
+	case 3: { // Plague
 		const creatures = [];
 		for(x = 3; x <= 24; x++) {
 			for(y = 3; y <= 24; y++) {
@@ -450,12 +451,13 @@ World.prototype.exec_catastrophe = function(type) {
 			for(let yy = y - 3; yy <= y + 3; yy++) {
 				const player_num = game.map_positions[yy][xx];
 				if(player_num >= 0 && random_int(0, 1)) {
-					this.kill_individual(xx, zz);
+					this.kill_individual(xx, yy);
 				}
 			}
 		}
 		break;
-	case 4: // Volcano
+		}
+	case 4: { // Volcano
 		const volcanos = [];
 		for(x = 3; x <= 24; x++) {
 			for(y = 3; y <= 24; y++) {
@@ -466,6 +468,7 @@ World.prototype.exec_catastrophe = function(type) {
 		}
 		this.volcano_step(5, volcanos);
 		break;
+		}
 	case 5: // Flood
 		game.temp += 10;
 		game.water_level += 5;
@@ -477,7 +480,7 @@ World.prototype.exec_catastrophe = function(type) {
 		// TODO RESEARCH: Are humans removed by an earthquake? I.e. is also the flag removed from the save?
 		this.catastrophe_finished();
 		break;
-	case 7: // Humans
+	case 7: { // Humans
 		const land = [];
 		for(x = 10; x <= 18; x++) {
 			for(y = 10; y <= 18; y++) {
@@ -492,7 +495,8 @@ World.prototype.exec_catastrophe = function(type) {
 		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finished();
 		game.humans_present = true;
 		break;
-	case 8: // Cosmic rays
+		}
+	case 8: { // Cosmic rays
 		for(let player of game.players) {
 			if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead) {
 				const stats = player.stats.slice();
@@ -503,6 +507,7 @@ World.prototype.exec_catastrophe = function(type) {
 		}
 		this.catastrophe_finished();
 		break;
+		}
 	}
 };
 
@@ -543,7 +548,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 
 	for(let xx = x - 1; xx <= x + 1; xx++) {
 		for(let yy = y - 1; yy <= y + 1; yy++) {
-			this.kill_individual(xx, zz);
+			this.kill_individual(xx, yy);
 		}
 	}
 
@@ -800,7 +805,7 @@ World.prototype.ai_step = function(dt) {
 		// The AI cannot physically move anymore
 		this.ai_end();
 		return;
-	};
+	}
 
 	this.set_individual(best_move[0], best_move[1]);
 	this.ai_own_individuals.push(best_move);
@@ -885,7 +890,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 
 
 World.prototype.create_height_map = function() {
-	const map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
+	const map = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(0));
 
 	// Mountains
 	for(let i = 0; i < 20; i++) {
@@ -909,8 +914,8 @@ World.prototype.create_height_map = function() {
 
 	// Basemap
 	const half = Math.floor(this.dim[0] / 2);
-	for(y = 1; y < this.dim[1] - 1; y++) {
-		for(x = 1; x < this.dim[0] - 1; x++) {
+	for(let y = 1; y < this.dim[1] - 1; y++) {
+		for(let x = 1; x < this.dim[0] - 1; x++) {
 			const dx = Math.abs(half - x);
 			const dy = Math.abs(half - y);
 			map[y][x] += random_int(0, Math.floor(((half - Math.max(dx, dy)) * 100) / half));
@@ -925,7 +930,7 @@ World.prototype.create_height_map = function() {
 
 
 World.prototype.create_world_map = function() {
-	const map = Array.from(Array(this.dim[1]), _ => Array(this.dim[0]).fill(0));
+	const map = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(0));
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {

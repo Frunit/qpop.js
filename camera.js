@@ -122,7 +122,7 @@ Camera.prototype.render = function() {
 	/*if(this._tiles_to_render.size === 2) {
 		console.log(this._movs_to_render);
 	}*/
-	let pos, x, y, sprite;
+	let pos, x, y;
 	for(let coord of this._tiles_to_render) {
 		pos = JSON.parse(coord);
 		x = pos[0];

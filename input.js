@@ -77,7 +77,7 @@
 		pressedKeys['MOUSE'] = true;
 	});
 
-	canvas.addEventListener('mouseout', function(e) {
+	canvas.addEventListener('mouseout', function() {
 		pressedKeys['CLICK'] = false;
 		pressedKeys['RCLICK'] = false;
 		pressedKeys['BLUR'] = true;
