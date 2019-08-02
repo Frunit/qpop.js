@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: A mob (enemy, predator, female) is not shown when it is on the tile that just enters the screen
+
 function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.level = level;
 	this.survival = survival;

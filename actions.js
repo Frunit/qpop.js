@@ -33,11 +33,12 @@ function Love(dir, character, partner, callback) {
 
 Love.prototype.update = function(dt) {
 	this.time += dt;
+	console.log(this.time);
 	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.time < 200) {} // Do nothing
-	else if(this.time < 900) {} // Remove partner and character and show cloud
-	else if(this.time < 1000) {} // Show offspring and character and the last two frames of the cloud
-	else if(this.time < 1100) {} // Show Heart symbol
+	if(this.time < 0.2) {} // Do nothing
+	else if(this.time < 0.9) {} // Remove partner and character and show cloud
+	else if(this.time < 1) {} // Show offspring and character and the last two frames of the cloud
+	else if(this.time < 1.1) {} // Show Heart symbol
 	else {this.finished = true;}
 };
 
@@ -82,13 +83,14 @@ function Fight(dir, character, opponent, player_wins, callback) {
 
 Fight.prototype.update = function(dt) {
 	this.time += dt;
+	console.log(this.time);
 	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.time < 200) {} // Do nothing
-	else if(this.time < 800) {} // Show attack face if predator
-	else if(this.time < 900) {} // Remove opponent and character and show cloud
-	else if(this.time < 1000) {} // Show opponent and character and the last two frames of the cloud
-	else if(this.time < 1100) {} // Depending on the winner, show cheering and moaning
-	else if(this.time < 1200) {} // If the player died, reset the character, otherwise return to normal; Show the death/victory symbol
+	if(this.time < 0.2) {} // Do nothing
+	else if(this.time < 0.8) {} // Show attack face if predator
+	else if(this.time < 0.9) {} // Remove opponent and character and show cloud
+	else if(this.time < 1) {} // Show opponent and character and the last two frames of the cloud
+	else if(this.time < 1.1) {} // Depending on the winner, show cheering and moaning
+	else if(this.time < 1.2) {} // If the player died, reset the character, otherwise return to normal; Show the death/victory symbol
 	else {this.finished = true;}
 };
 

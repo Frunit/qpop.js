@@ -55,7 +55,6 @@ function Survival() {
 	this.ai_dt = 0;
 	this.ai_own_individuals = [];
 
-	this.action_active = false;
 	this.action = null;
 
 	this.move_active = false;
@@ -389,8 +388,7 @@ Survival.prototype.finish_movement = function() {
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
 			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
-		console.log('QUICKSAND');
-		this.action_active = true;
+		console.info('QUICKSAND');
 		this.move_active = false;
 
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
@@ -405,14 +403,15 @@ Survival.prototype.finish_movement = function() {
 	if(dir) {
 		console.log(dir);
 		console.log(adjacent);
-		this.action_active = true;
 		this.move_active = false;
 
 		if(adjacent.type === SURV_MAP.FEMALE) {
+			console.info('LOVE');
 			this.action = new Love(dir, char, adjacent, () => this.love_finished(adjacent));
 		}
 		else {
 			const player_wins = this.does_player_win(adjacent);
+			console.info('FIGHT. Player does', player_wins ? '' : '*not*', 'win');
 			this.action = new Fight(dir, char, adjacent, player_wins, () => this.fight_finished(player_wins, adjacent));
 		}
 
@@ -429,7 +428,6 @@ Survival.prototype.finish_movement = function() {
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
 	this.action = null;
 	this.move_active = false;
-	this.action_active = false;
 };
 
 
@@ -467,6 +465,7 @@ Survival.prototype.love_finished = function(partner) {
 
 
 Survival.prototype.fight_finished = function(player_wins, opponent) {
+	console.log('Fight finished');
 	if(player_wins) {
 		// Only enemies are shown, although also predators count towards experience
 		if(opponent.type === SURV_MAP.ENEMY) {
@@ -480,8 +479,8 @@ Survival.prototype.fight_finished = function(player_wins, opponent) {
 	}
 	else {
 		const tile = this.level.character.tile;
-		this.mobmap[tile[1]][tile[0]] = new Enemy();
-		this.mobmap[tile[1]][tile[0]].defeat();
+		this.level.mobmap[tile[1]][tile[0]] = new Enemy(game.current_player.id, tile);
+		this.level.mobmap[tile[1]][tile[0]].defeat();
 		this.player_death();
 	}
 };
@@ -537,7 +536,6 @@ Survival.prototype.start_movement = function(dir) {
 		case 0: // Feeding/waiting
 			if(this.level.edible[this.level.map[pos[1]][pos[0]]] === '1') {
 				this.action = new Feeding(char, this.level.map, () => this.eating_finished(this.level.map[pos[1]][pos[0]]));
-				this.action_active = true;
 			}
 			else {
 				// TODO RESEARCH: Waiting; What happens here?
@@ -717,7 +715,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
-	this.action_active = false;
+	this.action = null;
 	this.move_active = false;
 	this.camera.move_to(char);
 };
@@ -727,7 +725,7 @@ Survival.prototype.update_entities = function(dt) {
 	// Update background sprites
 	this.camera.update_visible_level(dt);
 
-	if(this.action_active && this.action.finished) {
+	if(this.action !== null && this.action.finished) {
 		this.action.callback();
 	}
 };
@@ -849,7 +847,7 @@ Survival.prototype.handle_input = function(dt) {
 		}
 	}
 
-	if(!this.move_active && !this.action_active) {
+	if(!this.move_active && this.action === null) {
 		if(input.isDown('ENTER')) {
 			input.reset('ENTER');
 			this.next();

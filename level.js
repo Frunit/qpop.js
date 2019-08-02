@@ -405,6 +405,5 @@ function Enemy(species, tile) {
 
 Enemy.prototype.defeat = function() {
 	this.type = SURV_MAP.UNRESPONSIVE;
-	const def = random_int(0, 2);
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated[def].soffset, this.anims.enem_defeated[def].frames);
+	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
 };
