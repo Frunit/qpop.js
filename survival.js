@@ -728,7 +728,7 @@ Survival.prototype.update_entities = function() {
 Survival.prototype.update = function() {
 	this.handle_input();
 
-	if(this.level.character.movement) {
+	if(this.move_active) {
 		for(let predator of this.level.predators) {
 			this.resolve_movement(predator);
 		}

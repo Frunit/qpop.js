@@ -90,7 +90,7 @@ Game.prototype.start = function() {
 	this.world_map = null;
 	this.map_positions = null;
 	//this.stage = new Intro(); // DEBUG
-	this.stage = new Mutations(); // DEBUG
+	this.stage = new Survival(); // DEBUG
 	this.stage.initialize();
 	this.last_time = Date.now();
 	this.main();
