@@ -328,7 +328,7 @@ const anims_players = [
 		},
 		enem_still: {
 			soffset: [320, 256],
-			frames: [[0, 0], [0, 64]],
+			frames: [[0, 0], [64, 0]],
 		},
 		enem_defeated: {
 			soffset: [64, 256],

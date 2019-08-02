@@ -36,6 +36,7 @@ function Survival() {
 	this.sym_food_soffset = [0, 0];
 	this.sym_love_soffset = [16, 0];
 	this.sym_dead_soffset = [32, 0];
+	this.sym_won_soffset = [0, 24];
 	this.icon_steps_soffset = [48, 0];
 	this.icon_time_soffset = [68, 0];
 	this.minispec_soffset = [0, 24];

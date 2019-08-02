@@ -152,7 +152,7 @@ Level.prototype.populate = function() {
 
 	// Fixed number of enemies, iff enemies are in neighbourhood on world map.
 	// If more enemies are in the neighbourhood, they have to share the 100 spots.
-	let num_enemies = 0;
+	let num_enemies = 200; // DEBUG; should be 0
 	if(this.enemies.length > 0) {
 		num_enemies = 100;
 	}
@@ -192,6 +192,8 @@ Level.prototype.populate = function() {
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		this.mobmap[pos[1]][pos[0]] = new Female(game.current_player.id, pos);
 	}
+
+	this.enemies = [3, 4];  // DEBUG should be removed
 
 	for(let i = 0; i < num_enemies; i++) {
 		// Enemies may not be placed within 3 fields of the player
