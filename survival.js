@@ -28,8 +28,8 @@ function Survival() {
 	this.icon_time_offset = [470, 208];
 	this.sym_food_offset = [465, 286];
 	this.sym_love_offset = [465, 347];
-	this.sym_dead_offset = [465, 408];
-	this.sym_won_offset = [465, 469]; // TODO RESEARCH: Is this correct?
+	this.sym_dead_offset = [465, 381];
+	this.sym_won_offset = [465, 416];
 	this.minimap_offset = [465, 26];
 	this.minimap_sym_soffset = [0, 16];
 
@@ -41,9 +41,8 @@ function Survival() {
 	this.icon_time_soffset = [68, 0];
 	this.minispec_soffset = [0, 24];
 
-	this.icon_dy = 25;
-	this.food_dx = 8;
-	this.sym_delta = [20, 20]; // TODO RESEARCH: Is this correct?
+	this.sym_food_delta = [8, 25];
+	this.sym_dx = 17;
 
 	this.minimap_width = 21;
 	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
@@ -260,8 +259,8 @@ Survival.prototype.draw_time = function() {
 
 Survival.prototype.draw_symbols = function() {
 	// Delete earlier drawings
-	const w = this.sym_delta[0] * 10;
-	const h = this.sym_won_offset[1] - this.sym_food_offset[1] + this.sym_delta[1] * 2;
+	const w = this.sym_dx * 10;
+	const h = this.sym_won_offset[1] - this.sym_food_offset[1] + this.sym_dim[1];
 	ctx.drawImage(this.bg_pic,
 		this.sym_food_offset[0], this.sym_food_offset[1],
 		w, h,
@@ -273,7 +272,7 @@ Survival.prototype.draw_symbols = function() {
 		ctx.drawImage(this.gui_pics,
 			this.sym_food_soffset[0], this.sym_food_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
-			this.sym_food_offset[0] + this.food_dx * (i%20), this.sym_food_offset[1] + this.sym_delta[1] * Math.floor(i/20),
+			this.sym_food_offset[0] + this.sym_food_delta[0] * (i%20), this.sym_food_offset[1] + this.sym_food_delta[1] * Math.floor(i/20),
 			this.sym_dim[0], this.sym_dim[1]);
 	}
 
@@ -282,7 +281,7 @@ Survival.prototype.draw_symbols = function() {
 		ctx.drawImage(this.gui_pics,
 			this.sym_love_soffset[0], this.sym_love_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
-			this.sym_love_offset[0] + this.sym_delta[0] * (i%10), this.sym_love_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_love_offset[0] + this.sym_dx * i, this.sym_love_offset[1],
 			this.sym_dim[0], this.sym_dim[1]);
 	}
 
@@ -291,7 +290,7 @@ Survival.prototype.draw_symbols = function() {
 		ctx.drawImage(this.gui_pics,
 			this.sym_dead_soffset[0], this.sym_dead_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
-			this.sym_dead_offset[0] + this.sym_delta[0] * (i%10), this.sym_dead_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_dead_offset[0] + this.sym_dx * i, this.sym_dead_offset[1],
 			this.sym_dim[0], this.sym_dim[1]);
 	}
 
@@ -300,7 +299,7 @@ Survival.prototype.draw_symbols = function() {
 		ctx.drawImage(this.gui_pics,
 			this.sym_won_soffset[0] + this.sym_dim[0]*this.level.character.victories[i], this.sym_won_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
-			this.sym_won_offset[0] + this.sym_delta[0] * (i%10), this.sym_won_offset[1] + this.sym_delta[1] * Math.floor(i/10),
+			this.sym_won_offset[0] + this.sym_dx * i, this.sym_won_offset[1],
 			this.sym_dim[0], this.sym_dim[1]);
 	}
 };
@@ -441,6 +440,9 @@ Survival.prototype.eating_finished = function(food) {
 	// Normal food
 	else if(food < 36) {
 		game.current_player.eaten += game.current_player.stats[Math.floor(food / 6)];
+		if(game.current_player.eaten > 1480) {
+			game.current_player.eaten = 1480;
+		}
 		this.draw_symbols();
 	}
 
@@ -453,6 +455,9 @@ Survival.prototype.eating_finished = function(food) {
 Survival.prototype.love_finished = function(partner) {
 	partner.offspring();
 	game.current_player.loved++;
+	if(game.current_player.loved > 10) {
+		game.current_player.loved = 10;
+	}
 	this.draw_symbols();
 	this.finish_movement();
 };
@@ -462,7 +467,7 @@ Survival.prototype.fight_finished = function(player_wins, opponent) {
 	console.log('Fight finished');
 	if(player_wins) {
 		// Only enemies are shown, although also predators count towards experience
-		if(opponent.type === SURV_MAP.ENEMY) {
+		if(opponent.type === SURV_MAP.ENEMY && this.level.character.victories.length < 10) {
 			this.level.character.victories.push(opponent.species);
 		}
 		game.current_player.experience++;
@@ -700,6 +705,9 @@ Survival.prototype.start_predator_movement = function() {
 Survival.prototype.player_death = function(delete_sprite = false) {
 	console.info('Player died');
 	game.current_player.deaths++;
+	if(game.current_player.deaths > 10) {
+		game.current_player.deaths = 10;
+	}
 	this.draw_symbols();
 
 	const char = this.level.character;
