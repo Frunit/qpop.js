@@ -14,21 +14,24 @@ const debug4 = document.getElementById('debug4');
 
 let options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
-	wm_ai_delay: 0.05, // How many ms between two moves of the AI
+	wm_ai_delay: 2, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
-	transition_delay: 0.5, // How many seconds to show the transition screens
-	surv_move_speed: 80, // Speed of the player figure in survival (TODO: what unit?? Pixel per second?)
+	transition_delay: 3, // How many frames to show the transition screens
+	surv_move_speed: 8, // Speed of the player figure in survival in pixel per frame
 	music_on: true,
 	music: 255, // Music volume (0 - 255)
 	sound_on: true,
 	sound: 255, // Sound volume (0 - 255)
+	update_freq: 1/6, // Screen update frequency
 };
 
 
 function Game() {
+	this.update_freq = 1/6;
 	this.last_time = 0;
 	this.last_fps = 0;
 	this.frames = 0;
+	this.time = 0;
 	this.clicked_element = null;
 	this.right_clicked_element = null;
 	this.stage = null;
@@ -40,12 +43,17 @@ function Game() {
 // The main game loop
 Game.prototype.main = function() {
 	const now = Date.now();
-	const dt = (now - this.last_time) / 1000;
+
+	this.stage.handle_input();
+
+	this.time += (now - this.last_time) / 1000;
+	if(this.time > options.update_freq) {
+		this.time -= options.update_freq;
+		this.stage.update();
+		this.stage.render();
+	}
 
 	this.update_fps(now);
-
-	this.stage.update(dt);
-	this.stage.render();
 
 	this.last_time = now;
 
@@ -82,7 +90,7 @@ Game.prototype.start = function() {
 	this.world_map = null;
 	this.map_positions = null;
 	//this.stage = new Intro(); // DEBUG
-	this.stage = new Survival(); // DEBUG
+	this.stage = new Mutations(); // DEBUG
 	this.stage.initialize();
 	this.last_time = Date.now();
 	this.main();
@@ -373,6 +381,7 @@ Game.prototype.next_stage = function() {
 	case SCENE.OUTRO: // Outro
 		// This should never happen
 	default:
+		console.log(this.stage);
 		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!', () => {}, 'Oh no!');
 	}
 };

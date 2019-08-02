@@ -12,7 +12,7 @@ function Outro() {
 	this.pic_offset = [23, 42];
 	// CONST_END
 
-	this.current_time = 0;
+	this.frame = 0;
 
 	this.clickareas = [];
 }
@@ -44,11 +44,11 @@ Outro.prototype.render = function() {
 };
 
 
-Outro.prototype.update = function(dt) {
+Outro.prototype.update = function() {
 
 };
 
 
-Outro.prototype.handle_input = function(dt) {
+Outro.prototype.handle_input = function() {
 
 };

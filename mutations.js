@@ -295,7 +295,7 @@ Mutations.prototype.render = function() {
 };
 
 
-Mutations.prototype.update = function(dt) {
+Mutations.prototype.update = function() {
 	this.handle_input();
 };
 

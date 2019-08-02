@@ -52,8 +52,7 @@ function World() {
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 
 	this.ai_active = false;
-	this.ai_last_move = 0;
-	this.ai_dt = 0;
+	this.ai_frame = 0;
 	this.ai_own_individuals = [];
 
 	this.fight_active = false;
@@ -62,7 +61,6 @@ function World() {
 
 	this.clickareas = [];
 	this.rightclickareas = [];
-	this.timer = 0;
 
 	// [Ideal_Humid, Ideal_Temp] for Rangones, Blueleaf, ...
 	this.ideal = [[65, 60], [72, 50], [85, 90], [50, 30], [70, 75], [40, 40]];
@@ -229,31 +227,24 @@ World.prototype.render = function() {
 };
 
 
-World.prototype.update = function(dt) {
-	this.handle_input(dt);
+World.prototype.update = function() {
+	this.handle_input();
 	// TODO: All functions that act upon input that should not act when AI or animation is active, need respective checks in themselves! The check could be done here, but then option menus would be unresponsive.
 
 	if(this.ai_active) {
-		this.ai_step(dt);
-	}
-
-	this.timer += dt;
-	if(this.timer < 0.1) {
-		return;
+		this.ai_step();
 	}
 
 	if(this.animation) {
-		this.animation.update(dt);
+		this.animation.update();
 		if(this.animation.done) {
 			this.animation.callback();
 		}
 	}
-
-	this.timer = 0;
 };
 
 
-World.prototype.handle_input = function(dt) {
+World.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element || game.right_clicked_element) {
@@ -737,9 +728,7 @@ World.prototype.is_neighbour = function(num, x, y) {
 World.prototype.ai = function() {
 	canvas.style.cursor = 'wait';
 	this.ai_active = true;
-
-	this.ai_dt = 0;
-	this.ai_last_move = 0;
+	this.ai_frame = 0;
 
 	this.ai_own_individuals = [];
 	for(let x = 1; x < this.dim[0] - 1; x++) {
@@ -752,15 +741,16 @@ World.prototype.ai = function() {
 };
 
 
-World.prototype.ai_step = function(dt) {
+World.prototype.ai_step = function() {
 	if(this.animation) {
 		return;
 	}
 
-	this.ai_dt += dt;
-	if(this.ai_dt < this.ai_last_move + options.wm_ai_delay) {
+	this.ai_frame++;
+	if(this.ai_frame < options.wm_ai_delay) {
 		return;
 	}
+	this.ai_frame = 0;
 
 	if(!(game.current_player.toplace || game.current_player.tomove)) {
 		this.ai_end();
@@ -775,9 +765,6 @@ World.prototype.ai_step = function(dt) {
 	let best_value = -Infinity;
 	let best_move = [];
 	let to_remove = 0;
-
-	this.ai_dt = 0;
-	this.ai_last_move += this.ai_dt;
 
 	// Only use shadows (movements) if no individuals for placement are left
 	if(game.current_player.toplace === 0) {

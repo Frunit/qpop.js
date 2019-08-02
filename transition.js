@@ -12,7 +12,7 @@ function Transition(pic, id) {
 
 	this.lang_string = pic.split('/').pop().replace('.png', '');
 
-	this.current_time = 0;
+	this.frame = 0;
 
 	this.clickareas = [];
 }
@@ -44,18 +44,18 @@ Transition.prototype.redraw = function() {
 
 
 Transition.prototype.render = function() {
-	return;
+
 };
 
 
-Transition.prototype.update = function(dt) {
-	this.current_time += dt;
-	if(this.current_time > options.transition_delay) {
+Transition.prototype.update = function() {
+	this.frame++;
+	if(this.frame > options.transition_delay) {
 		game.next_stage();
 	}
 };
 
 
-Transition.prototype.handle_input = function(dt) {
-	return;
+Transition.prototype.handle_input = function() {
+
 };

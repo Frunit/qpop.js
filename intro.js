@@ -3,7 +3,7 @@
 // TODO RESEARCH: Check values. The pic is too big for the window.
 
 function Intro() {
-	this.id = 0;
+	this.id = SCENE.INTRO;
 	this.pic = resources.get('gfx/dummy_intro.png');
 
 	// CONST_START
@@ -11,7 +11,7 @@ function Intro() {
 	this.pic_offset = [23, 42];
 	// CONST_END
 
-	this.current_time = 0;
+	this.frame = 0;
 
 	this.clickareas = [];
 }
@@ -43,14 +43,14 @@ Intro.prototype.render = function() {
 };
 
 
-Intro.prototype.update = function(dt) {
-	this.current_time += dt;
-	if(this.current_time > options.transition_delay) {
+Intro.prototype.update = function() {
+	this.frame++;
+	if(this.frame > options.transition_delay) {
 		game.next_stage();
 	}
 };
 
 
-Intro.prototype.handle_input = function(dt) {
+Intro.prototype.handle_input = function() {
 
 };

@@ -190,12 +190,12 @@ Ranking.prototype.render = function() {
 };
 
 
-Ranking.prototype.update = function(dt) {
-	this.handle_input(dt);
+Ranking.prototype.update = function() {
+	this.handle_input();
 };
 
 
-Ranking.prototype.handle_input = function(dt) {
+Ranking.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element) {

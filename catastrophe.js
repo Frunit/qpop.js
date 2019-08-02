@@ -23,7 +23,7 @@ function Catastrophe() {
 	this.clickareas = [];
 
 	this.type = this.choose();
-	this.current_time = 0;
+	this.frame = 0;
 }
 
 
@@ -62,12 +62,12 @@ Catastrophe.prototype.render = function() {
 };
 
 
-Catastrophe.prototype.update = function(dt) {
-	this.current_time += dt;
-	if(this.current_time > options.transition_delay) {
+Catastrophe.prototype.update = function() {
+	this.frame++;
+	if(this.frame > options.transition_delay) {
 		this.end();
 	}
-	this.handle_input(dt);
+	this.handle_input();
 };
 
 
@@ -76,7 +76,7 @@ Catastrophe.prototype.choose = function() {
 };
 
 
-Catastrophe.prototype.handle_input = function(dt) {
+Catastrophe.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element) {

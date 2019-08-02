@@ -178,12 +178,12 @@ Init.prototype.render = function() {
 };
 
 
-Init.prototype.update = function(dt) {
-	this.handle_input(dt);
+Init.prototype.update = function() {
+	this.handle_input();
 };
 
 
-Init.prototype.handle_input = function(dt) {
+Init.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element || game.right_clicked_element) {

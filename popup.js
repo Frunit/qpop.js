@@ -28,7 +28,6 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.sprite = new Sprite('gfx/species.png', this.spec_dim, [0, 0], this.spec_positions[image]);
 
 	this.clickareas = [];
-	this.timer = 0;
 }
 
 
@@ -115,21 +114,13 @@ Popup.prototype.render = function() {
 };
 
 
-Popup.prototype.update = function(dt) {
-	this.handle_input(dt);
-
-	this.timer += dt;
-	if(this.timer < 0.1) {
-		return;
-	}
-
-	this.sprite.update(dt);
-
-	this.timer = 0;
+Popup.prototype.update = function() {
+	this.handle_input();
+	this.sprite.update();
 };
 
 
-Popup.prototype.handle_input = function(dt) {
+Popup.prototype.handle_input = function() {
 	if(game.clicked_element) {
 		let area = game.clicked_element;
 		let pos = input.mousePos();

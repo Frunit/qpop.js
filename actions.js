@@ -7,7 +7,7 @@ function Love(dir, character, partner, callback) {
 	this.partner = partner;
 	this.callback = callback;
 	this.finished = false;
-	this.time = 0;
+	this.frame = 0;
 	this.sprites = [];
 
 	switch(dir) {
@@ -31,14 +31,14 @@ function Love(dir, character, partner, callback) {
 }
 
 
-Love.prototype.update = function(dt) {
-	this.time += dt;
-	console.log(this.time);
+Love.prototype.update = function() {
+	this.frame++;
+	console.log(this.frame);
 	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.time < 0.2) {} // Do nothing
-	else if(this.time < 0.9) {} // Remove partner and character and show cloud
-	else if(this.time < 1) {} // Show offspring and character and the last two frames of the cloud
-	else if(this.time < 1.1) {} // Show Heart symbol
+	if(this.frame < 2) {} // Do nothing
+	else if(this.frame < 9) {} // Remove partner and character and show cloud
+	else if(this.frame < 10) {} // Show offspring and character and the last two frames of the cloud
+	else if(this.frame < 11) {} // Show Heart symbol
 	else {this.finished = true;}
 };
 
@@ -56,7 +56,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.opponent = opponent;
 	this.callback = callback;
 	this.finished = false;
-	this.time = 0;
+	this.frame = 0;
 	this.player_wins = player_wins;
 	this.sprites = [];
 
@@ -81,16 +81,16 @@ function Fight(dir, character, opponent, player_wins, callback) {
 }
 
 
-Fight.prototype.update = function(dt) {
-	this.time += dt;
-	console.log(this.time);
+Fight.prototype.update = function() {
+	this.frame++;
+	console.log(this.frame);
 	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.time < 0.2) {} // Do nothing
-	else if(this.time < 0.8) {} // Show attack face if predator
-	else if(this.time < 0.9) {} // Remove opponent and character and show cloud
-	else if(this.time < 1) {} // Show opponent and character and the last two frames of the cloud
-	else if(this.time < 1.1) {} // Depending on the winner, show cheering and moaning
-	else if(this.time < 1.2) {} // If the player died, reset the character, otherwise return to normal; Show the death/victory symbol
+	if(this.frame < 2) {} // Do nothing
+	else if(this.frame < 8) {} // Show attack face if predator
+	else if(this.frame < 9) {} // Remove opponent and character and show cloud
+	else if(this.frame < 10) {} // Show opponent and character and the last two frames of the cloud
+	else if(this.frame < 11) {} // Depending on the winner, show cheering and moaning
+	else if(this.frame < 12) {} // If the player died, reset the character, otherwise return to normal; Show the death/victory symbol
 	else {this.finished = true;}
 };
 
@@ -116,7 +116,7 @@ function Feeding(character, map, callback) {
 }
 
 
-Feeding.prototype.update = function(dt) {
+Feeding.prototype.update = function() {
 	this.frame += 1;
 	if(this.frame <= 0) {
 		return;
@@ -175,7 +175,7 @@ function Quicksand(character, callback) {
 }
 
 
-Quicksand.prototype.update = function(dt) {
+Quicksand.prototype.update = function() {
 	this.frame += 1;
 	if(this.frame <= 0) {
 		return;

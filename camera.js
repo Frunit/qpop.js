@@ -64,13 +64,13 @@ Camera.prototype.update_tiles = function() {
 };
 
 
-Camera.prototype.update_visible_level = function(dt) {
+Camera.prototype.update_visible_level = function() {
 	if(this.survival.action !== null) {
 		for(let tile of this.survival.action.tiles) {
 			this._tiles_to_render.add(JSON.stringify(tile));
 		}
 
-		this.survival.action.update(dt);
+		this.survival.action.update();
 	}
 
 	for(let y of this.y_tiles) {
@@ -79,14 +79,14 @@ Camera.prototype.update_visible_level = function(dt) {
 				this._tiles_to_render.add(JSON.stringify([x, y]));
 			}
 			else {
-				this.level.bg_sprites[y][x].update(dt);
+				this.level.bg_sprites[y][x].update();
 				if(this._pos_changed || this.level.bg_sprites[y][x].is_new_frame()) {
 					this._tiles_to_render.add(JSON.stringify([x, y]));
 				}
 			}
 
 			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
-				this.level.mobmap[y][x].sprite.update(dt);
+				this.level.mobmap[y][x].sprite.update();
 				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
 					this._movs_to_render.push(this.level.mobmap[y][x]);
 					this._tiles_to_render.add(JSON.stringify([x, y]));

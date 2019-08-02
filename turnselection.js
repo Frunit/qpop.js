@@ -43,7 +43,6 @@ function Turnselection() {
 
 	this.animations = null;
 	this.animation_type = 0;
-	this.timer = 0;
 }
 
 
@@ -191,33 +190,26 @@ Turnselection.prototype.render = function() {
 };
 
 
-Turnselection.prototype.update = function(dt) {
-	this.handle_input(dt);
-
-	this.timer += dt;
-	if(this.timer < 0.1) {
-		return;
-	}
+Turnselection.prototype.update = function() {
+	this.handle_input();
 
 	if(this.animations) {
 		if(this.animations.length === 1) {
-			this.animations[0].update(dt);
+			this.animations[0].update();
 			if(this.animations[0].finished) {
 				this.animations[0].callback();
 			}
 		}
 		else {
 			for(let anim of this.animations) {
-				anim.update(dt);
+				anim.update();
 			}
 		}
 	}
-
-	this.timer = 0;
 };
 
 
-Turnselection.prototype.handle_input = function(dt) {
+Turnselection.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element) {

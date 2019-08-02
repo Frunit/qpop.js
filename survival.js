@@ -51,11 +51,6 @@ function Survival() {
 	this.eating_div = 37;
 	// CONST_END
 
-	this.ai_active = false;
-	this.ai_last_move = 0;
-	this.ai_dt = 0;
-	this.ai_own_individuals = [];
-
 	this.action = null;
 
 	this.move_active = false;
@@ -65,8 +60,6 @@ function Survival() {
 
 	this.cam_clickpos = null;
 	this.cam_rightclickpos = null;
-
-	this.timer = 100;
 }
 
 
@@ -549,8 +542,8 @@ Survival.prototype.start_movement = function(dir) {
 };
 
 
-Survival.prototype.resolve_movement = function(obj, dt) {
-	const speed = options.surv_move_speed * dt;
+Survival.prototype.resolve_movement = function(obj) {
+	const speed = options.surv_move_speed;
 	let finished_move = false;
 	switch (obj.movement) {
 	case DIR.S:
@@ -722,9 +715,9 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 };
 
 
-Survival.prototype.update_entities = function(dt) {
+Survival.prototype.update_entities = function() {
 	// Update background sprites
-	this.camera.update_visible_level(dt);
+	this.camera.update_visible_level();
 
 	if(this.action !== null && this.action.finished) {
 		this.action.callback();
@@ -732,29 +725,23 @@ Survival.prototype.update_entities = function(dt) {
 };
 
 
-Survival.prototype.update = function(dt) {
-	this.handle_input(dt);
-
-	this.timer += dt;
-	if(this.timer < 0.1) {
-		return;
-	}
+Survival.prototype.update = function() {
+	this.handle_input();
 
 	if(this.level.character.movement) {
 		for(let predator of this.level.predators) {
-			this.resolve_movement(predator, this.timer);
+			this.resolve_movement(predator);
 		}
 
-		this.resolve_movement(this.level.character, this.timer);
+		this.resolve_movement(this.level.character);
 		this.camera.move_to(this.level.character);
 	}
 
-	this.update_entities(this.timer);
-	this.timer = 0;
+	this.update_entities();
 };
 
 
-Survival.prototype.handle_input = function(dt) {
+Survival.prototype.handle_input = function() {
 	if(input.isDown('MOVE')) {
 		let pos = input.mousePos();
 		if(game.clicked_element || game.right_clicked_element) {
