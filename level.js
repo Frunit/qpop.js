@@ -93,6 +93,7 @@ Level.prototype.generate_map = function() {
 
 	const plant_offsets = [0, 6, 12, 18, 24, 30]; // From tilemap
 
+	this.individuals = 5; // DEBUG, should be removed
 	[this.neighbourfields, this.enemies] = this.count_wm_neighbours();
 	this.density = 10 * this.individuals / this.neighbourfields;
 	const mod_density = 50 + 10 * this.density;
@@ -140,22 +141,28 @@ Level.prototype.populate = function() {
 	// More predators for higher difficulty and more individuals on world map.
 	// (More individuals attract more predators.)
 	let num_predators = 30 + (5 - game.current_player.iq) * this.individuals;
-	if(true || num_predators > 240) { // DEBUG
+	if(num_predators > 240) {
 		num_predators = 240;
 	}
 
 	// More females at a higher population density.
 	let num_females = 20 + 10 * this.density
-	if(true || num_females > 200) { // DEBUG
+	if(num_females > 200) {
 		num_females = 200;
 	}
 
 	// Fixed number of enemies, iff enemies are in neighbourhood on world map.
 	// If more enemies are in the neighbourhood, they have to share the 100 spots.
-	let num_enemies = 200; // DEBUG; should be 0
+	let num_enemies = 0;
 	if(this.enemies.length > 0) {
 		num_enemies = 100;
 	}
+
+	// DEBUG:
+	num_predators = 200;
+	num_females = 0;
+	num_enemies = 0;
+
 
 	console.info('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
