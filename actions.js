@@ -102,10 +102,11 @@ Fight.prototype.render = function(ctx, pos) {
 };
 
 
-function Feeding(character, map, callback) {
+function Feeding(character, level, food_type, callback) {
 	this.character = character;
-	this.map = map;
+	this.level = level;
 	this.callback = callback;
+	this.food_type = food_type;
 	this.frame = -1;
 	this.step = 0;
 	this.finished = false;
@@ -123,32 +124,23 @@ Feeding.prototype.update = function() {
 	}
 	this.sprite.update();
 	const tile = this.character.tile;
-	const food_type = this.map[tile[1]][tile[0]];
 	if(this.frame === 2) {
-		// Normal food gets one less
-		if(food_type < 36) {
-			this.map[tile[1]][tile[0]] -= 1;
-		}
-		// Power food has its corresponding empty space at +1
-		else if(food_type >= 118) {
-			this.map[tile[1]][tile[0]] += 1;
-		}
-		// Poison is never diminshed or changed
+		this.level.eat_tile(tile);
 	}
 
 	// This is depended on the species, so no fixed frame
 	else if(this.sprite.finished) {
 		// Special animation done or normal food -> We are finished
-		if(this.step === 1 || food_type < 36) {
+		if(this.step === 1 || this.food_type < 36) {
 			this.finished = true;
 		}
 		// Poison
-		else if(food_type >= 88 && food_type <= 93) {
+		else if(this.food_type >= 88 && this.food_type <= 93) {
 			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
 		}
 		// Power food
-		else if(food_type >= 118) {
+		else if(this.food_type >= 118) {
 			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
 		}

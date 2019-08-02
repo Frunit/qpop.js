@@ -400,13 +400,15 @@ Survival.prototype.finish_movement = function() {
 
 		if(adjacent.type === SURV_MAP.FEMALE) {
 			console.info('LOVE');
-			this.action = new Love(dir, char, adjacent, () => this.love_finished(adjacent));
+			this.action = new Love(dir, char, adjacent, () => this.finish_love(adjacent));
 		}
 		else {
 			const player_wins = this.does_player_win(adjacent);
 			console.info('FIGHT. Player does', player_wins ? '' : '*not*', 'win');
-			this.action = new Fight(dir, char, adjacent, player_wins, () => this.fight_finished(player_wins, adjacent));
+			this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent));
 		}
+
+		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 
 		console.log(this.action);
 
@@ -419,6 +421,7 @@ Survival.prototype.finish_movement = function() {
 
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
+	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 	this.action = null;
 	this.move_active = false;
 };
@@ -432,7 +435,7 @@ Survival.prototype.does_player_win = function(opponent) {
 };
 
 
-Survival.prototype.eating_finished = function(food) {
+Survival.prototype.finish_feeding = function(food) {
 	// Power food
 	if(food >= 118) {
 		this.level.character.invincible = true;
@@ -452,7 +455,7 @@ Survival.prototype.eating_finished = function(food) {
 };
 
 
-Survival.prototype.love_finished = function(partner) {
+Survival.prototype.finish_love = function(partner) {
 	partner.offspring();
 	game.current_player.loved++;
 	if(game.current_player.loved > 10) {
@@ -463,7 +466,7 @@ Survival.prototype.love_finished = function(partner) {
 };
 
 
-Survival.prototype.fight_finished = function(player_wins, opponent) {
+Survival.prototype.finish_fight = function(player_wins, opponent) {
 	console.log('Fight finished');
 	if(player_wins) {
 		// Only enemies are shown, although also predators count towards experience
@@ -532,14 +535,18 @@ Survival.prototype.start_movement = function(dir) {
 			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
-		case 0: // Feeding/waiting
-			if(this.level.edible[this.level.map[pos[1]][pos[0]]] === '1') {
-				this.action = new Feeding(char, this.level.map, () => this.eating_finished(this.level.map[pos[1]][pos[0]]));
+		case 0: { // Feeding/waiting
+			const food_type = this.level.map[pos[1]][pos[0]];
+			if(this.level.edible[food_type] === '1') {
+				this.action = new Feeding(char, this.level, food_type, () => this.finish_feeding(food_type));
+				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 			}
 			else {
-				// TODO RESEARCH: Waiting; What happens here?
+				// TODO: Still and decrement movement counter and reset time counter
+				// Space needs to be ignored for some short time to inhibit accidental multiple pauses in short time
 			}
 			break;
+		}
 	}
 
 	this.start_predator_movement();
@@ -717,6 +724,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
+	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 	this.action = null;
 	this.move_active = false;
 	this.camera.move_to(char);

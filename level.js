@@ -8,7 +8,7 @@ function Level() {
 	this.individuals = game.current_player.individuals;
 	this.density = 0;
 	this.blocking = '000000000000000000000000000000000000111111111111111111111110011110111100000000001111111100000000000111111111111111111100001111111111111';
-	this.edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000011111100000000000000000000000010100000000000000';
+	this.edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
 	this.height = 100;
 	this.width = 100;
 
@@ -293,6 +293,25 @@ Level.prototype.request_sprite = function(x, y) {
 	const xx = Math.floor(type % 10);
 	const yy = Math.floor(type / 10);
 	this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], [xx*64, yy*64]);
+};
+
+
+Level.prototype.eat_tile = function(tile) {
+	const food_type = this.map[tile[1]][tile[0]];
+
+	// Normal food gets one less
+	if(food_type < 36) {
+		this.map[tile[1]][tile[0]] -= 1;
+	}
+
+	// Power food has its corresponding empty space at +1
+	else if(food_type >= 118) {
+		this.map[tile[1]][tile[0]] += 1;
+	}
+
+	// Poison is never diminshed or changed
+
+	this.request_sprite(...tile);
 };
 
 
