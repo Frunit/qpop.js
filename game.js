@@ -48,7 +48,7 @@ Game.prototype.main = function() {
 
 	this.time += (now - this.last_time) / 1000;
 	if(this.time > options.update_freq) {
-		this.time -= options.update_freq;
+		this.time %= options.update_freq;
 		this.stage.update();
 		this.stage.render();
 	}
