@@ -56,9 +56,18 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.opponent = opponent;
 	this.callback = callback;
 	this.finished = false;
-	this.frame = 0;
+	this.frame = opponent.type === SURV_MAP.PREDATOR ? -5 : 0;  // Predators show the attack frame before attacking
 	this.player_wins = player_wins;
 	this.sprites = [];
+
+	if(this.opponent.type === SURV_MAP.PREDATOR) {
+		this.opponent_url = `gfx/pred${this.opponent.species+1}.png`;
+		this.opponent_anim = anims_predators[this.opponent.species];
+	}
+	else {
+		this.opponent_url = 'gfx/enemies.png';
+		this.opponent_anim = anims_players[this.opponent.species];
+	}
 
 	switch(dir) {
 		case DIR.N:
@@ -66,7 +75,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
 		case DIR.S:
-			this.tiles = [[character.tile[0], character.tile[1] + 1], character.tile];
+			this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
 		case DIR.W:
@@ -74,7 +83,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;
 		case DIR.E:
-			this.tiles = [[character.tile[0] + 1, character.tile[1]], character.tile];
+			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;
 	}
@@ -83,21 +92,47 @@ function Fight(dir, character, opponent, player_wins, callback) {
 
 Fight.prototype.update = function() {
 	this.frame++;
-	console.log(this.frame);
-	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.frame < 2) {} // Do nothing
-	else if(this.frame < 8) {} // Show attack face if predator
-	else if(this.frame < 9) {} // Remove opponent and character and show cloud
-	else if(this.frame < 10) {} // Show opponent and character and the last two frames of the cloud
-	else if(this.frame < 11) {} // Depending on the winner, show cheering and moaning
-	else if(this.frame < 12) {} // If the player died, reset the character, otherwise return to normal; Show the death/victory symbol
-	else {this.finished = true;}
+
+	switch(this.frame) {
+		case -4: {
+			this.sprites = [
+				new Sprite(this.opponent_url, [64, 64], this.opponent_anim.attack.soffset,  this.opponent_anim.attack.frames[this.dir - 1]),
+				new Sprite(this.character.url, [64, 64],  this.opponent_anim.still.soffset,  this.opponent_anim.still.frames),
+			];
+			if(this.dir === DIR.S || this.dir === DIR.E) {
+				this.sprites.reverse();
+			}
+			break;
+		}
+		case 1:
+			this.sprites = [this.cloud_sprite];
+			break;
+		case 10: {
+			game.stage.pre_finish_fight(this.player_wins, this.opponent);
+			this.sprites = [this.cloud_sprite];
+			break;
+		}
+		case 12: {
+			this.sprites = [];
+			break;
+		}
+		case 28:
+			this.finished = true;
+			break;
+		default:
+			for(let sprite of this.sprites) {
+				sprite.update();
+			}
+			break;
+	}
 };
 
 
-Fight.prototype.render = function(ctx, pos) {
-	for(let sprite of this.sprites) {
-		sprite.render(ctx, pos);
+Fight.prototype.render = function(ctx, dim, cpos) {
+	for(let i = 0; i < this.sprites.length; i++) {
+		this.sprites[i].render(ctx,
+			[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),
+			Math.round(this.tiles[i][1] * dim[1] - cpos[1])]);
 	}
 };
 

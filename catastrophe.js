@@ -9,13 +9,14 @@ function Catastrophe() {
 	this.cata_pic = resources.get('gfx/dummy_cata.png');
 
 	// CONST_START
-	this.dim = [300, 200];
-	this.title_dim = [300, 20];
-	this.img_dim = [260, 160];
+	this.dim = [360, 300];
+	this.close_dim = [22, 21];
+	this.title_dim = [339, 21];
+	this.img_dim = [320, 240];
 
-	this.offset = [140, 165];
+	this.offset = [140, 90];
 	this.title_offset = [150, 10];
-	this.img_offset = [20, 20];
+	this.img_offset = [20, 40];
 
 	this.img_soffset = [0, 0];
 	// CONST_END
@@ -64,7 +65,7 @@ Catastrophe.prototype.render = function() {
 
 Catastrophe.prototype.update = function() {
 	this.frame++;
-	if(this.frame > options.transition_delay) {
+	if(this.frame > options.transition_delay*100) {
 		this.end();
 	}
 	this.handle_input();

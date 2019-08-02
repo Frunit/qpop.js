@@ -427,7 +427,7 @@ const anims_predators = [
 		},
 		attack: {
 			soffset: [0, 0],
-			frames: [[128, 64], [0, 192], [64, 192], [128, 192]],  // N E S W
+			frames: [[[128, 192]], [[64, 192]], [[0, 64]], [[0, 192]]],  // opposite N E S W
 		},
 		winner: {
 			soffset: [0, 64],
@@ -436,11 +436,11 @@ const anims_predators = [
 		defeated: [
 			{  // Stars
 				soffset: [64, 128],
-				frames: [[0, 0], [0, 64], [0, 128], [0, 192]],
+				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 			},
 			{  // Crying
 				soffset: [320, 128],
-				frames: [[0, 0], [0, 64], [0, 128], [0, 192]],
+				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 			},
 			{  // Skeleton
 				soffset: [576, 128],
@@ -455,7 +455,7 @@ const anims_predators = [
 		},
 		north: {
 			soffset: [384, 0],
-			frames: [[0, 0], [0, 64], [0, 64], [0, 0], [0, 0], [0, 64], [0, 64], [0, 0]],
+			frames: [[0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [64, 0], [64, 0], [0, 0]],
 		},
 		south: {
 			soffset: [0, 0],
@@ -471,7 +471,7 @@ const anims_predators = [
 		},
 		attack: {
 			soffset: [0, 0],
-			frames: [[384, 0], [0, 64], [128, 64], [64, 64]],  // N E S W; TODO RESEARCH: North unclear
+			frames: [[[128, 64]], [[64, 64]], [[384, 0]], [[0, 64]]],  // opposite  N E S W; TODO RESEARCH: North unclear
 		},
 		winner: {
 			soffset: [0, 0],
@@ -515,7 +515,7 @@ const anims_predators = [
 		},
 		attack: {
 			soffset: [0, 0],
-			frames: [[192, 64], [64, 0], [576, 0], [320, 0]],  // N E S W; TODO RESEARCH: All unclear
+			frames: [[[576, 0]], [[320, 0]], [[192, 64]], [[64, 0]]],  // opposite N E S W; TODO RESEARCH: All unclear
 		},
 		winner: {
 			soffset: [448, 64],

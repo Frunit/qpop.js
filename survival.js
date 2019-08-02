@@ -408,7 +408,8 @@ Survival.prototype.finish_movement = function() {
 			this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent));
 		}
 
-		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
+		this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
+		this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]].hidden = true;
 
 		console.log(this.action);
 
@@ -422,6 +423,7 @@ Survival.prototype.finish_movement = function() {
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
+	this.level.mobmap[char.tile[1]][char.tile[0]].hidden = false;
 	this.action = null;
 	this.move_active = false;
 };
@@ -429,7 +431,7 @@ Survival.prototype.finish_movement = function() {
 
 Survival.prototype.does_player_win = function(opponent) {
 	// The player wins if the character is invincible, fights against an enemy, or has a high defense.
-	return this.level.character.invincible ||
+	return true || this.level.character.invincible ||
 		opponent.type === SURV_MAP.ENEMY ||
 		random_int(0, opponent.attack) <= game.current_player.stats[ATTR.DEFENSE];
 };
@@ -466,6 +468,25 @@ Survival.prototype.finish_love = function(partner) {
 };
 
 
+Survival.prototype.pre_finish_fight = function(player_wins, opponent) {
+	console.log('Fight ongoing');
+	opponent.hidden = false;
+	this.level.character.hidden = false;
+	if(player_wins) {
+		// Only enemies are shown, although also predators count towards experience
+		opponent.defeat();
+		const char = this.level.character;
+		char.sprite = new Sprite(char.url, [64, 64], char.anims.winner.soffset, char.anims.winner.frames);
+	}
+	else {
+		opponent.sprite = new Sprite(opponent.url, [64, 64], opponent.anims.winner.soffset, opponent.anims.winner.frames);
+		const tile = this.level.character.tile;
+		this.level.mobmap[tile[1]][tile[0]] = new Enemy(game.current_player.id, tile);
+		this.level.mobmap[tile[1]][tile[0]].defeat();
+	}
+};
+
+
 Survival.prototype.finish_fight = function(player_wins, opponent) {
 	console.log('Fight finished');
 	if(player_wins) {
@@ -475,14 +496,11 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 		}
 		game.current_player.experience++;
 
-		opponent.defeat();
 		this.draw_symbols();
 		this.finish_movement();
 	}
 	else {
-		const tile = this.level.character.tile;
-		this.level.mobmap[tile[1]][tile[0]] = new Enemy(game.current_player.id, tile);
-		this.level.mobmap[tile[1]][tile[0]].defeat();
+		opponent.sprite = new Sprite(opponent.url, [64, 64], opponent.anims.still.soffset, opponent.anims.still.frames);
 		this.player_death();
 	}
 };
@@ -539,7 +557,7 @@ Survival.prototype.start_movement = function(dir) {
 			const food_type = this.level.map[pos[1]][pos[0]];
 			if(this.level.edible[food_type] === '1') {
 				this.action = new Feeding(char, this.level, food_type, () => this.finish_feeding(food_type));
-				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
+				this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
 			}
 			else {
 				// TODO: Still and decrement movement counter and reset time counter
@@ -623,6 +641,9 @@ Survival.prototype.start_predator_movement = function() {
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {
+		if(predator.type === SURV_MAP.UNRESPONSIVE) {
+			continue;
+		}
 		const pos = predator.tile;
 
 		const dx = Math.abs(pos[0] - player_pos[0]);
@@ -746,7 +767,9 @@ Survival.prototype.update = function() {
 
 	if(this.move_active) {
 		for(let predator of this.level.predators) {
-			this.resolve_movement(predator);
+			if(predator.type === SURV_MAP.PREDATOR) {
+				this.resolve_movement(predator);
+			}
 		}
 
 		this.resolve_movement(this.level.character);

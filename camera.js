@@ -85,7 +85,7 @@ Camera.prototype.update_visible_level = function() {
 				}
 			}
 
-			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
+			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER && !this.level.mobmap[y][x].hidden) {
 				this.level.mobmap[y][x].sprite.update();
 				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
 					this._movs_to_render.push(this.level.mobmap[y][x]);
@@ -145,9 +145,7 @@ Camera.prototype.render = function() {
 	}
 
 	if(this.survival.action !== null) {
-		this.survival.action.render(ctx,
-			[Math.round(this.survival.action.tiles[0][0] * this.tile_dim[0] - this.cpos[0]),
-			Math.round(this.survival.action.tiles[0][1] * this.tile_dim[1] - this.cpos[1])]);
+		this.survival.action.render(ctx, this.tile_dim, this.cpos);
 	}
 
 	ctx.restore();

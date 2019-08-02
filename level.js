@@ -358,6 +358,7 @@ function Character(species, tile) {
 	this.rel_pos = [0, 0];
 	this.movement = 0;
 	this.invincible = false;
+	this.hidden = false;
 	this.steps = 40 + game.current_player.iq * 10;
 	this.time = 2000; // ms per turn TODO RESEARCH: Is this correct?
 
@@ -377,6 +378,7 @@ function Predator(species, tile) {
 	this.rel_pos = [0, 0];
 	this.movement = 0;       // current movement direction
 	this.last_movement = 0;  // last movement direction (important, because they can't move back)
+	this.hidden = false;
 
 	this.url = 'gfx/pred' + (species+1) + '.png';
 	this.anims = anims_predators[species];
@@ -403,6 +405,7 @@ function Female(species, tile) {
 	this.species = species;
 	this.rel_pos = [0, 0];
 	this.has_offspring = false;
+	this.hidden = false;
 
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
@@ -422,7 +425,7 @@ function Enemy(species, tile) {
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
-	this.lost = false;
+	this.hidden = false;
 
 	this.url = 'gfx/enemies.png';
 	this.anims = anims_players[species];
