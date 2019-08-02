@@ -413,7 +413,7 @@ canvas.addEventListener('contextmenu', function(e) {
 
 let lang = null;
 switch(options.language) {
-	case 'DE': lang = de; break
+	case 'DE': lang = de; break;
 	default: lang = en;
 }
 

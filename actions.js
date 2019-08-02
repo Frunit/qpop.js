@@ -8,7 +8,6 @@ function Love(dir, character, partner, callback) {
 	this.callback = callback;
 	this.finished = false;
 	this.time = 0;
-	this.offset = [0, 0];
 	this.sprites = [];
 
 	switch(dir) {
@@ -57,7 +56,6 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.callback = callback;
 	this.finished = false;
 	this.time = 0;
-	this.offset = [0, 0];
 	this.player_wins = player_wins;
 	this.sprites = [];
 
@@ -110,7 +108,7 @@ function Feeding(character, map, callback) {
 	this.step = 0;
 	this.finished = false;
 
-	this.tiles = [[this.character.tile]];
+	this.tiles = [this.character.tile];
 
 	this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
 }
@@ -144,12 +142,12 @@ Feeding.prototype.update = function(dt) {
 		}
 		// Poison
 		else if(food_type >= 88 && food_type <= 93) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].poisoned, soffset, anims_players[this.character.species].poisoned.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
 		}
 		// Power food
 		else if(food_type >= 118) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].power_food, soffset, anims_players[this.character.species].power_food.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
 		}
 	}
@@ -168,9 +166,10 @@ function Quicksand(character, callback) {
 	this.mov = [0, 0];
 	this.finished = false;
 
-	this.tiles = [[this.character.tile]];
+	this.tiles = [this.character.tile];
 
-	this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].quicksand, soffset, anims_players[this.character.species].quicksand.frames, true);
+	const qs = anims_players[this.character.species].quicksand;
+	this.sprite = new Sprite(this.character.url, [64, 64], qs.soffset, qs.frames, true);
 }
 
 

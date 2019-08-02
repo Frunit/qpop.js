@@ -157,18 +157,21 @@ Level.prototype.populate = function() {
 		num_enemies = 100;
 	}
 
-	console.log('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
+	console.info('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
 	this.mobmap = Array.from(Array(100), () => Array(100).fill(null));
 	let pos;
 
 	// Place the player somewhere around the center
 	this.place_player([49, 49]);
+	console.log(this.character.tile);  // DEBUG
 
 	let free_tiles = this.find_free_tiles();
 
+	// TODO: Placement *not* within x fields does not work.
+
 	for(let i = 0; i < num_predators; i++) {
-		// Predators may not be placed with 2 fields of the player
+		// Predators may not be placed within 2 fields of the player
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
@@ -178,16 +181,20 @@ Level.prototype.populate = function() {
 	}
 
 	for(let i = 0; i < num_females; i++) {
-		// Females may not be placed with 2 fields of the player
+		// Females may not be placed within 3 fields of the player
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+			// DEBUG
+			if(pos[0] > this.character.tile[0] - 2 && pos[0] < this.character.tile[0] + 2 && pos[1] > this.character.tile[1] - 2 && pos[1] < this.character.tile[1] + 2) {
+				console.log(i, pos);
+			}
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-		this.mobmap[pos[1]][pos[0]] = new Female(1, pos);
+		this.mobmap[pos[1]][pos[0]] = new Female(game.current_player.id, pos);
 	}
 
 	for(let i = 0; i < num_enemies; i++) {
-		// Enemies may not be placed with 2 fields of the player
+		// Enemies may not be placed within 3 fields of the player
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);

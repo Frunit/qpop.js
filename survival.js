@@ -315,6 +315,7 @@ Survival.prototype.draw_symbols = function() {
 
 Survival.prototype.render = function() {
 	this.camera.render();
+	this.draw_minimap();
 };
 
 
@@ -382,11 +383,13 @@ Survival.prototype.finish_movement = function() {
 	const char = this.level.character;
 	const current_bg = this.level.map[char.tile[1]][char.tile[0]]
 	char.rel_pos = [0, 0];
+	char.movement = 0;
 
-	if(Math.random <= 0.001 &&
+	if(Math.random() <= 0.001 &&
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
 			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
+		console.log('QUICKSAND');
 		this.action_active = true;
 		this.move_active = false;
 
@@ -400,6 +403,8 @@ Survival.prototype.finish_movement = function() {
 
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {
+		console.log(dir);
+		console.log(adjacent);
 		this.action_active = true;
 		this.move_active = false;
 
@@ -411,6 +416,8 @@ Survival.prototype.finish_movement = function() {
 			this.action = new Fight(dir, char, adjacent, player_wins, () => this.fight_finished(player_wins, adjacent));
 		}
 
+		console.log(this.action);
+
 		return;
 	}
 
@@ -419,7 +426,6 @@ Survival.prototype.finish_movement = function() {
 	}
 
 	// Nothing happened, end movement
-	char.movement = 0;
 	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
 	this.action = null;
 	this.move_active = false;
@@ -700,14 +706,20 @@ Survival.prototype.start_predator_movement = function() {
 
 
 Survival.prototype.player_death = function(delete_sprite = false) {
+	console.info('Player died');
 	game.current_player.deaths++;
 	this.draw_symbols();
+
+	const char = this.level.character;
+
 	if(delete_sprite) {
-		this.level.mobmap[this.level.character.tile[1]][this.level.character.tile[0]] = null;
+		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
+	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
 	this.action_active = false;
 	this.move_active = false;
+	this.camera.move_to(char);
 };
 
 
@@ -730,12 +742,12 @@ Survival.prototype.update = function(dt) {
 	}
 
 	if(this.level.character.movement) {
-		this.resolve_movement(this.level.character, this.timer);
-		this.camera.move_to(this.level.character);
-
 		for(let predator of this.level.predators) {
 			this.resolve_movement(predator, this.timer);
 		}
+
+		this.resolve_movement(this.level.character, this.timer);
+		this.camera.move_to(this.level.character);
 	}
 
 	this.update_entities(this.timer);

@@ -63,7 +63,7 @@ Camera.prototype.update_tiles = function() {
 
 
 Camera.prototype.update_visible_level = function(dt) {
-	if(this.survival.action_active) {
+	if(this.survival.action !== null) {
 		for(let tile of this.survival.action.tiles) {
 			this._tiles_to_render.add(JSON.stringify(tile));
 		}
@@ -122,11 +122,11 @@ Camera.prototype.render = function() {
 	/*if(this._tiles_to_render.size === 2) {
 		console.log(this._movs_to_render);
 	}*/
-	let pos, x, y;
+
 	for(let coord of this._tiles_to_render) {
-		pos = JSON.parse(coord);
-		x = pos[0];
-		y = pos[1];
+		const pos = JSON.parse(coord);
+		const x = pos[0];
+		const y = pos[1];
 
 		if(this.level.bg_sprites[y][x] === null) {
 			this.level.request_sprite(x, y);
@@ -142,15 +142,14 @@ Camera.prototype.render = function() {
 			Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.cpos[1])]);
 	}
 
-	if(this.survival.action_active) {
+	if(this.survival.action !== null) {
 		this.survival.action.render(ctx,
-			[Math.round(this.survival.action.tiles[0][0] * this.tile_dim[0] - this.cpos[0] + this.survival.action.offset[0]),
-			Math.round(this.survival.action.tiles[0][1] * this.tile_dim[1] - this.cpos[1] + this.survival.action.offset[1])]);
+			[Math.round(this.survival.action.tiles[0][0] * this.tile_dim[0] - this.cpos[0]),
+			Math.round(this.survival.action.tiles[0][1] * this.tile_dim[1] - this.cpos[1])]);
 	}
 
 	ctx.restore();
 
-	this.survival.draw_minimap();
 	this._pos_changed = false;
 	this._tiles_to_render.clear();
 	this._movs_to_render = [];
