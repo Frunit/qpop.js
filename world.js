@@ -357,7 +357,6 @@ World.prototype.next = function() {
 		open_popup(lang.popup_title, 'dino', lang.where_to_live, () => {}, lang.next);
 	}
 	else {
-		// TODO RESEARCH: Which image? Which answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 };
@@ -420,7 +419,7 @@ World.prototype.exec_catastrophe = function(type) {
 		game.world_map[y][x] = WORLD_MAP.CRATER;
 
 		// Big Explosion
-		this.animation = new Sprite('gfx/world.png', [48, 48], [0, 32],
+		this.animation = new Sprite('gfx/world.png', [48, 48], anim_delays.world, [0, 32],
 		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0]],
 		true, () => this.catastrophe_finished());
 		break;
@@ -544,7 +543,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 	}
 
 	// TODO RESEARCH: Check if frames and speed are correct
-	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
+	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
 };
@@ -581,7 +580,7 @@ World.prototype.fight = function(x, y) {
 
 	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
-	this.animation = new Sprite('gfx/world.png', [16, 16], [464, 16],
+	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [464, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.fight_end(winner, enemy, x, y));
 

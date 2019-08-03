@@ -1,33 +1,41 @@
 'use strict';
 
 
-function Sprite(url, size, offset=[0,0], frames=[[0,0]], once=false, callback=null) {
+function Sprite(url, size, delay=1, offset=[0,0], frames=[[0,0]], once=false, callback=null) {
 	this.pic = resources.get(url);
 	this.offset = offset;
 	this.size = size;
+	this.delay = delay;
 	this.frames = frames;
 	this.once = once;
 	this.callback = callback;
+	this.delay_counter = 0;
 	this.idx = 0;
-	this.finished = false;
+	this.finished = frames.length === 1; // true for one-frame Sprites; false for others
 }
 
 
 Sprite.prototype.update = function() {
 	if(!this.finished) {
-		this.idx++;
+		this.delay_counter++;
+
+		if(this.delay_counter >= this.delay) {
+			this.delay_counter = 0;
+			this.idx++;
+		}
 	}
 };
 
 
 Sprite.prototype.reset = function() {
 	this.idx = 0;
-	this.finished = false;
+	this.delay_counter = 0;
+	this.finished = this.frame.length === 1;
 };
 
 
 Sprite.prototype.is_new_frame = function() {
-	return !this.finished || this.frames.length > 1;
+	return this.delay_counter === 0 && (!this.finished || this.frames.length > 1);
 };
 
 

@@ -292,7 +292,7 @@ Level.prototype.request_sprite = function(x, y) {
 	const type = this.map[y][x];
 	const xx = Math.floor(type % 10);
 	const yy = Math.floor(type / 10);
-	this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], [xx*64, yy*64]);
+	this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [xx*64, yy*64]);
 };
 
 
@@ -367,7 +367,7 @@ function Character(species, tile) {
 
 	this.victories = [];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.soffset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.still.soffset, this.anims.still.frames);
 }
 
 
@@ -384,7 +384,7 @@ function Predator(species, tile) {
 	this.anims = anims_predators[species];
 	this.defeated = random_element(this.anims.defeated);
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.still.soffset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.still.soffset, this.anims.still.frames);
 
 	//             dino, mushroom, human
 	this.attack = [250 ,   350   ,  150][species];
@@ -395,7 +395,7 @@ function Predator(species, tile) {
 Predator.prototype.defeat = function() {
 	this.type = SURV_MAP.UNRESPONSIVE;
 	const def = random_int(0, 2);
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.defeated[def].soffset, this.anims.defeated[def].frames);
+	this.sprite = new Sprite(this.url, [64, 64], anim_delays.defeated, this.anims.defeated[def].soffset, this.anims.defeated[def].frames);
 };
 
 
@@ -410,13 +410,13 @@ function Female(species, tile) {
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.female.soffset, this.anims.female.frames);
+	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.female.soffset, this.anims.female.frames);
 }
 
 
 Female.prototype.offspring = function() {
 	this.type = SURV_MAP.UNRESPONSIVE;
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.offspring.soffset, this.anims.offspring.frames);
+	this.sprite = new Sprite(this.url, [64, 64], anim_delays.offspring, this.anims.offspring.soffset, this.anims.offspring.frames);
 };
 
 
@@ -430,11 +430,11 @@ function Enemy(species, tile) {
 	this.url = 'gfx/enemies.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_still.soffset, this.anims.enem_still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
 
 
 Enemy.prototype.defeat = function() {
 	this.type = SURV_MAP.UNRESPONSIVE;
-	this.sprite = new Sprite(this.url, [64, 64], this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
+	this.sprite = new Sprite(this.url, [64, 64], anim_delays.defeated, this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
 };

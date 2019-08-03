@@ -25,7 +25,7 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.left_answer_offset = [0, 128];
 	this.right_answer_offset = [179, 128];
 
-	this.sprite = new Sprite('gfx/species.png', this.spec_dim, [0, 0], this.spec_positions[image]);
+	this.sprite = new Sprite('gfx/species.png', this.spec_dim, anim_delays.popups, [0, 0], this.spec_positions[image]);
 
 	this.clickareas = [];
 }

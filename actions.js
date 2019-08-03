@@ -13,19 +13,19 @@ function Love(dir, character, partner, callback) {
 	switch(dir) {
 		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
 			break;
 		case DIR.S:
 			this.tiles = [[character.tile[0], character.tile[1] + 1], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
 			break;
 		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
 			break;
 		case DIR.E:
 			this.tiles = [[character.tile[0] + 1, character.tile[1]], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
 			break;
 	}
 }
@@ -72,19 +72,19 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	switch(dir) {
 		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anim_delays.cloud, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
 		case DIR.S:
 			this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.size, anim_delays.cloud, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames);
 			break;
 		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anim_delays.cloud, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;
 		case DIR.E:
 			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.size, anim_delays.cloud, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames);
 			break;
 	}
 }
@@ -96,8 +96,8 @@ Fight.prototype.update = function() {
 	switch(this.frame) {
 		case -4: {
 			this.sprites = [
-				new Sprite(this.opponent_url, [64, 64], this.opponent_anim.attack.soffset,  this.opponent_anim.attack.frames[this.dir - 1]),
-				new Sprite(this.character.url, [64, 64],  this.opponent_anim.still.soffset,  this.opponent_anim.still.frames),
+				new Sprite(this.opponent_url, [64, 64], 0, this.opponent_anim.attack.soffset,  this.opponent_anim.attack.frames[this.dir - 1]),
+				new Sprite(this.character.url, [64, 64], 0, this.opponent_anim.still.soffset,  this.opponent_anim.still.frames),
 			];
 			if(this.dir === DIR.S || this.dir === DIR.E) {
 				this.sprites.reverse();
@@ -113,6 +113,7 @@ Fight.prototype.update = function() {
 			break;
 		}
 		case 12: {
+			//game.stage.fight_change_speed(this.opponent);
 			this.sprites = [];
 			break;
 		}
@@ -140,15 +141,15 @@ Fight.prototype.render = function(ctx, dim, cpos) {
 function Feeding(character, level, food_type, callback) {
 	this.character = character;
 	this.level = level;
-	this.callback = callback;
 	this.food_type = food_type;
+	this.callback = callback;
 	this.frame = -1;
 	this.step = 0;
 	this.finished = false;
 
 	this.tiles = [this.character.tile];
 
-	this.sprite = new Sprite(character.url, [64, 64], anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
+	this.sprite = new Sprite(character.url, [64, 64], anim_delays.feeding, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
 }
 
 
@@ -171,12 +172,12 @@ Feeding.prototype.update = function() {
 		}
 		// Poison
 		else if(this.food_type >= 88 && this.food_type <= 93) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.poison, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
 		}
 		// Power food
 		else if(this.food_type >= 118) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
+			this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.power_food, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
 		}
 	}
@@ -198,7 +199,7 @@ function Quicksand(character, callback) {
 	this.tiles = [this.character.tile];
 
 	const qs = anims_players[this.character.species].quicksand;
-	this.sprite = new Sprite(this.character.url, [64, 64], qs.soffset, qs.frames, true);
+	this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.quicksand, qs.soffset, qs.frames, true);
 }
 
 

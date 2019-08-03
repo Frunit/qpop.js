@@ -14,20 +14,19 @@ const debug4 = document.getElementById('debug4');
 
 let options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
-	wm_ai_delay: 2, // How many frames between two moves of the AI
+	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
-	transition_delay: 3, // How many frames to show the transition screens
-	surv_move_speed: 8, // Speed of the player figure in survival in pixel per frame
+	transition_delay: 18, // How many frames to show the transition screens
+	surv_move_speed: 8, // Speed of the player figure in survival in pixel per updated frame
 	music_on: true,
 	music: 255, // Music volume (0 - 255)
 	sound_on: true,
 	sound: 255, // Sound volume (0 - 255)
-	update_freq: 1/6, // Screen update frequency
+	update_freq: 1/18, // Screen update frequency
 };
 
 
 function Game() {
-	this.update_freq = 1/6;
 	this.last_time = 0;
 	this.last_fps = 0;
 	this.frames = 0;

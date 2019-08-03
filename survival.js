@@ -52,7 +52,7 @@ function Survival() {
 
 	this.action = null;
 
-	this.move_active = false;
+	this.movement_active = false;
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -382,7 +382,7 @@ Survival.prototype.finish_movement = function() {
 			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
 		console.info('QUICKSAND');
-		this.move_active = false;
+		this.movement_active = false;
 
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 		this.action = new Quicksand(char, () => this.player_death(true));
@@ -396,7 +396,7 @@ Survival.prototype.finish_movement = function() {
 	if(dir) {
 		console.log(dir);
 		console.log(adjacent);
-		this.move_active = false;
+		this.movement_active = false;
 
 		if(adjacent.type === SURV_MAP.FEMALE) {
 			console.info('LOVE');
@@ -421,11 +421,11 @@ Survival.prototype.finish_movement = function() {
 	}
 
 	// Nothing happened, end movement
-	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
+	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 	this.level.mobmap[char.tile[1]][char.tile[0]].hidden = false;
 	this.action = null;
-	this.move_active = false;
+	this.movement_active = false;
 };
 
 
@@ -476,10 +476,10 @@ Survival.prototype.pre_finish_fight = function(player_wins, opponent) {
 		// Only enemies are shown, although also predators count towards experience
 		opponent.defeat();
 		const char = this.level.character;
-		char.sprite = new Sprite(char.url, [64, 64], char.anims.winner.soffset, char.anims.winner.frames);
+		char.sprite = new Sprite(char.url, [64, 64], anim_delays.winner, char.anims.winner.soffset, char.anims.winner.frames);
 	}
 	else {
-		opponent.sprite = new Sprite(opponent.url, [64, 64], opponent.anims.winner.soffset, opponent.anims.winner.frames);
+		opponent.sprite = new Sprite(opponent.url, [64, 64], anim_delays.winner, opponent.anims.winner.soffset, opponent.anims.winner.frames);
 		const tile = this.level.character.tile;
 		this.level.mobmap[tile[1]][tile[0]] = new Enemy(game.current_player.id, tile);
 		this.level.mobmap[tile[1]][tile[0]].defeat();
@@ -500,7 +500,7 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 		this.finish_movement();
 	}
 	else {
-		opponent.sprite = new Sprite(opponent.url, [64, 64], opponent.anims.still.soffset, opponent.anims.still.frames);
+		opponent.sprite = new Sprite(opponent.url, [64, 64], anim_delays.winner, opponent.anims.still.soffset, opponent.anims.still.frames);
 		this.player_death();
 	}
 };
@@ -538,19 +538,19 @@ Survival.prototype.start_movement = function(dir) {
 
 	switch(dir) {
 		case DIR.S:
-			char.sprite = new Sprite(char.url, [64, 64], char.anims.south.soffset, char.anims.south.frames);
+			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.south.soffset, char.anims.south.frames);
 			this.level.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
 			break;
 		case DIR.N:
-			char.sprite = new Sprite(char.url, [64, 64], char.anims.north.soffset, char.anims.north.frames);
+			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.north.soffset, char.anims.north.frames);
 			this.level.mobmap[pos[1] - 1][pos[0]] = placeholder;
 			break;
 		case DIR.E:
-			char.sprite = new Sprite(char.url, [64, 64], char.anims.east.soffset, char.anims.east.frames);
+			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.east.soffset, char.anims.east.frames);
 			this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 			break;
 		case DIR.W:
-			char.sprite = new Sprite(char.url, [64, 64], char.anims.west.soffset, char.anims.west.frames);
+			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 			break;
 		case 0: { // Feeding/waiting
@@ -568,7 +568,7 @@ Survival.prototype.start_movement = function(dir) {
 	}
 
 	this.start_predator_movement();
-	this.move_active = true;
+	this.movement_active = true;
 };
 
 
@@ -630,7 +630,7 @@ Survival.prototype.resolve_movement = function(obj) {
 			obj.rel_pos = [0, 0]
 			obj.last_movement = obj.movement;
 			obj.movement = 0;
-			obj.sprite = new Sprite(obj.url, [64, 64], obj.anims.still.soffset, obj.anims.still.frames);
+			obj.sprite = new Sprite(obj.url, [64, 64], 0, obj.anims.still.soffset, obj.anims.still.frames);
 		}
 	}
 };
@@ -638,6 +638,7 @@ Survival.prototype.resolve_movement = function(obj) {
 
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
+	const anim_delay = this.movement_active ? anim_delays.movement : anim_delays.feeding;
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {
@@ -710,19 +711,19 @@ Survival.prototype.start_predator_movement = function() {
 
 		switch(predator.movement) {
 			case DIR.N:
-				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.north.soffset, predator.anims.north.frames);
+				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
 				this.level.mobmap[pos[1] - 1][pos[0]] = placeholder; // Block the spot on the map to prevent others from going there
 				break;
 			case DIR.S:
-				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.south.soffset, predator.anims.south.frames);
+				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
 				this.level.mobmap[pos[1] + 1][pos[0]] = placeholder;
 				break;
 			case DIR.W:
-				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.west.soffset, predator.anims.west.frames);
+				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
 				this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
 				break;
 			case DIR.E:
-				predator.sprite = new Sprite(predator.url, [64, 64], predator.anims.east.soffset, predator.anims.east.frames);
+				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
 				this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
 				break;
 		}
@@ -744,10 +745,10 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
-	char.sprite = new Sprite(char.url, [64, 64], char.anims.still.soffset, char.anims.still.frames);
+	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 	this.action = null;
-	this.move_active = false;
+	this.movement_active = false;
 	this.camera.move_to(char);
 };
 
@@ -765,7 +766,7 @@ Survival.prototype.update_entities = function() {
 Survival.prototype.update = function() {
 	this.handle_input();
 
-	if(this.move_active) {
+	if(this.movement_active) {
 		for(let predator of this.level.predators) {
 			if(predator.type === SURV_MAP.PREDATOR) {
 				this.resolve_movement(predator);
@@ -874,7 +875,7 @@ Survival.prototype.handle_input = function() {
 		}
 	}
 
-	if(!this.move_active && this.action === null) {
+	if(!this.movement_active && this.action === null) {
 		if(input.isDown('ENTER')) {
 			input.reset('ENTER');
 			this.next();
@@ -961,7 +962,6 @@ Survival.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
 	if(this.level.character.steps > 0) {
-		// TODO RESEARCH: Which text, image, answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {
