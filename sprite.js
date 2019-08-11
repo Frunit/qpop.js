@@ -11,6 +11,7 @@ function Sprite(url, size, delay=1, offset=[0,0], frames=[[0,0]], once=false, ca
 	this.callback = callback;
 	this.delay_counter = 0;
 	this.idx = 0;
+	this.fresh = true;
 	this.finished = frames.length === 1; // true for one-frame Sprites; false for others
 }
 
@@ -35,6 +36,11 @@ Sprite.prototype.reset = function() {
 
 
 Sprite.prototype.is_new_frame = function() {
+	if(this.fresh) {
+		this.fresh = false;
+		return true;
+	}
+
 	return this.delay_counter === 0 && (!this.finished || this.frames.length > 1);
 };
 

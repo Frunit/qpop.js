@@ -4,6 +4,10 @@ const debug1 = document.getElementById('debug1');
 const debug2 = document.getElementById('debug2');
 const debug3 = document.getElementById('debug3');
 const debug4 = document.getElementById('debug4');
+const debug5 = document.getElementById('debug5');
+const debug6 = document.getElementById('debug6');
+const debug7 = document.getElementById('debug7');
+const debug8 = document.getElementById('debug8');
 
 // Master-TODO:
 /* - All sounds
@@ -22,7 +26,7 @@ let options = {
 	music: 255, // Music volume (0 - 255)
 	sound_on: true,
 	sound: 255, // Sound volume (0 - 255)
-	update_freq: 1/18, // Screen update frequency
+	update_freq: 1/18, // Screen update frequency DEBUG: 1/18
 };
 
 

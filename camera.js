@@ -87,7 +87,8 @@ Camera.prototype.update_visible_level = function() {
 
 			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER && !this.level.mobmap[y][x].hidden) {
 				this.level.mobmap[y][x].sprite.update();
-				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
+				// TODO: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
+				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame() || this.survival.action) {
 					this._movs_to_render.push(this.level.mobmap[y][x]);
 					this._tiles_to_render.add(JSON.stringify([x, y]));
 					switch(this.level.mobmap[y][x].movement) {
@@ -119,7 +120,8 @@ Camera.prototype.render = function() {
 	ctx.clip();
 
 	if(this._tiles_to_render.size || this._movs_to_render.length) {
-		debug1.value = this._tiles_to_render.size + ' ' + this._movs_to_render.length;
+		debug1.value = this._tiles_to_render.size;
+		debug5.value = this._movs_to_render.length;
 	}
 	/*if(this._tiles_to_render.size === 2) {
 		console.log(this._movs_to_render);

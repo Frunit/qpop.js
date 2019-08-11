@@ -1,5 +1,9 @@
 'use strict';
 
+// TODO: Enemies, Females and Offspring have randomized sprite animations
+// TODO RESEARCH: Buck Cherry feeding has only 5 (instead of 8) frames. How to handle predators?
+// TODO: Predators on the edge of the screen are not always shown
+
 function Survival() {
 	this.id = SCENE.SURVIVAL;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -51,8 +55,11 @@ function Survival() {
 	// CONST_END
 
 	this.action = null;
-
 	this.movement_active = false;
+	this.movement_just_finished = false;
+
+	this.delay = anim_delays.movement;
+	this.delay_counter = 0;
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -146,6 +153,9 @@ Survival.prototype.redraw = function() {
 
 	// Symbols
 	this.draw_symbols();
+
+	// Main area
+	this.camera.render();
 };
 
 
@@ -307,7 +317,11 @@ Survival.prototype.draw_symbols = function() {
 
 Survival.prototype.render = function() {
 	this.camera.render();
-	this.draw_minimap();
+
+	if(this.movement_just_finished) {
+		this.movement_just_finished = false;
+		this.draw_minimap();
+	}
 };
 
 
@@ -372,10 +386,12 @@ Survival.prototype.ai = function() {
 
 
 Survival.prototype.finish_movement = function() {
+	this.movement_just_finished = true;
 	const char = this.level.character;
 	const current_bg = this.level.map[char.tile[1]][char.tile[0]]
 	char.rel_pos = [0, 0];
 	char.movement = 0;
+	this.delay_counter = 0;
 
 	if(Math.random() <= 0.001 &&
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
@@ -394,8 +410,8 @@ Survival.prototype.finish_movement = function() {
 
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {
-		console.log(dir);
-		console.log(adjacent);
+		console.log('Direction:', 'XNESW'[dir]);
+		//console.log(adjacent);
 		this.movement_active = false;
 
 		if(adjacent.type === SURV_MAP.FEMALE) {
@@ -404,14 +420,14 @@ Survival.prototype.finish_movement = function() {
 		}
 		else {
 			const player_wins = this.does_player_win(adjacent);
-			console.info('FIGHT. Player does', player_wins ? '' : '*not*', 'win');
+			console.info('FIGHT. Player', player_wins ? 'wins' : 'loses');
 			this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent));
 		}
 
 		this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
 		this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]].hidden = true;
 
-		console.log(this.action);
+		//console.log(this.action);
 
 		return;
 	}
@@ -420,10 +436,12 @@ Survival.prototype.finish_movement = function() {
 		return;
 	}
 
+	console.info('NOTHING');
+
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
-	this.level.mobmap[char.tile[1]][char.tile[0]].hidden = false;
+	char.hidden = false;
 	this.action = null;
 	this.movement_active = false;
 };
@@ -431,6 +449,7 @@ Survival.prototype.finish_movement = function() {
 
 Survival.prototype.does_player_win = function(opponent) {
 	// The player wins if the character is invincible, fights against an enemy, or has a high defense.
+	// DEBUG
 	return true || this.level.character.invincible ||
 		opponent.type === SURV_MAP.ENEMY ||
 		random_int(0, opponent.attack) <= game.current_player.stats[ATTR.DEFENSE];
@@ -473,7 +492,6 @@ Survival.prototype.pre_finish_fight = function(player_wins, opponent) {
 	opponent.hidden = false;
 	this.level.character.hidden = false;
 	if(player_wins) {
-		// Only enemies are shown, although also predators count towards experience
 		opponent.defeat();
 		const char = this.level.character;
 		char.sprite = new Sprite(char.url, [64, 64], anim_delays.winner, char.anims.winner.soffset, char.anims.winner.frames);
@@ -481,14 +499,13 @@ Survival.prototype.pre_finish_fight = function(player_wins, opponent) {
 	else {
 		opponent.sprite = new Sprite(opponent.url, [64, 64], anim_delays.winner, opponent.anims.winner.soffset, opponent.anims.winner.frames);
 		const tile = this.level.character.tile;
-		this.level.mobmap[tile[1]][tile[0]] = new Enemy(game.current_player.id, tile);
-		this.level.mobmap[tile[1]][tile[0]].defeat();
+		this.level.mobmap[tile[1]][tile[0]] = null;
 	}
 };
 
 
 Survival.prototype.finish_fight = function(player_wins, opponent) {
-	console.log('Fight finished');
+	opponent.hidden = false;
 	if(player_wins) {
 		// Only enemies are shown, although also predators count towards experience
 		if(opponent.type === SURV_MAP.ENEMY && this.level.character.victories.length < 10) {
@@ -496,11 +513,14 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 		}
 		game.current_player.experience++;
 
+		this.level.character.hidden = false;
+		opponent.type = SURV_MAP.UNRESPONSIVE;
+		opponent.sprite = this.action.final_opponent_sprite;
 		this.draw_symbols();
 		this.finish_movement();
 	}
 	else {
-		opponent.sprite = new Sprite(opponent.url, [64, 64], anim_delays.winner, opponent.anims.still.soffset, opponent.anims.still.frames);
+		opponent.sprite = new Sprite(opponent.url, [64, 64], 0, opponent.anims.still.soffset, opponent.anims.still.frames);
 		this.player_death();
 	}
 };
@@ -535,33 +555,41 @@ Survival.prototype.start_movement = function(dir) {
 	this.level.character.movement = dir;
 	const char = this.level.character;
 	const pos = char.tile;
+	this.delay = anim_delays.movement;
 
 	switch(dir) {
 		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.south.soffset, char.anims.south.frames);
 			this.level.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
+			console.info('WALK SOUTH');
 			break;
 		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.north.soffset, char.anims.north.frames);
 			this.level.mobmap[pos[1] - 1][pos[0]] = placeholder;
+			console.info('WALK NORTH');
 			break;
 		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.east.soffset, char.anims.east.frames);
 			this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
+			console.info('WALK EAST');
 			break;
 		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
+			console.info('WALK WEST');
 			break;
 		case 0: { // Feeding/waiting
 			const food_type = this.level.map[pos[1]][pos[0]];
 			if(this.level.edible[food_type] === '1') {
 				this.action = new Feeding(char, this.level, food_type, () => this.finish_feeding(food_type));
-				this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
+				char.hidden = true;
+				this.delay = anim_delays.feeding;
+				console.info('FEED');
 			}
 			else {
-				// TODO: Still and decrement movement counter and reset time counter
-				// Space needs to be ignored for some short time to inhibit accidental multiple pauses in short time
+				this.action = new Waiting(char, () => this.finish_feeding(100));
+				char.hidden = true;
+				console.info('WAIT');
 			}
 			break;
 		}
@@ -577,7 +605,7 @@ Survival.prototype.resolve_movement = function(obj) {
 	let finished_move = false;
 	switch (obj.movement) {
 	case DIR.S:
-		if(obj.rel_pos[1] + speed > this.tile_dim[1]) {
+		if(obj.rel_pos[1] + speed >= this.tile_dim[1]) {
 			obj.tile[1]++;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]-1][obj.tile[0]];
 			this.level.mobmap[obj.tile[1]-1][obj.tile[0]] = null;
@@ -588,7 +616,7 @@ Survival.prototype.resolve_movement = function(obj) {
 		}
 		break;
 	case DIR.N:
-		if(Math.abs(obj.rel_pos[1] - speed) > this.tile_dim[1]) {
+		if(Math.abs(obj.rel_pos[1] - speed) >= this.tile_dim[1]) {
 			obj.tile[1]--;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]+1][obj.tile[0]];
 			this.level.mobmap[obj.tile[1]+1][obj.tile[0]] = null;
@@ -599,7 +627,7 @@ Survival.prototype.resolve_movement = function(obj) {
 		}
 		break;
 	case DIR.W:
-		if(Math.abs(obj.rel_pos[0] - speed) > this.tile_dim[0]) {
+		if(Math.abs(obj.rel_pos[0] - speed) >= this.tile_dim[0]) {
 			obj.tile[0]--;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]+1];
 			this.level.mobmap[obj.tile[1]][obj.tile[0]+1] = null;
@@ -610,7 +638,7 @@ Survival.prototype.resolve_movement = function(obj) {
 		}
 		break;
 	case DIR.E:
-		if(obj.rel_pos[0] + speed > this.tile_dim[0]) {
+		if(obj.rel_pos[0] + speed >= this.tile_dim[0]) {
 			obj.tile[0]++;
 			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]-1];
 			this.level.mobmap[obj.tile[1]][obj.tile[0]-1] = null;
@@ -638,7 +666,7 @@ Survival.prototype.resolve_movement = function(obj) {
 
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
-	const anim_delay = this.movement_active ? anim_delays.movement : anim_delays.feeding;
+	const anim_delay = this.action === null ? anim_delays.movement : anim_delays.feeding;
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {
@@ -754,12 +782,11 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 
 
 Survival.prototype.update_entities = function() {
-	// Update background sprites
-	this.camera.update_visible_level();
-
 	if(this.action !== null && this.action.finished) {
 		this.action.callback();
 	}
+
+	this.camera.update_visible_level();
 };
 
 
@@ -767,15 +794,23 @@ Survival.prototype.update = function() {
 	this.handle_input();
 
 	if(this.movement_active) {
-		for(let predator of this.level.predators) {
-			if(predator.type === SURV_MAP.PREDATOR) {
-				this.resolve_movement(predator);
-			}
-		}
+		this.delay_counter++;
 
-		this.resolve_movement(this.level.character);
-		this.camera.move_to(this.level.character);
+		if(this.delay_counter >= this.delay) {
+			this.delay_counter = 0;
+
+			for(let predator of this.level.predators) {
+				if(predator.type === SURV_MAP.PREDATOR) {
+					this.resolve_movement(predator);
+				}
+			}
+
+			this.resolve_movement(this.level.character);
+			this.camera.move_to(this.level.character);
+		}
 	}
+
+	debug6.value = this.movement_active + ' ' + this.action;
 
 	this.update_entities();
 };

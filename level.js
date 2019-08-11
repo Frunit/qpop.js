@@ -301,12 +301,12 @@ Level.prototype.eat_tile = function(tile) {
 
 	// Normal food gets one less
 	if(food_type < 36) {
-		this.map[tile[1]][tile[0]] -= 1;
+		this.map[tile[1]][tile[0]]--;
 	}
 
 	// Power food has its corresponding empty space at +1
 	else if(food_type >= 118) {
-		this.map[tile[1]][tile[0]] += 1;
+		this.map[tile[1]][tile[0]]++;
 	}
 
 	// Poison is never diminshed or changed
