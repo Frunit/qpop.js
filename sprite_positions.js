@@ -567,6 +567,7 @@ const anims_clouds = {
 
 const anim_delays = {
 	movement: 2,
+	electro: 3, // TODO RESEARCH
 	feeding: 3,
 	female: 3,
 	offspring: 3,

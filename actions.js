@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: Test all actions ... with alle species ... in low frame rate -.-
+// TODO: Test all actions ... with all species ... in low frame rate -.-
 // That is: Eat normal food, power food, poison; love, fight against predator (win and lose!) and enemy; quicksand; wait; electro flower (when it's finished).
 
 
@@ -18,8 +18,8 @@ function Love(dir, character, partner, callback) {
 	this.sprites = [];
 
 	this.sprites = [
-		new Sprite(partner.url, [64, 64], 0, partner.anims.still.soffset,  partner.anims.still.frame),
-		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset,  character.anims.still.frames),
+		new Sprite(partner.url, [64, 64], 0, partner.anims.still.soffset, partner.anims.still.frame),
+		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
 	];
 
 	if(dir === DIR.S || dir === DIR.E) {
@@ -142,7 +142,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.still.soffset, opponent.anims.still.frame)];
 	}
 
-	this.sprites.push(new Sprite(character.url, [64, 64], 0, character.anims.still.soffset,  character.anims.still.frames));
+	this.sprites.push(new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames));
 
 	if(dir === DIR.S || dir === DIR.E) {
 		this.sprites.reverse();
@@ -417,4 +417,59 @@ Waiting.prototype.render = function(ctx, dim, cpos) {
 	this.sprite.render(ctx,
 		[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
 		Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
+};
+
+
+// TODO RESEARCH: Details about the electro plant animation
+function Electro(dir, character, callback) {
+	this.dir = dir;
+	this.character = character;
+	this.callback = callback;
+	this.finished = false;
+	this.delay = anim_delays.electro;
+	this.delay_counter = 0;
+	this.frame = 0;
+
+	this.sprites = [
+		new Sprite('gfx/electro.png', [64, 64], anim_delays.electro, [0, 0], [[0, 0], [64, 0]], true), // TODO RESEARCH
+		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
+	];
+
+	if(dir === DIR.E) {
+		this.sprites.reverse();
+	}
+}
+
+
+Electro.prototype.update = function() {
+	for(let sprite of this.sprites) {
+		sprite.update();
+	}
+
+	this.delay_counter++
+	if(this.delay_counter >= this.delay) {
+		this.delay_counter = 0;
+		this.frame++;
+	}
+	else {
+		return;
+	}
+
+	const sprite_pos = dir !== DIR.E;
+
+	if(this.frame === 4) { // TODO RESEARCH: Which frame?
+		this.sprites[sprite_pos] = new Sprite(this.character.url, [64, 64], anim_delays.electro, this.character.anims.zapped.soffset, this.character.anims.zapped.frames);
+		break;
+	}
+
+	this.finished = this.sprites[!sprite_pos].finished;
+};
+
+
+Electro.prototype.render = function(ctx, dim, cpos) {
+	for(let i = 0; i < this.sprites.length; i++) {
+		this.sprites[i].render(ctx,
+			[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),
+			Math.round(this.tiles[i][1] * dim[1] - cpos[1])]);
+	}
 };
