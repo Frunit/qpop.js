@@ -392,13 +392,6 @@ function Predator(species, tile) {
 }
 
 
-Predator.prototype.defeat = function() {
-	this.type = SURV_MAP.UNRESPONSIVE;
-	const def = random_int(0, 2);
-	this.sprite = new Sprite(this.url, [64, 64], anim_delays.defeated, this.anims.defeated[def].soffset, this.anims.defeated[def].frames);
-};
-
-
 function Female(species, tile) {
 	this.type = SURV_MAP.FEMALE;
 	this.tile = tile;
@@ -432,9 +425,3 @@ function Enemy(species, tile) {
 
 	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
-
-
-Enemy.prototype.defeat = function() {
-	this.type = SURV_MAP.UNRESPONSIVE;
-	this.sprite = new Sprite(this.url, [64, 64], anim_delays.defeated, this.anims.enem_defeated.soffset, this.anims.enem_defeated.frames);
-};

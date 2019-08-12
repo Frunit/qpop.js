@@ -147,7 +147,6 @@ Fight.prototype.update = function() {
 			this.draw_cloud = true;
 			break;
 		case 10: {
-			//game.stage.pre_finish_fight(this.player_wins, this.opponent);
 			this.sprites = [];
 
 			if(this.player_wins) {

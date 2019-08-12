@@ -487,23 +487,6 @@ Survival.prototype.finish_love = function(partner) {
 };
 
 
-Survival.prototype.pre_finish_fight = function(player_wins, opponent) {
-	console.log('Fight ongoing');
-	opponent.hidden = false;
-	this.level.character.hidden = false;
-	if(player_wins) {
-		opponent.defeat();
-		const char = this.level.character;
-		char.sprite = new Sprite(char.url, [64, 64], anim_delays.winner, char.anims.winner.soffset, char.anims.winner.frames);
-	}
-	else {
-		opponent.sprite = new Sprite(opponent.url, [64, 64], anim_delays.winner, opponent.anims.winner.soffset, opponent.anims.winner.frames);
-		const tile = this.level.character.tile;
-		this.level.mobmap[tile[1]][tile[0]] = null;
-	}
-};
-
-
 Survival.prototype.finish_fight = function(player_wins, opponent) {
 	opponent.hidden = false;
 	if(player_wins) {
