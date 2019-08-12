@@ -3,15 +3,28 @@
 // TODO: Test all actions ... with alle species ... in low frame rate -.-
 // That is: Eat normal food, power food, poison; love, fight against predator (win and lose!) and enemy; quicksand; wait; electro flower (when it's finished).
 
-// TODO: Love does not work at all
+
 function Love(dir, character, partner, callback) {
 	this.dir = dir;
 	this.character = character;
 	this.partner = partner;
 	this.callback = callback;
 	this.finished = false;
+	this.delay = anim_delays.cloud;
+	this.delay_counter = 0;
 	this.frame = 0;
+	this.draw_cloud = false;
+	this.cloud_offset = [0, 0];
 	this.sprites = [];
+
+	this.sprites = [
+		new Sprite(partner.url, [64, 64], 0, partner.anims.still.soffset,  partner.anims.still.frame),
+		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset,  character.anims.still.frames),
+	];
+
+	if(dir === DIR.S || dir === DIR.E) {
+		this.sprites.reverse();
+	}
 
 	switch(dir) {
 		case DIR.N:
@@ -38,6 +51,9 @@ Love.prototype.update = function() {
 	for(let sprite of this.sprites) {
 		sprite.update();
 	}
+	if(this.draw_cloud) {
+		this.cloud_sprite.update();
+	}
 
 	this.delay_counter++
 	if(this.delay_counter >= this.delay) {
@@ -48,24 +64,63 @@ Love.prototype.update = function() {
 		return;
 	}
 
-	// TODO RESEARCH: The time values are examples; correct them!
-	if(this.frame < 2) {} // Do nothing
-	else if(this.frame < 9) {} // Remove partner and character and show cloud
-	else if(this.frame < 10) {} // Show offspring and character and the last two frames of the cloud
-	else if(this.frame < 11) {} // Show Heart symbol
-	else {this.finished = true;}
+	switch(this.frame) {
+		case 1:
+			this.sprites = [];
+			this.draw_cloud = true;
+			break;
+		case 10:
+			this.sprites = [];
+
+			if(this.partner.anims.hasOwnProperty('pre_offspring')) {
+				this.sprites.push(new Sprite(this.partner.url, [64, 64], anim_delays.cloud, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames));
+			}
+			else {
+				this.sprites.push(new Sprite(this.partner.url, [64, 64], anim_delays.cloud, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames));
+			}
+
+			this.sprites.push(new Sprite(this.character.url, [64, 64], 0, this.character.anims.still.soffset, this.character.anims.still.frames));
+
+			if(this.dir === DIR.S || this.dir === DIR.E) {
+				this.sprites.reverse();
+			}
+
+			break;
+		case 12:
+			if(this.partner.anims.hasOwnProperty('pre_offspring')) {
+				for(let sprite of this.sprites) {
+					sprite.delay = anim_delays.offspring;
+				}
+				this.delay = anim_delays.offspring;
+				this.draw_cloud = false;
+			}
+			else {
+				this.finished = true;
+			}
+			break;
+		case 14:
+			this.finished = true;
+			break;
+	}
 };
 
 
-Love.prototype.render = function(ctx, pos) {
-	for(let sprite of this.sprites) {
-		sprite.render(ctx, pos);
+Love.prototype.render = function(ctx, dim, cpos) {
+	for(let i = 0; i < this.sprites.length; i++) {
+		this.sprites[i].render(ctx,
+			[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),
+			Math.round(this.tiles[i][1] * dim[1] - cpos[1])]);
+	}
+
+	if(this.draw_cloud) {
+		this.cloud_sprite.render(ctx,
+			[Math.round(this.tiles[0][0] * dim[0] - cpos[0] + this.cloud_offset[0]),
+			Math.round(this.tiles[0][1] * dim[1] - cpos[1] + this.cloud_offset[1])]);
 	}
 };
 
 
 function Fight(dir, character, opponent, player_wins, callback) {
-	// this.opponent_anim is probably not needed and can be replaced by this.opponent.anims
 	this.dir = dir;
 	this.character = character;
 	this.opponent = opponent;
@@ -81,21 +136,15 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.final_opponent_sprite = null;
 
 	if(this.opponent.type === SURV_MAP.PREDATOR) {
-		this.opponent_url = `gfx/pred${this.opponent.species+1}.png`;
-		this.opponent_anim = anims_predators[this.opponent.species];
-
-		this.sprites = [new Sprite(this.opponent_url, [64, 64], 0, this.opponent_anim.attack.soffset,  this.opponent_anim.attack.frames[this.dir - 1])];
+		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.attack.soffset, opponent.anims.attack.frames[this.dir - 1])];
 	}
 	else {
-		this.opponent_url = 'gfx/enemies.png';
-		this.opponent_anim = anims_players[this.opponent.species];
-
-		this.sprites = [new Sprite(this.opponent_url, [64, 64], 0, this.opponent_anim.still.soffset,  this.opponent_anim.still.frame)];
+		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.still.soffset, opponent.anims.still.frame)];
 	}
 
-	this.sprites.push(new Sprite(this.character.url, [64, 64], 0, character.anims.still.soffset,  character.anims.still.frames));
+	this.sprites.push(new Sprite(character.url, [64, 64], 0, character.anims.still.soffset,  character.anims.still.frames));
 
-	if(this.dir === DIR.S || this.dir === DIR.E) {
+	if(dir === DIR.S || dir === DIR.E) {
 		this.sprites.reverse();
 	}
 
@@ -146,25 +195,27 @@ Fight.prototype.update = function() {
 			this.sprites = [];
 			this.draw_cloud = true;
 			break;
-		case 10: {
+		case 10:
 			this.sprites = [];
 
 			if(this.player_wins) {
+				let an = this.opponent.anims.defeated;
 				if(this.opponent.type === SURV_MAP.PREDATOR) {
-					const def = random_int(0, 2);
-					this.final_opponent_sprite = new Sprite(this.opponent.url, [64, 64], anim_delays.defeated, this.opponent_anim.defeated[def].soffset, this.opponent_anim.defeated[def].frames);
-					this.sprites.push(this.final_opponent_sprite);
-				}
-				else {
-					this.final_opponent_sprite = new Sprite(this.opponent.url, [64, 64], anim_delays.defeated, this.opponent_anim.enem_defeated.soffset, this.opponent_anim.enem_defeated.frames);
-					this.sprites.push(this.final_opponent_sprite);
+					an = an[random_int(0, 2)];
 				}
 
-				this.sprites.push(new Sprite(this.character.url, [64, 64], anim_delays.winner, this.character.anims.winner.soffset, this.character.anims.winner.frames));
+				this.final_opponent_sprite = new Sprite(this.opponent.url, [64, 64], anim_delays.cloud, an.soffset, an.frames);
+
+				this.sprites = [
+					this.final_opponent_sprite,
+					new Sprite(this.character.url, [64, 64], anim_delays.cloud, this.character.anims.winner.soffset, this.character.anims.winner.frames),
+				];
 			}
 			else {
-				this.sprites.push(null);
-				this.sprites.push(new Sprite(this.opponent.url, [64, 64], anim_delays.winner, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames));
+				this.sprites = [
+					new Sprite(this.opponent.url, [64, 64], anim_delays.cloud, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
+					null,
+				];
 			}
 
 			if(this.dir === DIR.S || this.dir === DIR.E) {
@@ -172,7 +223,6 @@ Fight.prototype.update = function() {
 			}
 
 			break;
-		}
 		case 12:
 			for(let sprite of this.sprites) {
 				if(sprite !== null) {
@@ -266,8 +316,8 @@ Feeding.prototype.update = function() {
 
 Feeding.prototype.render = function(ctx, dim, cpos) {
 	this.sprite.render(ctx,
-			[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
-			Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
+		[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
+		Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
 };
 
 
@@ -329,8 +379,8 @@ Quicksand.prototype.update = function() {
 
 Quicksand.prototype.render = function(ctx, dim, cpos) {
 	this.sprite.render(ctx,
-			[Math.round(this.tiles[0][0] * dim[0] - cpos[0] + this.mov[0]),
-			Math.round(this.tiles[0][1] * dim[1] - cpos[1] + this.mov[1])]);
+		[Math.round(this.tiles[0][0] * dim[0] - cpos[0] + this.mov[0]),
+		Math.round(this.tiles[0][1] * dim[1] - cpos[1] + this.mov[1])]);
 };
 
 
@@ -365,6 +415,6 @@ Waiting.prototype.update = function() {
 
 Waiting.prototype.render = function(ctx, dim, cpos) {
 	this.sprite.render(ctx,
-			[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
-			Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
+		[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
+		Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
 };

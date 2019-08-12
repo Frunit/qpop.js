@@ -477,7 +477,10 @@ Survival.prototype.finish_feeding = function(food) {
 
 
 Survival.prototype.finish_love = function(partner) {
-	partner.offspring();
+	partner.hidden = false;
+	this.level.character.hidden = false;
+	partner.type = SURV_MAP.UNRESPONSIVE;
+	partner.sprite = this.action.offspring_sprite;
 	game.current_player.loved++;
 	if(game.current_player.loved > 10) {
 		game.current_player.loved = 10;

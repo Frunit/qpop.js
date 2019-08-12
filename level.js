@@ -407,12 +407,6 @@ function Female(species, tile) {
 }
 
 
-Female.prototype.offspring = function() {
-	this.type = SURV_MAP.UNRESPONSIVE;
-	this.sprite = new Sprite(this.url, [64, 64], anim_delays.offspring, this.anims.offspring.soffset, this.anims.offspring.frames);
-};
-
-
 function Enemy(species, tile) {
 	this.type = SURV_MAP.ENEMY;
 	this.tile = tile;
