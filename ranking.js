@@ -43,12 +43,26 @@ function Ranking() {
 
 	this.pillartop_dx = 51;
 	this.sign_dx = 100;
+
+	this.delta = 8;
 	// CONST_END
 
 	this.dead_soffsets = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
 	this.sym_spec_soffsets = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
 
 	this.clickareas = [];
+	this.sprites = [];
+
+	// Phase 0: Walking in from right to left
+	// Phase 1: Moving upwards
+	// Phase 2: Standing still, the winner waves its hand
+	this.phase = 0;
+	this.delay = anim_delays.ranking;
+	this.delay_counter = 0;
+
+	// TODO: From here
+	this.lead_pos = 640;
+	this.height = 0;
 }
 
 
@@ -103,6 +117,8 @@ Ranking.prototype.redraw = function() {
 	if(game.turn === game.max_turns) {
 		ctx.drawImage(this.wreath_pic, this.wreath_offset[0], this.wreath_offset[1]);
 	}
+
+	// TODO: Turn number is written differently in the last turn and all other turns
 
 	// Draw turn number
 	ctx.save();
@@ -186,12 +202,62 @@ Ranking.prototype.redraw = function() {
 
 
 Ranking.prototype.render = function() {
-
+	// This must use some clipping function and only redraw the upper part (incl. upper pillar parts) in phases 0 and 1 and only the winner in phase 2 (always incl. background and wreath).
 };
 
 
 Ranking.prototype.update = function() {
 	this.handle_input();
+
+	for(let sprite of this.sprites) {
+		sprite.update();
+	}
+
+	if(phase === 2) {
+		return;
+	}
+
+	this.delay_counter++
+	if(this.delay_counter < this.delay) {
+		return;
+	}
+
+	this.delay_counter = 0;
+
+	if(this.phase === 0) {
+		this.lead -= this.delta;
+
+		if(this.lead <= 100) { // TODO RESEARCH
+			this.next_phase();
+		}
+	}
+	else if(this.phase === 1) {
+		this.height += this.delta;
+
+		if(this.height >= 160) { // TODO RESEARCH
+			this.next_phase();
+		}
+	}
+};
+
+
+Ranking.prototype.next_phase = function() {
+	if(phase === 0) {
+		this.sprites = [];
+		for(let i = 0; i < 6; i++) {
+			this.sprites.push(
+				new Sprite(this.pics, [64, 64], 0, [0, 0], [[0, 0]]); // TODO: Added the right sprite offsets and frames for each species
+			);
+		}
+
+		this.phase++;
+	}
+	else {
+		// TODO: Turn winner into winner sprite
+		// this.sprites[X] = new Sprite(this.pics, [64, 64], anim_delays.ranking_winner, [0, 0], [[0, 0]]);
+
+		this.delay = anim_delays.ranking_winner;
+	}
 };
 
 
