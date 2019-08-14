@@ -18,15 +18,18 @@ function Ranking() {
 	this.pillartop_dim = [50, 18];
 	this.species_dim = [64, 64];
 	this.icon_dim = [16, 16];
+	this.draw_area_dim = [634, 325];
 
 	this.load_offset = [0, 458];
 	this.save_offset = [229, 458];
 	this.next_offset = [459, 458];
-	this.turn_offset = [310, 170];
+	this.final_turn_offset = [307, 147];
+	this.turn_offset = [316, 39];
 	this.pillarbottom_offset = [21, 356];
 	this.pillartop_offset = [46, 338];
 	this.wreath_offset = [143, 29];
 	this.sign_offset = [39, 373];
+	this.draw_area_offset = [3, 23];
 
 	this.sym_spec_offset = [43, 372];
 	this.sym_dna_offset = [43, 397];
@@ -43,12 +46,14 @@ function Ranking() {
 
 	this.pillartop_dx = 51;
 	this.sign_dx = 100;
+	this.walk_y = 252;
 
 	this.delta = 8;
 	// CONST_END
 
 	this.dead_soffsets = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
 	this.sym_spec_soffsets = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
+	this.walking_rel_dy = [0, 5, 0, 0, 6, 1];
 
 	this.clickareas = [];
 	this.sprites = [];
@@ -60,8 +65,7 @@ function Ranking() {
 	this.delay = anim_delays.ranking;
 	this.delay_counter = 0;
 
-	// TODO: From here
-	this.lead_pos = 640;
+	this.lead_x = 638;
 	this.height = 0;
 }
 
@@ -113,23 +117,6 @@ Ranking.prototype.redraw = function() {
 		blur: () => draw_rect(this.next_offset, this.next_dim)
 	});
 
-	// Draw wreath only if the game is finished
-	if(game.turn === game.max_turns) {
-		ctx.drawImage(this.wreath_pic, this.wreath_offset[0], this.wreath_offset[1]);
-	}
-
-	// TODO: Turn number is written differently in the last turn and all other turns
-
-	// Draw turn number
-	ctx.save();
-	ctx.font = '24px serif';
-	ctx.textAlign = 'center';
-	ctx.fillStyle = '#c3c3c3';
-	ctx.fillText(game.turn, this.turn_offset[0]-1, this.turn_offset[1]-1);
-	ctx.fillStyle = '#000000';
-	ctx.fillText(game.turn, this.turn_offset[0], this.turn_offset[1]);
-	ctx.restore();
-
 	// Draw lower pillar parts
 	for(let i = -1; i < 7; i++) {
 		ctx.drawImage(this.pics,
@@ -137,15 +124,6 @@ Ranking.prototype.redraw = function() {
 			this.pillarbottom_dim[0], this.pillarbottom_dim[1],
 			this.pillarbottom_offset[0] + i*this.pillarbottom_dim[0], this.pillarbottom_offset[1],
 			this.pillarbottom_dim[0], this.pillarbottom_dim[1]);
-	}
-
-	// Draw upper pillar parts
-	for(let i = -1; i < 12; i++) {
-		ctx.drawImage(this.pics,
-			this.pillartop_soffset[0], this.pillartop_soffset[1],
-			this.pillartop_dim[0], this.pillartop_dim[1],
-			this.pillartop_offset[0] + i*this.pillartop_dim[0], this.pillartop_offset[1],
-			this.pillartop_dim[0], this.pillartop_dim[1]);
 	}
 
 	// Draw symbols in pillar signs
@@ -202,7 +180,55 @@ Ranking.prototype.redraw = function() {
 
 
 Ranking.prototype.render = function() {
-	// This must use some clipping function and only redraw the upper part (incl. upper pillar parts) in phases 0 and 1 and only the winner in phase 2 (always incl. background and wreath).
+	// Draw background in draw area
+	ctx.drawImage(resources.get('gfx/dark_bg.png'),
+			this.draw_area_offset[0], this.draw_area_offset[1],
+			this.draw_area_dim[0], this.draw_area_dim[1],
+			this.draw_area_offset[0], this.draw_area_offset[1],
+			this.draw_area_dim[0], this.draw_area_dim[1])
+
+	ctx.save();
+	ctx.translate(this.draw_area_offset[0], this.draw_area_offset[1]);
+	ctx.beginPath();
+	ctx.rect(0, 0, this.draw_area_dim[0], this.draw_area_dim[1]);
+	ctx.clip();
+
+	// Draw wreath only if the game is finished
+	if(game.turn === game.max_turns) {
+		ctx.drawImage(this.wreath_pic, this.wreath_offset[0], this.wreath_offset[1]);
+
+		// Draw turn number
+		ctx.save();
+		ctx.font = '24px serif';
+		ctx.textAlign = 'center';
+		ctx.fillStyle = '#c3c3c3';
+		ctx.fillText(game.turn, this.final_turn_offset[0]-1, this.final_turn_offset[1]-1);
+		ctx.fillStyle = '#000000';
+		ctx.fillText(game.turn, this.final_turn_offset[0], this.final_turn_offset[1]);
+		ctx.restore();
+	}
+	else {
+		// Draw turn number
+		ctx.save();
+		ctx.font = 'bold 24px serif';
+		ctx.textAlign = 'center';
+		ctx.fillStyle = '#828282';
+		ctx.fillText(lang.turn + ' ' + game.turn, this.turn_offset[0], this.turn_offset[1]);
+		ctx.restore();
+	}
+
+	// Draw upper pillar parts
+	for(let i = -1; i < 12; i++) {
+		ctx.drawImage(this.pics,
+			this.pillartop_soffset[0], this.pillartop_soffset[1],
+			this.pillartop_dim[0], this.pillartop_dim[1],
+			this.pillartop_offset[0] + i*this.pillartop_dim[0], this.pillartop_offset[1],
+			this.pillartop_dim[0], this.pillartop_dim[1]);
+	}
+
+	// Draw species
+
+	ctx.restore();
 };
 
 
@@ -213,7 +239,7 @@ Ranking.prototype.update = function() {
 		sprite.update();
 	}
 
-	if(phase === 2) {
+	if(this.phase === 2) {
 		return;
 	}
 
