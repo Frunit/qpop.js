@@ -246,7 +246,7 @@ Ranking.prototype.next_phase = function() {
 		this.sprites = [];
 		for(let i = 0; i < 6; i++) {
 			this.sprites.push(
-				new Sprite(this.pics, [64, 64], 0, [0, 0], [[0, 0]]); // TODO: Added the right sprite offsets and frames for each species
+				new Sprite(this.pics, [64, 64], 0, [0, 0], [[0, 0]]) // TODO: Add the right sprite offsets and frames for each species
 			);
 		}
 

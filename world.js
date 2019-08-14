@@ -40,7 +40,7 @@ function World() {
 	this.hygro_bar_dim = [24, 82];
 	this.temp_bar_offset = [604, 112];
 	this.temp_bar_dim = [2, 76];
-	this.minispec_soffset = [272, 16];
+	this.minispec_soffset = [320, 16];
 
 	this.dim = [28, 28]; // In tiles
 	// CONST_END
@@ -940,11 +940,11 @@ World.prototype.find_tile = function(height, y) {
 
 	let temp = game.temp + (y - this.dim[1] / 2) * 3 - height + 50;
 	if(temp < 0) temp = 0;
-	if(temp > 100) temp = 100;
+	else if(temp > 100) temp = 100;
 
 	let humid = game.humid - height + 50;
 	if(humid < 0) humid = 0;
-	if(humid > 100) humid = 100;
+	else if(humid > 100) humid = 100;
 
 	let delta = Infinity;
 	let tile = 0;
@@ -1052,10 +1052,14 @@ World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 		tile = this.coast_tile(x, y);
 	}
 	else {
-		tile = game.world_map[y][x] + 47;
+		tile = game.world_map[y][x] + 46;
 	}
 
-	const soffset = [(tile % 41) * this.tile_dim[0], Math.floor(tile / 40) * this.tile_dim[0]];
+	const soffset = [(tile % 37) * this.tile_dim[0], Math.floor(tile / 37) * this.tile_dim[0]];
+
+	if(36 < tile && tile < 46) {
+		console.log(tile, soffset);
+	}
 
 	ctx.drawImage(this.map_pics,
 		soffset[0], soffset[1],

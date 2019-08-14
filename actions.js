@@ -459,7 +459,7 @@ Electro.prototype.update = function() {
 
 	if(this.frame === 4) { // TODO RESEARCH: Which frame?
 		this.sprites[sprite_pos] = new Sprite(this.character.url, [64, 64], anim_delays.electro, this.character.anims.zapped.soffset, this.character.anims.zapped.frames);
-		break;
+		return;
 	}
 
 	this.finished = this.sprites[!sprite_pos].finished;
