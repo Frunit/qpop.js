@@ -565,7 +565,7 @@ const anims_clouds = {
 	},
 };
 
-const ranking = {
+const anim_ranking = {
 	walking: [
 		{
 			offset: [128, 0],

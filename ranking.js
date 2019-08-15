@@ -26,8 +26,8 @@ function Ranking() {
 	this.final_turn_offset = [307, 147];
 	this.turn_offset = [316, 39];
 	this.pillarbottom_offset = [21, 356];
-	this.pillartop_offset = [46, 338];
-	this.wreath_offset = [143, 29];
+	this.pillartop_offset = [43, 315]; // TODO: This probably needs to be fixed
+	this.wreath_offset = [140, 6]; // TODO: This probably needs to be fixed
 	this.sign_offset = [39, 373];
 	this.draw_area_offset = [3, 23];
 
@@ -66,11 +66,14 @@ function Ranking() {
 	this.delay_counter = 0;
 
 	this.lead_x = 638;
-	this.height = 0;
+	this.heights = [0, 0, 0, 0, 0, 0];
+	this.final_heights = [0, 0, 0, 0, 0, 0];
+	this.winners = [];
 }
 
 
 Ranking.prototype.initialize = function() {
+	this.determine_best();
 	this.redraw();
 };
 
@@ -174,14 +177,14 @@ Ranking.prototype.redraw = function() {
 		}
 	}
 
-	// Main rectangle (draw last to overwrite any spare pixels from creatures
+	// Main rectangle (draw last to overwrite any spare pixels from pillar parts)
 	draw_rect([0, 20], [640, 439]);
 };
 
 
 Ranking.prototype.render = function() {
 	// Draw background in draw area
-	ctx.drawImage(resources.get('gfx/dark_bg.png'),
+	ctx.drawImage(this.bg_pic),
 			this.draw_area_offset[0], this.draw_area_offset[1],
 			this.draw_area_dim[0], this.draw_area_dim[1],
 			this.draw_area_offset[0], this.draw_area_offset[1],
@@ -217,8 +220,8 @@ Ranking.prototype.render = function() {
 		ctx.restore();
 	}
 
-	// Draw upper pillar parts
-	for(let i = -1; i < 12; i++) {
+	// Draw fixed upper pillar parts
+	for(let i = -1; i < 12; i+=2) {
 		ctx.drawImage(this.pics,
 			this.pillartop_soffset[0], this.pillartop_soffset[1],
 			this.pillartop_dim[0], this.pillartop_dim[1],
@@ -226,7 +229,24 @@ Ranking.prototype.render = function() {
 			this.pillartop_dim[0], this.pillartop_dim[1]);
 	}
 
+	// TODO: Draw variable pillars (if phase >= 1)
+
+	// Draw variable upper pillar parts
+	for(let i = 0; i < 6; i++) {
+		ctx.drawImage(this.pics,
+			this.pillartop_soffset[0], this.pillartop_soffset[1],
+			this.pillartop_dim[0], this.pillartop_dim[1],
+			this.pillartop_offset[0] + i*2*this.pillartop_dim[0], this.pillartop_offset[1] - this.heights[i],
+			this.pillartop_dim[0], this.pillartop_dim[1]);
+	}
+
 	// Draw species
+	for(let i = 0; i < 6; i++) {
+		this.sprites[i].render(ctx,
+			[this.lead + i*this.sign_dx,
+			this.walk_y - this.heights[i] + this.walking_rel_dy[i]]
+		);
+	}
 
 	ctx.restore();
 };
@@ -253,15 +273,54 @@ Ranking.prototype.update = function() {
 	if(this.phase === 0) {
 		this.lead -= this.delta;
 
-		if(this.lead <= 100) { // TODO RESEARCH
+		if(this.lead <= 30) {
 			this.next_phase();
 		}
 	}
 	else if(this.phase === 1) {
+		for(let i = 0; i < 6; i++) {
+			this.heights[i] += this.delta;
+			if(this.heights[i] > this.final_heights[i]) {
+				this.heights[i] = this.final_heights[i];
+			}
+		}
 		this.height += this.delta;
 
 		if(this.height >= 160) { // TODO RESEARCH
 			this.next_phase();
+		}
+	}
+};
+
+
+Ranking.prototype.determine_best = function() {
+	// TODO RESEARCH: What happens if the `total_score` is equal?
+	scores = [];
+	for(let i = 0; i < 6; i++) {
+		scores.push([game.players[i].total_score, i]);
+	}
+
+	scores.sort((a, b) => a[0] - b[0]);
+
+	this.winners = [scores[0][1]]
+	for(let i = 1; i < 6; i++) {
+		if(scores[i][0] !== scores[i-1][0]) {
+			break;
+		}
+
+		this.winners.push(scores[i][1]);
+	}
+
+	const heights = [160, 150, 140, 130, 120, 110]; // TODO RESEARCH
+
+	this.final_heights[scores[5][1]] = heights[5];
+
+	for(let i = 4; i >= 0; i--) {
+		if(scores[i][0] === scores[i+1][0]) {
+			this.final_heights[scores[i][1]] = this.final_heights[scores[i+1][1]];
+		}
+		else {
+			this.final_heights[scores[i][1]] = heights[i];
 		}
 	}
 };
@@ -272,15 +331,16 @@ Ranking.prototype.next_phase = function() {
 		this.sprites = [];
 		for(let i = 0; i < 6; i++) {
 			this.sprites.push(
-				new Sprite(this.pics, [64, 64], 0, [0, 0], [[0, 0]]) // TODO: Add the right sprite offsets and frames for each species
+				new Sprite(this.pics, [64, 64], 0, [0, 0], [anim_ranking.standing[i]])
 			);
 		}
 
 		this.phase++;
 	}
 	else {
-		// TODO: Turn winner into winner sprite
-		// this.sprites[X] = new Sprite(this.pics, [64, 64], anim_delays.ranking_winner, [0, 0], [[0, 0]]);
+		for(let winner of this.winners) {
+			this.sprites[winner] = new Sprite(this.pics, [64, 64], anim_delays.ranking_winner, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames);
+		}
 
 		this.delay = anim_delays.ranking_winner;
 	}
