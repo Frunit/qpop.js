@@ -1,8 +1,7 @@
 'use strict';
 
-// TODO: Species must be shown
-// TODO: Pillars must have the right height
-// TODO: All animations (walking in, moving up, cheering)
+// TODO: Pillars must have the right height and be streched/repeated
+// TODO: All animations and positions must be checked. There is some weird offset among the species
 
 function Ranking() {
 	this.id = SCENE.RANKING;
@@ -11,14 +10,17 @@ function Ranking() {
 	this.wreath_pic = resources.get('gfx/wreath.png');
 
 	// CONST_START
+	this.pics_url = 'gfx/ranking.png';
+
 	this.load_dim = [230, 22];
 	this.save_dim = [231, 22];
 	this.next_dim = [181, 22];
 	this.pillarbottom_dim = [100, 100];
-	this.pillartop_dim = [50, 18];
+	this.pillarcenter_dim = [50, 8];
+	this.pillartop_dim = [50, 10];
 	this.species_dim = [64, 64];
 	this.icon_dim = [16, 16];
-	this.draw_area_dim = [634, 325];
+	this.draw_area_dim = [634, 333];
 
 	this.load_offset = [0, 458];
 	this.save_offset = [229, 458];
@@ -26,8 +28,9 @@ function Ranking() {
 	this.final_turn_offset = [307, 147];
 	this.turn_offset = [316, 39];
 	this.pillarbottom_offset = [21, 356];
-	this.pillartop_offset = [43, 315]; // TODO: This probably needs to be fixed
-	this.wreath_offset = [140, 6]; // TODO: This probably needs to be fixed
+	this.pillarcenter_offset = [43, 325];
+	this.pillartop_offset = [43, 315];
+	this.wreath_offset = [140, 6];
 	this.sign_offset = [39, 373];
 	this.draw_area_offset = [3, 23];
 
@@ -39,6 +42,7 @@ function Ranking() {
 	this.text_total_offset = [83, 435];
 
 	this.pillarbottom_soffset = [0, 0];
+	this.pillarcenter_soffset = [0, 111];
 	this.pillartop_soffset = [0, 101];
 	this.outoforder_soffset = [384, 384];
 	this.sym_dna_soffset = [400, 480];
@@ -73,6 +77,13 @@ function Ranking() {
 
 
 Ranking.prototype.initialize = function() {
+	this.sprites = [];
+	for(let i = 0; i < 6; i++) {
+		this.sprites.push(
+			new Sprite(this.pics_url, [64, 64], anim_delays.ranking, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames)
+		);
+	}
+
 	this.determine_best();
 	this.redraw();
 };
@@ -184,11 +195,11 @@ Ranking.prototype.redraw = function() {
 
 Ranking.prototype.render = function() {
 	// Draw background in draw area
-	ctx.drawImage(this.bg_pic),
+	ctx.drawImage(this.bg_pic,
 			this.draw_area_offset[0], this.draw_area_offset[1],
 			this.draw_area_dim[0], this.draw_area_dim[1],
 			this.draw_area_offset[0], this.draw_area_offset[1],
-			this.draw_area_dim[0], this.draw_area_dim[1])
+			this.draw_area_dim[0], this.draw_area_dim[1]);
 
 	ctx.save();
 	ctx.translate(this.draw_area_offset[0], this.draw_area_offset[1]);
@@ -227,9 +238,14 @@ Ranking.prototype.render = function() {
 			this.pillartop_dim[0], this.pillartop_dim[1],
 			this.pillartop_offset[0] + i*this.pillartop_dim[0], this.pillartop_offset[1],
 			this.pillartop_dim[0], this.pillartop_dim[1]);
+
+		ctx.drawImage(this.pics,
+			this.pillarcenter_soffset[0], this.pillarcenter_soffset[1],
+			this.pillarcenter_dim[0], this.pillarcenter_dim[1],
+			this.pillarcenter_offset[0] + i*this.pillarcenter_dim[0], this.pillarcenter_offset[1],
+			this.pillarcenter_dim[0], this.pillarcenter_dim[1]);
 	}
 
-	// TODO: Draw variable pillars (if phase >= 1)
 
 	// Draw variable upper pillar parts
 	for(let i = 0; i < 6; i++) {
@@ -238,15 +254,24 @@ Ranking.prototype.render = function() {
 			this.pillartop_dim[0], this.pillartop_dim[1],
 			this.pillartop_offset[0] + i*2*this.pillartop_dim[0], this.pillartop_offset[1] - this.heights[i],
 			this.pillartop_dim[0], this.pillartop_dim[1]);
+
+		// TODO: The center parts must be repeated/streched for phase 1 and 2
+		ctx.drawImage(this.pics,
+			this.pillarcenter_soffset[0], this.pillarcenter_soffset[1],
+			this.pillarcenter_dim[0], this.pillarcenter_dim[1],
+			this.pillarcenter_offset[0] + i*2*this.pillarcenter_dim[0], this.pillarcenter_offset[1] - this.heights[i],
+			this.pillarcenter_dim[0], this.pillarcenter_dim[1]);
 	}
 
 	// Draw species
 	for(let i = 0; i < 6; i++) {
 		this.sprites[i].render(ctx,
-			[this.lead + i*this.sign_dx,
+			[this.lead_x + i*this.sign_dx,
 			this.walk_y - this.heights[i] + this.walking_rel_dy[i]]
 		);
 	}
+
+	debug1.value = this.lead_x;
 
 	ctx.restore();
 };
@@ -271,9 +296,9 @@ Ranking.prototype.update = function() {
 	this.delay_counter = 0;
 
 	if(this.phase === 0) {
-		this.lead -= this.delta;
+		this.lead_x -= this.delta;
 
-		if(this.lead <= 30) {
+		if(this.lead_x <= 30) {
 			this.next_phase();
 		}
 	}
@@ -295,7 +320,7 @@ Ranking.prototype.update = function() {
 
 Ranking.prototype.determine_best = function() {
 	// TODO RESEARCH: What happens if the `total_score` is equal?
-	scores = [];
+	const scores = [];
 	for(let i = 0; i < 6; i++) {
 		scores.push([game.players[i].total_score, i]);
 	}
@@ -327,11 +352,11 @@ Ranking.prototype.determine_best = function() {
 
 
 Ranking.prototype.next_phase = function() {
-	if(phase === 0) {
+	if(this.phase === 0) {
 		this.sprites = [];
 		for(let i = 0; i < 6; i++) {
 			this.sprites.push(
-				new Sprite(this.pics, [64, 64], 0, [0, 0], [anim_ranking.standing[i]])
+				new Sprite(this.pics_url, [64, 64], 0, [0, 0], [anim_ranking.standing[i]])
 			);
 		}
 
@@ -339,7 +364,7 @@ Ranking.prototype.next_phase = function() {
 	}
 	else {
 		for(let winner of this.winners) {
-			this.sprites[winner] = new Sprite(this.pics, [64, 64], anim_delays.ranking_winner, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames);
+			this.sprites[winner] = new Sprite(this.pics_url, [64, 64], anim_delays.ranking_winner, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames);
 		}
 
 		this.delay = anim_delays.ranking_winner;

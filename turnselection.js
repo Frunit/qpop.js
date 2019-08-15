@@ -8,6 +8,8 @@ function Turnselection() {
 	this.pics = resources.get('gfx/turns.png');
 
 	// CONST_START
+	this.pics_url = 'gfx/turns.png';
+
 	this.panel_dim = [620, 211];
 	this.anim_dim = [420, 90];
 	this.anim_part_dim = [60, 90]
@@ -77,13 +79,13 @@ Turnselection.prototype.draw_turn_changed = function() {
 
 		if(this.animation_type) {
 			// Amorph splatters
-			this.animations = [new Sprite('gfx/turns.png', this.anim_dim, anim_delays.turn_selection, [420, 450],
+			this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [420, 450],
 				[[0, 0], [0, 90]],
 				true, () => this.end_animation())];
 		}
 		else {
 			// Chuckberry stumbles
-			this.animations = [new Sprite('gfx/turns.png', this.anim_dim, anim_delays.turn_selection, [0, 270],
+			this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [0, 270],
 				[[0, 0], [0, 90], [0, 180], [0, 270]],
 				true, () => this.end_animation())];
 		}
@@ -299,24 +301,24 @@ Turnselection.prototype.end_animation = function() {
 
 		this.animations = [
 			// left Chuckberry
-			new Sprite('gfx/turns.png', this.anim_part_dim, anim_delays.turn_selection, [420, 270],
+			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [420, 270],
 			[[0, 0], [60, 0], [120, 0], [180, 0]],
 			true, () => this.end_animation()),
 
 			// right Chuckberry
-			new Sprite('gfx/turns.png', this.anim_part_dim, anim_delays.turn_selection, [420, 360],
+			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [420, 360],
 			[[0, 0], [60, 0], [120, 0], [180, 0]],
 			true, () => this.end_animation()),
 
 			// Amorph
-			new Sprite('gfx/turns.png', this.anim_part_dim, anim_delays.turn_selection, [660, 270],
+			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [660, 270],
 			[[0, 0], [60, 0], [120, 0], [0, 90]],
 			true, () => this.end_animation())
 		];
 	}
 	else {
 		// Chuckberry stumbles
-		this.animations = [new Sprite('gfx/turns.png', this.anim_dim, anim_delays.turn_selection, [420, 0],
+		this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [420, 0],
 			[[0, 0], [0, 90], [0, 180]],
 			false)];
 	}
