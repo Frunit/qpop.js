@@ -464,7 +464,6 @@ Mutations.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
 	if(game.current_player.evo_score > 0) {
-		// TODO RESEARCH: Which image? Which answers?
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {
