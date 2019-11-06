@@ -2,7 +2,6 @@
 
 // TODO: Enemies, Females and Offspring have randomized sprite animations
 // TODO RESEARCH: Buck Cherry feeding has only 5 (instead of 8) frames. How to handle predators?
-// TODO: Predators on the edge of the screen are not always shown
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;
@@ -546,22 +545,22 @@ Survival.prototype.start_movement = function(dir) {
 	switch(dir) {
 		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.south.soffset, char.anims.south.frames);
-			this.level.mobmap[pos[1] + 1][pos[0]] = placeholder; // Block the position, the player wants to go, so no other predator will go there in the same moment
+			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the position, the player wants to go, so no other predator will go there in the same moment
 			console.info('WALK SOUTH');
 			break;
 		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.north.soffset, char.anims.north.frames);
-			this.level.mobmap[pos[1] - 1][pos[0]] = placeholder;
+			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK NORTH');
 			break;
 		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.east.soffset, char.anims.east.frames);
-			this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
+			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK EAST');
 			break;
 		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.west.soffset, char.anims.west.frames);
-			this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
+			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK WEST');
 			break;
 		case 0: { // Feeding/waiting
@@ -726,19 +725,19 @@ Survival.prototype.start_predator_movement = function() {
 		switch(predator.movement) {
 			case DIR.N:
 				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
-				this.level.mobmap[pos[1] - 1][pos[0]] = placeholder; // Block the spot on the map to prevent others from going there
+				this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the spot on the map to prevent others from going there
 				break;
 			case DIR.S:
 				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
-				this.level.mobmap[pos[1] + 1][pos[0]] = placeholder;
+				this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]);
 				break;
 			case DIR.W:
 				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
-				this.level.mobmap[pos[1]][pos[0] - 1] = placeholder;
+				this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
 				break;
 			case DIR.E:
 				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
-				this.level.mobmap[pos[1]][pos[0] + 1] = placeholder;
+				this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
 				break;
 		}
 	}

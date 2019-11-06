@@ -419,3 +419,10 @@ function Enemy(species, tile) {
 
 	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
+
+
+function Placeholder(posx, posy) {
+	this.type = SURV_MAP.PLACEHOLDER;
+	this.from_x = posx;
+	this.from_y = posy;
+}

@@ -85,25 +85,27 @@ Camera.prototype.update_visible_level = function() {
 				}
 			}
 
-			if(this.level.mobmap[y][x] !== null && this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER && !this.level.mobmap[y][x].hidden) {
-				this.level.mobmap[y][x].sprite.update();
-				// TODO: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
-				if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame() || this.survival.action) {
-					this._movs_to_render.push(this.level.mobmap[y][x]);
+			if(this.level.mobmap[y][x] !== null && !this.level.mobmap[y][x].hidden) {
+				if(this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
+					this.level.mobmap[y][x].sprite.update();
+					// TODO: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
+					if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame() || this.survival.action) {
+						this._movs_to_render.push(this.level.mobmap[y][x]);
+						this._tiles_to_render.add(JSON.stringify([x, y]));
+					}
+				}
+				else { // if type === SURV_MAP.PLACEHOLDER
 					this._tiles_to_render.add(JSON.stringify([x, y]));
-					switch(this.level.mobmap[y][x].movement) {
-						case DIR.N:
-							this._tiles_to_render.add(JSON.stringify([x, y-1]));
-							break;
-						case DIR.S:
-							this._tiles_to_render.add(JSON.stringify([x, y+1]));
-							break;
-						case DIR.W:
-							this._tiles_to_render.add(JSON.stringify([x-1, y]));
-							break;
-						case DIR.E:
-							this._tiles_to_render.add(JSON.stringify([x+1, y]));
-							break;
+					const fx = this.level.mobmap[y][x].from_x;
+					const fy = this.level.mobmap[y][x].from_y;
+
+					// Render sprites that are outside the camera but are about to move into the camera (usually enemies)
+					// The placeholder indicates where the object comes from that will occupy the spot
+					if(!this.x_tiles.includes(fx) || !this.y_tiles.includes(fy)) {
+						this.level.mobmap[fy][fx].sprite.update();
+						if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
+							this._movs_to_render.push(this.level.mobmap[fy][fx]);
+						}
 					}
 				}
 			}
