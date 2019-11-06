@@ -175,7 +175,7 @@ Level.prototype.populate = function() {
 
 	let free_tiles = this.find_free_tiles();
 
-	// TODO: Placement *not* within x fields does not work.
+	// TODO: Placement *not* within x fields does not work. Is that still so??
 
 	for(let i = 0; i < num_predators; i++) {
 		// Predators may not be placed within 2 fields of the player
@@ -189,25 +189,26 @@ Level.prototype.populate = function() {
 
 	for(let i = 0; i < num_females; i++) {
 		// Females may not be placed within 3 fields of the player
+		const show = false; // DEBUG
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 			// DEBUG
-			if(pos[0] > this.character.tile[0] - 2 && pos[0] < this.character.tile[0] + 2 && pos[1] > this.character.tile[1] - 2 && pos[1] < this.character.tile[1] + 2) {
-				console.log(i, pos);
+			if(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3) {
+				console.log(i, pos, this.character.tile);
+				show = true;
 			}
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
-		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		this.mobmap[pos[1]][pos[0]] = new Female(game.current_player.id, pos);
+		if(show) {console.log(pos);} // DEBUG
 	}
 
-	this.enemies = [3, 4];  // DEBUG should be removed
+	// /////this.enemies = [3, 4];  // DEBUG should be removed
 
 	for(let i = 0; i < num_enemies; i++) {
 		// Enemies may not be placed within 3 fields of the player
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
-		pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 		const species = random_element(this.enemies);
 		this.mobmap[pos[1]][pos[0]] = new Enemy(species, pos);
 	}
