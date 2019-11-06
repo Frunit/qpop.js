@@ -20,7 +20,7 @@ function Level() {
 }
 
 
-Level.prototype.listToMap = function(mainpart, border) {
+Level.prototype.list_to_map = function(mainpart, border) {
 	const matrix = Array(100);
 
 	for(let i = 0; i < 3; i++) {
@@ -122,7 +122,7 @@ Level.prototype.generate_map = function() {
 	// Shuffle everything and create the actual map
 	shuffle(mainpart);
 	shuffle(border);
-	this.map = this.listToMap(mainpart, border);
+	this.map = this.list_to_map(mainpart, border);
 
 	// If humans are present, a base is created at fixed coordinates, overwriting what ever is there
 	if(game.humans_present) {

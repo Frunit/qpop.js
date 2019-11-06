@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: A mob (enemy, predator, female) is not shown when it is on the tile that just enters the screen
 
 function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.level = level;
@@ -88,7 +87,7 @@ Camera.prototype.update_visible_level = function() {
 			if(this.level.mobmap[y][x] !== null && !this.level.mobmap[y][x].hidden) {
 				if(this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
 					this.level.mobmap[y][x].sprite.update();
-					// TODO: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
+					// MAYBE: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
 					if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame() || this.survival.action) {
 						this._movs_to_render.push(this.level.mobmap[y][x]);
 						this._tiles_to_render.add(JSON.stringify([x, y]));

@@ -512,7 +512,7 @@ World.prototype.catastrophe_finished = function() {
 
 	for(let y = 1; y < this.dim[1] - 1; y++) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
-			if((!game.world_map[y][x] || game.world_map >= WORLD_MAP.MOUNTAIN) && game.map_positions[y][x] >= 0) {
+			if((!game.world_map[y][x] || game.world_map[y][x] >= WORLD_MAP.MOUNTAIN) && game.map_positions[y][x] >= 0) {
 				this.kill_individual(x, y);
 			}
 		}
