@@ -146,7 +146,7 @@ Level.prototype.populate = function() {
 	}
 
 	// More females at a higher population density.
-	let num_females = 20 + 10 * this.density
+	let num_females = 20 + 10 * this.density;
 	if(num_females > 200) {
 		num_females = 200;
 	}
@@ -189,7 +189,7 @@ Level.prototype.populate = function() {
 
 	for(let i = 0; i < num_females; i++) {
 		// Females may not be placed within 3 fields of the player
-		const show = false; // DEBUG
+		let show = false; // DEBUG
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 			// DEBUG

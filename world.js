@@ -284,7 +284,7 @@ World.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -326,7 +326,7 @@ World.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;
@@ -937,12 +937,20 @@ World.prototype.find_tile = function(height, y) {
 	}
 
 	let temp = game.temp + (y - this.dim[1] / 2) * 3 - height + 50;
-	if(temp < 0) temp = 0;
-	else if(temp > 100) temp = 100;
+	if(temp < 0) {
+		temp = 0;
+	}
+	else if(temp > 100) {
+		temp = 100;
+	}
 
 	let humid = game.humid - height + 50;
-	if(humid < 0) humid = 0;
-	else if(humid > 100) humid = 100;
+	if(humid < 0) {
+		humid = 0;
+	}
+	else if(humid > 100) {
+		humid = 100;
+	}
 
 	let delta = Infinity;
 	let tile = 0;

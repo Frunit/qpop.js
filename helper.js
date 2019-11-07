@@ -114,7 +114,7 @@ function shuffle(arr) {
 
 function range(start, end) {
 	// Array with numbers from start (inclusive) to end (exclusive)
-	return Array.from(new Array(end - start), (x,i) => i + start)
+	return Array.from(new Array(end - start), (x,i) => i + start);
 }
 
 
@@ -131,8 +131,9 @@ function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 
 	const file = new Blob([data], {type: type});
-	if(window.navigator.msSaveOrOpenBlob) // IE10+
+	if(window.navigator.msSaveOrOpenBlob) { // IE10+
 		window.navigator.msSaveOrOpenBlob(file, filename);
+	}
 	else { // Other browsers
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(file);
@@ -334,7 +335,7 @@ function subtitle(x, y, text) {
 
 	ctx.fillStyle = "#ffffff";
 	ctx.textBaseline = "bottom";
-	ctx.fillText(text, x + 5, y + height - 5)
+	ctx.fillText(text, x + 5, y + height - 5);
 
 	ctx.restore();
 }

@@ -12,7 +12,7 @@ function Turnselection() {
 
 	this.panel_dim = [620, 211];
 	this.anim_dim = [420, 90];
-	this.anim_part_dim = [60, 90]
+	this.anim_part_dim = [60, 90];
 	this.button_dim = [43, 43];
 	this.bar_dim = [357, 43];
 	this.load_dim = [230, 22];
@@ -242,7 +242,7 @@ Turnselection.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -264,7 +264,7 @@ Turnselection.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

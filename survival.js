@@ -339,7 +339,7 @@ Survival.prototype.ai = function() {
 		food = 40;
 	}
 
-	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5
+	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5;
 	let saved = 0;
 	for(let i = 0; i < death; i++) {
 		if(random_int(0, 600) < game.current_player.stats[ATTR.SPEED] ||
@@ -387,7 +387,7 @@ Survival.prototype.ai = function() {
 Survival.prototype.finish_movement = function() {
 	this.movement_just_finished = true;
 	const char = this.level.character;
-	const current_bg = this.level.map[char.tile[1]][char.tile[0]]
+	const current_bg = this.level.map[char.tile[1]][char.tile[0]];
 	char.rel_pos = [0, 0];
 	char.movement = 0;
 	this.delay_counter = 0;
@@ -640,7 +640,7 @@ Survival.prototype.resolve_movement = function(obj) {
 			this.finish_movement();
 		}
 		else {
-			obj.rel_pos = [0, 0]
+			obj.rel_pos = [0, 0];
 			obj.last_movement = obj.movement;
 			obj.movement = 0;
 			obj.sprite = new Sprite(obj.url, [64, 64], 0, obj.anims.still.soffset, obj.anims.still.frames);
@@ -841,7 +841,7 @@ Survival.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -883,7 +883,7 @@ Survival.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

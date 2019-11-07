@@ -20,7 +20,7 @@
 
 	function _load(url) {
 		if(!resourceCache[url]) {
-			loading.push(url)
+			loading.push(url);
 			let request = new XMLHttpRequest();
 			request.open('GET', url, true);
 			request.responseType = 'arraybuffer';
@@ -28,7 +28,7 @@
 			request.onload = () => {
 				context.decodeAudioData(request.response, (buffer) => {
 					resourceCache[url] = buffer;
-				}, (e) => {console.log('Error: ' + e.err)});
+				}, (e) => {console.log('Error: ' + e.err);});
 
 				loaded++;
 				progressCallback(loaded);

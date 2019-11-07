@@ -133,7 +133,7 @@ Popup.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -155,7 +155,7 @@ Popup.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

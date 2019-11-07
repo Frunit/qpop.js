@@ -117,9 +117,9 @@ Init.prototype.redraw = function() {
 
 		write_text(lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
 
-		write_text(lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', null, 'center')
+		write_text(lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', null, 'center');
 		for(let iq = 0; iq < 4; iq++) {
-			write_text(lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy*iq], '#000000', null, 'left')
+			write_text(lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy*iq], '#000000', null, 'left');
 		}
 
 		// Draw Line around IQ title   (------ IQ ------)
@@ -215,7 +215,7 @@ Init.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -257,7 +257,7 @@ Init.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

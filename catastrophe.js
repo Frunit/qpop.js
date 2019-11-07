@@ -38,8 +38,14 @@ Catastrophe.prototype.initialize = function() {
 	draw_black_rect([this.offset[0], this.offset[1]], [this.dim[0]-1, this.dim[1]-1]);
 
 	// Title
-	draw_rect([this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
-	write_text(lang.catastrophe, [this.offset[0] + this.title_offset[0] + this.title_dim[0]/2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
+	draw_rect([this.offset[0] + this.title_offset[0],
+				this.offset[1] + this.title_offset[1]],
+				this.title_dim);
+	write_text(lang.catastrophe,
+				[this.offset[0] + this.title_offset[0] + this.title_dim[0]/2,
+				this.offset[1] + this.title_offset[1] + 15],
+				'white',
+				'black');
 
 	ctx.drawImage(this.cata_pic,
 		this.img_soffset[0], this.img_soffset[1] + this.type * this.img_dim[1],
@@ -108,7 +114,7 @@ Catastrophe.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -130,7 +136,7 @@ Catastrophe.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

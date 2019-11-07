@@ -288,7 +288,7 @@ Ranking.prototype.update = function() {
 		return;
 	}
 
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter < this.delay) {
 		return;
 	}
@@ -327,7 +327,7 @@ Ranking.prototype.determine_best = function() {
 
 	scores.sort((a, b) => a[0] - b[0]);
 
-	this.winners = [scores[0][1]]
+	this.winners = [scores[0][1]];
 	for(let i = 1; i < 6; i++) {
 		if(scores[i][0] !== scores[i-1][0]) {
 			break;
@@ -403,7 +403,7 @@ Ranking.prototype.handle_input = function() {
 	}
 
 	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE')
+		input.reset('MOUSE');
 		if(input.isDown('CLICK')) {
 			input.reset('CLICK');
 			let pos = input.mousePos();
@@ -425,7 +425,7 @@ Ranking.prototype.handle_input = function() {
 			}
 		}
 		else if(input.isDown('BLUR')) {
-			input.reset('BLUR')
+			input.reset('BLUR');
 			if(game.clicked_element) {
 				game.clicked_element.blur();
 				game.clicked_element = null;

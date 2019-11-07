@@ -156,7 +156,8 @@ Game.prototype.is_game_finished = function() {
 		if(this.infinite_game === false) {
 			this.infinite_game = humans_alive[0];
 			// TODO RESEARCH: Which image?
-			open_popup(lang.popup_title, 'chuck_berry', lang.continue_alone, (x) => game.game_finished_popup(x), lang.no, lang.yes);
+			open_popup(lang.popup_title, 'chuck_berry', lang.continue_alone,
+						(x) => game.game_finished_popup(x), lang.no, lang.yes);
 			return null;
 		}
 		// asked and infinite game is a player number, so the player won
@@ -165,9 +166,7 @@ Game.prototype.is_game_finished = function() {
 		}
 	}
 	// more than one player (human or PC) still alive or single player chose to start an infinite game -> game continues
-	else {
-		return false;
-	}
+	return false;
 };
 
 
@@ -261,7 +260,8 @@ Game.prototype.load_game = function(save_file) {
 
 	const content = new DataView(save_file);
 
-	if(save_file.byteLength !== 4172 || new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
+	if(save_file.byteLength !== 4172 ||
+			new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
 		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.next);
 		return;
 	}
@@ -424,7 +424,8 @@ Game.prototype.next_stage = function() {
 		// This should never happen
 	default:
 		console.log(this.stage);
-		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!', () => {}, 'Oh no!');
+		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!',
+					() => {}, 'Oh no!');
 	}
 };
 

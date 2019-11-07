@@ -55,7 +55,7 @@ Love.prototype.update = function() {
 		this.cloud_sprite.update();
 	}
 
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
@@ -181,7 +181,7 @@ Fight.prototype.update = function() {
 		this.cloud_sprite.update();
 	}
 
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
@@ -275,7 +275,7 @@ function Feeding(character, level, food_type, callback) {
 
 Feeding.prototype.update = function() {
 	this.sprite.update();
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
@@ -340,7 +340,7 @@ function Quicksand(character, callback) {
 Quicksand.prototype.update = function() {
 	this.sprite.update();
 
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
@@ -398,7 +398,7 @@ function Waiting(character, callback) {
 
 
 Waiting.prototype.update = function() {
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
@@ -446,7 +446,7 @@ Electro.prototype.update = function() {
 		sprite.update();
 	}
 
-	this.delay_counter++
+	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;

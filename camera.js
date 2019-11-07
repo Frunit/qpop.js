@@ -59,7 +59,10 @@ Camera.prototype.update_tiles = function() {
 	this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
 		Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
 
-	debug3.value = Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' + Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + ' ' + Math.floor(this.cpos[1] / this.tile_dim[1]) + '-' + Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);
+	debug3.value = Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
+					Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + ' ' +
+					Math.floor(this.cpos[1] / this.tile_dim[1]) + '-' +
+					Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);
 };
 
 
@@ -88,7 +91,9 @@ Camera.prototype.update_visible_level = function() {
 				if(this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
 					this.level.mobmap[y][x].sprite.update();
 					// MAYBE: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
-					if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame() || this.survival.action) {
+					if(this._pos_changed ||
+							this.level.mobmap[y][x].sprite.is_new_frame() ||
+							this.survival.action) {
 						this._movs_to_render.push(this.level.mobmap[y][x]);
 						this._tiles_to_render.add(JSON.stringify([x, y]));
 					}
