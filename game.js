@@ -88,6 +88,7 @@ Game.prototype.start = function() {
 	this.water_level = 20;
 	this.mountain_level = 80;
 	this.humans_present = false;
+	this.infinite_game = false;
 	this.current_player = this.players[0];
 	this.height_map = null;
 	this.world_map = null;
@@ -124,34 +125,59 @@ Game.prototype.next_player = function() {
 };
 
 
-// TODO: Is this ever used?
-Game.prototype.is_last_player = function() {
-	for(let i = this.current_player.id + 1; i < 6; i++) {
-		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-			return false;
+// Returns false, if the game goes on, -1 if the game was lost, null if the player still has to be asked, and a number [0-5] if the player with the number won.
+Game.prototype.is_game_finished = function() {
+	const humans_alive = [];
+	const pcs_alive = [];
+	for(let i = 0; i < 6; i++) {
+		if(players[i].type === PLAYER_TYPE.HUMAN && !players[i].is_dead) {
+			humans_alive.push(i);
+		}
+		else if(players[i].type === PLAYER_TYPE.COMPUTER && !players[i].is_dead) {
+			pcs_alive.push(i);
 		}
 	}
-	return true;
+
+	// all human players are dead -> game is lost
+	if(humans_alive.length === 0) {
+		if(pcs_alive.length === 0) {
+			return -1;
+		}
+
+		if (pcs_alive.length === 1) {
+			return pcs_alive[0];
+		}
+
+		// TODO: Find out, which PC player is best
+	}
+	// only one player left and no infinite game
+	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
+		// not asked, yet; indecisive
+		if(this.infinite_game === false) {
+			this.infinite_game = humans_alive[0];
+			// TODO RESEARCH: Which image?
+			open_popup(lang.popup_title, 'chuck_berry', lang.continue_alone, (x) => game.game_finished_popup(x), lang.no, lang.yes);
+			return null;
+		}
+		// asked and infinite game is a player number, so the player won
+		else {
+			return this.infinite_game;
+		}
+	}
+	// more than one player (human or PC) still alive or single player chose to start an infinite game -> game continues
+	else {
+		return false;
+	}
 };
 
 
-// TODO: This should ask if the single human player wants to continue alone
-// TODO: Should also give some feedback, whether the game has finished.
-// TODO RESEARCH: Does it really directly jump to the outro? Maybe rather set some variable to true and let the stagemanager handle it!
-Game.prototype.test_finished = function() {
-	let humans_alive = 0;
-	let pcs_alive = 0;
-	for(let player of this.players) {
-		if(player.type === PLAYER_TYPE.HUMAN) {
-			humans_alive++;
-		}
-		else if(player.type === PLAYER_TYPE.COMPUTER) {
-			pcs_alive++;
-		}
+Game.prototype.game_finished_popup = function(answer) {
+	if(answer === 1) {
+		game.infinite_game = true;
 	}
 
-	this.stage = new Outro();
-}
+	game.next_stage();
+};
 
 
 Game.prototype.save_game = function() {
@@ -311,74 +337,87 @@ Game.prototype.load_game = function(save_file) {
 
 
 Game.prototype.next_stage = function() {
+	if(this.stage.id > SCENE.TURN_SELECTION) {
+		const finished = this.is_game_finished();
+		if(finished === null) {
+			return; // indecisive; wait for player to choose
+		}
+
+		if(finished !== false) {
+			this.stage = new Outro(finished);
+			this.stage.initialize();
+			return;
+		}
+	}
+
 	switch(this.stage.id) {
 	case SCENE.INTRO: // Intro
-		game.stage = new Init(game.players);
-		game.stage.initialize();
+		this.stage = new Init(this.players);
+		this.stage.initialize();
 		break;
 	case SCENE.INIT: // Init screen (choose players)
-		game.stage = new Turnselection();
-		game.stage.initialize();
+		this.stage = new Turnselection();
+		this.stage.initialize();
 		break;
 	case SCENE.TURN_SELECTION: // Choose game length
-		game.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
-		game.stage.initialize();
+		this.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
+		this.stage.initialize();
 		break;
 	case SCENE.TRANS_WORLD: // Transition screen
-		game.stage = new World();
-		game.stage.initialize();
+		this.stage = new World();
+		this.stage.initialize();
 		break;
 	case SCENE.WORLD: // World map
-		if(game.next_player()) {
-			game.stage.next_player();
+		if(this.next_player()) {
+			this.stage.next_player();
 		} else {
-			if(game.turn === 0) {
-				game.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
-				game.stage.initialize();
+			if(this.turn === 0) {
+				this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
+				this.stage.initialize();
 			}
 			else {
-				game.backstage.push(game.stage);
-				game.stage = new Catastrophe();
-				game.stage.initialize();
+				this.backstage.push(this.stage);
+				this.stage = new Catastrophe();
+				this.stage.initialize();
 			}
 		}
 		break;
 	case SCENE.CATASTROPHE: // Catastrophe
-		game.stage = new Ranking();
-		game.stage.initialize();
+		this.stage = new Ranking();
+		this.stage.initialize();
 		break;
 	case SCENE.RANKING: // Ranking
-		if(game.turn === game.max_turns) {
-			game.stage = new Outro();
+		if(this.turn === this.max_turns) {
+			this.stage = new Outro();
 		}
 		else {
-			game.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
+			this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 		}
-		game.stage.initialize();
+		this.stage.initialize();
 		break;
 	case SCENE.TRANS_MUTATION: // Transition screen
-		game.turn++;
-		game.stage = new Mutations();
-		game.stage.initialize();
+		this.turn++;
+		this.stage = new Mutations();
+		this.stage.initialize();
 		break;
 	case SCENE.MUTATION: // Mutations
-		if(game.next_player()) {
-			game.stage.next_player();
+		if(this.next_player()) {
+			this.stage.next_player();
 		} else {
-			game.stage = new Transition('gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
-			game.stage.initialize();
+			this.stage = new Transition('gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
+			this.stage.initialize();
 		}
 		break;
 	case SCENE.TRANS_SURVIVAL: // Transition screen
-		game.stage = new Survival();
-		game.stage.initialize();
+		this.stage = new Survival();
+		this.stage.initialize();
 		break;
 	case SCENE.SURVIVAL: // Survival
-		if(game.next_player()) {
-			game.stage.initialize();
+		if(this.next_player()) {
+			this.stage.initialize();
 		} else {
-			game.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
-			game.stage.initialize();
+			this.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
+			this.stage.initialize();
 		}
 		break;
 	case SCENE.OUTRO: // Outro

@@ -345,13 +345,11 @@ World.prototype.handle_input = function() {
 };
 
 
-// TODO: Need to test if game is finished. A rudimentary function is game.test_finished()
 World.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
 	if(game.current_player.toplace === 0) {
-		this.test_if_dead();
-		game.next_stage();
+		this.next_popup(1);
 	}
 	else if(game.current_player.individuals === 0) {
 		open_popup(lang.popup_title, 'dino', lang.where_to_live, () => {}, lang.next);
@@ -373,8 +371,8 @@ World.prototype.next_popup = function(answer) {
 World.prototype.test_if_dead = function() {
 	for(let player of game.players) {
 		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
-			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
 			player.is_dead = true;
+			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
 		}
 	}
 };

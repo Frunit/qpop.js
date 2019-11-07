@@ -3,8 +3,9 @@
 // TODO!
 // TODO: This must also know, which player won and whether it was a human player.
 
-function Outro() {
+function Outro(winner) {
 	this.id = SCENE.OUTRO;
+	this.winner = winner; // negative -> game is lost
 	this.pic = resources.get('gfx/dummy_outro.png');
 
 	// CONST_START
