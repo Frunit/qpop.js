@@ -328,12 +328,18 @@ Survival.prototype.ai = function() {
 	const iq = 5 - game.current_player.iq;
 	game.current_player.experience = random_int(0, iq);
 
+	// MAYBE correct: This does not include the density that affects human players. For human players: Higher density -> less food
 	let food = 0;
-	// TODO: Go through each individual on the world map. For each individual:
-	// food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[___FOOD_ON_FIELD___] / (3 * this.eating_div);
-	// then:
-	// food = Math.floor(food / game.current_player.individuals);
-	// This does not include the density that affects human players. For human players: Higher density -> less food
+
+	for(x = 3; x <= 24; x++) {
+		for(y = 3; y <= 24; y++) {
+			if(game.map_positions[y][x] === game.current_player.id) {
+				food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[game.world_map[y][x]] / (3 * this.eating_div);
+			}
+		}
+	}
+
+	food = Math.floor(food / game.current_player.individuals);
 
 	if(food > 40) {
 		food = 40;
@@ -361,7 +367,14 @@ Survival.prototype.ai = function() {
 		death_prob = 0.9;
 	}
 
-	// TODO: Go through each own individual on the world map and if Math.random < death_prob, kill the individual
+	for(x = 3; x <= 24; x++) {
+		for(y = 3; y <= 24; y++) {
+			if(game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
+				game.map_positions[y][x] = -1;
+				game.current_player.individuals--;
+			}
+		}
+	}
 
 	// This does not take into account density. For a human player: Higher density > more females
 	let loved = random_int(0, iq * 2 + 2);
