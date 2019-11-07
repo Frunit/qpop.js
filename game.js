@@ -148,7 +148,7 @@ Game.prototype.is_game_finished = function() {
 			return pcs_alive[0];
 		}
 
-		// TODO: Find out, which PC player is best
+		return this.get_ranking(pcs_alive)[0][0];
 	}
 	// only one player left and no infinite game
 	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
@@ -176,6 +176,28 @@ Game.prototype.game_finished_popup = function(answer) {
 	}
 
 	game.next_stage();
+};
+
+
+Game.prototype.get_ranking = function(selection=[0,1,2,3,4,5]) {
+
+	// Sort by total_score and individuals
+	function sortme(obj1, obj2) {
+		if(obj1[1] === obj2[1]) {
+			return obj1[2] - obj2[2];
+		}
+
+		return obj1[1] - obj2[1];
+	}
+
+	const scores = [];
+	for(let i of selection) {
+		scores.push([i, game.players[i].total_score, game.players[i].individuals]);
+	}
+
+	scores.sort(sortme);
+
+	return scores;
 };
 
 

@@ -58,6 +58,7 @@ function Ranking() {
 	this.dead_soffsets = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
 	this.sym_spec_soffsets = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
 	this.walking_rel_dy = [0, 5, 0, 0, 6, 1];
+	this.max_heights = [160, 150, 140, 130, 120, 110]; // TODO RESEARCH
 
 	this.clickareas = [];
 	this.sprites = [];
@@ -319,33 +320,25 @@ Ranking.prototype.update = function() {
 
 
 Ranking.prototype.determine_best = function() {
-	// TODO RESEARCH: What happens if the `total_score` is equal?
-	const scores = [];
-	for(let i = 0; i < 6; i++) {
-		scores.push([game.players[i].total_score, i]);
-	}
+	const scores = game.get_ranking();
 
-	scores.sort((a, b) => a[0] - b[0]);
-
-	this.winners = [scores[0][1]];
+	this.winners = [scores[0][0]];
 	for(let i = 1; i < 6; i++) {
-		if(scores[i][0] !== scores[i-1][0]) {
+		if(scores[i][1] !== scores[i-1][1] || scores[i][2] !== scores[i-1][2]) {
 			break;
 		}
 
-		this.winners.push(scores[i][1]);
+		this.winners.push(scores[i][0]);
 	}
 
-	const heights = [160, 150, 140, 130, 120, 110]; // TODO RESEARCH
-
-	this.final_heights[scores[5][1]] = heights[5];
+	this.final_heights[scores[5][0]] = this.max_heights[5];
 
 	for(let i = 4; i >= 0; i--) {
-		if(scores[i][0] === scores[i+1][0]) {
-			this.final_heights[scores[i][1]] = this.final_heights[scores[i+1][1]];
+		if(scores[i][1] === scores[i+1][1] && scores[i][2] === scores[i+1][2]) {
+			this.final_heights[scores[i][0]] = this.final_heights[scores[i+1][0]];
 		}
 		else {
-			this.final_heights[scores[i][1]] = heights[i];
+			this.final_heights[scores[i][0]] = this.max_heights[i];
 		}
 	}
 };

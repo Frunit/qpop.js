@@ -1,7 +1,6 @@
 'use strict';
 
-// TODO!
-// TODO: This must also know, which player won and whether it was a human player.
+// TODO: Outro!
 
 function Outro(winner) {
 	this.id = SCENE.OUTRO;
