@@ -505,9 +505,13 @@ Survival.prototype.finish_love = function(partner) {
 Survival.prototype.finish_fight = function(player_wins, opponent) {
 	opponent.hidden = false;
 	if(player_wins) {
-		// Only enemies are shown, although also predators count towards experience
-		if(opponent.type === SURV_MAP.ENEMY && this.level.character.victories.length < 10) {
-			this.level.character.victories.push(opponent.species);
+		if(this.level.character.victories.length < 10) {
+			if(opponent.type === SURV_MAP.ENEMY) {
+				this.level.character.victories.push(opponent.species);
+			}
+			else { // Predator
+				this.level.character.victories.push(opponent.species + 6);
+			}
 		}
 		game.current_player.experience++;
 
