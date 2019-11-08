@@ -107,7 +107,7 @@ Survival.prototype.redraw = function() {
 	// Black border around camera
 	draw_black_rect([this.camera_offset[0] - 1, this.camera_offset[1] - 1], [this.camera_dim[0] + 1, this.camera_dim[1] + 1]);
 
-	// Click on camera
+	// TODO: Click on camera
 	/*this.clickareas.push({
 		x1: this.camera_offset[0],
 		y1: this.camera_offset[1],
@@ -971,10 +971,17 @@ Survival.prototype.calc_outcome = function() {
 		death_prob = 0.9;
 	}
 
-	// TODO: Go through each own individual on the world map and if Math.random < death_prob, kill the individual
+	for(x = 3; x <= 24; x++) {
+		for(y = 3; y <= 24; y++) {
+			if(game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
+				game.map_positions[y][x] = -1;
+				game.current_player.individuals--;
+			}
+		}
+	}
 
 	let loved = game.current_player.loved;
-	// A little bonus if you have eaten alot
+	// A little bonus if you have eaten alot. It's a bit more than in the original game, so you actually get a bonus when you fill the second row.
 	if(game.current_player.eaten >= 20 * this.eating_div) {
 		loved += Math.floor((game.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
 	}
@@ -998,14 +1005,14 @@ Survival.prototype.next = function() {
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {
-		this.calc_outcome();
-		game.next_stage();
+		this.next_popup(1);
 	}
 };
 
 
 Survival.prototype.next_popup = function(answer) {
 	if(answer === 1) {
+		this.calc_outcome();
 		game.next_stage();
 	}
 };

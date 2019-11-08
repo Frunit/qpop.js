@@ -43,20 +43,15 @@ function Mutations() {
 
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 	this.bar_soffsets = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
+	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 
 	this.clickareas = [];
 }
 
 
 Mutations.prototype.initialize = function() {
-	this.stats = game.current_player.stats.slice();
-
 	this.redraw();
-
-	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
-		this.ai();
-		this.next_popup(1);
-	}
+	this.next_player();
 };
 
 
@@ -467,8 +462,7 @@ Mutations.prototype.next = function() {
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {
-		game.current_player.stats = this.stats;
-		game.next_stage();
+		this.next_popup(1);
 	}
 };
 
