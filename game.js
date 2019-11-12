@@ -172,10 +172,10 @@ Game.prototype.is_game_finished = function() {
 
 Game.prototype.game_finished_popup = function(answer) {
 	if(answer === 1) {
-		game.infinite_game = true;
+		this.infinite_game = true;
 	}
 
-	game.next_stage();
+	this.next_stage();
 };
 
 
@@ -268,10 +268,30 @@ Game.prototype.save_game = function() {
 		}
 	}
 
-	// TODO: The following two options:
-	//content.setUint8(); // Set when the game is infinite (not in the mechanics yet)
-	//content.setUint8(); // Set when the all enemies are dead and the player continues alone (not in the mechanics yet)
-	content.setUint8(0x104b, 1);
+	content.setUint8(0x1049, game.infinite_game & 1);
+
+	// Determination whether only a single human player without any others is playing
+	let single = 0;
+	if(game.infinite_game) {
+		single = 1;
+	}
+	else {
+		for(let i = 0; i < 6; i++) {
+			if(game.players[i].type === PLAYER_TYPE.HUMAN) {
+				single += 1;
+			}
+			else if(game.players[i].type === PLAYER_TYPE.COMPUTER) {
+				single = 0;
+				break;
+			}
+		}
+		if(single > 1) {
+			single = 1;
+		}
+	}
+	content.setUint8(0x104a, single);
+
+	content.setUint8(0x104b, 1); // scrolling option is always on
 
 	download(save_file, 'qpop_save.qpp', 'application/octet-stream');
 };
@@ -336,7 +356,6 @@ Game.prototype.load_game = function(save_file) {
 	game.height_map = Array.from(Array(size), () => Array(size).fill(0));
 	game.map_positions = Array.from(Array(size), () => Array(size).fill(0));
 
-
 	for(let y = 0; y < size; y++) {
 		for(let x = 0; x < size; x++) {
 			const i = x + y*size;
@@ -352,6 +371,8 @@ Game.prototype.load_game = function(save_file) {
 			}
 		}
 	}
+
+	game.infinite_game = content.getUint8(0x1049) || content.getUint8(0x104a);
 
 	game.stage = new World();
 	game.stage.initialize();
