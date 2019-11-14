@@ -151,11 +151,10 @@ Game.prototype.is_game_finished = function() {
 		return this.get_ranking(pcs_alive)[0][0];
 	}
 	// only one player left and no infinite game
-	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
+	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0 && this.max_turns > 100) {
 		// not asked, yet; indecisive
 		if(this.infinite_game === false) {
 			this.infinite_game = humans_alive[0];
-			// TODO RESEARCH: Which image?
 			open_popup(lang.popup_title, 'chuck_berry', lang.continue_alone,
 						(x) => game.game_finished_popup(x), lang.no, lang.yes);
 			return null;
