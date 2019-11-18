@@ -1,6 +1,9 @@
 'use strict';
 
 
+// TODO: Flickering during movement. Seems like background is rendered after the sprite every second frame. But only during first movement tile. If arrow is keeping pressed, the flickering stops with the second tile
+
+
 function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.level = level;
 	this.survival = survival;
@@ -107,7 +110,7 @@ Camera.prototype.update_visible_level = function() {
 					// The placeholder indicates where the object comes from that will occupy the spot
 					if(!this.x_tiles.includes(fx) || !this.y_tiles.includes(fy)) {
 						this.level.mobmap[fy][fx].sprite.update();
-						if(this._pos_changed || this.level.mobmap[y][x].sprite.is_new_frame()) {
+						if(this._pos_changed || this.level.mobmap[fy][fx].sprite.is_new_frame()) {
 							this._movs_to_render.push(this.level.mobmap[fy][fx]);
 						}
 					}

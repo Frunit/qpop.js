@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: Making love ends with wrong position of cloud, player and female
 // TODO: Enemies, Females and Offspring have randomized sprite animations
 // TODO RESEARCH: Buck Cherry feeding has only 5 (instead of 8) frames. How to handle predators?
 

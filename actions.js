@@ -139,7 +139,7 @@ function Fight(dir, character, opponent, player_wins, callback) {
 		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.attack.soffset, opponent.anims.attack.frames[this.dir - 1])];
 	}
 	else {
-		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.still.soffset, opponent.anims.still.frame)];
+		this.sprites = [new Sprite(opponent.url, [64, 64], 0, opponent.anims.enem_still.soffset, opponent.anims.enem_still.frame)];
 	}
 
 	this.sprites.push(new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames));
@@ -147,6 +147,8 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	if(dir === DIR.S || dir === DIR.E) {
 		this.sprites.reverse();
 	}
+
+	console.log(this.sprites);
 
 	switch(dir) {
 		case DIR.N:
@@ -199,6 +201,7 @@ Fight.prototype.update = function() {
 			this.sprites = [];
 
 			if(this.player_wins) {
+				console.log(this.opponent.anims)
 				let an = this.opponent.anims.defeated;
 				if(this.opponent.type === SURV_MAP.PREDATOR) {
 					an = an[random_int(0, 2)];

@@ -62,7 +62,7 @@ const anims_players = [
 			soffset: [320, 0],
 			frames: [[0, 0], [0, 64]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
@@ -132,7 +132,7 @@ const anims_players = [
 			soffset: [320, 64],
 			frames: [[0, 0], [0, 64]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 64],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
@@ -198,7 +198,7 @@ const anims_players = [
 			soffset: [320, 128],
 			frames: [[0, 0], [0, 64]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 128],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
@@ -264,7 +264,7 @@ const anims_players = [
 			soffset: [320, 192],
 			frames: [[0, 0], [0, 64]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 192],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
@@ -330,7 +330,7 @@ const anims_players = [
 			soffset: [320, 256],
 			frames: [[0, 0], [64, 0]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 256],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
@@ -396,7 +396,7 @@ const anims_players = [
 			soffset: [320, 320],
 			frames: [[0, 0], [0, 64]],
 					},
-		enem_defeated: {
+		defeated: {
 			soffset: [64, 320],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},

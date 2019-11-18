@@ -44,7 +44,7 @@ Level.prototype.list_to_map = function(mainpart, border) {
 
 
 Level.prototype.count_wm_neighbours = function() {
-	return [5, new Set([4, 5])]; // DEBUG
+	return [5, [4, 5]]; // DEBUG
 	/*let num_neighbours = 0;
 	const enemies = new Set();
 	const wm_width = game.map_positions[0].length;
@@ -159,9 +159,9 @@ Level.prototype.populate = function() {
 	}
 
 	// DEBUG:
-	num_predators = 200;
-	num_females = 0;
-	num_enemies = 0;
+	num_predators = 0;
+	num_females = 200;
+	num_enemies = 200;
 
 
 	console.info('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
@@ -171,11 +171,9 @@ Level.prototype.populate = function() {
 
 	// Place the player somewhere around the center
 	this.place_player([49, 49]);
-	console.log(this.character.tile);  // DEBUG
+	console.log('Player placed at: ', this.character.tile);  // DEBUG
 
 	let free_tiles = this.find_free_tiles();
-
-	// TODO: Placement *not* within x fields does not work. Is that still so??
 
 	for(let i = 0; i < num_predators; i++) {
 		// Predators may not be placed within 2 fields of the player
@@ -189,20 +187,12 @@ Level.prototype.populate = function() {
 
 	for(let i = 0; i < num_females; i++) {
 		// Females may not be placed within 3 fields of the player
-		let show = false; // DEBUG
 		do {
 			pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-			// DEBUG
-			if(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3) {
-				console.log(i, pos, this.character.tile);
-				show = true;
-			}
+
 		} while(Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 		this.mobmap[pos[1]][pos[0]] = new Female(game.current_player.id, pos);
-		if(show) {console.log(pos);} // DEBUG
 	}
-
-	// /////this.enemies = [3, 4];  // DEBUG should be removed
 
 	for(let i = 0; i < num_enemies; i++) {
 		// Enemies may not be placed within 3 fields of the player
