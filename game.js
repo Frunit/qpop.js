@@ -424,7 +424,7 @@ Game.prototype.next_stage = function() {
 			}
 		}
 		break;
-	case SCENE.CATASTROPHE: // Catastrophe
+	case SCENE.CATASTROPHE: // Catastrophe TODO: This is wrong! The world must be shown until next is clicked
 		this.stage = new Ranking();
 		this.stage.initialize();
 		break;
@@ -541,8 +541,6 @@ resources.load([
 	'gfx/survival_gui.png',
 	'gfx/ranking.png',
 	'gfx/wreath.png',
-	'gfx/dummy_cata.png',
-	'gfx/dummy_outro.png',
 	'anim_gfx/alpha.png',
 	'anim_gfx/amoegro.png',
 	'anim_gfx/amoesaug.png',

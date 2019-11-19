@@ -1,85 +1,83 @@
 'use strict';
 
-// TODO RESEARCH: All values have to be checked (dims, offsets, ...)
-// TODO: The catastrophe should be animation, not only show a image.
 
 function Catastrophe() {
 	this.id = SCENE.CATASTROPHE;
 	this.bg = resources.get('gfx/dark_bg.png');
-	this.cata_pic = resources.get('gfx/dummy_cata.png');
 
 	// CONST_START
 	this.dim = [360, 300];
-	this.close_dim = [22, 21];
-	this.title_dim = [339, 21];
-	this.img_dim = [320, 240];
+	this.title_dim = [360, 21];
+	this.anim_dim = [320, 240];
 
 	this.offset = [140, 90];
-	this.title_offset = [150, 10];
-	this.img_offset = [20, 40];
+	this.title_offset = [140, 90];
+	this.anim_offset = [160, 130];
 
-	this.img_soffset = [0, 0];
+	this.anim_soffset = [0, 0];
 	// CONST_END
 
 	this.clickareas = [];
+	this.animation = null;
 
-	this.type = this.choose();
-	this.frame = 0;
+	this.type = random_int(0, 8);
 }
 
 
 Catastrophe.prototype.initialize = function() {
+	canvas.style.cursor = 'default';
+	this.animation = new Animation(catastrophe_frames[this.type], this.anim_offset);
+	this.redraw();
+};
+
+
+Catastrophe.prototype.redraw = function() {
+	// Background
 	ctx.drawImage(this.bg,
 		0, 0,
 		this.dim[0], this.dim[1],
 		this.offset[0], this.offset[1],
 		this.dim[0], this.dim[1]);
 
+	// Black rect around whole catastrophe window
 	draw_black_rect([this.offset[0], this.offset[1]], [this.dim[0]-1, this.dim[1]-1]);
 
 	// Title
-	draw_rect([this.offset[0] + this.title_offset[0],
-				this.offset[1] + this.title_offset[1]],
-				this.title_dim);
+	draw_rect([this.title_offset[0], this.title_offset[1]], this.title_dim);
 	write_text(lang.catastrophe,
-				[this.offset[0] + this.title_offset[0] + this.title_dim[0]/2,
-				this.offset[1] + this.title_offset[1] + 15],
-				'white',
-				'black');
+				[this.title_offset[0] + this.title_dim[0]/2,
+				this.title_offset[1] + 15],
+				'white', 'black');
 
-	ctx.drawImage(this.cata_pic,
-		this.img_soffset[0], this.img_soffset[1] + this.type * this.img_dim[1],
-		this.img_dim[0], this.img_dim[1],
-		this.offset[0] + this.img_offset[0], this.offset[1] + this.img_offset[1],
-		this.img_dim[0], this.img_dim[1]);
+	// Rect around animation
+	draw_inv_rect([this.anim_offset[0] - 1, this.anim_offset[1] - 1], [this.anim_dim[0] + 2, this.anim_dim[1] + 2]);
+
+	this.clickareas = [];
 
 	this.clickareas.push({
-		x1: this.offset[0] + this.img_offset[0],
-		y1: this.offset[1] + this.img_offset[1],
-		x2: this.offset[0] + this.img_offset[0] + this.img_dim[0],
-		y2: this.offset[1] + this.img_offset[1] + this.img_dim[1],
+		x1: this.anim_offset[0],
+		y1: this.anim_offset[1],
+		x2: this.anim_offset[0] + this.anim_dim[0],
+		y2: this.anim_offset[1] + this.anim_dim[1],
 		down: () => {},
 		up: () => this.end(),
 		blur: () => {}
 	});
 };
 
+
 Catastrophe.prototype.render = function() {
-	return;
+	this.animation.render();
 };
 
 
 Catastrophe.prototype.update = function() {
-	this.frame++;
-	if(this.frame > options.transition_delay*100) {
+	if(this.animation.has_stopped) {
 		this.end();
 	}
-	this.handle_input();
-};
-
-
-Catastrophe.prototype.choose = function() {
-	return random_int(0, 8);
+	else {
+		this.animation.step();
+	}
 };
 
 
