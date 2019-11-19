@@ -286,12 +286,12 @@ Mutations.prototype.draw_evo_score = function() {
 
 
 Mutations.prototype.render = function() {
-	return;
+
 };
 
 
 Mutations.prototype.update = function() {
-	this.handle_input();
+
 };
 
 

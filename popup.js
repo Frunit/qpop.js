@@ -115,7 +115,6 @@ Popup.prototype.render = function() {
 
 
 Popup.prototype.update = function() {
-	this.handle_input();
 	this.sprite.update();
 };
 

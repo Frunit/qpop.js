@@ -228,7 +228,6 @@ World.prototype.render = function() {
 
 
 World.prototype.update = function() {
-	this.handle_input();
 	// TODO: All functions that act upon input that should not act when AI or animation is active, need respective checks in themselves! The check could be done here, but then option menus would be unresponsive.
 
 	if(this.ai_active) {
@@ -1062,10 +1061,6 @@ World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 	}
 
 	const soffset = [(tile % 37) * this.tile_dim[0], Math.floor(tile / 37) * this.tile_dim[0]];
-
-	if(36 < tile && tile < 46) {
-		console.log(tile, soffset);
-	}
 
 	ctx.drawImage(this.map_pics,
 		soffset[0], soffset[1],

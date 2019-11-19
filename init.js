@@ -174,12 +174,12 @@ Init.prototype.redraw = function() {
 
 
 Init.prototype.render = function() {
-	return;
+
 };
 
 
 Init.prototype.update = function() {
-	this.handle_input();
+
 };
 
 

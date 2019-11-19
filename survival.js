@@ -794,8 +794,6 @@ Survival.prototype.update_entities = function() {
 
 
 Survival.prototype.update = function() {
-	this.handle_input();
-
 	if(this.movement_active) {
 		this.delay_counter++;
 

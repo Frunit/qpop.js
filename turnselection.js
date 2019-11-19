@@ -193,8 +193,6 @@ Turnselection.prototype.render = function() {
 
 
 Turnselection.prototype.update = function() {
-	this.handle_input();
-
 	if(this.animations) {
 		if(this.animations.length === 1) {
 			this.animations[0].update();

@@ -40,7 +40,7 @@ Intro.prototype.redraw = function() {
 		y2: this.anim_offset[1] + this.anim_dim[1],
 		down: () => {},
 		up: () => game.next_stage(),
-		blur: () => game.next_stage()
+		blur: () => {}
 	});
 };
 

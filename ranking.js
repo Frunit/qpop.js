@@ -279,8 +279,6 @@ Ranking.prototype.render = function() {
 
 
 Ranking.prototype.update = function() {
-	this.handle_input();
-
 	for(let sprite of this.sprites) {
 		sprite.update();
 	}

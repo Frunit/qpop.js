@@ -1,6 +1,6 @@
 'use strict';
 
-const anims_players = [
+const anims_players = Object.freeze([
 	{   // Purplus
 		still: {
 			soffset: [0, 0],
@@ -401,9 +401,9 @@ const anims_players = [
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
 	},
-];
+]);
 
-const anims_predators = [
+const anims_predators = Object.freeze([
 	{   // Dino
 		still: {
 			soffset: [0, 0],
@@ -536,9 +536,9 @@ const anims_predators = [
 			},
 		],
 	},
-];
+]);
 
-const anims_clouds = {
+const anims_clouds = Object.freeze({
 	fight_hor: {
 		size: [100, 64],
 		offset: [14, 0],
@@ -563,9 +563,9 @@ const anims_clouds = {
 		soffset: [0, 356],
 		frames: [[64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [320, 0], [384, 0]], // 234512345167
 	},
-};
+});
 
-const anim_ranking = {
+const anim_ranking = Object.freeze({
 	walking: [
 		{
 			offset: [128, 0],
@@ -619,9 +619,9 @@ const anim_ranking = {
 			frames: [[0, 0],  [64, 0]],
 		},
 	],
-};
+});
 
-const anim_delays = {
+const anim_delays = Object.freeze({
 	movement: 2,
 	electro: 3, // TODO RESEARCH
 	feeding: 3,
@@ -639,4 +639,4 @@ const anim_delays = {
 	cloud: 6,
 	quicksand: 6,
 	popups: 12,
-};
+});
