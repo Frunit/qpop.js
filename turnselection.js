@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO RESEARCH: Compare animation speed and frames with original for both animations
 
 function Turnselection() {
 	this.id = SCENE.TURN_SELECTION;
@@ -29,7 +28,6 @@ function Turnselection() {
 	this.anim_amorph_offset = [278, 87];
 
 	this.bar_soffset = [86, 630];
-	this.anim_speed = 1; // DEBUG
 	// CONST_END
 
 	this.panel_offsets = [[9, 27], [9, 241]];
@@ -44,7 +42,6 @@ function Turnselection() {
 	this.clickareas = [];
 
 	this.animations = null;
-	this.animation_type = 0;
 }
 
 
@@ -75,19 +72,19 @@ Turnselection.prototype.draw_turn_changed = function() {
 	write_text(lang.turns[this.turn_index], this.bar_text_offset, 'black', false);
 
 	if(this.turn_index === 3) {
-		this.animation_type = random_int(0, 1);
-
-		if(this.animation_type) {
+		if(random_int(0, 1)) {
 			// Amorph splatters
-			this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [420, 450],
+			this.animations = [new Sprite(this.pics_url, this.anim_dim,
+				anim_delays.turn_selection, [420, 450],
 				[[0, 0], [0, 90]],
-				true, () => this.end_animation())];
+				true, () => this.end_animation(1))];
 		}
 		else {
 			// Chuckberry stumbles
-			this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [0, 270],
+			this.animations = [new Sprite(this.pics_url, this.anim_dim,
+				anim_delays.turn_selection, [0, 270],
 				[[0, 0], [0, 90], [0, 180], [0, 270]],
-				true, () => this.end_animation())];
+				true, () => this.end_animation(0))];
 		}
 	}
 	else {
@@ -203,6 +200,9 @@ Turnselection.prototype.update = function() {
 		else {
 			for(let anim of this.animations) {
 				anim.update();
+				if(anim.finished) {
+					anim.callback();
+				}
 			}
 		}
 	}
@@ -293,33 +293,39 @@ Turnselection.prototype.handle_input = function() {
 };
 
 
-Turnselection.prototype.end_animation = function() {
-	if(this.animation_type) {
+Turnselection.prototype.end_animation = function(animation_type) {
+	if(animation_type) {
 		// Amorph splatters
 
 		this.animations = [
 			// left Chuckberry
 			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [420, 270],
-			[[0, 0], [60, 0], [120, 0], [180, 0]],
-			true, () => this.end_animation()),
+			[[120, 0], [180, 0], [0, 0], [60, 0]],
+			false),
 
 			// right Chuckberry
 			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [420, 360],
-			[[0, 0], [60, 0], [120, 0], [180, 0]],
-			true, () => this.end_animation()),
+			[[120, 0], [180, 0], [0, 0], [60, 0]],
+			false),
 
 			// Amorph
-			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection, [660, 270],
-			[[0, 0], [60, 0], [120, 0], [0, 90]],
-			true, () => this.end_animation())
+			new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection*4, [660, 270],
+			[[0, 0], [60, 0], [120, 0]],
+			true, () => this.amorph_eye())
 		];
 	}
 	else {
 		// Chuckberry stumbles
 		this.animations = [new Sprite(this.pics_url, this.anim_dim, anim_delays.turn_selection, [420, 0],
-			[[0, 0], [0, 90], [0, 180]],
+			[[0, 90], [0, 180], [0, 0]],
 			false)];
 	}
+};
+
+
+Turnselection.prototype.amorph_eye = function() {
+	this.animations[2] = new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection*4, [660, 270],
+			[[120, 0], [0, 90]], false)
 };
 
 
