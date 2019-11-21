@@ -1,8 +1,5 @@
 'use strict';
 
-// TODO: Pillars must have the right height and be streched/repeated
-// TODO: All animations and positions must be checked. There is some weird offset among the species
-
 function Ranking() {
 	this.id = SCENE.RANKING;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -57,8 +54,9 @@ function Ranking() {
 
 	this.dead_soffsets = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
 	this.sym_spec_soffsets = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
-	this.walking_rel_dy = [0, 5, 0, 0, 6, 1];
-	this.max_heights = [160, 150, 140, 130, 120, 110]; // TODO RESEARCH
+	this.rel_dx = [0, 106, 206, 306, 406, 504];
+	this.rel_dy = [[0, 5, 0, 0, 6, 1], [0, 5, 0, 0, 6, 4], [0, 5, 0, 0, 6, 6]];
+	this.max_heights = [167, 128, 104, 80, 56, 32];
 
 	this.clickareas = [];
 	this.sprites = [];
@@ -70,7 +68,8 @@ function Ranking() {
 	this.delay = anim_delays.ranking;
 	this.delay_counter = 0;
 
-	this.lead_x = 638;
+	this.lead_x = 641;
+	this.height = 0;
 	this.heights = [0, 0, 0, 0, 0, 0];
 	this.final_heights = [0, 0, 0, 0, 0, 0];
 	this.winners = [];
@@ -194,6 +193,7 @@ Ranking.prototype.redraw = function() {
 };
 
 
+// MAYBE: This could be made more efficient, drawing only the necessary parts depeding on the phase
 Ranking.prototype.render = function() {
 	// Draw background in draw area
 	ctx.drawImage(this.bg_pic,
@@ -256,19 +256,18 @@ Ranking.prototype.render = function() {
 			this.pillartop_offset[0] + i*2*this.pillartop_dim[0], this.pillartop_offset[1] - this.heights[i],
 			this.pillartop_dim[0], this.pillartop_dim[1]);
 
-		// TODO: The center parts must be repeated/streched for phase 1 and 2
 		ctx.drawImage(this.pics,
 			this.pillarcenter_soffset[0], this.pillarcenter_soffset[1],
 			this.pillarcenter_dim[0], this.pillarcenter_dim[1],
 			this.pillarcenter_offset[0] + i*2*this.pillarcenter_dim[0], this.pillarcenter_offset[1] - this.heights[i],
-			this.pillarcenter_dim[0], this.pillarcenter_dim[1]);
+			this.pillarcenter_dim[0], this.heights[i] + this.pillarcenter_dim[1]);
 	}
 
 	// Draw species
 	for(let i = 0; i < 6; i++) {
 		this.sprites[i].render(ctx,
-			[this.lead_x + i*this.sign_dx,
-			this.walk_y - this.heights[i] + this.walking_rel_dy[i]]
+			[this.lead_x + this.rel_dx[i],
+			this.walk_y - this.heights[i] + this.rel_dy[this.phase][i]]
 		);
 	}
 
@@ -297,7 +296,8 @@ Ranking.prototype.update = function() {
 	if(this.phase === 0) {
 		this.lead_x -= this.delta;
 
-		if(this.lead_x <= 30) {
+		if(this.lead_x <= 33) {
+			this.lead_x = 33;
 			this.next_phase();
 		}
 	}
@@ -310,7 +310,7 @@ Ranking.prototype.update = function() {
 		}
 		this.height += this.delta;
 
-		if(this.height >= 160) { // TODO RESEARCH
+		if(this.height >= this.max_heights[0]) {
 			this.next_phase();
 		}
 	}
@@ -329,7 +329,12 @@ Ranking.prototype.determine_best = function() {
 		this.winners.push(scores[i][0]);
 	}
 
-	this.final_heights[scores[5][0]] = this.max_heights[5];
+	if(game.players[scores[5][0]].is_dead) {
+		this.final_heights[scores[5][0]] = 0;
+	}
+	else {
+		this.final_heights[scores[5][0]] = this.max_heights[5];
+	}
 
 	for(let i = 4; i >= 0; i--) {
 		if(scores[i][1] === scores[i+1][1] && scores[i][2] === scores[i+1][2]) {
@@ -359,6 +364,8 @@ Ranking.prototype.next_phase = function() {
 		}
 
 		this.delay = anim_delays.ranking_winner;
+
+		this.phase++;
 	}
 };
 

@@ -26,7 +26,7 @@ let options = {
 	music: 255, // Music volume (0 - 255)
 	sound_on: true,
 	sound: 255, // Sound volume (0 - 255)
-	update_freq: 1/18, // Screen update frequency DEBUG: 1/18
+	update_freq: 1/18, // Screen update frequency
 };
 
 
@@ -183,10 +183,10 @@ Game.prototype.get_ranking = function(selection=[0,1,2,3,4,5]) {
 	// Sort by total_score and individuals
 	function sortme(obj1, obj2) {
 		if(obj1[1] === obj2[1]) {
-			return obj1[2] - obj2[2];
+			return obj2[2] - obj1[2];
 		}
 
-		return obj1[1] - obj2[1];
+		return obj2[1] - obj1[1];
 	}
 
 	const scores = [];
@@ -243,7 +243,7 @@ Game.prototype.save_game = function() {
 		content.setUint8(0x33 + offset, p.stats[ATTR.STINKBALLS]);
 		content.setUint8(0x34 + offset, p.stats[ATTR.SNAKEROOTS]);
 		content.setUint8(0x35 + offset, p.stats[ATTR.FIREGRASS]);
-		content.setUint8(0x36 + offset, !p.is_dead);
+		content.setUint8(0x36 + offset, p.is_dead);
 		content.setUint8(0x1042 + i, p.is_dead);
 	}
 
@@ -299,6 +299,8 @@ Game.prototype.save_game = function() {
 Game.prototype.load_game = function(save_file) {
 	// NB! Except for a simple test for the right file type, I do not do any sanity checks. The file will only be processed on the client side with data provided by the client, so at worst, the game will freeze when using a manipulated file.
 
+	// MAYBE: Allow loading of MPlanet savegames
+
 	const content = new DataView(save_file);
 
 	if(save_file.byteLength !== 4172 ||
@@ -337,7 +339,7 @@ Game.prototype.load_game = function(save_file) {
 		p.stats[ATTR.STINKBALLS] = content.getUint8(0x33 + offset);
 		p.stats[ATTR.SNAKEROOTS] = content.getUint8(0x34 + offset);
 		p.stats[ATTR.FIREGRASS] = content.getUint8(0x35 + offset);
-		p.is_dead = !content.getUint8(0x36 + offset);
+		p.is_dead = !!content.getUint8(0x36 + offset);
 
 		p.individuals = 0;
 	}
@@ -365,7 +367,7 @@ Game.prototype.load_game = function(save_file) {
 
 			const map_pos = content.getUint8(0x6d7 + i) - 1;
 			game.map_positions[y][x] = map_pos;
-			if(map_pos > 0) {
+			if(map_pos >= 0) {
 				game.players[map_pos].individuals++;
 			}
 		}
@@ -373,7 +375,7 @@ Game.prototype.load_game = function(save_file) {
 
 	game.infinite_game = content.getUint8(0x1049) || content.getUint8(0x104a);
 
-	game.stage = new World();
+	game.stage = new Ranking();  // TODO: Consider if this should be World instead
 	game.stage.initialize();
 };
 
@@ -675,11 +677,3 @@ canvas.addEventListener('drop', function(event) {
 		game.load_game(readerEvent.target.result);
 	});
 });
-
-
-/*
-// DEBUG: Next frame event listener
-nf.addEventListener('click', function(e) {
-	game.main();
-});
-*/

@@ -1,5 +1,6 @@
 'use strict';
 
+// MAYBE: Show on which plants the player stands to help distributing the points
 
 function Mutations() {
 	this.id = SCENE.MUTATION;
