@@ -168,7 +168,7 @@ Survival.prototype.draw_minimap = function() {
 	const MM_PREDATOR = 3;
 	const MM_ENEMY = 4;
 
-	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10 * 10; // DEBUG: Remove *10
+	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
 	let draw = false;
 
 	for(let y = -range; y < range; y++) {
@@ -555,8 +555,8 @@ Survival.prototype.get_adjacent = function() {
 
 
 Survival.prototype.start_movement = function(dir) {
-	this.level.character.movement = dir;
 	const char = this.level.character;
+	char.movement = dir;
 	const pos = char.tile;
 	this.delay = anim_delays.movement;
 
@@ -811,7 +811,7 @@ Survival.prototype.update = function() {
 		}
 	}
 
-	debug6.value = this.movement_active + ' ' + this.action;
+	debug6.value = 'mvmnt act: ' + this.movement_active + '; act: ' + this.action;
 
 	this.update_entities();
 };
@@ -974,8 +974,8 @@ Survival.prototype.calc_outcome = function() {
 		death_prob = 0.9;
 	}
 
-	for(x = 1; x <= 26; x++) {
-		for(y = 1; y <= 26; y++) {
+	for(let x = 1; x <= 26; x++) {
+		for(let y = 1; y <= 26; y++) {
 			if(game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
 				game.map_positions[y][x] = -1;
 				game.current_player.individuals--;

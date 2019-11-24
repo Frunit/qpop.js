@@ -41,7 +41,7 @@ Sprite.prototype.is_new_frame = function() {
 		return true;
 	}
 
-	return this.delay_counter === 0 && (!this.finished || this.frames.length > 1);
+	return this.delay_counter === 0 && !this.finished;
 };
 
 

@@ -32,7 +32,7 @@ Camera.prototype.move_to = function(obj) {
 
 	let must_update_tiles = true; // DEBUG
 
-	debug2.value = new_x + ' ' + new_y;
+	debug2.value = 'nx: ' + new_x + '; ny: ' + new_y;
 
 	if(new_x !== this.cpos[0]) {
 		this.cpos[0] = new_x;
@@ -62,7 +62,7 @@ Camera.prototype.update_tiles = function() {
 	this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
 		Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
 
-	debug3.value = Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
+	debug3.value = 'tiles: ' + Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
 					Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + ' ' +
 					Math.floor(this.cpos[1] / this.tile_dim[1]) + '-' +
 					Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);
@@ -129,8 +129,9 @@ Camera.prototype.render = function() {
 	ctx.clip();
 
 	if(this._tiles_to_render.size || this._movs_to_render.length) {
-		debug1.value = this._tiles_to_render.size;
-		debug5.value = this._movs_to_render.length;
+		console.log(this._tiles_to_render.size, this._movs_to_render.length);
+		debug1.value = 'tiles rndr: ' + this._tiles_to_render.size;
+		debug5.value = 'moves rndr: ' + this._movs_to_render.length;
 	}
 	/*if(this._tiles_to_render.size === 2) {
 		console.log(this._movs_to_render);
