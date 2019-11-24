@@ -670,6 +670,8 @@ World.prototype.wm_click = function(x, y, raw = true) {
 
 	this.wm_clickpos = [x, y];
 
+	console.log(this.wm_clickpos, game.world_map[y][x], this.is_neighbour(game.current_player.id, x, y));
+
 	// Clicked on own individual -> take it
 	if(game.map_positions[y][x] === game.current_player.id) {
 		// But only, if you still can move individuals
@@ -679,8 +681,8 @@ World.prototype.wm_click = function(x, y, raw = true) {
 		}
 	}
 	else if(game.current_player.toplace &&
-			game.world_map[y][x] >= WORLD_MAP.DESERT &&
-			game.world_map[y][x] <= WORLD_MAP.FIREGRASS &&
+			game.world_map[y][x] >= WORLD_MAP.RANGONES &&
+			game.world_map[y][x] <= WORLD_MAP.DESERT &&
 			this.is_neighbour(game.current_player.id, x, y) &&
 			this.wm_set_mode !== 2)
 	{

@@ -20,7 +20,7 @@ let options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
-	transition_delay: 200, // How many frames to show the transition screens
+	transition_delay: 36, // How many frames to show the transition screens
 	surv_move_speed: 8, // Speed of the player figure in survival in pixel per updated frame
 	music_on: true,
 	music: 255, // Music volume (0 - 255)
@@ -130,10 +130,10 @@ Game.prototype.is_game_finished = function() {
 	const humans_alive = [];
 	const pcs_alive = [];
 	for(let i = 0; i < 6; i++) {
-		if(players[i].type === PLAYER_TYPE.HUMAN && !players[i].is_dead) {
+		if(this.players[i].type === PLAYER_TYPE.HUMAN && !this.players[i].is_dead) {
 			humans_alive.push(i);
 		}
-		else if(players[i].type === PLAYER_TYPE.COMPUTER && !players[i].is_dead) {
+		else if(this.players[i].type === PLAYER_TYPE.COMPUTER && !this.players[i].is_dead) {
 			pcs_alive.push(i);
 		}
 	}

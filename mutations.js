@@ -152,7 +152,7 @@ Mutations.prototype.redraw = function() {
 
 	this.draw_avatar();
 
-	write_text(lang.evo_points, this.evo_pts_text_offset, 'white', 'black', 'left');
+	write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
 
 	this.draw_evo_score();
 };
