@@ -9,11 +9,11 @@ const debug6 = document.getElementById('debug6');
 const debug7 = document.getElementById('debug7');
 const debug8 = document.getElementById('debug8');
 
-// Master-TODO:
-/* - All sounds
- * - Background music
- * - *All* animations (Intro, Catastrophes, Outro)
- * - All options
+/* Master-TODO: Unified input handling
+ * Master-TODO: All sounds
+ * Master-TODO: Background music
+ * Master-TODO: All options
+ * Master-TODO: Loading screen?
  */
 
 let options = {
@@ -299,27 +299,33 @@ Game.prototype.save_game = function() {
 Game.prototype.load_game = function(save_file) {
 	// NB! Except for a simple test for the right file type, I do not do any sanity checks. The file will only be processed on the client side with data provided by the client, so at worst, the game will freeze when using a manipulated file.
 
-	// MAYBE: Allow loading of MPlanet savegames
-
 	const content = new DataView(save_file);
+	let mp = 0;
 
-	if(save_file.byteLength !== 4172 ||
-			new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) !== 'Q-POP Savegame') {
+	if(save_file.byteLength === 4172 &&
+			new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) === 'Q-POP Savegame') {
+		mp = 0;
+	}
+	else ifsave_file.byteLength === 4174 &&
+			new TextDecoder().decode(new Uint8Array(save_file, 0, 24)) === 'Magnetic Planet Savegame') {
+		mp = 10;
+	}
+	else {
 		open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => {}, lang.next);
 		return;
 	}
 
-	options.music_on = !!content.getUint8(0x10);
-	options.music = content.getUint8(0x11);
-	options.sound_on = !!content.getUint8(0x12);
-	options.sound = content.getUint8(0x13);
+	options.music_on = !!content.getUint8(0x10 + mp);
+	options.music = content.getUint8(0x11 + mp);
+	options.sound_on = !!content.getUint8(0x12 + mp);
+	options.sound = content.getUint8(0x13 + mp);
 
 	for(let i = 0; i < game.players.length; i++) {
 		const p = game.players[i];
-		p.type = content.getUint8(0x14 + 2*i);
-		p.iq = content.getUint8(0x15 + 2*i);
+		p.type = content.getUint8(0x14 + 2*i + mp);
+		p.iq = content.getUint8(0x15 + 2*i + mp);
 
-		const offset = 0x17 * i;
+		const offset = 0x17 * i + mp;
 		p.stats[ATTR.ATTACK] = content.getUint8(0x20 + offset);
 		p.stats[ATTR.DEFENSE] = content.getUint8(0x21 + offset);
 		p.stats[ATTR.REPRODUCTION] = content.getUint8(0x22 + offset);
@@ -344,12 +350,20 @@ Game.prototype.load_game = function(save_file) {
 		p.individuals = 0;
 	}
 
-	game.turn = content.getUint16(0xaa, true);
-	game.max_turns = content.getUint8(0xac);
-	game.humans_present = content.getUint8(0xad);
-	game.water_level = content.getUint16(0xb1, true);
-	game.humid = content.getUint16(0xb3, true);
-	game.temp = content.getUint16(0xb5, true);
+	game.turn = content.getUint16(0xaa + mp, true);
+	if(mp) {
+		// Magnetic Planet has always “infinite” turns and no humans
+		game.max_turns = 255;
+		game.humans_present = false;
+		mp = 8;
+	}
+	else {
+		game.max_turns = content.getUint8(0xac);
+		game.humans_present = !!content.getUint8(0xad);
+	}
+	game.water_level = content.getUint16(0xb1 + mp, true);
+	game.humid = content.getUint16(0xb3 + mp, true);
+	game.temp = content.getUint16(0xb5 + mp, true);
 
 	const size = 28;
 
@@ -362,10 +376,10 @@ Game.prototype.load_game = function(save_file) {
 			const i = x + y*size;
 			const j = y + x*size; // x and y are exchanged in the heightmap for some reason
 
-			game.world_map[y][x] = content.getUint8(0xb7 + i);
-			game.height_map[y][x] = content.getUint8(0x3c7 + j);
+			game.world_map[y][x] = content.getUint8(0xb7 + i + mp);
+			game.height_map[y][x] = content.getUint8(0x3c7 + j + mp);
 
-			const map_pos = content.getUint8(0x6d7 + i) - 1;
+			const map_pos = content.getUint8(0x6d7 + i + mp) - 1;
 			game.map_positions[y][x] = map_pos;
 			if(map_pos >= 0) {
 				game.players[map_pos].individuals++;
@@ -373,7 +387,11 @@ Game.prototype.load_game = function(save_file) {
 		}
 	}
 
-	game.infinite_game = content.getUint8(0x1049) || content.getUint8(0x104a);
+	if(mp) {
+		mp = 4;
+	}
+
+	game.infinite_game = content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp);
 
 	game.stage = new Ranking();  // TODO: Consider if this should be World instead
 	game.stage.initialize();
