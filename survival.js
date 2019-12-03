@@ -1,7 +1,7 @@
 'use strict';
 
-// TODO: Making love ends with wrong position of cloud, player and female
-// TODO: Enemies, Females and Offspring have randomized sprite animations
+
+// TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
 
 function Survival() {
@@ -412,8 +412,6 @@ Survival.prototype.finish_movement = function() {
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
 			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
-		console.info('QUICKSAND');
-
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 		this.action = new Quicksand(char, () => this.player_death(true));
 
@@ -425,23 +423,16 @@ Survival.prototype.finish_movement = function() {
 	// Enemy or Female found
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {
-		console.log('Direction:', 'XNESW'[dir]);
-		//console.log(adjacent);
-
 		if(adjacent.type === SURV_MAP.FEMALE) {
-			console.info('LOVE');
 			this.action = new Love(dir, char, adjacent, () => this.finish_love(adjacent));
 		}
 		else {
 			const player_wins = this.does_player_win(adjacent);
-			console.info('FIGHT. Player', player_wins ? 'wins' : 'loses');
 			this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent));
 		}
 
 		this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
 		this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]].hidden = true;
-
-		//console.log(this.action);
 
 		return;
 	}
@@ -449,8 +440,6 @@ Survival.prototype.finish_movement = function() {
 	if(this.test_movement_input()) {
 		return;
 	}
-
-	console.info('NOTHING');
 
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
@@ -564,22 +553,18 @@ Survival.prototype.start_movement = function(dir) {
 		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.south.soffset, char.anims.south.frames);
 			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the position, the player wants to go, so no other predator will go there in the same moment
-			console.info('WALK SOUTH');
 			break;
 		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.north.soffset, char.anims.north.frames);
 			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]);
-			console.info('WALK NORTH');
 			break;
 		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.east.soffset, char.anims.east.frames);
 			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
-			console.info('WALK EAST');
 			break;
 		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
-			console.info('WALK WEST');
 			break;
 		case 0: { // Feeding/waiting
 			const food_type = this.level.map[pos[1]][pos[0]];
@@ -587,12 +572,10 @@ Survival.prototype.start_movement = function(dir) {
 				this.action = new Feeding(char, this.level, food_type, () => this.finish_feeding(food_type));
 				char.hidden = true;
 				this.delay = anim_delays.feeding;
-				console.info('FEED');
 			}
 			else {
 				this.action = new Waiting(char, () => this.finish_feeding(100));
 				char.hidden = true;
-				console.info('WAIT');
 			}
 			break;
 		}
@@ -698,11 +681,11 @@ Survival.prototype.start_predator_movement = function() {
 		const dirs = this.level.get_dirs(predator.tile, predator.last_movement);
 		const target_dirs = [0, 0];
 
-		// If the predator scents the player, try to get closer or don't move at all.
+		// If the predator scents the player, try to get closer or don't move at all:
 		// If possible, move closer on the axis where the predator is further away.
 		// If not, move close on the other axis.
 		// If both axes are equally close, prefer DIR.N/DIR.S over DIR.E/DIR.W.
-		// If a move would put the predator further away from the player, don't move (that's not very smart, but the original behaviour).
+		// If a move would put the predator further away from the player, don't move (that's not necessarily very smart, but the original behaviour).
 		if(scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance-1) > evasion)) {
 			if(pos[1] - player_pos[1] > 0) {
 				target_dirs[0] = DIR.N;

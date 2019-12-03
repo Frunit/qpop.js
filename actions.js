@@ -16,6 +16,7 @@ function Love(dir, character, partner, callback) {
 	this.draw_cloud = false;
 	this.cloud_offset = [0, 0];
 	this.sprites = [];
+	this.offspring_sprite = new Sprite(partner.url, [64, 64], anim_delays.offspring, partner.anims.offspring.soffset, partner.anims.offspring.frames);
 
 	this.sprites = [
 		new Sprite(partner.url, [64, 64], 0, partner.anims.still.soffset, partner.anims.still.frame),
@@ -30,18 +31,22 @@ function Love(dir, character, partner, callback) {
 		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_offset = [0, 14];
 			break;
 		case DIR.S:
-			this.tiles = [[character.tile[0], character.tile[1] + 1], character.tile];
+			this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_offset = [0, 14];
 			break;
 		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_offset = [14, 0];
 			break;
 		case DIR.E:
-			this.tiles = [[character.tile[0] + 1, character.tile[1]], character.tile];
+			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
 			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_offset = [14, 0];
 			break;
 	}
 }
@@ -147,8 +152,6 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	if(dir === DIR.S || dir === DIR.E) {
 		this.sprites.reverse();
 	}
-
-	//console.log(this.sprites);
 
 	switch(dir) {
 		case DIR.N:
