@@ -93,7 +93,7 @@ Game.prototype.start = function() {
 	this.height_map = null;
 	this.world_map = null;
 	this.map_positions = null;
-	this.stage = new Intro(); // DEBUG
+	this.stage = new Loader();
 	//this.stage = new Survival(); // DEBUG
 	this.stage.initialize();
 	this.last_time = Date.now();
@@ -413,6 +413,10 @@ Game.prototype.next_stage = function() {
 	}
 
 	switch(this.stage.id) {
+	case SCENE.LOADING: // Loader
+		this.stage = new Intro();
+		this.stage.initialize();
+		break;
 	case SCENE.INTRO: // Intro
 		this.stage = new Init(this.players);
 		this.stage.initialize();
@@ -512,12 +516,12 @@ function Player(num) {
 
 
 // Create the canvas
-let canvas = document.createElement('canvas');
-let ctx = canvas.getContext('2d');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
 canvas.width = 640;
 canvas.height = 480;
-document.body.appendChild(canvas);
-let canvas_pos = canvas.getBoundingClientRect();
+document.getElementById('qpop').appendChild(canvas);
+const canvas_pos = canvas.getBoundingClientRect();
 
 // Disable the right-click context menu in the game
 canvas.addEventListener('contextmenu', function(e) {
@@ -532,157 +536,17 @@ switch(options.language) {
 }
 
 const version = 'pre-alpha';
-let game = new Game();
+const game = new Game();
 
-resources.load([
-	'gfx/init.png',
-	'gfx/clouds.png',
-	'gfx/enemies.png',
-	'gfx/spec1.png',
-	'gfx/spec2.png',
-	'gfx/spec3.png',
-	'gfx/spec4.png',
-	'gfx/spec5.png',
-	'gfx/spec6.png',
-	'gfx/pred1.png',
-	'gfx/pred2.png',
-	'gfx/pred3.png',
-	'gfx/dark_bg.png',
-	'gfx/light_bg.png',
-	'gfx/species.png',
-	'gfx/turns.png',
-	'gfx/transition_survival.png',
-	'gfx/transition_world.png',
-	'gfx/transition_mutations.png',
-	'gfx/world.png',
-	'gfx/world_gui.png',
-	'gfx/background.png',
-	'gfx/mutations.png',
-	'gfx/survival_gui.png',
-	'gfx/ranking.png',
-	'gfx/wreath.png',
-	'anim_gfx/alpha.png',
-	'anim_gfx/amoegro.png',
-	'anim_gfx/amoesaug.png',
-	'anim_gfx/amoeweg.png',
-	'anim_gfx/asche.png',
-	'anim_gfx/balken.png',
-	'anim_gfx/baumbebe.png',
-	'anim_gfx/baumbe.png',
-	'anim_gfx/baumgro.png',
-	'anim_gfx/bauwas.png',
-	'anim_gfx/beben1.png',
-	'anim_gfx/beben2.png',
-	'anim_gfx/beben3.png',
-	'anim_gfx/beben.png',
-	'anim_gfx/boschild.png',
-	'anim_gfx/bum.png',
-	'anim_gfx/dino.png',
-	'anim_gfx/eisfru.png',
-	'anim_gfx/eiswolk.png',
-	'anim_gfx/elektro.png',
-	'anim_gfx/endamoe.png',
-	'anim_gfx/endfru.png',
-	'anim_gfx/endhai2.png',
-	'anim_gfx/endhai.png',
-	'anim_gfx/endkaef.png',
-	'anim_gfx/endtext2.png',
-	'anim_gfx/endtext.png',
-	'anim_gfx/fegesek.png',
-	'anim_gfx/fisch.png',
-	'anim_gfx/flash.png',
-	'anim_gfx/floss.png',
-	'anim_gfx/flugmobi.png',
-	'anim_gfx/gras.png',
-	'anim_gfx/hai1.png',
-	'anim_gfx/hai2.png',
-	'anim_gfx/hai3.png',
-	'anim_gfx/hai4.png',
-	'anim_gfx/haschild.png',
-	'anim_gfx/hintend1.png',
-	'anim_gfx/hintend.png',
-	'anim_gfx/hunter.png',
-	'anim_gfx/intfru1.png',
-	'anim_gfx/intfru2.png',
-	'anim_gfx/intfru3.png',
-	'anim_gfx/intfru.png',
-	'anim_gfx/inthai.png',
-	'anim_gfx/introme2.png',
-	'anim_gfx/intropil.png',
-	'anim_gfx/intsek1.png',
-	'anim_gfx/kaefer.png',
-	'anim_gfx/kastro1.png',
-	'anim_gfx/kastro2a.png',
-	'anim_gfx/kastro3.png',
-	'anim_gfx/kastro4.png',
-	'anim_gfx/kastro5.png',
-	'anim_gfx/kiwi2.png',
-	'anim_gfx/kiwi.png',
-	'anim_gfx/knall.png',
-	'anim_gfx/krone.png',
-	'anim_gfx/kuh1.png',
-	'anim_gfx/kuh2.png',
-	'anim_gfx/kuhtot.png',
-	'anim_gfx/laken2.png',
-	'anim_gfx/meteor.png',
-	'anim_gfx/minidino.png',
-	'anim_gfx/minipilz.png',
-	'anim_gfx/nest1.png',
-	'anim_gfx/nest.png',
-	'anim_gfx/palme.png',
-	'anim_gfx/pilzkle.png',
-	'anim_gfx/planeten.png',
-	'anim_gfx/pophin1.png',
-	'anim_gfx/pophin.png',
-	'anim_gfx/posilich.png',
-	'anim_gfx/pubeben.png',
-	'anim_gfx/qpopfruk.png',
-	'anim_gfx/radar.png',
-	'anim_gfx/rakete.png',
-	'anim_gfx/rakrauch.png',
-	'anim_gfx/rampe.png',
-	'anim_gfx/saugsek.png',
-	'anim_gfx/schiff1.png',
-	'anim_gfx/schiff_mp.png',
-	'anim_gfx/schiff.png',
-	'anim_gfx/schipop2.png',
-	'anim_gfx/schnee.png',
-	'anim_gfx/schrift.png',
-	'anim_gfx/see.png',
-	'anim_gfx/seuvieh.png',
-	'anim_gfx/sonne2.png',
-	'anim_gfx/sonne.png',
-	'anim_gfx/space.png',
-	'anim_gfx/sputnik.png',
-	'anim_gfx/stars.png',
-	'anim_gfx/station2.png',
-	'anim_gfx/statuen.png',
-	'anim_gfx/staub.png',
-	'anim_gfx/stern.png',
-	'anim_gfx/stuhl.png',
-	'anim_gfx/suevieh.png',
-	'anim_gfx/tafeldec.png',
-	'anim_gfx/tafelfru.png',
-	'anim_gfx/titelmp.png',
-	'anim_gfx/tuer2.png',
-	'anim_gfx/tuer.png',
-	'anim_gfx/typ.png',
-	'anim_gfx/ufos.png',
-	'anim_gfx/vulkan1.png',
-	'anim_gfx/vulkan2.png',
-	'anim_gfx/vulkan.png',
-	'anim_gfx/vulkfru.png',
-	'anim_gfx/welle.png',
-]);
-resources.onReady(() => game.start());
+game.start();
 
 
+// TODO: The dragover and drop should only be possible after the loader is finished.
 canvas.addEventListener('dragover', function(event) {
     event.stopPropagation();
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
 });
-
 
 canvas.addEventListener('drop', function(event) {
     event.stopPropagation();

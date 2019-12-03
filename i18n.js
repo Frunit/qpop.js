@@ -2,12 +2,15 @@
 
 const de = {
 	title: 'Q-POP',
+	subtitle: 'Evolution im Weltraum',
 	next: 'Weiter',
 	yes: 'Ja',
 	no: 'Nein',
 	turn: 'Runde',
 	load_game: 'Lade Spielstand',
 	save_game: 'Speichere Spielstand',
+	start_game: 'Spiel starten',
+	loading: 'lädt',
 	player: 'Spieler {num}',
 	species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
 	iq: 'IQ',
@@ -34,12 +37,15 @@ const de = {
 
 const en = {
 	title: 'Q-POP',
+	subtitle: 'Evolution in space',
 	next: 'Continue',  // "continue" is a protected word, so "next" is used as variable name
 	yes: 'Yes',
 	no: 'No',
 	turn: 'Turn',
 	load_game: 'Load savegame',
 	save_game: 'Save game',
+	start_game: 'start game',
+	loading: 'loading',
 	player: 'Player {num}',
 	species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
 	iq: 'IQ',
