@@ -306,7 +306,7 @@ Game.prototype.load_game = function(save_file) {
 			new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) === 'Q-POP Savegame') {
 		mp = 0;
 	}
-	else ifsave_file.byteLength === 4174 &&
+	else if(save_file.byteLength === 4174 &&
 			new TextDecoder().decode(new Uint8Array(save_file, 0, 24)) === 'Magnetic Planet Savegame') {
 		mp = 10;
 	}

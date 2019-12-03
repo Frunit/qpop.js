@@ -2,7 +2,7 @@
 
 // TODO: Making love ends with wrong position of cloud, player and female
 // TODO: Enemies, Females and Offspring have randomized sprite animations
-// TODO RESEARCH: Buck Cherry feeding has only 5 (instead of 8) frames. How to handle predators?
+// TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;
@@ -402,16 +402,17 @@ Survival.prototype.finish_movement = function() {
 	this.movement_just_finished = true;
 	const char = this.level.character;
 	const current_bg = this.level.map[char.tile[1]][char.tile[0]];
-	char.rel_pos = [0, 0];
-	char.movement = 0;
 	this.delay_counter = 0;
+	char.hidden = false;
+	this.action = null;
+	this.movement_active = false;
 
+	// Test for Quicksand
 	if(Math.random() <= 0.001 &&
 			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
 			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
 	{
 		console.info('QUICKSAND');
-		this.movement_active = false;
 
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 		this.action = new Quicksand(char, () => this.player_death(true));
@@ -421,11 +422,11 @@ Survival.prototype.finish_movement = function() {
 
 	// TODO RESEARCH: Test for electric flower
 
+	// Enemy or Female found
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {
 		console.log('Direction:', 'XNESW'[dir]);
 		//console.log(adjacent);
-		this.movement_active = false;
 
 		if(adjacent.type === SURV_MAP.FEMALE) {
 			console.info('LOVE');
@@ -453,10 +454,6 @@ Survival.prototype.finish_movement = function() {
 
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
-	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
-	char.hidden = false;
-	this.action = null;
-	this.movement_active = false;
 };
 
 
@@ -555,6 +552,9 @@ Survival.prototype.get_adjacent = function() {
 
 
 Survival.prototype.start_movement = function(dir) {
+	if(this.movement_active) { // DEBUG
+		return;                // DEBUG
+	}                          // DEBUG
 	const char = this.level.character;
 	char.movement = dir;
 	const pos = char.tile;
@@ -562,22 +562,22 @@ Survival.prototype.start_movement = function(dir) {
 
 	switch(dir) {
 		case DIR.S:
-			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.south.soffset, char.anims.south.frames);
+			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.south.soffset, char.anims.south.frames);
 			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the position, the player wants to go, so no other predator will go there in the same moment
 			console.info('WALK SOUTH');
 			break;
 		case DIR.N:
-			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.north.soffset, char.anims.north.frames);
+			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.north.soffset, char.anims.north.frames);
 			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK NORTH');
 			break;
 		case DIR.E:
-			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.east.soffset, char.anims.east.frames);
+			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.east.soffset, char.anims.east.frames);
 			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK EAST');
 			break;
 		case DIR.W:
-			char.sprite = new Sprite(char.url, [64, 64], anim_delays.movement, char.anims.west.soffset, char.anims.west.frames);
+			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.west.soffset, char.anims.west.frames);
 			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
 			console.info('WALK WEST');
 			break;
@@ -606,6 +606,7 @@ Survival.prototype.start_movement = function(dir) {
 Survival.prototype.resolve_movement = function(obj) {
 	const speed = options.surv_move_speed;
 	let finished_move = false;
+	obj.sprite.update();
 	switch (obj.movement) {
 	case DIR.S:
 		if(obj.rel_pos[1] + speed >= this.tile_dim[1]) {
@@ -654,13 +655,14 @@ Survival.prototype.resolve_movement = function(obj) {
 	}
 
 	if(finished_move) {
+		obj.rel_pos = [0, 0];
+		obj.last_movement = obj.movement;
+		obj.movement = 0;
+
 		if(obj.type === SURV_MAP.PLAYER) {
 			this.finish_movement();
 		}
 		else {
-			obj.rel_pos = [0, 0];
-			obj.last_movement = obj.movement;
-			obj.movement = 0;
 			obj.sprite = new Sprite(obj.url, [64, 64], 0, obj.anims.still.soffset, obj.anims.still.frames);
 		}
 	}
@@ -669,7 +671,7 @@ Survival.prototype.resolve_movement = function(obj) {
 
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
-	const anim_delay = this.action === null ? anim_delays.movement : anim_delays.feeding;
+	const anim_delay = 0;//DEBUGthis.action === null ? anim_delays.movement : anim_delays.feeding;
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {
@@ -778,18 +780,12 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
 	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
+	char.hidden = false;
 	this.action = null;
 	this.movement_active = false;
+	this.movement_just_finished = true;
+	this.delay_counter = 0;
 	this.camera.move_to(char);
-};
-
-
-Survival.prototype.update_entities = function() {
-	if(this.action !== null && this.action.finished) {
-		this.action.callback();
-	}
-
-	this.camera.update_visible_level();
 };
 
 
@@ -811,9 +807,13 @@ Survival.prototype.update = function() {
 		}
 	}
 
+	if(this.action !== null && this.action.finished) {
+		this.action.callback();
+	}
+
 	debug6.value = 'mvmnt act: ' + this.movement_active + '; act: ' + this.action;
 
-	this.update_entities();
+	this.camera.update_visible_level();
 };
 
 

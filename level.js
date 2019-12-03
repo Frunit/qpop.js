@@ -159,7 +159,7 @@ Level.prototype.populate = function() {
 	}
 
 	// DEBUG:
-	num_predators = 0;
+	num_predators = 200;
 	num_females = 200;
 	num_enemies = 200;
 
@@ -408,7 +408,7 @@ function Enemy(species, tile) {
 	this.url = 'gfx/enemies.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.enem_still.soffset, this.anims.enem_still.frames);
+	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
 
 

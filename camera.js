@@ -1,9 +1,6 @@
 'use strict';
 
 
-// TODO: Flickering during movement. Seems like background is rendered after the sprite every second frame. But only during first movement tile. If arrow is keeping pressed, the flickering stops with the second tile
-
-
 function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.level = level;
 	this.survival = survival;
@@ -14,7 +11,7 @@ function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.offset = offset;
 	this._pos_changed = true;
 	this._tiles_to_render = new Set();
-	this._movs_to_render = [];
+	this._movs_to_render = new Set();
 	this.x_tiles = [];
 	this.y_tiles = [];
 
@@ -30,42 +27,26 @@ Camera.prototype.move_to = function(obj) {
 	const new_x = obj.tile[0] * this.tile_dim[0] + obj.rel_pos[0] + this.tile_dim[0]/2 - Math.floor(this.cwidth/2);
 	const new_y = obj.tile[1] * this.tile_dim[1] + obj.rel_pos[1] + this.tile_dim[1]/2 - Math.floor(this.cheight/2);
 
-	let must_update_tiles = true; // DEBUG
-
-	debug2.value = 'nx: ' + new_x + '; ny: ' + new_y;
+	//debug2.value = 'nx: ' + new_x + '; ny: ' + new_y;
 
 	if(new_x !== this.cpos[0]) {
 		this.cpos[0] = new_x;
-		/*if(Math.floor(this.cpos[0] / this.tile_dim[0]) !== this.x_tiles[0]) {
-			must_update_tiles = true;
-		}*/
+		this._pos_changed = true;
+		this.x_tiles = range(Math.floor(this.cpos[0] / this.tile_dim[0]),
+			Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]));
 	}
 
 	if(new_y !== this.cpos[1]) {
 		this.cpos[1] = new_y;
-		/*if(Math.floor(this.cpos[1] / this.tile_dim[1]) !== this.y_tiles[0]) {
-			must_update_tiles = true;
-		}*/
+		this._pos_changed = true;
+		this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
+			Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
 	}
 
-	if(must_update_tiles) {
-		this.update_tiles();
-	}
-
-	this._pos_changed = true;
-};
-
-
-Camera.prototype.update_tiles = function() {
-	this.x_tiles = range(Math.floor(this.cpos[0] / this.tile_dim[0]),
-		Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]));
-	this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
-		Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
-
-	debug3.value = 'tiles: ' + Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
+	/*debug3.value = 'tiles: ' + Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
 					Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + ' ' +
 					Math.floor(this.cpos[1] / this.tile_dim[1]) + '-' +
-					Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);
+					Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);*/
 };
 
 
@@ -90,28 +71,32 @@ Camera.prototype.update_visible_level = function() {
 				}
 			}
 
-			if(this.level.mobmap[y][x] !== null && !this.level.mobmap[y][x].hidden) {
-				if(this.level.mobmap[y][x].type !== SURV_MAP.PLACEHOLDER) {
-					this.level.mobmap[y][x].sprite.update();
-					// MAYBE: this.survival.action is not very ressource friendly. Should check if the specific tile is involved in the action.
-					if(this._pos_changed ||
-							this.level.mobmap[y][x].sprite.is_new_frame() ||
-							this.survival.action) {
-						this._movs_to_render.push(this.level.mobmap[y][x]);
+			const mob = this.level.mobmap[y][x];
+
+			if(mob !== null && !mob.hidden) {
+				if(mob.type === SURV_MAP.ENEMY ||
+						mob.type === SURV_MAP.FEMALE ||
+						mob.type === SURV_MAP.UNRESPONSIVE) {
+					mob.sprite.update();
+				}
+
+				if(mob.type !== SURV_MAP.PLACEHOLDER) {
+					if(this._pos_changed || mob.sprite.is_new_frame()) {
+						this._movs_to_render.add(JSON.stringify([x, y]));
 						this._tiles_to_render.add(JSON.stringify([x, y]));
 					}
 				}
 				else { // if type === SURV_MAP.PLACEHOLDER
-					this._tiles_to_render.add(JSON.stringify([x, y]));
-					const fx = this.level.mobmap[y][x].from_x;
-					const fy = this.level.mobmap[y][x].from_y;
+					const fx = mob.from_x;
+					const fy = mob.from_y;
 
 					// Render sprites that are outside the camera but are about to move into the camera (usually enemies)
 					// The placeholder indicates where the object comes from that will occupy the spot
 					if(!this.x_tiles.includes(fx) || !this.y_tiles.includes(fy)) {
-						this.level.mobmap[fy][fx].sprite.update();
 						if(this._pos_changed || this.level.mobmap[fy][fx].sprite.is_new_frame()) {
-							this._movs_to_render.push(this.level.mobmap[fy][fx]);
+							this._movs_to_render.add(JSON.stringify([fx, fy]));
+							this._tiles_to_render.add(JSON.stringify([fx, fy]));
+							this._tiles_to_render.add(JSON.stringify([x, y]));
 						}
 					}
 				}
@@ -128,19 +113,19 @@ Camera.prototype.render = function() {
 	ctx.rect(0, 0, this.cwidth, this.cheight);
 	ctx.clip();
 
-	if(this._tiles_to_render.size || this._movs_to_render.length) {
-		console.log(this._tiles_to_render.size, this._movs_to_render.length);
+	if(this._tiles_to_render.size || this._movs_to_render.size) {
 		debug1.value = 'tiles rndr: ' + this._tiles_to_render.size;
-		debug5.value = 'moves rndr: ' + this._movs_to_render.length;
+		debug5.value = 'moves rndr: ' + this._movs_to_render.size;
+
+		/*if(this._movs_to_render.size === 1 && this._tiles_to_render.size === 1) {
+			console.log(this.level.character.sprite.is_new_frame());
+		}
+
+		console.log(this._tiles_to_render.size, this._movs_to_render.size);*/
 	}
-	/*if(this._tiles_to_render.size === 2) {
-		console.log(this._movs_to_render);
-	}*/
 
 	for(let coord of this._tiles_to_render) {
-		const pos = JSON.parse(coord);
-		const x = pos[0];
-		const y = pos[1];
+		const [x, y] = JSON.parse(coord);
 
 		if(this.level.bg_sprites[y][x] === null) {
 			this.level.request_sprite(x, y);
@@ -150,7 +135,9 @@ Camera.prototype.render = function() {
 			y * this.tile_dim[1] - this.cpos[1]]);
 	}
 
-	for(let mov of this._movs_to_render) {
+	for(let coord of this._movs_to_render) {
+		const [x, y] = JSON.parse(coord);
+		const mov = this.level.mobmap[y][x];
 		mov.sprite.render(ctx,
 			[Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.cpos[0]),
 			Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.cpos[1])]);
@@ -164,7 +151,7 @@ Camera.prototype.render = function() {
 
 	this._pos_changed = false;
 	this._tiles_to_render.clear();
-	this._movs_to_render = [];
+	this._movs_to_render.clear();
 };
 
 
