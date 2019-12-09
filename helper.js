@@ -207,6 +207,7 @@ function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
 	ctx.restore();
 }
 
+
 function draw_base() {
 	const bg = resources.get('gfx/dark_bg.png');
 	ctx.drawImage(bg, 0, 0);
@@ -223,6 +224,7 @@ function draw_base() {
 	write_text(lang.title + ' ' + version, [320, 15], 'white', 'black');
 }
 
+
 function draw_black_rect(pos, dim, fill=false) {
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -237,6 +239,7 @@ function draw_black_rect(pos, dim, fill=false) {
 	}
 	ctx.restore();
 }
+
 
 function draw_rect(pos, dim, black_line=true, clicked=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
@@ -274,6 +277,7 @@ function draw_rect(pos, dim, black_line=true, clicked=false) {
 	ctx.restore();
 }
 
+
 function draw_inv_rect(pos, dim, black_line=true) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
@@ -308,6 +312,7 @@ function draw_inv_rect(pos, dim, black_line=true) {
 
 	ctx.restore();
 }
+
 
 function subtitle(x, y, text) {
 	const radius = 5;

@@ -278,7 +278,7 @@ Survival.prototype.draw_symbols = function() {
 		w, h);
 
 	// Food
-	for(let i = 0; i < Math.floor(game.current_player.eaten / this.eating_div); i++){
+	for(let i = 0; i < Math.floor(game.current_player.eaten / this.eating_div); i++) {
 		ctx.drawImage(this.gui_pics,
 			this.sym_food_soffset[0], this.sym_food_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
@@ -287,7 +287,7 @@ Survival.prototype.draw_symbols = function() {
 	}
 
 	// Love
-	for(let i = 0; i < game.current_player.loved; i++){
+	for(let i = 0; i < game.current_player.loved; i++) {
 		ctx.drawImage(this.gui_pics,
 			this.sym_love_soffset[0], this.sym_love_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
@@ -296,7 +296,7 @@ Survival.prototype.draw_symbols = function() {
 	}
 
 	// Deaths
-	for(let i = 0; i < game.current_player.deaths; i++){
+	for(let i = 0; i < game.current_player.deaths; i++) {
 		ctx.drawImage(this.gui_pics,
 			this.sym_dead_soffset[0], this.sym_dead_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],
@@ -305,7 +305,7 @@ Survival.prototype.draw_symbols = function() {
 	}
 
 	// Wins
-	for(let i = 0; i < this.level.character.victories.length; i++){
+	for(let i = 0; i < this.level.character.victories.length; i++) {
 		ctx.drawImage(this.gui_pics,
 			this.sym_won_soffset[0] + this.sym_dim[0]*this.level.character.victories[i], this.sym_won_soffset[1],
 			this.sym_dim[0], this.sym_dim[1],

@@ -2,16 +2,13 @@
 
 function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.id = SCENE.POPUP;
+	this.bg = resources.get('gfx/dark_bg.png');
+	this.spec_pics = resources.get('gfx/species.png');
+
+	// CONST_START
 	this.line_height = 18;
 	this.max_text_width = 260;
 
-	this.title = title;
-	this.text = multiline(text, this.max_text_width);
-	this.right_answer = right_answer;
-	this.left_answer = left_answer;
-	this.callback = callback;
-	this.bg = resources.get('gfx/dark_bg.png');
-	this.spec_pics = resources.get('gfx/species.png');
 	this.dim = [360, 150];
 	this.title_dim = [361, 21];
 	this.spec_dim = [64, 64];
@@ -24,6 +21,13 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.text_offset = [219, 80];
 	this.left_answer_offset = [0, 128];
 	this.right_answer_offset = [179, 128];
+	// CONST_END
+
+	this.title = title;
+	this.text = multiline(text, this.max_text_width);
+	this.right_answer = right_answer;
+	this.left_answer = left_answer;
+	this.callback = callback;
 
 	this.sprite = new Sprite('gfx/species.png', this.spec_dim, anim_delays.popups, [0, 0], this.spec_positions[image]);
 
@@ -64,7 +68,7 @@ Popup.prototype.initialize = function() {
 
 	// Text
 	const line_correction = this.line_height * this.text.length / 2;
-	for(let i = 0; i < this.text.length; i++){
+	for(let i = 0; i < this.text.length; i++) {
 		write_text(this.text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] - line_correction + this.line_height * i], 'white', 'black');
 	}
 
@@ -100,6 +104,7 @@ Popup.prototype.initialize = function() {
 		});
 	}
 };
+
 
 Popup.prototype.render = function() {
 	if(this.sprite.is_new_frame()) {

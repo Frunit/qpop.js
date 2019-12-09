@@ -928,6 +928,7 @@ World.prototype.create_world_map = function() {
 	return map;
 };
 
+
 World.prototype.find_tile = function(height, y) {
 	if(height <= game.water_level) {
 		return WORLD_MAP.WATER;
@@ -994,13 +995,13 @@ World.prototype.draw_bar = function() {
 		w, h);
 
 	let max_individuals = 0;
-	for(let player of game.players){
+	for(let player of game.players) {
 		if(player.individuals > max_individuals) {
 			max_individuals = player.individuals;
 		}
 	}
 
-	for(let i = 0; i < game.players.length; i++){
+	for(let i = 0; i < game.players.length; i++) {
 		ctx.drawImage(this.map_pics,
 			this.minispec_soffset[0] + 16*i, this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
@@ -1027,7 +1028,7 @@ World.prototype.draw_minispec = function() {
 		this.toplace_offset[0], this.toplace_offset[1],
 		w, h);
 
-	for(let i = 0; i < game.current_player.toplace; i++){
+	for(let i = 0; i < game.current_player.toplace; i++) {
 		ctx.drawImage(this.map_pics,
 			this.minispec_soffset[0] + this.tile_dim[0]*game.current_player.id, this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
@@ -1035,7 +1036,7 @@ World.prototype.draw_minispec = function() {
 			this.tile_dim[0], this.tile_dim[1]);
 	}
 
-	for(let i = 0; i < game.current_player.tomove; i++){
+	for(let i = 0; i < game.current_player.tomove; i++) {
 		ctx.drawImage(this.map_pics,
 			this.minispec_soffset[0] + this.tile_dim[0]*(game.current_player.id + 6), this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
@@ -1052,6 +1053,7 @@ World.prototype.draw_worldmap = function() {
 		}
 	}
 };
+
 
 World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 	let tile = 0;
