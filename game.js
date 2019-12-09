@@ -530,9 +530,11 @@ canvas.addEventListener('contextmenu', function(e) {
 });
 
 let lang = null;
-switch(options.language) {
-	case 'DE': lang = de; break;
-	default: lang = en;
+if(i18n.hasOwnProperty(options.language)) {
+	lang = i18n[options.language];
+}
+else {
+	lang = i18n.EN;
 }
 
 const version = 'pre-alpha';
