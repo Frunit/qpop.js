@@ -23,6 +23,10 @@ Sprite.prototype.update = function() {
 		if(this.delay_counter >= this.delay) {
 			this.delay_counter = 0;
 			this.idx++;
+
+			if(this.once && this.idx === this.frames.length - 1) {
+				this.finished = true;
+			}
 		}
 	}
 };
@@ -48,10 +52,6 @@ Sprite.prototype.is_new_frame = function() {
 Sprite.prototype.render = function(ctx, pos) {
 	const real_idx = this.idx % this.frames.length;
 	const frame = this.frames[real_idx];
-
-	if(this.once && real_idx === this.frames.length - 1) {
-		this.finished = true;
-	}
 
 	ctx.drawImage(this.pic,
 				this.offset[0] + frame[0], this.offset[1] + frame[1],

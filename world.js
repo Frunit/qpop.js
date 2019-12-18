@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: Background of animations must be redrawn every frame. Also for larger areas (meteor explosion)
+
 function World() {
 	this.id = SCENE.WORLD;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -57,7 +59,7 @@ function World() {
 
 	this.fight_active = false;
 	this.animation = null;
-	this.fight_pos = [0, 0];
+	this.animation_pos = [0, 0];
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -68,6 +70,9 @@ function World() {
 	this.wm_clickpos = null;
 	this.wm_rightclickpos = null;
 	this.wm_set_mode = 0;  // 0 = no mode; 1 = set; 2 = remove
+
+	this.catastrophe_status = 0;
+	this.catastrophe_type = -1;
 }
 
 
@@ -86,6 +91,8 @@ World.prototype.initialize = function() {
 	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
 	}
+
+	this.catastrophe_status = 0;
 };
 
 
@@ -221,8 +228,8 @@ World.prototype.redraw = function() {
 
 World.prototype.render = function() {
 	if(this.animation) {
-		this.redraw_wm_part(this.fight_pos[0], this.fight_pos[1], false);
-		this.animation.render(ctx, [this.map_offset[0] + this.fight_pos[0]*this.tile_dim[0], this.map_offset[1] + this.fight_pos[1]*this.tile_dim[1]]);
+		this.redraw_wm_part(this.animation_pos[0], this.animation_pos[1], false);
+		this.animation.render(ctx, [this.map_offset[0] + this.animation_pos[0]*this.tile_dim[0], this.map_offset[1] + this.animation_pos[1]*this.tile_dim[1]]);
 	}
 };
 
@@ -236,9 +243,13 @@ World.prototype.update = function() {
 
 	if(this.animation) {
 		this.animation.update();
-		if(this.animation.done) {
+		if(this.animation.finished) {
 			this.animation.callback();
 		}
+	}
+
+	else if(this.catastrophe_status === 1) {
+		this.catastrophe_exec();
 	}
 };
 
@@ -368,6 +379,10 @@ World.prototype.next_popup = function(answer) {
 
 
 World.prototype.test_if_dead = function() {
+	if(game.turn === 0) {
+		return;
+	}
+
 	for(let player of game.players) {
 		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
 			player.is_dead = true;
@@ -377,20 +392,36 @@ World.prototype.test_if_dead = function() {
 };
 
 
-World.prototype.exec_catastrophe = function(type) {
+World.prototype.catastrophe_start = function() {
+	self = this
+	game.backstage.push(game.stage);
+	game.stage = new Catastrophe(self.catastrophe_callback);
+	game.stage.initialize();
+};
+
+
+World.prototype.catastrophe_callback = function(type) {
+	game.stage = game.backstage.pop();
+	game.stage.catastrophe_type = type;
+	game.stage.catastrophe_status = 1;
+};
+
+
+World.prototype.catastrophe_exec = function() {
+	this.catastrophe_status = 2;
 	this.redraw();
 	let x, y;
-	switch(type) {
+	switch(this.catastrophe_type) {
 	case 0: // Warming
 		game.temp += 10;
 		game.humid -= 10;
 		game.water_level -= 2;
-		this.catastrophe_finished();
+		this.catastrophe_finish();
 		break;
 	case 1: // Cooling
 		game.temp -= 10;
 		game.humid += 10;
-		this.catastrophe_finished();
+		this.catastrophe_finish();
 		break;
 	case 2: { // Comet
 		game.temp -= 10;
@@ -416,9 +447,11 @@ World.prototype.exec_catastrophe = function(type) {
 		game.world_map[y][x] = WORLD_MAP.CRATER;
 
 		// Big Explosion
+		// TODO RESEARCH: Check if frames and speed are correct
 		this.animation = new Sprite('gfx/world.png', [48, 48], anim_delays.world, [0, 32],
-		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0]],
-		true, () => this.catastrophe_finished());
+		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]],
+		true, () => this.catastrophe_finish());
+		this.animation_pos = [x-1, y-1];
 		break;
 		}
 	case 3: { // Plague
@@ -442,6 +475,7 @@ World.prototype.exec_catastrophe = function(type) {
 				}
 			}
 		}
+		this.catastrophe_finish();
 		break;
 		}
 	case 4: { // Volcano
@@ -459,13 +493,12 @@ World.prototype.exec_catastrophe = function(type) {
 	case 5: // Flood
 		game.temp += 10;
 		game.water_level += 5;
-		this.catastrophe_finished();
+		this.catastrophe_finish();
 		break;
 	case 6: // Earthquake
 		game.height_map = this.create_height_map();
-		game.world_map = this.create_world_map();
 		// TODO RESEARCH: Are humans removed by an earthquake? I.e. is also the flag removed from the save?
-		this.catastrophe_finished();
+		this.catastrophe_finish();
 		break;
 	case 7: { // Humans
 		const land = [];
@@ -479,33 +512,40 @@ World.prototype.exec_catastrophe = function(type) {
 
 		[x, y] = random_element(land);
 		game.world_map[y][x] = WORLD_MAP.HUMANS;
-		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finished();
+		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finish();
 		game.humans_present = true;
+		this.catastrophe_finish();
 		break;
 		}
 	case 8: { // Cosmic rays
 		for(let player of game.players) {
 			if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead) {
 				const stats = player.stats.slice();
-				for(let i = 0; i < stats.length; i++) {
-					player.stats[i] = stats.splice(stats.length * Math.random() | 0, 1)[0];
-				}
+				shuffle(stats)
+				player.stats = stats.slice();
 			}
 		}
-		this.catastrophe_finished();
+		this.catastrophe_finish();
 		break;
 		}
+	default:
+		console.log(this.catastrophe_type);
+		open_popup(lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
+					() => {}, lang.debug_too_bad);
 	}
 };
 
 
-World.prototype.catastrophe_finished = function() {
+World.prototype.catastrophe_finish = function() {
 	if(game.temp > 100) { game.temp = 100; }
 	else if (game.temp < 0) { game.temp = 0; }
 	if(game.humid > 100) { game.humid = 100; }
 	else if (game.humid < 0) { game.humid = 0; }
 	if(game.water_level > 100) { game.water_level = 100; }
 	else if (game.water_level < 0) { game.water_level = 0; }
+
+	this.animation = null;
+	game.world_map = this.create_world_map();
 
 	for(let y = 1; y < this.dim[1] - 1; y++) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
@@ -515,21 +555,21 @@ World.prototype.catastrophe_finished = function() {
 		}
 	}
 
-	for(let player of game.players) {
-		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
-			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
-			player.is_dead = true;
-		}
-	}
+	this.test_if_dead();
 
 	this.redraw();
+
+	this.catastrophe_status = 3;
 };
 
 
 World.prototype.volcano_step = function(volcanos_left, positions) {
-	if(!volcanos_left) {
-		this.catastrophe_finished();
+	if(volcanos_left === 0) {
+		this.catastrophe_finish();
+		return;
 	}
+
+	this.draw_worldmap();
 
 	const [x, y] = random_element(positions);
 
@@ -540,9 +580,10 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 	}
 
 	// TODO RESEARCH: Check if frames and speed are correct
-	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [464, 16],
+	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
+	this.animation_pos = [x, y];
 };
 
 
@@ -577,11 +618,11 @@ World.prototype.fight = function(x, y) {
 
 	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
-	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [464, 16],
+	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.fight_end(winner, enemy, x, y));
 
-	this.fight_pos = [x, y];
+	this.animation_pos = [x, y];
 };
 
 
@@ -663,14 +704,16 @@ World.prototype.wm_rightmove = function(x, y) {
 
 
 World.prototype.wm_click = function(x, y, raw = true) {
+	if(this.catastrophe_status > 0) {
+		return;
+	}
+
 	if(raw) {
 		x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
 		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 	}
 
 	this.wm_clickpos = [x, y];
-
-	console.log(this.wm_clickpos, game.world_map[y][x], this.is_neighbour(game.current_player.id, x, y));
 
 	// Clicked on own individual -> take it
 	if(game.map_positions[y][x] === game.current_player.id) {
@@ -699,6 +742,10 @@ World.prototype.wm_clickup = function() {
 
 
 World.prototype.wm_move = function(x, y) {
+	if(this.catastrophe_status > 0) {
+		return;
+	}
+
 	x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
 	y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 
@@ -921,6 +968,9 @@ World.prototype.create_world_map = function() {
 		for(let x = 0; x < this.dim[0]; x++) {
 			if(!game.world_map || game.world_map[y][x] < WORLD_MAP.MOUNTAIN) {
 				map[y][x] = this.find_tile(game.height_map[y][x], y);
+			}
+			else {
+				map[y][x] = game.world_map[y][x];
 			}
 		}
 	}

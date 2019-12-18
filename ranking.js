@@ -1,5 +1,9 @@
 'use strict';
 
+
+// TODO RESEARCH: What happens to "out of order" players?
+
+
 function Ranking() {
 	this.id = SCENE.RANKING;
 	this.bg_pic = resources.get('gfx/dark_bg.png');

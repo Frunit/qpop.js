@@ -1,9 +1,11 @@
 'use strict';
 
 
-function Catastrophe() {
+function Catastrophe(callback) {
 	this.id = SCENE.CATASTROPHE;
 	this.bg = resources.get('gfx/dark_bg.png');
+
+	this.callback = callback;
 
 	// CONST_START
 	this.dim = [360, 300];
@@ -154,6 +156,5 @@ Catastrophe.prototype.handle_input = function() {
 
 
 Catastrophe.prototype.end = function() {
-	game.stage = game.backstage.pop();
-	game.stage.exec_catastrophe(self.type); // also redraws
+	this.callback(this.type); // also redraws
 };

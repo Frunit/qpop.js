@@ -3,6 +3,7 @@
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
+// TODO: Food does not provide as many leaves as in the original (e.g. at 60% specialization)
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;

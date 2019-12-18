@@ -13,19 +13,18 @@ const debug8 = document.getElementById('debug8');
  * Master-TODO: All sounds
  * Master-TODO: Background music
  * Master-TODO: All options
- * Master-TODO: Loading screen?
  */
 
-let options = {
+const options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
 	transition_delay: 36, // How many frames to show the transition screens
 	surv_move_speed: 8, // Speed of the player figure in survival in pixel per updated frame
 	music_on: true,
-	music: 255, // Music volume (0 - 255)
+	music: 100, // Music volume (0 - 100)
 	sound_on: true,
-	sound: 255, // Sound volume (0 - 255)
+	sound: 100, // Sound volume (0 - 100)
 	update_freq: 1/18, // Screen update frequency
 };
 
@@ -101,27 +100,27 @@ Game.prototype.start = function() {
 };
 
 
-Game.prototype.next_player = function() {
+Game.prototype.set_to_next_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-			this.current_player.id = i;
 			this.current_player = this.players[i];
-			console.log('There is another player.');
+			console.log('Active player is: ' + this.current_player.id);
 			return true;
 		}
 	}
 
+	return false;
+};
+
+
+Game.prototype.set_to_first_player = function() {
 	for(let i = 0; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-			this.current_player.id = i;
 			this.current_player = this.players[i];
-			console.log('This was the last player.');
+			console.log('Active player is: ' + this.current_player.id);
 			return false;
 		}
 	}
-
-	console.warn('All players are dead or inactive!!!');
-	return false;
 };
 
 
@@ -430,31 +429,31 @@ Game.prototype.next_stage = function() {
 		this.stage.initialize();
 		break;
 	case SCENE.TRANS_WORLD: // Transition screen
+		this.set_to_first_player();
 		this.stage = new World();
 		this.stage.initialize();
 		break;
 	case SCENE.WORLD: // World map
-		if(this.next_player()) {
+		if(this.stage.catastrophe_status === 3) {
+			this.stage = new Ranking();
+			this.stage.initialize();
+		}
+		else if(this.set_to_next_player()) {
 			this.stage.next_player();
-		} else {
+		}
+		else {
 			if(this.turn === 0) {
 				this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				this.stage.initialize();
 			}
 			else {
-				this.backstage.push(this.stage);
-				this.stage = new Catastrophe();
-				this.stage.initialize();
+				this.stage.catastrophe_start();
 			}
 		}
 		break;
-	case SCENE.CATASTROPHE: // Catastrophe TODO: This is wrong! The world must be shown until next is clicked
-		this.stage = new Ranking();
-		this.stage.initialize();
-		break;
 	case SCENE.RANKING: // Ranking
 		if(this.turn === this.max_turns) {
-			this.stage = new Outro();
+			this.stage = new Outro(this.stage.winners[0]);
 		}
 		else {
 			this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
@@ -463,11 +462,12 @@ Game.prototype.next_stage = function() {
 		break;
 	case SCENE.TRANS_MUTATION: // Transition screen
 		this.turn++;
+		this.set_to_first_player();
 		this.stage = new Mutations();
 		this.stage.initialize();
 		break;
 	case SCENE.MUTATION: // Mutations
-		if(this.next_player()) {
+		if(this.set_to_next_player()) {
 			this.stage.next_player();
 		} else {
 			this.stage = new Transition('gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
@@ -475,11 +475,12 @@ Game.prototype.next_stage = function() {
 		}
 		break;
 	case SCENE.TRANS_SURVIVAL: // Transition screen
+		this.set_to_first_player();
 		this.stage = new Survival();
 		this.stage.initialize();
 		break;
 	case SCENE.SURVIVAL: // Survival
-		if(this.next_player()) {
+		if(this.set_to_next_player()) {
 			this.stage.initialize();
 		} else {
 			this.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
@@ -490,8 +491,8 @@ Game.prototype.next_stage = function() {
 		// This should never happen
 	default:
 		console.log(this.stage);
-		open_popup(lang.popup_title, 'dino_cries', 'This should never ever happen!',
-					() => {}, 'Oh no!');
+		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code. This should never ever happen!',
+					() => {}, lang.debug_too_bad);
 	}
 };
 
