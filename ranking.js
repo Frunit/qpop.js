@@ -2,6 +2,7 @@
 
 
 // TODO RESEARCH: What happens to "out of order" players?
+// TODO: Happy Chuck Berry stands/jumps too low.
 
 
 function Ranking() {

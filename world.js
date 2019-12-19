@@ -1,6 +1,7 @@
 'use strict';
 
 // TODO: Background of animations must be redrawn every frame. Also for larger areas (meteor explosion)
+// MAYBE: After a catastrophe, a symbol of the catastrophe could be shown in the lower right area. What to do with the avatar?
 
 function World() {
 	this.id = SCENE.WORLD;
@@ -57,7 +58,6 @@ function World() {
 	this.ai_frame = 0;
 	this.ai_own_individuals = [];
 
-	this.fight_active = false;
 	this.animation = null;
 	this.animation_pos = [0, 0];
 
@@ -71,7 +71,7 @@ function World() {
 	this.wm_rightclickpos = null;
 	this.wm_set_mode = 0;  // 0 = no mode; 1 = set; 2 = remove
 
-	this.catastrophe_status = 0;
+	this.catastrophe_status = 0;  // 0 = no cata yet; 1 = cata called back; 2 = cata executing; 3 = cata finished
 	this.catastrophe_type = -1;
 }
 
@@ -237,15 +237,16 @@ World.prototype.render = function() {
 World.prototype.update = function() {
 	// TODO: All functions that act upon input that should not act when AI or animation is active, need respective checks in themselves! The check could be done here, but then option menus would be unresponsive.
 
-	if(this.ai_active) {
-		this.ai_step();
-	}
 
 	if(this.animation) {
 		this.animation.update();
 		if(this.animation.finished) {
 			this.animation.callback();
 		}
+	}
+
+	else if(this.ai_active) {
+		this.ai_step();
 	}
 
 	else if(this.catastrophe_status === 1) {
@@ -358,6 +359,10 @@ World.prototype.handle_input = function() {
 World.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
 
+	if(this.ai_active || this.animation !== null) {
+		return;
+	}
+
 	if(game.current_player.toplace === 0) {
 		this.next_popup(1);
 	}
@@ -410,7 +415,6 @@ World.prototype.catastrophe_callback = function(type) {
 World.prototype.catastrophe_exec = function() {
 	this.catastrophe_status = 2;
 	this.redraw();
-	let x, y;
 	switch(this.catastrophe_type) {
 	case 0: // Warming
 		game.temp += 10;
@@ -428,8 +432,8 @@ World.prototype.catastrophe_exec = function() {
 		game.water_level -= 3;
 
 		const impactable = [];
-		for(x = 10; x <= 18; x++) {
-			for(y = 10; y <= 18; y++) {
+		for(let x = 10; x <= 18; x++) {
+			for(let y = 10; y <= 18; y++) {
 				if(game.world_map[y][x] !== WORLD_MAP.WATER) {
 					impactable.push([x, y]);
 				}
@@ -456,8 +460,8 @@ World.prototype.catastrophe_exec = function() {
 		}
 	case 3: { // Plague
 		const creatures = [];
-		for(x = 3; x <= 24; x++) {
-			for(y = 3; y <= 24; y++) {
+		for(let x = 3; x <= 24; x++) {
+			for(let y = 3; y <= 24; y++) {
 				if(game.map_positions[y][x] >= 0) {
 					creatures.push([x, y]);
 				}
@@ -480,8 +484,8 @@ World.prototype.catastrophe_exec = function() {
 		}
 	case 4: { // Volcano
 		const volcanos = [];
-		for(x = 3; x <= 24; x++) {
-			for(y = 3; y <= 24; y++) {
+		for(let x = 3; x <= 24; x++) {
+			for(let y = 3; y <= 24; y++) {
 				if(game.world_map[y][x] === WORLD_MAP.MOUNTAIN) {
 					volcanos.push([x, y]);
 				}
@@ -502,8 +506,8 @@ World.prototype.catastrophe_exec = function() {
 		break;
 	case 7: { // Humans
 		const land = [];
-		for(x = 10; x <= 18; x++) {
-			for(y = 10; y <= 18; y++) {
+		for(let x = 10; x <= 18; x++) {
+			for(let y = 10; y <= 18; y++) {
 				if(game.world_map[y][x] !== WORLD_MAP.WATER) {
 					land.push([x, y]);
 				}
@@ -608,7 +612,6 @@ World.prototype.take_individual = function(x, y) {
 
 
 World.prototype.fight = function(x, y) {
-	this.fight_active = true;
 	const attack = game.current_player.stats[ATTR.ATTACK] + game.current_player.stats[ATTR.INTELLIGENCE]/2 + game.current_player.experience * 10 + game.current_player.stats[game.world_map[y][x] - WORLD_MAP.RANGONES];
 
 	const enemy = game.players[game.map_positions[y][x]];
@@ -638,7 +641,6 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 	this.draw_minispec();
 
 	this.animation = null;
-	this.fight_active = false;
 
 	if(enemy.individuals === 0) {
 		open_popup(lang.popup_title, enemy.id, lang.dead, () => {}, lang.next);
@@ -669,6 +671,10 @@ World.prototype.set_individual = function(x, y) {
 
 
 World.prototype.wm_rightclick = function(x, y, raw = true) {
+	if(this.ai_active || this.animation !== null) {
+		return;
+	}
+
 	if(raw) {
 		x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
 		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
@@ -684,27 +690,31 @@ World.prototype.wm_rightclick = function(x, y, raw = true) {
 
 
 World.prototype.wm_rightclickup = function() {
-	const [x, y] = this.wm_rightclickpos;
-	this.wm_rightclickpos = null;
+	if(this.wm_rightclickpos !== null) {
+		const [x, y] = this.wm_rightclickpos;
+		this.wm_rightclickpos = null;
 
-	// Show the individual again
-	this.redraw_wm_part(x, y, true);
+		// Show the individual again
+		this.redraw_wm_part(x, y, true);
+	}
 };
 
 
 World.prototype.wm_rightmove = function(x, y) {
-	x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
-	y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
+	if(this.wm_rightclickpos !== null) {
+		x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
+		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 
-	if(x !== this.wm_rightclickpos[0] || y !== this.wm_rightclickpos[1]) {
-		this.wm_rightclickup();
-		this.wm_rightclick(x, y, false);
+		if(x !== this.wm_rightclickpos[0] || y !== this.wm_rightclickpos[1]) {
+			this.wm_rightclickup();
+			this.wm_rightclick(x, y, false);
+		}
 	}
 };
 
 
 World.prototype.wm_click = function(x, y, raw = true) {
-	if(this.catastrophe_status > 0) {
+	if(this.ai_active || this.animation !== null || this.catastrophe_status > 0) {
 		return;
 	}
 
@@ -742,15 +752,13 @@ World.prototype.wm_clickup = function() {
 
 
 World.prototype.wm_move = function(x, y) {
-	if(this.catastrophe_status > 0) {
-		return;
-	}
+	if(this.wm_clickpos !== null) {
+		x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
+		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 
-	x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
-	y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
-
-	if(x !== this.wm_clickpos[0] || y !== this.wm_clickpos[1]) {
-		this.wm_click(x, y, false);
+		if(x !== this.wm_clickpos[0] || y !== this.wm_clickpos[1]) {
+			this.wm_click(x, y, false);
+		}
 	}
 };
 
@@ -787,19 +795,19 @@ World.prototype.ai = function() {
 
 
 World.prototype.ai_step = function() {
-	if(this.animation) {
-		return;
-	}
-
 	this.ai_frame++;
 	if(this.ai_frame < options.wm_ai_delay) {
 		return;
 	}
 	this.ai_frame = 0;
 
-	if(!(game.current_player.toplace || game.current_player.tomove)) {
-		this.ai_end();
-		return;
+	if(game.current_player.toplace === 0) {
+		// No more units to place (but may to move)
+		if(game.current_player.tomove === 0 || game.current_player.individuals < 2) {
+			// No more shadows or only one individual on map (that cannot be removed)
+			this.ai_end();
+			return;
+		}
 	}
 
 	let depth = 4 - game.current_player.iq;
@@ -813,12 +821,6 @@ World.prototype.ai_step = function() {
 
 	// Only use shadows (movements) if no individuals for placement are left
 	if(game.current_player.toplace === 0) {
-		if(game.current_player.tomove === 0 || game.current_player.individuals < 2) {
-			// The AI doesn't have shadows left or has only on individual on the map
-			this.ai_end();
-			return;
-		}
-
 		to_remove = random_element(this.ai_own_individuals);
 		remove_from_array(this.ai_own_individuals, to_remove);
 		this.take_individual(to_remove[0], to_remove[1]);
@@ -845,6 +847,8 @@ World.prototype.ai_step = function() {
 
 
 World.prototype.ai_end = function() {
+	game.current_player.toplace = 0;
+	game.current_player.tomove = 0;
 	this.ai_active = false;
 	canvas.style.cursor = 'default';
 	if(options.wm_ai_auto_continue) {
@@ -882,7 +886,7 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 					value += winning_chance * weight;
 				}
 			}
-			else if(game.world_map[yy][xx] > WORLD_MAP.DESERT && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
+			else if(game.world_map[yy][xx] > WORLD_MAP.RANGONES && game.world_map[yy][xx] <= WORLD_MAP.DESERT) {
 				value += game.players[game.current_player.id].stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] * weight;
 			}
 		}
@@ -897,7 +901,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 	if(individuals.length === 0) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
 			for(let y = 1; y < this.dim[1] - 1; y++) {
-				if(game.map_positions[y][x] === -1 && game.world_map[y][x] >= WORLD_MAP.DESERT && game.world_map[y][x] <= WORLD_MAP.FIREGRASS) {
+				if(game.map_positions[y][x] === -1 && game.world_map[y][x] >= WORLD_MAP.RANGONES && game.world_map[y][x] <= WORLD_MAP.DESERT) {
 					possible_moves.push([x, y]);
 				}
 			}
@@ -910,7 +914,7 @@ World.prototype.ai_possible_moves = function(individuals) {
 			for(let pos of [[x-1, y], [x+1, y], [x, y-1], [x, y+1]]) {
 				const xx = pos[0];
 				const yy = pos[1];
-				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WORLD_MAP.DESERT && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
+				if(possible_moves.indexOf(pos) === -1 && game.map_positions[yy][xx] !== game.current_player.id && game.world_map[yy][xx] >= WORLD_MAP.RANGONES && game.world_map[yy][xx] <= WORLD_MAP.DESERT) {
 					possible_moves.push(pos);
 				}
 			}

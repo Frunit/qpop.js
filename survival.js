@@ -78,6 +78,7 @@ Survival.prototype.initialize = function() {
 
 	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();
+		return;
 	}
 
 	this.level = new Level();
@@ -333,8 +334,8 @@ Survival.prototype.ai = function() {
 	// MAYBE correct: This does not include the density that affects human players. For human players: Higher density -> less food
 	let food = 0;
 
-	for(x = 1; x <= 26; x++) {
-		for(y = 1; y <= 26; y++) {
+	for(let x = 1; x <= 26; x++) {
+		for(let y = 1; y <= 26; y++) {
 			if(game.map_positions[y][x] === game.current_player.id) {
 				food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[game.world_map[y][x]] / (3 * this.eating_div);
 			}
@@ -369,8 +370,8 @@ Survival.prototype.ai = function() {
 		death_prob = 0.9;
 	}
 
-	for(x = 1; x <= 26; x++) {
-		for(y = 1; y <= 26; y++) {
+	for(let x = 1; x <= 26; x++) {
+		for(let y = 1; y <= 26; y++) {
 			if(game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
 				game.map_positions[y][x] = -1;
 				game.current_player.individuals--;
@@ -1000,6 +1001,12 @@ Survival.prototype.next = function() {
 Survival.prototype.next_popup = function(answer) {
 	if(answer === 1) {
 		this.calc_outcome();
-		game.next_stage();
+		if(game.current_player.individuals === 0) {
+			game.current_player.is_dead = true;
+			open_popup(lang.popup_title, game.current_player.id, lang.dead, game.next_stage, lang.next);
+		}
+		else {
+			game.next_stage();
+		}
 	}
 };

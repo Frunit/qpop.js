@@ -93,7 +93,6 @@ Game.prototype.start = function() {
 	this.world_map = null;
 	this.map_positions = null;
 	this.stage = new Loader();
-	//this.stage = new Survival(); // DEBUG
 	this.stage.initialize();
 	this.last_time = Date.now();
 	this.main();
@@ -500,8 +499,8 @@ Game.prototype.next_stage = function() {
 function Player(num) {
 	this.id = num;
 	this.iq = 2;
-	this.type = (num === 1) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
-	//this.type = (num === 0) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
+	//this.type = (num === 1) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
+	this.type = (num === 0) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
 	this.individuals = 0;
 	this.toplace = 10;
 	this.tomove = 0;

@@ -1,6 +1,9 @@
 'use strict';
 
 
+// TODO: When the player stands still, predators move animation is strange towards the end
+
+
 function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.level = level;
 	this.survival = survival;
