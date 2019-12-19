@@ -1,7 +1,9 @@
 'use strict';
 
 
+// TODO: render() needs a "force" argument to re-render everything, e.g. after a popup closed
 // TODO: When the player stands still, predators move animation is strange towards the end
+// TODO: I might want to consider using a hidden canvas to prepare the background and draw everything on every frame. This will dramatically simplify the methods for the price of an extra canvas.
 
 
 function Camera(level, survival, tile_dim, window_dim, offset) {

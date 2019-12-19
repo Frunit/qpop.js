@@ -367,8 +367,8 @@ function Predator(species, tile) {
 	this.tile = tile;
 	this.species = species;
 	this.rel_pos = [0, 0];
-	this.movement = 0;       // current movement direction
-	this.last_movement = 0;  // last movement direction (important, because they can't move back)
+	this.movement = 0;		// current movement direction
+	this.last_movement = 0;	// last movement direction (important, because they can't move back)
 	this.hidden = false;
 
 	this.url = 'gfx/pred' + (species+1) + '.png';

@@ -161,6 +161,7 @@ Survival.prototype.redraw = function() {
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+		{'key': 'ESCAPE', 'action': () => this.suicide(), 'reset': true},
 	];
 };
 
@@ -474,7 +475,6 @@ Survival.prototype.finish_feeding = function(food) {
 		if(game.current_player.eaten > 1480) {
 			game.current_player.eaten = 1480;
 		}
-		console.log(food_type, game.current_player.stats[food_type], game.current_player.eaten);
 		this.draw_symbols();
 	}
 
@@ -753,6 +753,12 @@ Survival.prototype.start_predator_movement = function() {
 				break;
 		}
 	}
+};
+
+
+Survival.prototype.suicide = function() {
+	// TODO RESEARCH: Which image?
+	open_popup(lang.popup_title, 'chuck_berry', lang.suicide, (x) => {if(x===1) {this.player_death(true);}}, lang.no, lang.yes);
 };
 
 

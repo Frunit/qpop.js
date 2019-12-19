@@ -204,7 +204,7 @@ Game.prototype.handle_input = function() {
 	for(let key of game.stage.keys) {
 		if(input.isDown(key.key)) {
 			if(key.reset) {
-				input.reset('ENTER');
+				input.reset(key.key);
 			}
 			key.action();
 		}
@@ -658,15 +658,15 @@ game.start();
 
 // TODO: The dragover and drop should only be possible after the loader is finished.
 canvas.addEventListener('dragover', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
+	event.stopPropagation();
+	event.preventDefault();
+	event.dataTransfer.dropEffect = 'copy';
 });
 
 canvas.addEventListener('drop', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
+	event.stopPropagation();
+	event.preventDefault();
+	const file = event.dataTransfer.files[0];
 	const reader = new FileReader();
 	reader.readAsArrayBuffer(file);
 

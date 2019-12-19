@@ -341,7 +341,7 @@ World.prototype.catastrophe_exec = function() {
 			}
 		}
 
-		[x, y] = random_element(impactable);
+		const [x, y] = random_element(impactable);
 
 		for(let xx = x - 1; xx <= x + 1; xx++) {
 			for(let yy = y - 1; yy <= y + 1; yy++) {
@@ -369,7 +369,7 @@ World.prototype.catastrophe_exec = function() {
 			}
 		}
 
-		[x, y] = random_element(creatures);
+		const [x, y] = random_element(creatures);
 
 		// TODO: This could be animated such that not all creatures disappear simultaneously but one after the other
 		for(let xx = x - 3; xx <= x + 3; xx++) {
@@ -415,7 +415,7 @@ World.prototype.catastrophe_exec = function() {
 			}
 		}
 
-		[x, y] = random_element(land);
+		const [x, y] = random_element(land);
 		game.world_map[y][x] = WORLD_MAP.HUMANS;
 		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finish();
 		game.humans_present = true;

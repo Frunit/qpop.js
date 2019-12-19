@@ -31,9 +31,9 @@ const i18n = Object.freeze({
 		game_over: 'BUUH, NUN IST ES VORBEI!!\nAlle menschlichen Spieler sind tot, das Spiel ist aus!',
 		evo_score: 'Evolutionspunkte',
 		traits: ['Anpassung Rangonen', 'Anpassung Blaublatt', 'Anpassung Wulgpilze', 'Anpassung Stinkbälle', 'Anpassung Schlingwurz', 'Anpassung Feuergras', 'Vermehrung', 'Angriffsstärke', 'Verteidigungsstärke', 'Tarnung', 'Geschwindigkeit', 'Sinnesorgane', 'Intelligenz'],
-		transition_mutations: '', // Monstren und Mutationen
-		transition_survival: '',  // Fressen und gefressen werden
-		transition_world: '',     // Der Krieg der Arten
+		transition_mutations: '',	// Monstren und Mutationen
+		transition_survival: '',	// Fressen und gefressen werden
+		transition_world: '',		// Der Krieg der Arten
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
 		information: 'TODO: Dies ist ein längerer Text über Q-Pop',
 		credits_original: [ // TODO
