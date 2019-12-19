@@ -1,6 +1,9 @@
 'use strict';
 
 
+// TODO: Splattering animation does not update correctly. Background must be redrawn
+
+
 function Turnselection() {
 	this.id = SCENE.TURN_SELECTION;
 	this.bg = resources.get('gfx/light_bg.png');
@@ -40,6 +43,8 @@ function Turnselection() {
 	this.turn_index = 0;
 
 	this.clickareas = [];
+	this.rightclickareas = [];
+	this.keys = [];
 
 	this.animations = null;
 }
@@ -150,6 +155,14 @@ Turnselection.prototype.redraw = function() {
 	}
 
 	this.draw_turn_changed();
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+		{'key': 'RIGHT', 'action': () => this.change_turn(1), 'reset': true},
+		{'key': 'UP', 'action': () => this.change_turn(1), 'reset': true},
+		{'key': 'LEFT', 'action': () => this.change_turn(0), 'reset': true},
+		{'key': 'DOWN', 'action': () => this.change_turn(0), 'reset': true},
+	];
 };
 
 
@@ -205,90 +218,6 @@ Turnselection.prototype.update = function() {
 				}
 			}
 		}
-	}
-};
-
-
-Turnselection.prototype.handle_input = function() {
-	if(input.isDown('MOVE')) {
-		let pos = input.mousePos();
-		if(game.clicked_element) {
-			let area = game.clicked_element;
-			if(!(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2))
-			{
-				area.blur();
-				game.clicked_element = null;
-			}
-		}
-		else {
-			let found = false;
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					canvas.style.cursor = 'pointer';
-					found = true;
-					break;
-				}
-			}
-
-			if(!found) {
-				canvas.style.cursor = 'default';
-			}
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-		}
-	}
-
-	if(input.isDown('ENTER')) {
-		input.reset('ENTER');
-		this.next();
-	}
-	else if(input.isDown('RIGHT')) {
-		input.reset('RIGHT');
-		this.change_turn(1);
-	}
-	else if(input.isDown('UP')) {
-		input.reset('UP');
-		this.change_turn(1);
-	}
-	else if(input.isDown('LEFT')) {
-		input.reset('LEFT');
-		this.change_turn(0);
-	}
-	else if(input.isDown('DOWN')) {
-		input.reset('DOWN');
-		this.change_turn(0);
 	}
 };
 

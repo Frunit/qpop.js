@@ -32,6 +32,8 @@ function Loader() {
 	this.images_drawn = false;
 
 	this.clickareas = [];
+	this.rightclickareas = [];
+	this.keys = [];
 }
 
 
@@ -132,6 +134,10 @@ Loader.prototype.redraw = function() {
 			blur: () => draw_rect(this.start_offset, this.start_dim)
 		});
 	}
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+	];
 };
 
 
@@ -367,76 +373,8 @@ Loader.prototype.update = function() {
 };
 
 
-Loader.prototype.handle_input = function() {
-	if(window.input === undefined) {
-		// Input may be uninitialized because it might still be loading
-		return;
-	}
-
-	if(input.isDown('MOVE')) {
-		let pos = input.mousePos();
-		if(game.clicked_element) {
-			let area = game.clicked_element;
-			if(!(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2))
-			{
-				area.blur();
-				game.clicked_element = null;
-			}
-		}
-		else {
-			let found = false;
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					canvas.style.cursor = 'pointer';
-					found = true;
-					break;
-				}
-			}
-
-			if(!found) {
-				canvas.style.cursor = 'default';
-			}
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-		}
-	}
-
-	if(input.isDown('ENTER')) {
-		input.reset('ENTER');
-		if(this.phase >= 2) {
-			game.next_stage();
-		}
+Loader.prototype.next = function() {
+	if(this.phase >= 2) {
+		game.next_stage();
 	}
 };

@@ -64,6 +64,8 @@ function Ranking() {
 	this.max_heights = [167, 128, 104, 80, 56, 32];
 
 	this.clickareas = [];
+	this.rightclickareas = [];
+	this.keys = [];
 	this.sprites = [];
 
 	// Phase 0: Walking in from right to left
@@ -195,6 +197,10 @@ Ranking.prototype.redraw = function() {
 
 	// Main rectangle (draw last to overwrite any spare pixels from pillar parts)
 	draw_rect([0, 20], [640, 439]);
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+	];
 };
 
 
@@ -371,74 +377,6 @@ Ranking.prototype.next_phase = function() {
 		this.delay = anim_delays.ranking_winner;
 
 		this.phase++;
-	}
-};
-
-
-Ranking.prototype.handle_input = function() {
-	if(input.isDown('MOVE')) {
-		let pos = input.mousePos();
-		if(game.clicked_element) {
-			let area = game.clicked_element;
-			if(!(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2))
-			{
-				area.blur();
-				game.clicked_element = null;
-			}
-		}
-		else {
-			let found = false;
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					canvas.style.cursor = 'pointer';
-					found = true;
-					break;
-				}
-			}
-
-			if(!found) {
-				canvas.style.cursor = 'default';
-			}
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-		}
-	}
-
-	if(input.isDown('ENTER')) {
-		input.reset('ENTER');
-		this.next();
 	}
 };
 

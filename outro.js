@@ -16,6 +16,8 @@ function Outro(winner) {
 	this.animation = null;
 
 	this.clickareas = [];
+	this.rightclickareas = [];
+	this.keys = [];
 }
 
 
@@ -46,9 +48,4 @@ Outro.prototype.update = function() {
 	if(!this.animation.has_stopped) {
 		this.animation.step();
 	}
-};
-
-
-Outro.prototype.handle_input = function() {
-
 };

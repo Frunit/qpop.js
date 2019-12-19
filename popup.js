@@ -32,6 +32,8 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.sprite = new Sprite('gfx/species.png', this.spec_dim, anim_delays.popups, [0, 0], this.spec_positions[image]);
 
 	this.clickareas = [];
+	this.rightclickareas = [];
+	this.keys = [];
 }
 
 
@@ -103,6 +105,11 @@ Popup.prototype.initialize = function() {
 			blur: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim)
 		});
 	}
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.clicked(this.left_answer !== null ? 1 : 0), 'reset': true},
+		{'key': 'ESCAPE', 'action': () => this.clicked(0), 'reset': true},
+	];
 };
 
 
@@ -121,65 +128,6 @@ Popup.prototype.render = function() {
 
 Popup.prototype.update = function() {
 	this.sprite.update();
-};
-
-
-Popup.prototype.handle_input = function() {
-	if(game.clicked_element) {
-		let area = game.clicked_element;
-		let pos = input.mousePos();
-		if(!(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-			pos[1] >= area.y1 && pos[1] <= area.y2))
-			{
-			area.blur();
-			game.clicked_element = null;
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-		}
-	}
-
-	if(input.isDown('ENTER')) {
-		input.reset('ENTER');
-		if(this.left_answer !== null) {
-			this.clicked(1);
-		}
-		else {
-			this.clicked(0);
-		}
-	}
-	else if(input.isDown('ESCAPE')) {
-		input.reset('ESCAPE');
-		this.clicked(0);
-	}
 };
 
 

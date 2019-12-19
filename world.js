@@ -63,6 +63,7 @@ function World() {
 
 	this.clickareas = [];
 	this.rightclickareas = [];
+	this.keys = [];
 
 	// [Ideal_Humid, Ideal_Temp] for Rangones, Blueleaf, ...
 	this.ideal = [[65, 60], [72, 50], [85, 90], [50, 30], [70, 75], [40, 40]];
@@ -223,6 +224,10 @@ World.prototype.redraw = function() {
 
 	// Individuals to place and move
 	this.draw_minispec();
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+	];
 };
 
 
@@ -235,9 +240,6 @@ World.prototype.render = function() {
 
 
 World.prototype.update = function() {
-	// TODO: All functions that act upon input that should not act when AI or animation is active, need respective checks in themselves! The check could be done here, but then option menus would be unresponsive.
-
-
 	if(this.animation) {
 		this.animation.update();
 		if(this.animation.finished) {
@@ -251,107 +253,6 @@ World.prototype.update = function() {
 
 	else if(this.catastrophe_status === 1) {
 		this.catastrophe_exec();
-	}
-};
-
-
-World.prototype.handle_input = function() {
-	if(input.isDown('MOVE')) {
-		let pos = input.mousePos();
-		if(game.clicked_element || game.right_clicked_element) {
-			let area = game.clicked_element || game.right_clicked_element;
-			if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-				pos[1] >= area.y1 && pos[1] <= area.y2)
-			{
-				if(area.move) {
-					area.move(pos[0], pos[1]);
-				}
-			}
-			else
-				{
-				area.blur();
-				game.clicked_element = null;
-				game.right_clicked_element = null;
-			}
-		}
-		else {
-			let found = false;
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					if(!area.default_pointer) {
-						canvas.style.cursor = 'pointer';
-						found = true;
-					}
-					break;
-				}
-			}
-
-			if(!found) {
-				canvas.style.cursor = 'default';
-			}
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('RCLICK')) {
-			input.reset('RCLICK');
-			let pos = input.mousePos();
-			for(let area of this.rightclickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.right_clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('RCLICKUP')) {
-			input.reset('RCLICKUP');
-			if(game.right_clicked_element) {
-				game.right_clicked_element.up();
-				game.right_clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-			if(game.right_clicked_element) {
-				game.right_clicked_element.blur();
-				game.right_clicked_element = null;
-			}
-		}
-	}
-
-	if(input.isDown('ENTER')) {
-		input.reset('ENTER');
-		this.next();
 	}
 };
 
@@ -852,6 +753,7 @@ World.prototype.ai_end = function() {
 	this.ai_active = false;
 	canvas.style.cursor = 'default';
 	if(options.wm_ai_auto_continue) {
+		// TODO: Don't call next if it was the last player.
 		this.next();
 	}
 };

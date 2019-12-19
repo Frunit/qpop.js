@@ -9,7 +9,7 @@ const debug6 = document.getElementById('debug6');
 const debug7 = document.getElementById('debug7');
 const debug8 = document.getElementById('debug8');
 
-/* Master-TODO: Unified input handling
+/*
  * Master-TODO: All sounds
  * Master-TODO: Background music
  * Master-TODO: All options
@@ -39,6 +39,8 @@ function Game() {
 	this.stage = null;
 	this.backstage = [];
 	this.players = [];
+	this.clickareas = [];
+	this.rightclickareas = [];
 }
 
 
@@ -46,7 +48,7 @@ function Game() {
 Game.prototype.main = function() {
 	const now = Date.now();
 
-	this.stage.handle_input();
+	this.handle_input();
 
 	this.time += (now - this.last_time) / 1000;
 	if(this.time > options.update_freq) {
@@ -96,6 +98,117 @@ Game.prototype.start = function() {
 	this.stage.initialize();
 	this.last_time = Date.now();
 	this.main();
+};
+
+
+Game.prototype.handle_input = function() {
+	if(window.input === undefined) {
+		// Input may be uninitialized because it might still be loading
+		return;
+	}
+
+	if(input.isDown('MOVE')) {
+		const pos = input.mousePos();
+		if(game.clicked_element || game.right_clicked_element) {
+			const area = game.clicked_element || game.right_clicked_element;
+			if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
+				pos[1] >= area.y1 && pos[1] <= area.y2)
+			{
+				if(area.move) {
+					area.move(pos[0], pos[1]);
+				}
+			}
+			else
+				{
+				area.blur();
+				game.clicked_element = null;
+				game.right_clicked_element = null;
+			}
+		}
+		else {
+			let found = false;
+			for(let area of game.stage.clickareas) {
+				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
+						pos[1] >= area.y1 && pos[1] <= area.y2)
+				{
+					if(!area.default_pointer) {
+						canvas.style.cursor = 'pointer';
+						found = true;
+					}
+					break;
+				}
+			}
+
+			if(!found) {
+				canvas.style.cursor = 'default';
+			}
+		}
+	}
+
+	if(input.isDown('MOUSE')) {
+		input.reset('MOUSE');
+		if(input.isDown('CLICK')) {
+			input.reset('CLICK');
+			const pos = input.mousePos();
+			for(let area of game.stage.clickareas) {
+				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
+						pos[1] >= area.y1 && pos[1] <= area.y2)
+					{
+					area.down(pos[0], pos[1]);
+					game.clicked_element = area;
+					break;
+				}
+			}
+		}
+		else if(input.isDown('CLICKUP')) {
+			input.reset('CLICKUP');
+			if(game.clicked_element) {
+				game.clicked_element.up();
+				game.clicked_element = null;
+			}
+		}
+		else if(input.isDown('RCLICK')) {
+			input.reset('RCLICK');
+			const pos = input.mousePos();
+			for(let area of game.stage.rightclickareas) {
+				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
+					pos[1] >= area.y1 && pos[1] <= area.y2)
+					{
+					area.down(pos[0], pos[1]);
+					game.right_clicked_element = area;
+					break;
+				}
+			}
+		}
+		else if(input.isDown('RCLICKUP')) {
+			input.reset('RCLICKUP');
+			if(game.right_clicked_element) {
+				game.right_clicked_element.up();
+				game.right_clicked_element = null;
+			}
+		}
+		else if(input.isDown('BLUR')) {
+			input.reset('BLUR');
+			if(game.clicked_element) {
+				game.clicked_element.blur();
+				game.clicked_element = null;
+			}
+			if(game.right_clicked_element) {
+				game.right_clicked_element.blur();
+				game.right_clicked_element = null;
+			}
+		}
+	}
+
+
+	for(let key of game.stage.keys) {
+		if(input.isDown(key.key)) {
+			if(key.reset) {
+				input.reset('ENTER');
+			}
+			key.action();
+		}
+	}
 };
 
 

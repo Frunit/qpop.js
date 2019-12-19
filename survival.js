@@ -64,6 +64,7 @@ function Survival() {
 
 	this.clickareas = [];
 	this.rightclickareas = [];
+	this.keys = [];
 
 	this.cam_clickpos = null;
 	this.cam_rightclickpos = null;
@@ -158,6 +159,10 @@ Survival.prototype.redraw = function() {
 
 	// Main area
 	this.camera.render();
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
+	];
 };
 
 
@@ -775,6 +780,8 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 
 
 Survival.prototype.update = function() {
+	this.test_movement_input();
+
 	if(this.movement_active) {
 		this.delay_counter++;
 
@@ -802,113 +809,11 @@ Survival.prototype.update = function() {
 };
 
 
-Survival.prototype.handle_input = function() {
-	if(input.isDown('MOVE')) {
-		let pos = input.mousePos();
-		if(game.clicked_element || game.right_clicked_element) {
-			let area = game.clicked_element || game.right_clicked_element;
-			if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-				pos[1] >= area.y1 && pos[1] <= area.y2)
-			{
-				if(area.move) {
-					area.move(pos[0], pos[1]);
-				}
-			}
-			else
-				{
-				area.blur();
-				game.clicked_element = null;
-				game.right_clicked_element = null;
-			}
-		}
-		else {
-			let found = false;
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2)
-				{
-					if(!area.default_pointer) {
-						canvas.style.cursor = 'pointer';
-						found = true;
-					}
-					break;
-				}
-			}
-
-			if(!found) {
-				canvas.style.cursor = 'default';
-			}
-		}
-	}
-
-	if(input.isDown('MOUSE')) {
-		input.reset('MOUSE');
-		if(input.isDown('CLICK')) {
-			input.reset('CLICK');
-			let pos = input.mousePos();
-			for(let area of this.clickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('CLICKUP')) {
-			input.reset('CLICKUP');
-			if(game.clicked_element) {
-				game.clicked_element.up();
-				game.clicked_element = null;
-			}
-		}
-		else if(input.isDown('RCLICK')) {
-			input.reset('RCLICK');
-			let pos = input.mousePos();
-			for(let area of this.rightclickareas) {
-				if(pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2)
-					{
-					area.down(pos[0], pos[1]);
-					game.right_clicked_element = area;
-					break;
-				}
-			}
-		}
-		else if(input.isDown('RCLICKUP')) {
-			input.reset('RCLICKUP');
-			if(game.right_clicked_element) {
-				game.right_clicked_element.up();
-				game.right_clicked_element = null;
-			}
-		}
-		else if(input.isDown('BLUR')) {
-			input.reset('BLUR');
-			if(game.clicked_element) {
-				game.clicked_element.blur();
-				game.clicked_element = null;
-			}
-			if(game.right_clicked_element) {
-				game.right_clicked_element.blur();
-				game.right_clicked_element = null;
-			}
-		}
-	}
-
-	if(!this.movement_active && this.action === null) {
-		if(input.isDown('ENTER')) {
-			input.reset('ENTER');
-			this.next();
-		}
-		else {
-			this.test_movement_input();
-		}
-	}
-};
-
-
 Survival.prototype.test_movement_input = function() {
+	if(this.movement_active || this.action !== null) {
+		return;
+	}
+
 	if(input.isDown('DOWN')) {
 		//input.reset('DOWN');
 		if(this.level.is_unblocked(this.level.character.tile, DIR.S)) {
@@ -988,6 +893,10 @@ Survival.prototype.calc_outcome = function() {
 
 Survival.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
+
+	if(this.movement_active || this.action !== null) {
+		return;
+	}
 
 	if(this.level.character.steps > 0) {
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
