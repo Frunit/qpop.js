@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: Background of animations must be redrawn every frame. Also for larger areas (meteor explosion)
 // MAYBE: After a catastrophe, a symbol of the catastrophe could be shown in the lower right area. What to do with the avatar?
 
 function World() {
@@ -59,7 +58,7 @@ function World() {
 	this.ai_own_individuals = [];
 
 	this.animation = null;
-	this.animation_pos = [0, 0];
+	this.animation_pos = [[0, 0]];
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -233,8 +232,10 @@ World.prototype.redraw = function() {
 
 World.prototype.render = function() {
 	if(this.animation) {
-		this.redraw_wm_part(this.animation_pos[0], this.animation_pos[1], false);
-		this.animation.render(ctx, [this.map_offset[0] + this.animation_pos[0]*this.tile_dim[0], this.map_offset[1] + this.animation_pos[1]*this.tile_dim[1]]);
+		for(let pos of this.animation_pos) {
+			this.redraw_wm_part(pos[0], pos[1], false);
+		}
+		this.animation.render(ctx, [this.map_offset[0] + this.animation_pos[0][0]*this.tile_dim[0], this.map_offset[1] + this.animation_pos[0][1]*this.tile_dim[1]]);
 	}
 };
 
@@ -343,20 +344,19 @@ World.prototype.catastrophe_exec = function() {
 
 		const [x, y] = random_element(impactable);
 
+		this.animation_pos = [];
+
 		for(let xx = x - 1; xx <= x + 1; xx++) {
 			for(let yy = y - 1; yy <= y + 1; yy++) {
-				game.height_map[yy][xx] = 100;
-				game.world_map[yy][xx] = WORLD_MAP.MOUNTAIN;
+				this.animation_pos.push([xx, yy]);
 			}
 		}
-		game.world_map[y][x] = WORLD_MAP.CRATER;
 
 		// Big Explosion
 		// TODO RESEARCH: Check if frames and speed are correct
 		this.animation = new Sprite('gfx/world.png', [48, 48], anim_delays.world, [0, 32],
 		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]],
-		true, () => this.catastrophe_finish());
-		this.animation_pos = [x-1, y-1];
+		true, () => this.comet_finish());
 		break;
 		}
 	case 3: { // Plague
@@ -371,7 +371,7 @@ World.prototype.catastrophe_exec = function() {
 
 		const [x, y] = random_element(creatures);
 
-		// TODO: This could be animated such that not all creatures disappear simultaneously but one after the other
+		// MAYBE: This could be animated such that not all creatures disappear simultaneously but one after the other
 		for(let xx = x - 3; xx <= x + 3; xx++) {
 			for(let yy = y - 3; yy <= y + 3; yy++) {
 				const player_num = game.map_positions[yy][xx];
@@ -468,6 +468,20 @@ World.prototype.catastrophe_finish = function() {
 };
 
 
+World.prototype.comet_finish = function() {
+	const [x, y] = self.animation_pos[0];
+	for(let xx = x; xx <= x + 2; xx++) {
+		for(let yy = y; yy <= y + 2; yy++) {
+			game.height_map[yy][xx] = 100;
+			game.world_map[yy][xx] = WORLD_MAP.MOUNTAIN;
+		}
+	}
+	game.world_map[y+1][x+1] = WORLD_MAP.CRATER;
+
+	this.catastrophe_finish();
+};
+
+
 World.prototype.volcano_step = function(volcanos_left, positions) {
 	if(volcanos_left === 0) {
 		this.catastrophe_finish();
@@ -488,7 +502,7 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
-	this.animation_pos = [x, y];
+	this.animation_pos = [[x, y]];
 };
 
 
@@ -526,7 +540,7 @@ World.prototype.fight = function(x, y) {
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.fight_end(winner, enemy, x, y));
 
-	this.animation_pos = [x, y];
+	this.animation_pos = [[x, y]];
 };
 
 
@@ -752,8 +766,7 @@ World.prototype.ai_end = function() {
 	game.current_player.tomove = 0;
 	this.ai_active = false;
 	canvas.style.cursor = 'default';
-	if(options.wm_ai_auto_continue) {
-		// TODO: Don't call next if it was the last player.
+	if(options.wm_ai_auto_continue && !game.is_last_player()) {
 		this.next();
 	}
 };
