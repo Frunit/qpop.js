@@ -33,7 +33,8 @@ Intro.prototype.redraw = function() {
 	// Inverted rectangle around the picture
 	draw_inv_rect([this.anim_offset[0] - 1, this.anim_offset[1] - 1], [this.anim_dim[0] + 2, this.anim_dim[1] + 2]);
 
-	this.clickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	this.clickareas.push({
 		x1: this.anim_offset[0],

@@ -41,7 +41,8 @@ Transition.prototype.redraw = function() {
 		subtitle(this.subtitle_offset[0], this.subtitle_offset[1], lang[this.lang_string]);
 	}
 
-	this.clickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	this.clickareas.push({
 		x1: this.pic_offset[0],

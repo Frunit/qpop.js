@@ -97,6 +97,17 @@ Game.prototype.start = function() {
 	this.stage = new Loader();
 	this.stage.initialize();
 	this.last_time = Date.now();
+
+	this.clickareas.push({
+		x1: 1,
+		y1: 1,
+		x2: 21,
+		y2: 20,
+		down: () => {},
+		up: () => this.toggle_credits(),
+		blur: () => {}
+	});
+
 	this.main();
 };
 
@@ -616,6 +627,19 @@ Game.prototype.next_stage = function() {
 		console.log(this.stage);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code. This should never ever happen!',
 					() => {}, lang.debug_too_bad);
+	}
+};
+
+
+Game.prototype.toggle_credits = function() {
+	if(game.stage.id === SCENE.CREDITS) {
+		game.stage = game.backstage.pop();
+		game.stage.redraw();
+	}
+	else {
+		game.backstage.push(game.stage);
+		game.stage = new Credits();
+		game.stage.initialize();
 	}
 };
 

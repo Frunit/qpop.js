@@ -32,6 +32,9 @@ Outro.prototype.initialize = function() {
 Outro.prototype.redraw = function() {
 	draw_base();
 
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
+
 	draw_rect([0, 20], [640, 460]); // Main rectangle
 
 	// Inverted rectangle around the picture

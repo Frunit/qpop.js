@@ -10,11 +10,11 @@ function Credits() {
 	this.lower_panel_dim = [150, 211]; // Actual dimension is twice as wide!
 	this.close_dim = [181, 22];
 
-	this.upper_panel_offset = [9, 7];
+	this.upper_panel_offset = [9, 27];
 	this.close_offset = [459, 458];
-	this.info_text_offset = [20, 20];
-	this.original_text_offset = [20, 20];
-	this.remake_text_offset = [20, 20];
+	this.info_text_offset = [20, 50];
+	this.original_text_offset = [20, 274];
+	this.remake_text_offset = [341, 274];
 
 	this.panel_left_soffset = [150, 211];
 	this.panel_right_soffset = [470, 211];
@@ -23,7 +23,7 @@ function Credits() {
 	this.line_height = 20;
 	// CONST_END
 
-	this.lower_panel_offsets = [[9, 230], [330, 230]];
+	this.lower_panel_offsets = [[9, 241], [330, 241]];
 
 	this.text = multiline(lang.information, this.max_text_width);
 
@@ -43,11 +43,12 @@ Credits.prototype.redraw = function() {
 
 	// TODO: Make credits button in header red
 
-	draw_rect([0, 20], [640, 439]); // Main rectangle
+	draw_rect([0, 20], [640, 460]); // Main rectangle
 	draw_rect(this.close_offset, this.close_dim); // Close
 	write_text(lang.close, [549, 473], 'white', 'black');
 
-	this.clickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	this.clickareas.push({
 		x1: this.close_offset[0],
@@ -78,20 +79,20 @@ Credits.prototype.redraw = function() {
 
 	// Info text
 	for(let i = 0; i < this.text.length; i++) {
-		write_text(this.text[i], [this.info_text_offset[0], this.info_text_offset[1] + this.line_height * i], fg='#000000', bg='#ffffff', align='left');
+		write_text(this.text[i], [this.info_text_offset[0], this.info_text_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
 	}
 
 	// Credits for original game
 	for(let i = 0; i < lang.credits_original.length; i++) {
 		for(let j = 0; j < 2; j++) {
-			write_text(lang.credits_original[i][j], [this.original_text_offset[0] + j * 20, this.original_text_offset[1] + this.line_height * (i*2 + j) - j*3], fg='#000000', bg='#ffffff', align='left');
+			write_text(lang.credits_original[i][j], [this.original_text_offset[0] + j * 20, this.original_text_offset[1] + this.line_height * (i*2 + j) - j*3], '#000000', '#ffffff', 'left');
 		}
 	}
 
 	// Credits for remake
 	for(let i = 0; i < lang.credits_remake.length; i++) {
 		for(let j = 0; j < 2; j++) {
-			write_text(lang.credits_remake[i][j], [this.remake_text_offset[0] + j * 20, this.remake_text_offset[1] + this.line_height * (i*2 + j) - j*3], fg='#000000', bg='#ffffff', align='left');
+			write_text(lang.credits_remake[i][j], [this.remake_text_offset[0] + j * 20, this.remake_text_offset[1] + this.line_height * (i*2 + j) - j*3], '#000000', '#ffffff', 'left');
 		}
 	}
 
@@ -112,7 +113,7 @@ Credits.prototype.update = function() {
 
 
 Credits.prototype.close = function() {
-	draw_rect(this.next_offset, this.next_dim);
+	draw_rect(this.close_offset, this.close_dim);
 	game.stage = game.backstage.pop();
 	game.stage.redraw();
 };

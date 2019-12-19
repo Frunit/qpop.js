@@ -108,8 +108,8 @@ World.prototype.next_player = function() {
 
 World.prototype.redraw = function() {
 	draw_base();
-	this.clickareas = [];
-	this.rightclickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	draw_rect(this.left_rect_offset, this.left_rect_dim); // World rectangle
 	draw_rect(this.right_rect_offset, this.right_rect_dim); // Right rectangle

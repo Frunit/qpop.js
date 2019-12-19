@@ -83,7 +83,8 @@ Mutations.prototype.redraw = function() {
 	draw_rect(this.next_offset, this.next_dim); // Continue
 	write_text(lang.next, [549, 473], 'white', 'black');
 
-	this.clickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	this.clickareas.push({
 		x1: this.next_offset[0],

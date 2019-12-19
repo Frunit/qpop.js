@@ -55,8 +55,8 @@ Init.prototype.redraw = function() {
 	draw_rect(this.next_offset, this.next_dim); // Continue
 	write_text(lang.next, [549, 473], 'white', 'black');
 
-	this.clickareas = [];
-	this.rightclickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	this.clickareas.push({
 		x1: this.load_offset[0],

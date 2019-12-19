@@ -95,7 +95,8 @@ Loader.prototype.redraw = function() {
 
 	this.draw_bar();
 
-	this.clickareas = [];
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
 
 	// Loading/Starting button
 	draw_rect(this.start_offset, this.start_dim);
