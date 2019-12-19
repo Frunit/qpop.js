@@ -98,7 +98,7 @@ Level.prototype.generate_map = function() {
 	this.density = 10 * this.individuals / this.neighbourfields;
 	const mod_density = 50 + 10 * this.density;
 	const wfactor = 2500/this.individuals;
-	const wtable = Array(6).fill(0); // TODO: wtable[n]+=wfactor for each own individual on plant n in world map
+	const wtable = Array(6).fill(0); // TODO: wtable[n]+=wfactor for each own individual on plant n in world map. Note that survival indices and world indices for plants are different!!!
 	wtable[2] = 10*wfactor; // DEBUG Should be determined by the positions on the world map
 
 	// Add food to the map

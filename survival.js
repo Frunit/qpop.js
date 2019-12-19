@@ -3,7 +3,6 @@
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
-// TODO: Food does not provide as many leaves as in the original (e.g. at 60% specialization)
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;
@@ -469,10 +468,13 @@ Survival.prototype.finish_feeding = function(food) {
 	}
 	// Normal food
 	else if(food < 36) {
-		game.current_player.eaten += game.current_player.stats[Math.floor(food / 6)];
+		// Mapping from survival food to stats food.
+		const food_type = [0, 2, 5, 1, 3, 4][Math.floor(food / 6)];
+		game.current_player.eaten += game.current_player.stats[food_type];
 		if(game.current_player.eaten > 1480) {
 			game.current_player.eaten = 1480;
 		}
+		console.log(food_type, game.current_player.stats[food_type], game.current_player.eaten);
 		this.draw_symbols();
 	}
 

@@ -3,6 +3,7 @@
 
 // TODO RESEARCH: What happens to "out of order" players?
 // TODO: Happy Chuck Berry stands/jumps too low.
+// TODO: Need to distribute new evolution points based on number of individuals on world map
 
 
 function Ranking() {
