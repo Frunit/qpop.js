@@ -2,7 +2,7 @@
 
 
 function Credits() {
-	this.id = -1;
+	this.id = SCENE.CREDITS;
 	this.bg = resources.get('gfx/light_bg.png');
 
 	// CONST_START
