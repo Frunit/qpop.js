@@ -1,5 +1,6 @@
 'use strict';
 
+// MAYBE: Subtitles for some animations? (Intro and Outro text)
 
 function Animation(animation, offset) {
 	// Apparently the best way to copy an object...

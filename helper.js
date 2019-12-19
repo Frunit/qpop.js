@@ -80,8 +80,9 @@ const SCENE = Object.freeze({
 	SURVIVAL:       11,
 	OUTRO:          12,
 	POPUP:          20,
-	CREDITS:        21,
-	CATASTROPHE:    22,
+	CATASTROPHE:    21,
+	CREDITS:        30,
+	OPTIONS:        31,
 });
 
 const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46]);
@@ -211,6 +212,7 @@ function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
 
 function draw_base() {
 	const bg = resources.get('gfx/dark_bg.png');
+	const gui = resources.get('gfx/gui.png');
 	ctx.drawImage(bg, 0, 0);
 	ctx.save();
 	ctx.beginPath();
@@ -219,10 +221,45 @@ function draw_base() {
     ctx.stroke();
 	ctx.restore();
 
+	// Info
 	draw_rect([0, 0], [22, 21]);
-	draw_rect([21, 0], [619, 21]);
+	if(game.stage.id === SCENE.CREDITS) {
+		ctx.drawImage(gui, 12, 0, 12, 12, 5, 4, 12, 12);
+	}
+	else {
+		ctx.drawImage(gui, 0, 0, 12, 12, 5, 4, 12, 12);
+	}
 
-	write_text(lang.title + ' ' + version, [320, 15], 'white', 'black');
+	// Middle
+	draw_rect([21, 0], [525, 21]);
+	write_text(lang.title + ' ' + version, [320, 14], 'white', 'black');
+
+	// Language
+	draw_rect([545, 0], [32, 21]);
+	write_text(options.language, [561, 14], 'white', 'black');
+
+	// Sound
+	draw_rect([576, 0], [22, 21]);
+	ctx.drawImage(gui, 24, 0, 12, 12, 581, 4, 12, 12);
+	if(!options.sound_on) {
+		ctx.drawImage(gui, 72, 0, 12, 12, 581, 4, 12, 12);
+	}
+
+	// Music
+	draw_rect([597, 0], [22, 21]);
+	ctx.drawImage(gui, 36, 0, 12, 12, 602, 4, 12, 12);
+	if(!options.music_on) {
+		ctx.drawImage(gui, 72, 0, 12, 12, 602, 4, 12, 12);
+	}
+
+	// Settings
+	draw_rect([618, 0], [22, 21]);
+	if(game.stage.id === SCENE.OPTIONS) {
+		ctx.drawImage(gui, 60, 0, 12, 12, 623, 4, 12, 12);
+	}
+	else {
+		ctx.drawImage(gui, 48, 0, 12, 12, 623, 4, 12, 12);
+	}
 }
 
 

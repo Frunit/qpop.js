@@ -98,13 +98,52 @@ Game.prototype.start = function() {
 	this.stage.initialize();
 	this.last_time = Date.now();
 
-	this.clickareas.push({
-		x1: 1,
-		y1: 1,
-		x2: 21,
-		y2: 20,
+	// TODO: All buttons need the push-in/push-out effect
+	this.clickareas.push({ // Info/credits
+		x1: 1, y1: 1,
+		x2: 21, y2: 20,
 		down: () => {},
 		up: () => this.toggle_credits(),
+		blur: () => {}
+	});
+
+	this.clickareas.push({ // Language
+		x1: 546, y1: 1,
+		x2: 576, y2: 20,
+		down: () => {},
+		up: () => this.next_language(1),
+		blur: () => {}
+	});
+
+	this.rightclickareas.push({ // Language
+		x1: 546, y1: 1,
+		x2: 576, y2: 20,
+		down: () => {},
+		up: () => this.next_language(-1),
+		blur: () => {}
+	});
+
+	this.clickareas.push({ // Sound
+		x1: 577, y1: 1,
+		x2: 597, y2: 20,
+		down: () => {},
+		up: () => this.toggle_sound(),
+		blur: () => {}
+	});
+
+	this.clickareas.push({ // Music
+		x1: 598, y1: 1,
+		x2: 618, y2: 20,
+		down: () => {},
+		up: () => this.toggle_music(),
+		blur: () => {}
+	});
+
+	this.clickareas.push({ // Options
+		x1: 619, y1: 1,
+		x2: 639, y2: 20,
+		down: () => {},
+		up: () => this.toggle_options(),
 		blur: () => {}
 	});
 
@@ -641,6 +680,42 @@ Game.prototype.toggle_credits = function() {
 		game.stage = new Credits();
 		game.stage.initialize();
 	}
+};
+
+
+Game.prototype.toggle_options = function() {
+	if(game.stage.id === SCENE.OPTIONS) {
+		game.stage = game.backstage.pop();
+		game.stage.redraw();
+	}
+	else {
+		open_popup(lang.popup_title, 'dino_cries', 'Options are not implemented, yet.', () => {}, lang.debug_too_bad);
+		/*game.backstage.push(game.stage);
+		game.stage = new Options();
+		game.stage.initialize();*/
+	}
+};
+
+
+Game.prototype.toggle_sound = function() {
+	options.sound_on = !options.sound_on;
+	game.stage.redraw();
+};
+
+
+Game.prototype.toggle_music = function() {
+	options.music_on = !options.music_on;
+	game.stage.redraw();
+};
+
+
+Game.prototype.next_language = function(direction) {
+	const lang_list = Object.keys(i18n);
+	const current_lang = lang_list.indexOf(options.language);
+
+	options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
+	lang = i18n[options.language];
+	game.stage.redraw();
 };
 
 

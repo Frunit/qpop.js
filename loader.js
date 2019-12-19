@@ -48,6 +48,7 @@ Loader.prototype.initialize = function() {
 		['gfx/dark_bg.png', 'image'],
 		['gfx/mutations.png', 'image'],
 		['gfx/header.png', 'image'],
+		['gfx/gui.png', 'image'],
 	]);
 };
 
