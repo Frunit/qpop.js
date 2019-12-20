@@ -98,53 +98,52 @@ Game.prototype.start = function() {
 	this.stage.initialize();
 	this.last_time = Date.now();
 
-	// TODO: All buttons need the push-in/push-out effect
 	this.clickareas.push({ // Info/credits
 		x1: 1, y1: 1,
 		x2: 21, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([0, 0], [22, 21], true, true);},
 		up: () => this.toggle_credits(),
-		blur: () => {}
+		blur: () => {draw_rect([0, 0], [22, 21]);}
 	});
 
 	this.clickareas.push({ // Language
 		x1: 546, y1: 1,
 		x2: 576, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([545, 0], [32, 21], true, true);},
 		up: () => this.next_language(1),
-		blur: () => {}
+		blur: () => {draw_rect([545, 0], [32, 21]);}
 	});
 
 	this.rightclickareas.push({ // Language
 		x1: 546, y1: 1,
 		x2: 576, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([545, 0], [32, 21], true, true);},
 		up: () => this.next_language(-1),
-		blur: () => {}
+		blur: () => {draw_rect([545, 0], [32, 21]);}
 	});
 
 	this.clickareas.push({ // Sound
 		x1: 577, y1: 1,
 		x2: 597, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([576, 0], [22, 21], true, true);},
 		up: () => this.toggle_sound(),
-		blur: () => {}
+		blur: () => {draw_rect([576, 0], [22, 21]);}
 	});
 
 	this.clickareas.push({ // Music
 		x1: 598, y1: 1,
 		x2: 618, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([597, 0], [22, 21], true, true);},
 		up: () => this.toggle_music(),
-		blur: () => {}
+		blur: () => {draw_rect([597, 0], [22, 21]);}
 	});
 
 	this.clickareas.push({ // Options
 		x1: 619, y1: 1,
 		x2: 639, y2: 20,
-		down: () => {},
+		down: () => {draw_rect([618, 0], [22, 21], true, true);},
 		up: () => this.toggle_options(),
-		blur: () => {}
+		blur: () => {draw_rect([618, 0], [22, 21]);}
 	});
 
 	this.main();
@@ -671,6 +670,7 @@ Game.prototype.next_stage = function() {
 
 
 Game.prototype.toggle_credits = function() {
+	draw_rect([0, 0], [22, 21]);
 	if(game.stage.id === SCENE.CREDITS) {
 		game.stage = game.backstage.pop();
 		game.stage.redraw();
@@ -684,6 +684,7 @@ Game.prototype.toggle_credits = function() {
 
 
 Game.prototype.toggle_options = function() {
+	draw_rect([618, 0], [22, 21]);
 	if(game.stage.id === SCENE.OPTIONS) {
 		game.stage = game.backstage.pop();
 		game.stage.redraw();
@@ -698,18 +699,21 @@ Game.prototype.toggle_options = function() {
 
 
 Game.prototype.toggle_sound = function() {
+	draw_rect([576, 0], [22, 21]);
 	options.sound_on = !options.sound_on;
 	game.stage.redraw();
 };
 
 
 Game.prototype.toggle_music = function() {
+	draw_rect([597, 0], [22, 21]);
 	options.music_on = !options.music_on;
 	game.stage.redraw();
 };
 
 
 Game.prototype.next_language = function(direction) {
+	draw_rect([545, 0], [32, 21]);
 	const lang_list = Object.keys(i18n);
 	const current_lang = lang_list.indexOf(options.language);
 
