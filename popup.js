@@ -10,7 +10,7 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.max_text_width = 260;
 
 	this.dim = [360, 150];
-	this.title_dim = [361, 21];
+	this.title_dim = [360, 21];
 	this.spec_dim = [64, 64];
 	this.left_answer_dim = [180, 22];
 	this.right_answer_dim = [181, 22];
@@ -51,6 +51,11 @@ Popup.prototype.spec_positions = {
 
 
 Popup.prototype.initialize = function() {
+	this.redraw();
+};
+
+
+Popup.prototype.redraw = function() {
 	ctx.drawImage(this.bg,
 		0, 0,
 		this.dim[0], this.dim[1],
