@@ -36,15 +36,17 @@ const i18n = Object.freeze({
 		transition_world: '',		// Der Krieg der Arten
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
 		information: 'TODO: Dies ist ein längerer Text über Q-Pop',
-		credits_original: [ // TODO
-			['Programmierung', 'Karl-L. von Wendt, Lars Hammer'],
-			['Grafiken', 'Stefan Beyer'],
-			['Musik', 'Karl-L. von Wendt, Lars Hammer'],
+		credits_original: [
+			['Herausgeber und Entwickler', ['von Wendt Konzept GmbH']],
+			['Idee', ['Karl-L. von Wendt']],
+			['Programmierung', ['Karl-L. von Wendt', 'Lars Hammer']],
+			['Grafiken und Animationen', ['Stefan Beyer']],
+			['Musik', ['Karl-L. von Wendt', 'Lars Hammer']],
 		],
-		credits_remake: [ // TODO
-			['Programmierung', 'Mathias Bockwoldt'],
-			['Reverse Engineering', 'Mathias Bockwoldt, Christian Klamt'],
-			['Neue Grafiken', 'Eike Strahtmann'],
+		credits_remake: [
+			['Programmierung', ['Mathias Bockwoldt']],
+			['Reverse Engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
+			['Neue Grafiken', ['Eike Strahtmann']],
 		],
 		debug_too_bad: 'Schade',
 	},
@@ -63,7 +65,7 @@ const i18n = Object.freeze({
 		player: 'Player {num}',
 		species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
 		iq: 'IQ',
-		iqs: ['Charles Darwin', 'Darwin’s Assistant', 'Darwin’s Aunt', 'Darwin’s Dog'],
+		iqs: ['Charles Darwin', 'Darwin’s helper', 'Darwin’s aunt', 'Darwin’s dog'],
 		popup_title: 'Q-POP Security Service',
 		catastrophe: 'Catastrophe',
 		turns: ['5 turns', '10 turns', '20 turns', 'To the bitter end'],  // In original, the texts have some more info
@@ -82,16 +84,18 @@ const i18n = Object.freeze({
 		transition_world: 'The War of the Species',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
 		information: 'TODO: This is a lengthy text about Q-Pop',
-		credits_original: [ // TODO
-			['Programming', 'Karl-L. von Wendt, Lars Hammer'],
-			['Graphics', 'Stefan Beyer'],
-			['Music', 'Karl-L. von Wendt, Lars Hammer'],
+		credits_original: [
+			['Publisher and developer', ['von Wendt Konzept GmbH']],
+			['Game design', ['Karl-L. von Wendt']],
+			['Programming', ['Karl-L. von Wendt', 'Lars Hammer']],
+			['Graphics', ['Stefan Beyer']],
+			['Music', ['Karl-L. von Wendt', 'Lars Hammer']],
 		],
-		credits_remake: [ // TODO
-			['Programming', 'Mathias Bockwoldt'],
-			['Reverse engineering', 'Mathias Bockwoldt, Christian Klamt'],
-			['New graphics', 'Eike Strahtmann'],
-			['English translation', 'Mathias Bockwoldt'],
+		credits_remake: [
+			['Programming', ['Mathias Bockwoldt']],
+			['Reverse engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
+			['New graphics', ['Eike Strahtmann']],
+			['English translation', ['Mathias Bockwoldt']],
 		],
 		debug_too_bad: 'Too bad!',
 	}

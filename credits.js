@@ -41,8 +41,6 @@ Credits.prototype.initialize = function() {
 Credits.prototype.redraw = function() {
 	draw_base();
 
-	// TODO: Make credits button in header red
-
 	draw_rect([0, 20], [640, 460]); // Main rectangle
 	draw_rect(this.close_offset, this.close_dim); // Close
 	write_text(lang.close, [549, 473], 'white', 'black');
@@ -83,16 +81,24 @@ Credits.prototype.redraw = function() {
 	}
 
 	// Credits for original game
+	let line = 0;
 	for(let i = 0; i < lang.credits_original.length; i++) {
-		for(let j = 0; j < 2; j++) {
-			write_text(lang.credits_original[i][j], [this.original_text_offset[0] + j * 20, this.original_text_offset[1] + this.line_height * (i*2 + j) - j*3], '#000000', '#ffffff', 'left');
+		write_text(lang.credits_original[i][0], [this.original_text_offset[0], this.original_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+		line++;
+		for(let j = 0; j < lang.credits_original[i][1].length; j++) {
+			write_text(lang.credits_original[i][1][j], [this.original_text_offset[0] + 30, this.original_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			line++;
 		}
 	}
 
 	// Credits for remake
+	line = 0;
 	for(let i = 0; i < lang.credits_remake.length; i++) {
-		for(let j = 0; j < 2; j++) {
-			write_text(lang.credits_remake[i][j], [this.remake_text_offset[0] + j * 20, this.remake_text_offset[1] + this.line_height * (i*2 + j) - j*3], '#000000', '#ffffff', 'left');
+		write_text(lang.credits_remake[i][0], [this.remake_text_offset[0], this.remake_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+		line++;
+		for(let j = 0; j < lang.credits_remake[i][1].length; j++) {
+			write_text(lang.credits_remake[i][1][j], [this.remake_text_offset[0] + 30, this.remake_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			line++;
 		}
 	}
 
