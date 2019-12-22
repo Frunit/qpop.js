@@ -757,7 +757,6 @@ Survival.prototype.start_predator_movement = function() {
 
 
 Survival.prototype.suicide = function() {
-	// TODO RESEARCH: Which image?
 	open_popup(lang.popup_title, 'chuck_berry', lang.suicide, (x) => {if(x===1) {this.player_death(true);}}, lang.no, lang.yes);
 };
 

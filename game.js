@@ -564,7 +564,7 @@ Game.prototype.load_game = function(save_file) {
 
 	game.infinite_game = content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp);
 
-	game.stage = new Ranking();  // TODO: Consider if this should be World instead
+	game.stage = new Ranking();  // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
 	game.stage.initialize();
 };
 

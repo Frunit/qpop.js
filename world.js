@@ -29,7 +29,7 @@ function World() {
 	this.hygro_offset = [545, 26];
 	this.temp_offset = [585, 26];
 	this.spec_offset = [465, 70];
-	this.calendar_text_offset = [490, 59]; // TODO RESEARCH: check this!
+	this.calendar_text_offset = [492, 55];
 	this.bar_icon_offset = [465, 146];
 	this.bar_offset = [485, 150];
 	this.toplace_offset = [465, 286];
@@ -163,7 +163,7 @@ World.prototype.redraw = function() {
 
 	if(game.turn > 0) {
 		ctx.save();
-		ctx.font = '18px serif';
+		ctx.font = '15px serif';
 		ctx.textAlign = 'center';
 		if(game.turn !== game.max_turns) {
 			ctx.fillStyle = '#000000';
@@ -417,7 +417,7 @@ World.prototype.catastrophe_exec = function() {
 
 		const [x, y] = random_element(land);
 		game.world_map[y][x] = WORLD_MAP.HUMANS;
-		// TODO RESEARCH: Is there an explosion? Otherwise: this.catastrophe_finish();
+		// TODO: Run explosion
 		game.humans_present = true;
 		this.catastrophe_finish();
 		break;
