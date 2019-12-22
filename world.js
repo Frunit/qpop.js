@@ -416,10 +416,11 @@ World.prototype.catastrophe_exec = function() {
 		}
 
 		const [x, y] = random_element(land);
-		game.world_map[y][x] = WORLD_MAP.HUMANS;
-		// TODO: Run explosion
-		game.humans_present = true;
-		this.catastrophe_finish();
+		this.animation_pos = [[x, y]];
+
+		this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
+			[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
+			true, () => this.humans_finish());
 		break;
 		}
 	case 8: { // Cosmic rays
@@ -478,6 +479,14 @@ World.prototype.comet_finish = function() {
 	}
 	game.world_map[y+1][x+1] = WORLD_MAP.CRATER;
 
+	this.catastrophe_finish();
+};
+
+
+World.prototype.humans_finish = function() {
+	const [x, y] = self.animation_pos[0];
+	game.world_map[y][x] = WORLD_MAP.HUMANS;
+	game.humans_present = true;
 	this.catastrophe_finish();
 };
 
