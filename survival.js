@@ -3,6 +3,7 @@
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
+// TODO: Radar is updated at the beginning of the movement, not at the end
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;

@@ -507,7 +507,6 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 		}
 	}
 
-	// TODO RESEARCH: Check if frames and speed are correct
 	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
