@@ -371,6 +371,24 @@ Game.prototype.get_ranking = function(selection=[0,1,2,3,4,5]) {
 };
 
 
+Game.prototype.count_plants = function() {
+	const wm_width = game.map_positions[0].length;
+	const wm_height = game.map_positions.length;
+	const counts = [0, 0, 0, 0, 0, 0];
+
+	for(let x = 1; x < wm_width - 1; x++) {
+		for(let y = 1; y < wm_height - 1; y++) {
+			if(game.map_positions[y][x] === this.current_player.id)
+			{
+				counts[game.world_map[y][x] - WORLD_MAP.RANGONES]++;
+			}
+		}
+	}
+
+	return counts;
+};
+
+
 Game.prototype.save_game = function() {
 	const save_file = new ArrayBuffer(4172);
 	const content = new DataView(save_file);

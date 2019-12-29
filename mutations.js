@@ -16,6 +16,7 @@ function Mutations() {
 	this.next_dim = [181, 22];
 	this.percent_del_dim = [60, 16];
 	this.evo_pts_numdel_dim = [60, 16];
+	this.pie_dim = [16, 16];
 
 	this.text_offset = [20, 123];
 	this.percent_offset = [571, 123];
@@ -30,6 +31,7 @@ function Mutations() {
 	this.plus_offset = [547, 111];
 	this.spec_offset = [23, 23];
 	this.next_offset = [459, 458];
+	this.pie_offset = [615, 111];
 
 	this.symbol_soffset = [0, 96];
 	this.plus_soffset = [312, 96];
@@ -38,6 +40,7 @@ function Mutations() {
 	this.minusdown_soffset = [360, 96];
 	this.evobar_soffset = [0, 0];
 	this.emptybar_soffset = [300, 80];
+	this.pie_soffset = [376, 96];
 
 	this.deltay = 26;
 	// CONST_END
@@ -45,6 +48,7 @@ function Mutations() {
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 	this.bar_soffsets = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
+	this.plant_counts = [0, 0, 0, 0, 0, 0];
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -54,7 +58,6 @@ function Mutations() {
 
 Mutations.prototype.initialize = function() {
 	this.redraw();
-	this.next_player();
 };
 
 
@@ -66,10 +69,23 @@ Mutations.prototype.next_player = function() {
 		this.next_popup(1);
 	}
 	else {
+		this.plant_counts = game.count_plants();
+		const total_count = this.plant_counts.reduce((a, b) => a+b);
+		for(let i = 0; i < this.plant_counts.length; i++) {
+			this.plant_counts[i] = Math.round(this.plant_counts[i] / total_count * 12);
+		}
 		this.draw_avatar();
 		this.draw_evo_score();
 		for(let i = 0; i < 13; i++) {
 			this.draw_bar(i);
+			// Pie chart
+			if(i <= 5) {
+				ctx.drawImage(this.pics,
+					this.pie_soffset[0] + this.pie_dim[0]*this.plant_counts[i], this.pie_soffset[1],
+					this.pie_dim[0], this.pie_dim[1],
+					this.pie_offset[0], this.pie_offset[1] + this.deltay*i,
+					this.pie_dim[0], this.pie_dim[1]);
+			}
 		}
 	}
 };
@@ -109,8 +125,6 @@ Mutations.prototype.redraw = function() {
 		// Minus and Plus
 		this.draw_minus(i);
 		this.draw_plus(i);
-
-		this.draw_bar(i);
 
 		this.clickareas.push({
 			x1: this.minus_offset[0],
@@ -158,6 +172,8 @@ Mutations.prototype.redraw = function() {
 	write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
 
 	this.draw_evo_score();
+
+	this.next_player();
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
