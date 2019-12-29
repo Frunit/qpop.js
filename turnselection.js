@@ -1,6 +1,5 @@
 'use strict';
 
-
 function Turnselection() {
 	this.id = SCENE.TURN_SELECTION;
 	this.bg = resources.get('gfx/light_bg.png');
@@ -68,19 +67,21 @@ Turnselection.prototype.draw_turn_changed = function() {
 	write_text(lang.turns[this.turn_index], this.bar_text_offset, 'black', false);
 
 	if(this.turn_index === 3) {
-		if(random_int(0, 1)) {
-			// Amorph splatters
-			this.animations = [new Sprite(this.pics_url, this.anim_dim,
-				anim_delays.turn_selection, [420, 450],
-				[[0, 0], [0, 90]],
-				true, () => this.end_animation(1))];
-		}
-		else {
-			// Chuckberry stumbles
-			this.animations = [new Sprite(this.pics_url, this.anim_dim,
-				anim_delays.turn_selection, [0, 270],
-				[[0, 0], [0, 90], [0, 180], [0, 270], [0, 270]],
-				true, () => this.end_animation(0))];
+		if(this.animations === null) {
+			if(random_int(0, 1)) {
+				// Amorph splatters
+				this.animations = [new Sprite(this.pics_url, this.anim_dim,
+					anim_delays.turn_selection, [420, 450],
+					[[0, 0], [0, 90]],
+					true, () => this.end_animation(1))];
+			}
+			else {
+				// Chuckberry stumbles
+				this.animations = [new Sprite(this.pics_url, this.anim_dim,
+					anim_delays.turn_selection, [0, 270],
+					[[0, 0], [0, 90], [0, 180], [0, 270], [0, 270]],
+					true, () => this.end_animation(0))];
+			}
 		}
 
 		this.render();
