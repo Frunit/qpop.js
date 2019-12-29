@@ -39,6 +39,7 @@ function Game() {
 	this.stage = null;
 	this.backstage = [];
 	this.players = [];
+	this.evo_points = [0, 0, 0, 0, 0, 0];
 	this.clickareas = [];
 	this.rightclickareas = [];
 }
@@ -389,6 +390,19 @@ Game.prototype.count_plants = function() {
 };
 
 
+Game.prototype.select_evo_points = function() {
+	if(this.max_turns <= 5) {
+		this.evo_points = [60, 50, 40, 30, 20, 10];
+	}
+	else if(this.max_turns <= 10) {
+		this.evo_points = [42, 35, 28, 21, 14, 7];
+	}
+	else {
+		this.evo_points = [30, 25, 20, 15, 10, 5];
+	}
+};
+
+
 Game.prototype.save_game = function() {
 	const save_file = new ArrayBuffer(4172);
 	const content = new DataView(save_file);
@@ -553,6 +567,8 @@ Game.prototype.load_game = function(save_file) {
 	game.water_level = content.getUint16(0xb1 + mp, true);
 	game.humid = content.getUint16(0xb3 + mp, true);
 	game.temp = content.getUint16(0xb5 + mp, true);
+
+	this.select_evo_points();
 
 	const size = 28;
 

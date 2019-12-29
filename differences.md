@@ -42,6 +42,11 @@ In the original game, you had to click for each individual to be placed. Now, yo
 The mutation screen now shows the distribution of own individuals among the plants of the world map to make it easier to choose the appropriate traits to improve.
 
 
+#### More mutation points when playing with less than six players
+
+When playing with less than six players (human or ai), you could not get the maximum number of mutation points. In this version, the best player will always get most mutations points.
+
+
 #### Survival map creation
 
 I spent many hours extracting survival maps from RAM and running statistics on them. I hope that I managed to resemble the survival maps as closely as possible, but there will probably be differences.

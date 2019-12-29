@@ -280,6 +280,34 @@ World.prototype.next = function() {
 World.prototype.next_popup = function(answer) {
 	if(answer === 1) {
 		this.test_if_dead();
+
+		if(this.catastrophe_status === 3) {
+			// The catastrophe is finished, distribute evolution points.
+			// The first turn has no catastrophe, but the evolution points are fixed to 100, so no special condition here
+
+			const scores = [];
+			const points = [0, 0, 0, 0, 0, 0];
+			for(let i = 0; i < 6; i++) {
+				scores.push([i, game.players[i].individuals]);
+			}
+
+			scores.sort((a, b) => b[1] - a[1]);
+
+			game.players[scores[0][0]].evo_score = game.evo_points[0];
+			for(let i = 1; i < 6; i++) {
+				const p = game.players[scores[i][0]];
+				if(p.is_dead || p.type === PLAYER_TYPE.NOBODY) {
+					p.evo_score = 0;
+				}
+				else if(scores[i-1][1] === scores[i][1]) {
+					p.evo_score = game.players[scores[i-1][0]].evo_score;
+				}
+				else {
+					p.evo_score = game.evo_points[i];
+				}
+			}
+		}
+
 		game.next_stage();
 	}
 };
@@ -402,7 +430,6 @@ World.prototype.catastrophe_exec = function() {
 		break;
 	case 6: // Earthquake
 		game.height_map = this.create_height_map();
-		// TODO RESEARCH: Are humans removed by an earthquake? I.e. is also the flag removed from the save?
 		this.catastrophe_finish();
 		break;
 	case 7: { // Humans
@@ -575,7 +602,7 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 World.prototype.set_individual = function(x, y) {
 	// Fight against another player
 	if(game.map_positions[y][x] >= 0) {
-		if(game.turn === -1) { // DEBUG! Should be 0 instead of -1
+		if(game.turn === 0) {
 			// No one may attack during the first turn
 			return;
 		}
