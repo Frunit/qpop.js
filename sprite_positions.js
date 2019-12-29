@@ -38,6 +38,10 @@ const anims_players = Object.freeze([
 			soffset: [0, 256],
 			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]],
 					},
+		female_pre_love: {
+			soffset: [0, 256],
+			frames: [[0, 0]],
+					},
 		offspring: {
 			soffset: [256, 256],
 			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [128, 0], [128, 0], [0, 0], [0, 0], [128, 0], [128, 0]],
@@ -103,6 +107,10 @@ const anims_players = Object.freeze([
 		female: {
 			soffset: [128, 256],
 			frames: [[0, 0], [64, 0]],
+					},
+		female_pre_love: {
+			soffset: [128, 256],
+			frames: [[0, 0]],
 					},
 		pre_offspring: {
 			soffset: [256, 256],
@@ -174,6 +182,10 @@ const anims_players = Object.freeze([
 			soffset: [192, 256],
 			frames: [[0, 0], [320, 0]],
 					},
+		female_pre_love: {
+			soffset: [192, 256],
+			frames: [[0, 0]],
+					},
 		offspring: {
 			soffset: [256, 256],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
@@ -239,6 +251,10 @@ const anims_players = Object.freeze([
 		female: {
 			soffset: [384, 256],
 			frames: [[0, 0], [64, 0]],
+					},
+		female_pre_love: {
+			soffset: [384, 256],
+			frames: [[0, 0]],
 					},
 		offspring: {
 			soffset: [512, 256],
@@ -306,6 +322,10 @@ const anims_players = Object.freeze([
 			soffset: [0, 256],
 			frames: [[0, 0], [0, 64]],
 					},
+		female_pre_love: {
+			soffset: [0, 256],
+			frames: [[0, 0]],
+					},
 		offspring: {
 			soffset: [128, 256],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
@@ -335,7 +355,7 @@ const anims_players = Object.freeze([
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
 	},
-	{   // Chuck Berry
+	{   // Chuck Berry TODO: Some positions of the sprites in the png file are off a little
 		still: {
 			soffset: [0, 0],
 			frames: [[0, 0]],
@@ -358,7 +378,7 @@ const anims_players = Object.freeze([
 					},
 		feeding: {
 			soffset: [0, 0],
-			frames: [[576, 0], [0, 64], [0, 128], [0, 64], [576, 0]],
+			frames: [[576, 0], [0, 64], [128, 64], [0, 64], [576, 0]],
 					},
 		power_food: {
 			soffset: [0, 0],
@@ -371,6 +391,10 @@ const anims_players = Object.freeze([
 		female: {
 			soffset: [0, 192],
 			frames: [[448, 0], [0, 64], [64, 64], [0, 64]],
+					},
+		female_pre_love: {
+			soffset: [0, 192],
+			frames: [[448, 0]],
 					},
 		offspring: {
 			soffset: [512, 192],

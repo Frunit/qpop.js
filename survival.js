@@ -529,7 +529,6 @@ Survival.prototype.get_adjacent = function() {
 	const x = this.level.character.tile[0];
 	const y = this.level.character.tile[1];
 
-	// TODO RESEARCH: Are females prioritized? What is the order of checking?
 	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y-1][x].type !== SURV_MAP.PLACEHOLDER) {
 		return [DIR.N, this.level.mobmap[y-1][x]];
 	}
@@ -664,7 +663,7 @@ Survival.prototype.resolve_movement = function(obj) {
 
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
-	const anim_delay = 0;//DEBUGthis.action === null ? anim_delays.movement : anim_delays.feeding;
+	const anim_delay = 0;
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
 
 	for(let predator of this.level.predators) {

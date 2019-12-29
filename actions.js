@@ -19,7 +19,7 @@ function Love(dir, character, partner, callback) {
 	this.offspring_sprite = new Sprite(partner.url, [64, 64], anim_delays.offspring, partner.anims.offspring.soffset, partner.anims.offspring.frames);
 
 	this.sprites = [
-		new Sprite(partner.url, [64, 64], 0, partner.anims.still.soffset, partner.anims.still.frame),
+		new Sprite(partner.url, [64, 64], 0, partner.anims.female_pre_love.soffset, partner.anims.female_pre_love.frame),
 		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
 	];
 
