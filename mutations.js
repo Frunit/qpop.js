@@ -78,14 +78,6 @@ Mutations.prototype.next_player = function() {
 		this.draw_evo_score();
 		for(let i = 0; i < 13; i++) {
 			this.draw_bar(i);
-			// Pie chart
-			if(i <= 5) {
-				ctx.drawImage(this.pics,
-					this.pie_soffset[0] + this.pie_dim[0]*this.plant_counts[i], this.pie_soffset[1],
-					this.pie_dim[0], this.pie_dim[1],
-					this.pie_offset[0], this.pie_offset[1] + this.deltay*i,
-					this.pie_dim[0], this.pie_dim[1]);
-			}
 		}
 	}
 };
@@ -269,6 +261,15 @@ Mutations.prototype.draw_bar = function(num) {
 			this.bar_offset[0] + length, this.bar_offset[1] + this.deltay*num,
 			3, this.bar_dim[1]);
 	}
+
+	// Pie chart
+	if(num <= 5) {
+		ctx.drawImage(this.pics,
+			this.pie_soffset[0] + this.pie_dim[0]*this.plant_counts[num], this.pie_soffset[1],
+			this.pie_dim[0], this.pie_dim[1],
+			this.pie_offset[0], this.pie_offset[1] + this.deltay*num,
+			this.pie_dim[0], this.pie_dim[1]);
+	}
 };
 
 
@@ -406,8 +407,6 @@ Mutations.prototype.ai = function() {
 
 	game.current_player.evo_score = 0;
 	this.stats = game.current_player.stats;
-
-	this.redraw();
 };
 
 
