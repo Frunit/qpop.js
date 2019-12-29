@@ -259,12 +259,15 @@ Turnselection.prototype.change_turn = function(up) {
 		this.turn_index--;
 	}
 
+	game.max_turns = this.turns[this.turn_index];
+
 	this.draw_turn_changed();
 };
 
 
 Turnselection.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
+	game.select_evo_points();
 	game.next_stage();
 };
 
