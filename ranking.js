@@ -1,11 +1,5 @@
 'use strict';
 
-
-// TODO RESEARCH: What happens to "out of order" players?
-// TODO: Happy Chuck Berry stands/jumps too low.
-// TODO: Need to distribute new evolution points based on number of individuals on world map
-
-
 function Ranking() {
 	this.id = SCENE.RANKING;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -61,7 +55,6 @@ function Ranking() {
 	this.dead_soffsets = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
 	this.sym_spec_soffsets = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
 	this.rel_dx = [0, 106, 206, 306, 406, 504];
-	this.rel_dy = [[0, 5, 0, 0, 6, 1], [0, 5, 0, 0, 6, 4], [0, 5, 0, 0, 6, 6]];
 	this.max_heights = [167, 128, 104, 80, 56, 32];
 
 	this.clickareas = [];
@@ -280,7 +273,7 @@ Ranking.prototype.render = function() {
 	for(let i = 0; i < 6; i++) {
 		this.sprites[i].render(ctx,
 			[this.lead_x + this.rel_dx[i],
-			this.walk_y - this.heights[i] + this.rel_dy[this.phase][i]]
+			this.walk_y - this.heights[i]]
 		);
 	}
 
@@ -342,7 +335,7 @@ Ranking.prototype.determine_best = function() {
 		this.winners.push(scores[i][0]);
 	}
 
-	if(game.players[scores[5][0]].is_dead) {
+	if(game.players[scores[5][0]].is_dead || game.players[scores[5][0]].type === PLAYER_TYPE.NOBODY) {
 		this.final_heights[scores[5][0]] = 0;
 	}
 	else {
