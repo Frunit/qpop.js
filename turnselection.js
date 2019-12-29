@@ -1,9 +1,6 @@
 'use strict';
 
 
-// TODO: Splattering animation does not update correctly. Background must be redrawn
-
-
 function Turnselection() {
 	this.id = SCENE.TURN_SELECTION;
 	this.bg = resources.get('gfx/light_bg.png');
@@ -36,7 +33,7 @@ function Turnselection() {
 	this.panel_offsets = [[9, 27], [9, 241]];
 	this.button_offsets = [[95, 328], [495, 328]];
 
-	this.anim_soffsets = [[0, 0], [0, 90], [0, 180], [0, 270]];
+	this.anim_soffsets = [[0, 0], [0, 90], [0, 180]];
 	this.button_soffsets = [[0, 630], [43, 630]];
 
 	this.turns = [5, 10, 20, 255];
@@ -62,12 +59,6 @@ Turnselection.prototype.draw_turn_changed = function() {
 		this.anim_offset[0], this.anim_offset[1],
 		this.anim_dim[0], this.anim_dim[1]);
 
-	ctx.drawImage(this.pics,						// Animation
-		this.anim_soffsets[this.turn_index][0], this.anim_soffsets[this.turn_index][1],
-		this.anim_dim[0], this.anim_dim[1],
-		this.anim_offset[0], this.anim_offset[1],
-		this.anim_dim[0], this.anim_dim[1]);
-
 	ctx.drawImage(this.pics,						// Turn indicator
 		this.bar_soffset[0], this.bar_soffset[1],
 		this.bar_dim[0], this.bar_dim[1],
@@ -88,12 +79,20 @@ Turnselection.prototype.draw_turn_changed = function() {
 			// Chuckberry stumbles
 			this.animations = [new Sprite(this.pics_url, this.anim_dim,
 				anim_delays.turn_selection, [0, 270],
-				[[0, 0], [0, 90], [0, 180], [0, 270]],
+				[[0, 0], [0, 90], [0, 180], [0, 270], [0, 270]],
 				true, () => this.end_animation(0))];
 		}
+
+		this.render();
 	}
 	else {
 		this.animations = null;
+
+		ctx.drawImage(this.pics,						// Amorph and Chuck Berrys
+			this.anim_soffsets[this.turn_index][0], this.anim_soffsets[this.turn_index][1],
+			this.anim_dim[0], this.anim_dim[1],
+			this.anim_offset[0], this.anim_offset[1],
+			this.anim_dim[0], this.anim_dim[1]);
 	}
 };
 
@@ -169,30 +168,21 @@ Turnselection.prototype.redraw = function() {
 
 Turnselection.prototype.render = function() {
 	if(this.animations) {
+		ctx.drawImage(this.bg,  // Clear background
+			this.anim_offset[0] - this.panel_offsets[0][0], this.anim_offset[1] - this.panel_offsets[0][1],
+			this.anim_dim[0], this.anim_dim[1],
+			this.anim_offset[0], this.anim_offset[1],
+			this.anim_dim[0], this.anim_dim[1]);
+
 		if(this.animations.length === 1) {
-			ctx.drawImage(this.bg,
-				this.anim_offset[0] - this.panel_offsets[0][0], this.anim_offset[1] - this.panel_offsets[0][1],
-				this.anim_dim[0], this.anim_dim[1],
-				this.anim_offset[0], this.anim_offset[1],
-				this.anim_dim[0], this.anim_dim[1]);
 			this.animations[0].render(ctx, this.anim_offset);
 		}
 		else {
-			ctx.drawImage(this.bg,
-				this.anim_left_cb_offset[0] - this.panel_offsets[0][0], this.anim_left_cb_offset[1] - this.panel_offsets[0][1],
-				this.anim_part_dim[0], this.anim_part_dim[1],
-				this.anim_left_cb_offset[0], this.anim_left_cb_offset[1],
-				this.anim_part_dim[0], this.anim_part_dim[1]);
-			ctx.drawImage(this.bg,
-				this.anim_right_cb_offset[0] - this.panel_offsets[0][0], this.anim_right_cb_offset[1] - this.panel_offsets[0][1],
-				this.anim_part_dim[0], this.anim_part_dim[1],
-				this.anim_right_cb_offset[0], this.anim_right_cb_offset[1],
-				this.anim_part_dim[0], this.anim_part_dim[1]);
-			ctx.drawImage(this.bg,
-				this.anim_amorph_offset[0] - this.panel_offsets[0][0], this.anim_amorph_offset[1] - this.panel_offsets[0][1],
-				this.anim_part_dim[0], this.anim_part_dim[1],
-				this.anim_amorph_offset[0], this.anim_amorph_offset[1],
-				this.anim_part_dim[0], this.anim_part_dim[1]);
+			ctx.drawImage(this.pics, // Splatter image
+				420, 540,
+				this.anim_dim[0], this.anim_dim[1],
+				this.anim_offset[0], this.anim_offset[1],
+				this.anim_dim[0], this.anim_dim[1]);
 
 			// Three animations when Amorph is ripped apart
 			this.animations[0].render(ctx, this.anim_left_cb_offset);
