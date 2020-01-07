@@ -158,7 +158,7 @@ Survival.prototype.redraw = function() {
 	this.draw_symbols();
 
 	// Main area
-	this.camera.render();
+	this.camera.render(true);
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
@@ -324,7 +324,7 @@ Survival.prototype.draw_symbols = function() {
 
 
 Survival.prototype.render = function() {
-	this.camera.render();
+	this.camera.render(this.movement_just_finished);
 
 	if(this.movement_just_finished) {
 		this.movement_just_finished = false;

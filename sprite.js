@@ -24,7 +24,7 @@ Sprite.prototype.update = function() {
 			this.delay_counter = 0;
 			this.idx++;
 
-			if(this.once && this.idx === this.frames.length - 1) {
+			if(this.once && this.idx === this.frames.length) {
 				this.finished = true;
 			}
 		}
