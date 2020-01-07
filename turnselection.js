@@ -267,6 +267,18 @@ Turnselection.prototype.change_turn = function(up) {
 
 Turnselection.prototype.next = function() {
 	draw_rect(this.next_offset, this.next_dim);
+
+	let players_active = 0;
+	for(let i = 0; i < 6; i++) {
+		if(game.players[i].type !== PLAYER_TYPE.NOBODY) {
+			players_active++;
+		}
+	}
+
+	if(players_active === 1) {
+		game.infinite_game = true;
+	}
+
 	game.select_evo_points();
 	game.next_stage();
 };
