@@ -79,7 +79,7 @@ Turnselection.prototype.draw_turn_changed = function() {
 				// Chuckberry stumbles
 				this.animations = [new Sprite(this.pics_url, this.anim_dim,
 					anim_delays.turn_selection, [0, 270],
-					[[0, 0], [0, 90], [0, 180], [0, 270], [0, 270]],
+					[[0, 0], [0, 90], [0, 180], [0, 270]],
 					true, () => this.end_animation(0))];
 			}
 		}
