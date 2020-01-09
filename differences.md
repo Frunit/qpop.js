@@ -1,7 +1,7 @@
 Known differences between the original game and this remake
 ===========================================================
 
-Listed here are all differences between the two versions that I know of. The differences were included either deliberately to improve usability or due to the limitations of JavaScript or the browser. If you find other differences or think that the behaviour is wrong, please feel free to contact me, preferably via [Github issues](https://github.com/Frunit/qpop.js/issues) or via [frunit.de/qpop/kontakt.php](https://frunit.de/qpop/kontakt.php).
+Listed here are all differences between the original game an this remake that I know of. The differences were included either deliberately to improve usability or due to the limitations of JavaScript or the browser. If you find other differences or think that some game behaviour is wrong, please feel free to contact me, preferably via [Github issues](https://github.com/Frunit/qpop.js/issues) or via [frunit.de/qpop/kontakt.php](https://frunit.de/qpop/kontakt.php).
 
 
 #### Loader before the game starts
@@ -50,6 +50,8 @@ When playing with less than six players (human or ai), you could not get the max
 #### Survival map creation
 
 I spent many hours extracting survival maps from RAM and running statistics on them. I hope that I managed to resemble the survival maps as closely as possible, but there will probably be differences.
+
+One deliberate difference is the presence of craters in survival maps. In the original game, there is a graphics tile for a crater, but it was never used in any survival map. In this remake, craters appear if the player has individuals on the world map close to the impact site(s) created by the meteor catastrophe. They don't serve any purpose other than blocking the movement.
 
 
 #### Electro flower and other behaviour
