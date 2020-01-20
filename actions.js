@@ -426,7 +426,6 @@ Waiting.prototype.render = function(ctx, dim, cpos) {
 };
 
 
-// TODO RESEARCH: Details about the electro plant animation
 function Electro(dir, character, callback) {
 	this.dir = dir;
 	this.character = character;
@@ -436,13 +435,19 @@ function Electro(dir, character, callback) {
 	this.delay_counter = 0;
 	this.frame = 0;
 
-	this.sprites = [
-		new Sprite('gfx/electro.png', [64, 64], anim_delays.electro, [0, 0], [[0, 0], [64, 0]], true), // TODO RESEARCH
-		new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
-	];
-
 	if(dir === DIR.E) {
-		this.sprites.reverse();
+		this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
+		this.sprites = [
+			new Sprite('gfx/electro.png', [64, 64], anim_delays.electro, [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [0, 128], [0, 128], [256, 64], [256, 64], [0, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], true),
+			new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
+		];
+	}
+	else {
+		this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
+		this.sprites = [
+			new Sprite(character.url, [64, 64], 0, character.anims.still.soffset, character.anims.still.frames),
+			new Sprite('gfx/electro.png', [64, 64], anim_delays.electro, [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [256, 64], [256, 64], [0, 128], [0, 128], [256, 64], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], true),
+		];
 	}
 }
 
@@ -461,14 +466,13 @@ Electro.prototype.update = function() {
 		return;
 	}
 
-	const sprite_pos = dir !== DIR.E;
+	const sprite_pos = 1*(this.dir === DIR.E);
 
-	if(this.frame === 4) { // TODO RESEARCH: Which frame?
-		this.sprites[sprite_pos] = new Sprite(this.character.url, [64, 64], anim_delays.electro, this.character.anims.zapped.soffset, this.character.anims.zapped.frames);
-		return;
+	if(this.frame === 15) {
+		this.sprites[sprite_pos] = new Sprite(this.character.url, [64, 64], anim_delays.electro, this.character.anims.zapped.soffset, this.character.anims.zapped.frames, true);
 	}
 
-	this.finished = this.sprites[!sprite_pos].finished;
+	this.finished = this.sprites[1*!sprite_pos].finished;
 };
 
 

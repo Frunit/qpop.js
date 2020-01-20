@@ -5,6 +5,7 @@
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
 // TODO: Radar is updated at the beginning of the movement, not at the end
 
+
 function Survival() {
 	this.id = SCENE.SURVIVAL;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -409,24 +410,10 @@ Survival.prototype.ai = function() {
 Survival.prototype.finish_movement = function() {
 	this.movement_just_finished = true;
 	const char = this.level.character;
-	const current_bg = this.level.map[char.tile[1]][char.tile[0]];
 	this.delay_counter = 0;
 	char.hidden = false;
 	this.action = null;
 	this.movement_active = false;
-
-	// Test for Quicksand
-	if(Math.random() <= 0.001 &&
-			((current_bg > 63 && current_bg < 89) || (current_bg >= 95 && current_bg <= 98)) &&
-			!(input.isDown('DOWN') || input.isDown('UP') || input.isDown('LEFT') || input.isDown('RIGHT') || input.isDown('SPACE')))
-	{
-		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
-		this.action = new Quicksand(char, () => this.player_death(true));
-
-		return;
-	}
-
-	// TODO RESEARCH: Test for electric flower
 
 	// Enemy or Female found
 	const [dir, adjacent] = this.get_adjacent();
@@ -788,6 +775,43 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 
 Survival.prototype.update = function() {
 	this.test_movement_input();
+
+	if(!this.movement_active && this.action === null) {
+		const char = this.level.character;
+
+		// Test for Quicksand
+		// The player must stand on one of the empty tiles
+		if(Math.random() <= 0.000055 &&
+				[0, 12, 18, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 119, 121].includes(this.level.map[char.tile[1]][char.tile[0]]))
+		{
+			console.log('Quicksand!');
+			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
+			this.action = new Quicksand(char, () => this.player_death(true));
+		}
+
+
+		// Test for Electro flower
+		// The field left or right must be empty (tile 65) and no unit may be on it
+		else if(Math.random() <= 0.000055 &&
+				((this.level.map[char.tile[1]][char.tile[0] - 1] === 65 &&
+				this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) ||
+				(this.level.map[char.tile[1]][char.tile[0] + 1] === 65 &&
+				this.level.mobmap[char.tile[1]][char.tile[0] + 1] === null)))
+		{
+			console.log('Electro flower!');
+			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
+
+			// If the left (western) field is empty, use that. Otherwise use the right field.
+			if(this.level.map[char.tile[1]][char.tile[0] - 1] === 65 &&
+				this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null)
+			{
+				this.action = new Electro(DIR.E, char, () => this.player_death(true));
+			}
+			else {
+				this.action = new Electro(DIR.W, char, () => this.player_death(true));
+			}
+		}
+	}
 
 	if(this.movement_active) {
 		this.delay_counter++;
