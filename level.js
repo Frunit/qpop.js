@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: Number of tiles must be checked (compare original and remake distribution using the same savegame)
+
 function Level() {
 	this.map = null;
 	this.mobmap = null;
@@ -61,31 +63,31 @@ Level.prototype.update_tile_numbers = function(x, y, numbers) {
 		}
 	}
 
-	// Mountains, vulcanos, and crystalls
+	// Mountains, vulcanos, and crystals
 	let mountains = 0;
-	let crystalls = 0;
+	let crystals = 0;
 
 	if(40 <= height && height <= 50) {
 		mountains = 50;
 	}
 	else if(51 <= height && height <= 60) {
 		mountains = 100;
-		crystalls = 15;
+		crystals = 15;
 	}
 	else if(61 <= height) {
 		mountains = 150;
-		crystalls = 30;
+		crystals = 30;
 	}
 
 	numbers[51] += mountains; // mountains 1
 	numbers[52] += mountains; // mountains 1
 	numbers[53] += mountains; // mountains 1
 	numbers[54] += mountains; // mountains 1
-	numbers[44] += 6 * crystalls; // volcano
-	numbers[61] += 6 * crystalls; // silent volcano
-	numbers[80] += 3 * crystalls; // crystalls 1
-	numbers[84] += 3 * crystalls; // crystalls 2
-	numbers[88] += 4 * crystalls; // small crystalls
+	numbers[44] += 6 * crystals; // volcano
+	numbers[61] += 6 * crystals; // silent volcano
+	numbers[80] += 3 * crystals; // crystals 1
+	numbers[84] += 3 * crystals; // crystals 2
+	numbers[88] += 4 * crystals; // small crystals
 
 	// Cacti, whips, trees, eyes, lakes, mossy rocks, and drippy flowers
 	let whips = 0;
@@ -142,13 +144,13 @@ Level.prototype.update_tile_numbers = function(x, y, numbers) {
 	// Craters; please note! Craters do not appear in the original game, although the graphic is there. I included them in a similar way that human structures are included to use the graphic.
 	numbers[55] += craters * 25;
 
-	// Green flower TODO: borders of local temp are not clear, yet.
-	if(0 <= local_humid && local_humid <= 10 && 20 <= local_temp && local_temp <= 54) {
+	// Green flower
+	if(0 <= local_humid && local_humid <= 10 && 20 <= local_temp && local_temp <= 50) {
 		numbers[62] += 300;
 	}
 
-	// Swamp and snail shell TODO: borders of local temp and actual numbers are not clear, yet.
-	if((local_humid < -50 || local_humid > 10) && (local_temp < -15 || local_temp > 35)) {
+	// Swamp and snail shell TODO: actual numbers are not clear, yet.
+	if((local_humid <= -51 || local_humid >= 11) && (local_temp <= -12 || local_temp >= 40)) {
 		numbers[36] += 300;
 		numbers[66] += 400;
 	}
@@ -176,7 +178,7 @@ Level.prototype.scan_world_map = function() {
 					num_neighbours++;
 				}
 			}
-			else {
+			else {  // game.map_positions[y][x] === player
 				this.update_tile_numbers(x, y, numbers);
 				if(game.world_map[y][x] >= WORLD_MAP.RANGONES && game.world_map[y][x] <= WORLD_MAP.FIREGRASS) {
 					const plant_type = [0, 3, 1, 4, 5, 2][game.world_map[y][x] - WORLD_MAP.RANGONES];
@@ -219,12 +221,12 @@ Level.prototype.scan_world_map = function() {
 		if(wtable[i] > 0) {
 			const factor = Math.floor(wtable[i]/mod_density);
 			const plant_offset = i*6;
-			numbers[plant_offset + 5] = 4*factor;
-			numbers[plant_offset + 4] = 7*factor;
-			numbers[plant_offset + 3] = 10*factor;
-			numbers[plant_offset + 2] = 15*factor;
-			numbers[plant_offset + 1] = 25*factor;
-			numbers[plant_offset] = (mod_density - 61)*factor;
+			numbers[plant_offset + 5] = 5*factor;
+			numbers[plant_offset + 4] = 9*factor;
+			numbers[plant_offset + 3] = 12*factor;
+			numbers[plant_offset + 2] = 19*factor;
+			numbers[plant_offset + 1] = 31*factor;
+			numbers[plant_offset] = (mod_density - 76)*factor;
 		}
 	}
 
@@ -250,8 +252,6 @@ Level.prototype.scan_world_map = function() {
 	// Remaining empty spaces (65)
 	numbers[65] = empty;
 
-	console.log(numbers);
-
 	return [numbers, enemies];
 };
 
@@ -266,8 +266,6 @@ Level.prototype.generate_map = function() {
 	const [tile_numbers, enemies] = this.scan_world_map();
 	this.enemies = [...enemies];
 
-	console.log(tile_numbers);
-
 	let main_pos = 0;
 	for(let i = 0; i < tile_numbers.length; i++) {
 		if(tile_numbers[i] > 0) {
@@ -275,6 +273,8 @@ Level.prototype.generate_map = function() {
 			main_pos += tile_numbers[i];
 		}
 	}
+
+	//console.log(mainpart.join(','));
 
 	// Shuffle everything and create the actual map
 	shuffle(mainpart);
@@ -310,7 +310,7 @@ Level.prototype.populate = function() {
 	}
 
 	// More females at a higher population density.
-	let num_females = 20 + 10 * this.density;
+	let num_females = Math.floor(20 + 10 * this.density);
 	if(num_females > 200) {
 		num_females = 200;
 	}
@@ -321,12 +321,6 @@ Level.prototype.populate = function() {
 	if(this.enemies.length > 0) {
 		num_enemies = 100;
 	}
-
-	// DEBUG:
-	num_predators = 200;
-	num_females = 200;
-	num_enemies = 200;
-
 
 	console.info('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
@@ -448,9 +442,15 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 
 Level.prototype.request_sprite = function(x, y) {
 	const type = this.map[y][x];
-	const xx = Math.floor(type % 10);
-	const yy = Math.floor(type / 10);
-	this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [xx*64, yy*64]);
+
+	if(survival_background.hasOwnProperty(type)) {
+		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [0, 0], survival_background[type]);
+	}
+	else {
+		const xx = Math.floor(type % 10);
+		const yy = Math.floor(type / 10);
+		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [xx*64, yy*64]);
+	}
 };
 
 
