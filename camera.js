@@ -1,7 +1,6 @@
 'use strict';
 
 
-// TODO: render() needs a "force" argument to re-render everything, e.g. after a popup closed
 // TODO: When the player stands still, predators move animation is strange towards the end
 // TODO: I might want to consider using a hidden canvas to prepare the background and draw everything on every frame. This will dramatically simplify the methods for the price of an extra canvas.
 
@@ -111,12 +110,25 @@ Camera.prototype.update_visible_level = function() {
 };
 
 
-Camera.prototype.render = function() {
+Camera.prototype.render = function(force=false) {
 	ctx.save();
 	ctx.translate(this.offset[0], this.offset[1]);
 	ctx.beginPath();
 	ctx.rect(0, 0, this.cwidth, this.cheight);
 	ctx.clip();
+
+	if(force) {
+		for(let y of this.y_tiles) {
+			for(let x of this.x_tiles) {
+				this._tiles_to_render.add(JSON.stringify([x, y]));
+
+				const mob = this.level.mobmap[y][x];
+				if(mob !== null && !mob.hidden && mob.type !== SURV_MAP.PLACEHOLDER) {
+					this._movs_to_render.add(JSON.stringify([x, y]));
+				}
+			}
+		}
+	}
 
 	if(this._tiles_to_render.size || this._movs_to_render.size) {
 		debug1.value = 'tiles rndr: ' + this._tiles_to_render.size;

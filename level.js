@@ -43,18 +43,131 @@ Level.prototype.list_to_map = function(mainpart, border) {
 };
 
 
-Level.prototype.count_wm_neighbours = function() {
-	return [5, [4, 5]]; // DEBUG
-	/*let num_neighbours = 0;
+Level.prototype.update_tile_numbers = function(x, y, numbers) {
+	const height = game.height_map[y][x];
+	const local_temp = game.temp + y*3 - height;
+	const local_humid = game.humid - height;
+	let bases = 0;
+	let craters = 0;
+
+	for(let xpos = Math.max(0, x-2); xpos <= Math.min(27, x+2); xpos++) {
+		for(let ypos = Math.max(0, y-2); ypos <= Math.min(27, y+2); ypos++) {
+			if(game.world_map[ypos][xpos] === WORLD_MAP.HUMANS) {
+				bases += [0, 2, 1][Math.max(Math.abs(xpos), Math.abs(ypos))];
+			}
+			else if(game.world_map[ypos][xpos] === WORLD_MAP.CRATER) {
+				craters += [0, 2, 1][Math.max(Math.abs(xpos), Math.abs(ypos))];
+			}
+		}
+	}
+
+	// Mountains, vulcanos, and crystalls
+	let mountains = 0;
+	let crystalls = 0;
+
+	if(40 <= height && height <= 50) {
+		mountains = 50;
+	}
+	else if(51 <= height && height <= 60) {
+		mountains = 100;
+		crystalls = 15;
+	}
+	else if(61 <= height) {
+		mountains = 150;
+		crystalls = 30;
+	}
+
+	numbers[51] += mountains; // mountains 1
+	numbers[52] += mountains; // mountains 1
+	numbers[53] += mountains; // mountains 1
+	numbers[54] += mountains; // mountains 1
+	numbers[44] += 6 * crystalls; // volcano
+	numbers[61] += 6 * crystalls; // silent volcano
+	numbers[80] += 3 * crystalls; // crystalls 1
+	numbers[84] += 3 * crystalls; // crystalls 2
+	numbers[88] += 4 * crystalls; // small crystalls
+
+	// Cacti, whips, trees, eyes, lakes, mossy rocks, and drippy flowers
+	let whips = 0;
+	let trees = 0;
+	let eye = 0;
+	let lakes = 0;
+
+	if(local_humid < -50) {
+		lakes = 20;
+	}
+	else if(local_humid <= -30) {
+		whips = 200;
+	}
+	else if(local_humid <= -10) {
+		whips = 100;
+		trees = 180;
+	}
+	else if(local_humid <= 10) {
+		trees = 340;
+		eye = 320;
+	}
+	else if(local_humid <= 30) {
+		trees = 180;
+		lakes = 10;
+	}
+	else {
+		lakes = 20;
+	}
+
+	numbers[57] += 3 * whips; // cactus 1
+	numbers[58] += 3 * whips; // cactus 1
+	numbers[125] += 2 * whips; // whip plant 1
+	numbers[130] += 2 * whips; // whip plant 2
+
+	numbers[56] += trees; // dead tree
+	numbers[64] += 3 * trees; // tree
+
+	numbers[114] += eye; // eye
+
+	numbers[59] += 30 * lakes; // lake 1
+	numbers[60] += 30 * lakes; // lake 2
+	numbers[63] += 14 * lakes; // mossy rocks
+	numbers[110] += 26 * lakes; // drippy flowers
+
+	// Humans
+	numbers[104] += bases * 25; // base structure 1
+	numbers[105] += bases * 25; // base structure 1
+	numbers[106] += bases * 25; // base structure 1
+	numbers[107] += bases * 25; // base structure 1
+	numbers[108] += bases * 25; // base structure 1
+	numbers[109] += bases * 25; // base structure 1
+	numbers[122] += bases * 150; // nuclear waste
+
+	// Craters; please note! Craters do not appear in the original game, although the graphic is there. I included them in a similar way that human structures are included to use the graphic.
+	numbers[55] += craters * 25;
+
+	// Green flower TODO: borders of local temp are not clear, yet.
+	if(0 <= local_humid && local_humid <= 10 && 20 <= local_temp && local_temp <= 54) {
+		numbers[62] += 300;
+	}
+
+	// Swamp and snail shell TODO: borders of local temp and actual numbers are not clear, yet.
+	if((local_humid < -50 || local_humid > 10) && (local_temp < -15 || local_temp > 35)) {
+		numbers[36] += 300;
+		numbers[66] += 400;
+	}
+};
+
+
+Level.prototype.scan_world_map = function() {
+	const numbers = Array(135).fill(0);
+	const wtable = [0, 0, 0, 0, 0, 0];
 	const enemies = new Set();
+	let num_neighbours = 0;
+
 	const wm_width = game.map_positions[0].length;
 	const wm_height = game.map_positions.length;
 	const player = game.current_player.id;
+
 	for(let x = 1; x < wm_width - 1; x++) {
 		for(let y = 1; y < wm_height - 1; y++) {
-			if(game.map_positions[y][x]	>= 0 &&
-				game.map_positions[y][x] !== player)
-			{
+			if(game.map_positions[y][x] !== player) {
 				if(game.map_positions[y][x-1] === player ||
 					game.map_positions[y][x+1] === player ||
 					game.map_positions[y-1][x] === player ||
@@ -64,10 +177,15 @@ Level.prototype.count_wm_neighbours = function() {
 				}
 			}
 			else {
-				for(let xx = x-1; x <= x+1; x++) {
-					for(let yy = y-1; y <= y+1; y++) {
-						if(game.map_positions[yy][xx] >= 0 &&
-							game.map_positions[yy][xx] !== player)
+				this.update_tile_numbers(x, y, numbers);
+				if(game.world_map[y][x] >= WORLD_MAP.RANGONES && game.world_map[y][x] <= WORLD_MAP.FIREGRASS) {
+					const plant_type = [0, 3, 1, 4, 5, 2][game.world_map[y][x] - WORLD_MAP.RANGONES];
+					wtable[plant_type] += 1;
+				}
+
+				for(let xx = x-1; xx <= x+1; xx++) {
+					for(let yy = y-1; yy <= y+1; yy++) {
+						if(game.map_positions[yy][xx] >= 0 && game.map_positions[yy][xx] !== player)
 						{
 							enemies.add(game.map_positions[yy][xx]);
 						}
@@ -77,46 +195,85 @@ Level.prototype.count_wm_neighbours = function() {
 		}
 	}
 
-	return num_neighbours, [...enemies];*/
-};
+	for(let i = 0; i < numbers.length; i++) {
+		numbers[i] = Math.floor(numbers[i] / this.individuals);
+	}
 
+	// Power food
+	numbers[118] = 4;
+	numbers[120] = 4;
 
-// TODO RESEARCH: Make maps more similar to the original maps
-Level.prototype.generate_map = function() {
-	// Border is based on RAM analysis. It looks like the border components are actually partly dependent on the worldmap situation.
-	// As it is now, the (0-based) tiles 44, 51, 52, 53, 54, 61 make 14.3% each and 80, 84, 99 make 4.8% each
-	const border = Array(1164).fill(44, 0, 166).fill(51, 166, 332).fill(52, 332, 498).fill(53, 498, 664).fill(54, 664, 830).fill(61, 830, 996).fill(80, 996, 1052).fill(84, 1052, 1108).fill(99, 1108);
+	// Green blobs
+	numbers[50] = random_int(10, 70);
 
-	const tiles_human_base = [100, 104, 105, 106, 107, 108, 109];
-
-	const mainpart = [];
-
-	const plant_offsets = [0, 6, 12, 18, 24, 30]; // From tilemap
-
-	this.individuals = 5; // DEBUG, should be removed
-	[this.neighbourfields, this.enemies] = this.count_wm_neighbours();
-	this.density = 10 * this.individuals / this.neighbourfields;
+	// Food
+	this.density = 10 * this.individuals / num_neighbours;
 	const mod_density = 50 + 10 * this.density;
-	const wfactor = 2500/this.individuals;
-	const wtable = Array(6).fill(0); // TODO: wtable[n]+=wfactor for each own individual on plant n in world map. Note that survival indices and world indices for plants are different!!!
-	wtable[2] = 10*wfactor; // DEBUG Should be determined by the positions on the world map
+	const wfactor = Math.floor(2500/this.individuals);
 
-	// Add food to the map
+	for(let i = 0; i < wtable.length; i++) {
+		wtable[i] *= wfactor;
+	}
+
 	for(let i = 0; i < 5; i++) {
 		if(wtable[i] > 0) {
-			const factor = wtable[i]/mod_density;
-			mainpart.push(...Array(4*factor|0).fill(plant_offsets[i]+5));
-			mainpart.push(...Array(7*factor|0).fill(plant_offsets[i]+4));
-			mainpart.push(...Array(10*factor|0).fill(plant_offsets[i]+3));
-			mainpart.push(...Array(15*factor|0).fill(plant_offsets[i]+2));
-			mainpart.push(...Array(25*factor|0).fill(plant_offsets[i]+1));
-			mainpart.push(...Array((mod_density - 61)*factor|0).fill(plant_offsets[i]));
+			const factor = Math.floor(wtable[i]/mod_density);
+			const plant_offset = i*6;
+			numbers[plant_offset + 5] = 4*factor;
+			numbers[plant_offset + 4] = 7*factor;
+			numbers[plant_offset + 3] = 10*factor;
+			numbers[plant_offset + 2] = 15*factor;
+			numbers[plant_offset + 1] = 25*factor;
+			numbers[plant_offset] = (mod_density - 61)*factor;
 		}
 	}
 
-	// Fill with empty fields
-	for(let i = mainpart.length; i < 8836; i++) {
-		mainpart.push(74); // TODO RESEARCH: Should be the real empty fields!
+	// Empty spaces and constants
+	const remaining = 8836 - numbers.reduce((a, b) => a + b);
+	let empty = remaining;
+	let num;
+
+	// Empty spaces (70-79)
+	num = Math.floor(remaining * 0.04);
+	for(let i = 70; i < 80; i++) {
+		numbers[i] = num;
+	}
+	empty -= num*10;
+
+	// Brains and yellow ponds (89-98)
+	num = Math.floor(remaining * 0.01);
+	for(let i = 89; i < 99; i++) {
+		numbers[i] = num;
+	}
+	empty -= num*10;
+
+	// Remaining empty spaces (65)
+	numbers[65] = empty;
+
+	console.log(numbers);
+
+	return [numbers, enemies];
+};
+
+
+Level.prototype.generate_map = function() {
+	// Border is based on RAM analysis. The (0-based) tiles 44, 51, 52, 53, 54, 61 make 14.3% each and 80, 84, 99 make 4.8% each
+	const border = Array(1164).fill(44, 0, 166).fill(51, 166, 332).fill(52, 332, 498).fill(53, 498, 664).fill(54, 664, 830).fill(61, 830, 996).fill(80, 996, 1052).fill(84, 1052, 1108).fill(99, 1108);
+
+	// The mainpart is also based on RAM analysis. However, it is depending on various factors on the world map
+	const mainpart = Array(8836);
+
+	const [tile_numbers, enemies] = this.scan_world_map();
+	this.enemies = [...enemies];
+
+	console.log(tile_numbers);
+
+	let main_pos = 0;
+	for(let i = 0; i < tile_numbers.length; i++) {
+		if(tile_numbers[i] > 0) {
+			mainpart.fill(i, main_pos, main_pos + tile_numbers[i]);
+			main_pos += tile_numbers[i];
+		}
 	}
 
 	// Shuffle everything and create the actual map
@@ -124,11 +281,18 @@ Level.prototype.generate_map = function() {
 	shuffle(border);
 	this.map = this.list_to_map(mainpart, border);
 
-	// If humans are present, a base is created at fixed coordinates, overwriting what ever is there
-	if(game.humans_present) {
+	// If humans are in vicinity, a base is created at fixed coordinates, overwriting whatever there was before
+	const tiles_human_base = [104, 105, 106, 107, 108, 109];
+	if(tile_numbers[122] > 0) {
 		for(let x = 47; x <= 51; x++) {
 			for(let y = 37; y <= 41; y++) {
-				if(Math.random() <= 0.7) {
+				const r = Math.random();
+				if(r <= 0.2) {
+					// Radar station (on average 5)
+					this.map[y][x] = 100;
+				}
+				else if(r <= 0.7) {
+					// Other human base structures (on average 2 per tile or 12 in total)
 					this.map[y][x] = random_element(tiles_human_base);
 				}
 			}
@@ -213,10 +377,13 @@ Level.prototype.place_player = function(ideal_pos) {
 		this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
 		this.character.tile = ideal_pos;
 
+		// 65 exists more often to make it more likely to choose it
+		const empty_tiles = [65, 65, 65, 65, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79];
+
 		for(let y = ideal_pos[1] -1; y <= ideal_pos[1] + 1; y++) {
 			for(let x = ideal_pos[0] -1; x <= ideal_pos[0] + 1; x++) {
 				this.mobmap[y][x] = null;
-				this.map[y][x] = 74;  // TODO RESEARCH: Should use some random empty tiles
+				this.map[y][x] = random_element(empty_tiles);
 			}
 		}
 	}
