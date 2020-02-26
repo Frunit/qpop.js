@@ -1,8 +1,7 @@
 'use strict';
 
 
-// TODO: When the player stands still, predators move animation is strange towards the end
-// TODO: I might want to consider using a hidden canvas to prepare the background and draw everything on every frame. This will dramatically simplify the methods for the price of an extra canvas.
+// TODO: When the player stands still, the last predator move frame is not properly cleared (only after another frame)
 
 
 function Camera(level, survival, tile_dim, window_dim, offset) {
@@ -78,6 +77,7 @@ Camera.prototype.update_visible_level = function() {
 			const mob = this.level.mobmap[y][x];
 
 			if(mob !== null && !mob.hidden) {
+				// PLAYER and PREDATOR are updated by survival. PLACEHOLDER does not need an update.
 				if(mob.type === SURV_MAP.ENEMY ||
 						mob.type === SURV_MAP.FEMALE ||
 						mob.type === SURV_MAP.UNRESPONSIVE) {
@@ -90,18 +90,16 @@ Camera.prototype.update_visible_level = function() {
 						this._tiles_to_render.add(JSON.stringify([x, y]));
 					}
 				}
-				else { // if type === SURV_MAP.PLACEHOLDER
+				else { // if mob.type === SURV_MAP.PLACEHOLDER
 					const fx = mob.from_x;
 					const fy = mob.from_y;
 
 					// Render sprites that are outside the camera but are about to move into the camera (usually enemies)
 					// The placeholder indicates where the object comes from that will occupy the spot
-					if(!this.x_tiles.includes(fx) || !this.y_tiles.includes(fy)) {
-						if(this._pos_changed || this.level.mobmap[fy][fx].sprite.is_new_frame()) {
-							this._movs_to_render.add(JSON.stringify([fx, fy]));
-							this._tiles_to_render.add(JSON.stringify([fx, fy]));
-							this._tiles_to_render.add(JSON.stringify([x, y]));
-						}
+					if(this._pos_changed || this.level.mobmap[fy][fx].sprite.is_new_frame()) {
+						this._movs_to_render.add(JSON.stringify([fx, fy]));
+						this._tiles_to_render.add(JSON.stringify([fx, fy]));
+						this._tiles_to_render.add(JSON.stringify([x, y]));
 					}
 				}
 			}
@@ -133,12 +131,6 @@ Camera.prototype.render = function(force=false) {
 	if(this._tiles_to_render.size || this._movs_to_render.size) {
 		debug1.value = 'tiles rndr: ' + this._tiles_to_render.size;
 		debug5.value = 'moves rndr: ' + this._movs_to_render.size;
-
-		/*if(this._movs_to_render.size === 1 && this._tiles_to_render.size === 1) {
-			console.log(this.level.character.sprite.is_new_frame());
-		}
-
-		console.log(this._tiles_to_render.size, this._movs_to_render.size);*/
 	}
 
 	for(let coord of this._tiles_to_render) {
@@ -170,19 +162,3 @@ Camera.prototype.render = function(force=false) {
 	this._tiles_to_render.clear();
 	this._movs_to_render.clear();
 };
-
-
-/*Camera.prototype.to_tiles = function(obj, size) {
-	const pos = [obj.tile[0] * this.tile_dim[0] + obj.rel_pos[0], obj.tile[1] * this.tile_dim[1] + obj.rel_pos[1]];
-	const x_tiles = range(Math.floor(pos[0] / this.tile_dim[0]), Math.ceil((pos[0] + size[0]) / this.tile_dim[0]));
-	const y_tiles = range(Math.floor(pos[1] / this.tile_dim[1]), Math.ceil((pos[1] + size[1]) / this.tile_dim[1]));
-
-	let res = [];
-	for(let x of x_tiles) {
-		for(let y of y_tiles) {
-			res.push([x, y]);
-		}
-	}
-
-	return res;
-};*/

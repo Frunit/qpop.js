@@ -2,7 +2,7 @@
 
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
-// TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. How to handle predators?
+// TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. Isno has 9 frames. How to handle predators?
 // TODO: Radar is updated at the beginning of the movement, not at the end
 
 
@@ -59,6 +59,7 @@ function Survival() {
 	this.action = null;
 	this.movement_active = false;
 	this.movement_just_finished = false;
+	this.moving_predators = [];
 
 	this.delay = anim_delays.movement;
 	this.delay_counter = 0;
@@ -178,20 +179,20 @@ Survival.prototype.draw_minimap = function() {
 	const MM_ENEMY = 4;
 
 	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
-	let draw = false;
 
-	for(let y = -range; y < range; y++) {
+	for(let y = -10; y < 10; y++) {
 		const real_y = this.level.character.tile[1] + y;
-		for(let x = -range; x < range; x++) {
-			const real_x = this.level.character.tile[0] + x;
-			let sym;
+		for(let x = -10; x < 10; x++) {
 
 			// If the range is too low, don't show anything here
 			if(range <= Math.sqrt(y**2 + x**2) * 10 - 30) {
 				continue;
 			}
 
-			draw = false;
+			const real_x = this.level.character.tile[0] + x;
+			let sym;
+			let draw = false;
+
 			if(x === 0 && y === 0) {
 				draw = true;
 				sym = MM_PLAYER;
@@ -415,6 +416,11 @@ Survival.prototype.finish_movement = function() {
 	this.action = null;
 	this.movement_active = false;
 
+	for(let predator of this.moving_predators) {
+		this.resolve_movement(predator, true);
+	}
+	this.moving_predators = [];
+
 	// Enemy or Female found
 	const [dir, adjacent] = this.get_adjacent();
 	if(dir) {
@@ -548,31 +554,30 @@ Survival.prototype.start_movement = function(dir) {
 	switch(dir) {
 		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.south.soffset, char.anims.south.frames);
-			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the position, the player wants to go, so no other predator will go there in the same moment
+			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos); // Block the position, the player wants to go, so no other predator will go there in the same moment
 			break;
 		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.north.soffset, char.anims.north.frames);
-			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]);
+			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos);
 			break;
 		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.east.soffset, char.anims.east.frames);
-			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
+			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos);
 			break;
 		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.west.soffset, char.anims.west.frames);
-			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
+			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos);
 			break;
 		case 0: { // Feeding/waiting
-			const food_type = this.level.map[pos[1]][pos[0]];
-			if(this.level.edible[food_type] === '1') {
-				this.action = new Feeding(char, this.level, food_type, () => this.finish_feeding(food_type));
-				char.hidden = true;
+			const ground_type = this.level.map[pos[1]][pos[0]];
+			if(this.level.edible[ground_type] === '1') {
+				this.action = new Feeding(char, this.level, ground_type, () => this.finish_feeding(ground_type));
 				this.delay = anim_delays.feeding;
 			}
 			else {
 				this.action = new Waiting(char, () => this.finish_feeding(100));
-				char.hidden = true;
 			}
+			char.hidden = true;
 			break;
 		}
 	}
@@ -582,61 +587,63 @@ Survival.prototype.start_movement = function(dir) {
 };
 
 
-Survival.prototype.resolve_movement = function(obj) {
-	const speed = options.surv_move_speed;
+Survival.prototype.resolve_movement = function(obj, force=false) {
+	if(!obj.movement) {
+		return;
+	}
+
 	let finished_move = false;
+
+	const speed = options.surv_move_speed;
 	obj.sprite.update();
+	const old_tile = [obj.tile[0], obj.tile[1]];
+
 	switch (obj.movement) {
-	case DIR.S:
-		if(obj.rel_pos[1] + speed >= this.tile_dim[1]) {
-			obj.tile[1]++;
-			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]-1][obj.tile[0]];
-			this.level.mobmap[obj.tile[1]-1][obj.tile[0]] = null;
-			finished_move = true;
-		}
-		else {
-			obj.rel_pos[1] += speed;
-		}
-		break;
-	case DIR.N:
-		if(Math.abs(obj.rel_pos[1] - speed) >= this.tile_dim[1]) {
-			obj.tile[1]--;
-			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]+1][obj.tile[0]];
-			this.level.mobmap[obj.tile[1]+1][obj.tile[0]] = null;
-			finished_move = true;
-		}
-		else {
-			obj.rel_pos[1] -= speed;
-		}
-		break;
-	case DIR.W:
-		if(Math.abs(obj.rel_pos[0] - speed) >= this.tile_dim[0]) {
-			obj.tile[0]--;
-			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]+1];
-			this.level.mobmap[obj.tile[1]][obj.tile[0]+1] = null;
-			finished_move = true;
-		}
-		else {
-			obj.rel_pos[0] -= speed;
-		}
-		break;
-	case DIR.E:
-		if(obj.rel_pos[0] + speed >= this.tile_dim[0]) {
-			obj.tile[0]++;
-			this.level.mobmap[obj.tile[1]][obj.tile[0]] = this.level.mobmap[obj.tile[1]][obj.tile[0]-1];
-			this.level.mobmap[obj.tile[1]][obj.tile[0]-1] = null;
-			finished_move = true;
-		}
-		else {
-			obj.rel_pos[0] += speed;
-		}
-		break;
+		case DIR.S:
+			if(force || obj.rel_pos[1] + speed >= this.tile_dim[1]) {
+				obj.tile[1]++;
+				finished_move = true;
+			}
+			else {
+				obj.rel_pos[1] += speed;
+			}
+			break;
+		case DIR.N:
+			if(force || Math.abs(obj.rel_pos[1] - speed) >= this.tile_dim[1]) {
+				obj.tile[1]--;
+				finished_move = true;
+			}
+			else {
+				obj.rel_pos[1] -= speed;
+			}
+			break;
+		case DIR.W:
+			if(force || Math.abs(obj.rel_pos[0] - speed) >= this.tile_dim[0]) {
+				obj.tile[0]--;
+				finished_move = true;
+			}
+			else {
+				obj.rel_pos[0] -= speed;
+			}
+			break;
+		case DIR.E:
+			if(force || obj.rel_pos[0] + speed >= this.tile_dim[0]) {
+				obj.tile[0]++;
+				finished_move = true;
+			}
+			else {
+				obj.rel_pos[0] += speed;
+			}
+			break;
 	}
 
 	if(finished_move) {
 		obj.rel_pos = [0, 0];
 		obj.last_movement = obj.movement;
 		obj.movement = 0;
+
+		this.level.mobmap[old_tile[1]][old_tile[0]] = null;
+		this.level.mobmap[obj.tile[1]][obj.tile[0]] = obj;
 
 		if(obj.type === SURV_MAP.PLAYER) {
 			this.finish_movement();
@@ -652,6 +659,8 @@ Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
 	const anim_delay = 0;
 	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
+
+	this.moving_predators = [];
 
 	for(let predator of this.level.predators) {
 		if(predator.type === SURV_MAP.UNRESPONSIVE) {
@@ -721,23 +730,49 @@ Survival.prototype.start_predator_movement = function() {
 			}
 		}
 
-		switch(predator.movement) {
-			case DIR.N:
-				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
-				this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos[0], pos[1]); // Block the spot on the map to prevent others from going there
-				break;
-			case DIR.S:
-				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
-				this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos[0], pos[1]);
-				break;
-			case DIR.W:
-				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
-				this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos[0], pos[1]);
-				break;
-			case DIR.E:
-				predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
-				this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos[0], pos[1]);
-				break;
+		// If the predator is too far away, immediately set it to the new spot.
+		// Otherwise, initiate visible movement.
+		if(dist > 5) {
+			this.level.mobmap[pos[1]][pos[0]] = null;
+			switch(predator.movement) {
+				case DIR.N:
+					predator.tile[1]--;
+					break;
+				case DIR.S:
+					predator.tile[1]++;
+					break;
+				case DIR.W:
+					predator.tile[0]--;
+					break;
+				case DIR.E:
+					predator.tile[0]++;
+					break;
+			}
+			this.level.mobmap[pos[1]][pos[0]] = predator;
+			predator.last_movement = predator.movement;
+			predator.movement = 0;
+		}
+		else {
+			switch(predator.movement) {
+				case DIR.N:
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
+					this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos); // Block the spot on the map to prevent others from going there
+					break;
+				case DIR.S:
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
+					this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos);
+					break;
+				case DIR.W:
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
+					this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos);
+					break;
+				case DIR.E:
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
+					this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos);
+					break;
+			}
+
+			this.moving_predators.push(predator);
 		}
 	}
 };
@@ -819,10 +854,8 @@ Survival.prototype.update = function() {
 		if(this.delay_counter >= this.delay) {
 			this.delay_counter = 0;
 
-			for(let predator of this.level.predators) {
-				if(predator.type === SURV_MAP.PREDATOR) {
-					this.resolve_movement(predator);
-				}
+			for(let predator of this.moving_predators) {
+				this.resolve_movement(predator);
 			}
 
 			this.resolve_movement(this.level.character);

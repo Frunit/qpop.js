@@ -579,8 +579,8 @@ function Enemy(species, tile) {
 }
 
 
-function Placeholder(posx, posy) {
+function Placeholder(from_tile) {
 	this.type = SURV_MAP.PLACEHOLDER;
-	this.from_x = posx;
-	this.from_y = posy;
+	this.from_x = from_tile[0];
+	this.from_y = from_tile[1];
 }
