@@ -3,7 +3,6 @@
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. Isno has 9 frames. How to handle predators?
-// TODO: Radar is updated at the beginning of the movement, not at the end
 
 
 function Survival() {
@@ -522,19 +521,19 @@ Survival.prototype.get_adjacent = function() {
 	const x = this.level.character.tile[0];
 	const y = this.level.character.tile[1];
 
-	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y-1][x].type !== SURV_MAP.PLACEHOLDER) {
+	if(this.level.mobmap[y-1][x] !== null && this.level.mobmap[y-1][x].type !== SURV_MAP.UNRESPONSIVE) {
 		return [DIR.N, this.level.mobmap[y-1][x]];
 	}
 
-	if(this.level.mobmap[y][x+1] !== null && this.level.mobmap[y][x+1].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y][x+1].type !== SURV_MAP.PLACEHOLDER) {
+	if(this.level.mobmap[y][x+1] !== null && this.level.mobmap[y][x+1].type !== SURV_MAP.UNRESPONSIVE) {
 		return [DIR.E, this.level.mobmap[y][x+1]];
 	}
 
-	if(this.level.mobmap[y+1][x] !== null && this.level.mobmap[y+1][x].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y+1][x].type !== SURV_MAP.PLACEHOLDER) {
+	if(this.level.mobmap[y+1][x] !== null && this.level.mobmap[y+1][x].type !== SURV_MAP.UNRESPONSIVE) {
 		return [DIR.S, this.level.mobmap[y+1][x]];
 	}
 
-	if(this.level.mobmap[y][x-1] !== null && this.level.mobmap[y][x-1].type !== SURV_MAP.UNRESPONSIVE && this.level.mobmap[y][x-1].type !== SURV_MAP.PLACEHOLDER) {
+	if(this.level.mobmap[y][x-1] !== null && this.level.mobmap[y][x-1].type !== SURV_MAP.UNRESPONSIVE) {
 		return [DIR.W, this.level.mobmap[y][x-1]];
 	}
 
@@ -548,28 +547,35 @@ Survival.prototype.start_movement = function(dir) {
 	}                          // DEBUG
 	const char = this.level.character;
 	char.movement = dir;
-	const pos = char.tile;
 	this.delay = anim_delays.movement;
+
+	if(dir !== DIR.X) {
+		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
+	}
 
 	switch(dir) {
 		case DIR.S:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.south.soffset, char.anims.south.frames);
-			this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos); // Block the position, the player wants to go, so no other predator will go there in the same moment
+			char.tile[1]++;
+			char.rel_pos = [0, -this.tile_dim[1]];
 			break;
 		case DIR.N:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.north.soffset, char.anims.north.frames);
-			this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos);
+			char.tile[1]--;
+			char.rel_pos = [0, this.tile_dim[1]];
 			break;
 		case DIR.E:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.east.soffset, char.anims.east.frames);
-			this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos);
+			char.tile[0]++;
+			char.rel_pos = [-this.tile_dim[0], 0];
 			break;
 		case DIR.W:
 			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.west.soffset, char.anims.west.frames);
-			this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos);
+			char.tile[0]--;
+			char.rel_pos = [this.tile_dim[0], 0];
 			break;
-		case 0: { // Feeding/waiting
-			const ground_type = this.level.map[pos[1]][pos[0]];
+		case DIR.X: { // Feeding/waiting
+			const ground_type = this.level.map[char.tile[1]][char.tile[0]];
 			if(this.level.edible[ground_type] === '1') {
 				this.action = new Feeding(char, this.level, ground_type, () => this.finish_feeding(ground_type));
 				this.delay = anim_delays.feeding;
@@ -582,8 +588,13 @@ Survival.prototype.start_movement = function(dir) {
 		}
 	}
 
+	if(dir !== DIR.X) {
+		this.level.mobmap[char.tile[1]][char.tile[0]] = char;
+	}
+
 	this.start_predator_movement();
 	this.movement_active = true;
+	this.draw_minimap();
 };
 
 
@@ -596,54 +607,30 @@ Survival.prototype.resolve_movement = function(obj, force=false) {
 
 	const speed = options.surv_move_speed;
 	obj.sprite.update();
-	const old_tile = [obj.tile[0], obj.tile[1]];
 
 	switch (obj.movement) {
 		case DIR.S:
-			if(force || obj.rel_pos[1] + speed >= this.tile_dim[1]) {
-				obj.tile[1]++;
-				finished_move = true;
-			}
-			else {
-				obj.rel_pos[1] += speed;
-			}
+			obj.rel_pos[1] += speed;
+			finished_move = obj.rel_pos[1] >= 0;
 			break;
 		case DIR.N:
-			if(force || Math.abs(obj.rel_pos[1] - speed) >= this.tile_dim[1]) {
-				obj.tile[1]--;
-				finished_move = true;
-			}
-			else {
-				obj.rel_pos[1] -= speed;
-			}
+			obj.rel_pos[1] -= speed;
+			finished_move = obj.rel_pos[1] <= 0;
 			break;
 		case DIR.W:
-			if(force || Math.abs(obj.rel_pos[0] - speed) >= this.tile_dim[0]) {
-				obj.tile[0]--;
-				finished_move = true;
-			}
-			else {
-				obj.rel_pos[0] -= speed;
-			}
+			obj.rel_pos[0] -= speed;
+			finished_move = obj.rel_pos[0] <= 0;
 			break;
 		case DIR.E:
-			if(force || obj.rel_pos[0] + speed >= this.tile_dim[0]) {
-				obj.tile[0]++;
-				finished_move = true;
-			}
-			else {
-				obj.rel_pos[0] += speed;
-			}
+			obj.rel_pos[0] += speed;
+			finished_move = obj.rel_pos[0] >= 0;
 			break;
 	}
 
-	if(finished_move) {
+	if(finished_move || force) {
 		obj.rel_pos = [0, 0];
 		obj.last_movement = obj.movement;
 		obj.movement = 0;
-
-		this.level.mobmap[old_tile[1]][old_tile[0]] = null;
-		this.level.mobmap[obj.tile[1]][obj.tile[0]] = obj;
 
 		if(obj.type === SURV_MAP.PLAYER) {
 			this.finish_movement();
@@ -726,52 +713,54 @@ Survival.prototype.start_predator_movement = function() {
 				predator.movement = random_element(dirs);
 			}
 			else {
-				predator.movement = 0;
+				predator.movement = DIR.X;
+				predator.last_movement = DIR.X;
+				continue;
 			}
 		}
+
+		this.level.mobmap[pos[1]][pos[0]] = null;
+
+		switch(predator.movement) {
+			case DIR.N:
+				pos[1]--;
+				if(dist <= 5) {
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
+					predator.rel_pos = [0, this.tile_dim[1]];
+				}
+				break;
+			case DIR.S:
+				pos[1]++;
+				if(dist <= 5) {
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
+					predator.rel_pos = [0, -this.tile_dim[1]];
+				}
+				break;
+			case DIR.W:
+				pos[0]--;
+				if(dist <= 5) {
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
+					predator.rel_pos = [this.tile_dim[0], 0];
+				}
+				break;
+			case DIR.E:
+				pos[0]++;
+				if(dist <= 5) {
+					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
+					predator.rel_pos = [-this.tile_dim[0], 0];
+				}
+				break;
+		}
+
+		this.level.mobmap[pos[1]][pos[0]] = predator;
 
 		// If the predator is too far away, immediately set it to the new spot.
 		// Otherwise, initiate visible movement.
 		if(dist > 5) {
-			this.level.mobmap[pos[1]][pos[0]] = null;
-			switch(predator.movement) {
-				case DIR.N:
-					predator.tile[1]--;
-					break;
-				case DIR.S:
-					predator.tile[1]++;
-					break;
-				case DIR.W:
-					predator.tile[0]--;
-					break;
-				case DIR.E:
-					predator.tile[0]++;
-					break;
-			}
-			this.level.mobmap[pos[1]][pos[0]] = predator;
 			predator.last_movement = predator.movement;
 			predator.movement = 0;
 		}
 		else {
-			switch(predator.movement) {
-				case DIR.N:
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
-					this.level.mobmap[pos[1] - 1][pos[0]] = new Placeholder(pos); // Block the spot on the map to prevent others from going there
-					break;
-				case DIR.S:
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
-					this.level.mobmap[pos[1] + 1][pos[0]] = new Placeholder(pos);
-					break;
-				case DIR.W:
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
-					this.level.mobmap[pos[1]][pos[0] - 1] = new Placeholder(pos);
-					break;
-				case DIR.E:
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
-					this.level.mobmap[pos[1]][pos[0] + 1] = new Placeholder(pos);
-					break;
-			}
-
 			this.moving_predators.push(predator);
 		}
 	}

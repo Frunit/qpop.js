@@ -21,7 +21,6 @@ function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.cpos = [0, 0]; // Camera position in pixel
 
 	this.move_to(level.character);
-	//this.update_tiles(); Already done in move_to()
 	this.update_visible_level();
 }
 
@@ -29,8 +28,6 @@ function Camera(level, survival, tile_dim, window_dim, offset) {
 Camera.prototype.move_to = function(obj) {
 	const new_x = obj.tile[0] * this.tile_dim[0] + obj.rel_pos[0] + this.tile_dim[0]/2 - Math.floor(this.cwidth/2);
 	const new_y = obj.tile[1] * this.tile_dim[1] + obj.rel_pos[1] + this.tile_dim[1]/2 - Math.floor(this.cheight/2);
-
-	//debug2.value = 'nx: ' + new_x + '; ny: ' + new_y;
 
 	if(new_x !== this.cpos[0]) {
 		this.cpos[0] = new_x;
@@ -45,11 +42,6 @@ Camera.prototype.move_to = function(obj) {
 		this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
 			Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
 	}
-
-	/*debug3.value = 'tiles: ' + Math.floor(this.cpos[0] / this.tile_dim[0]) + '-' +
-					Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + ' ' +
-					Math.floor(this.cpos[1] / this.tile_dim[1]) + '-' +
-					Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]);*/
 };
 
 
@@ -76,32 +68,45 @@ Camera.prototype.update_visible_level = function() {
 
 			const mob = this.level.mobmap[y][x];
 
-			if(mob !== null && !mob.hidden) {
-				// PLAYER and PREDATOR are updated by survival. PLACEHOLDER does not need an update.
-				if(mob.type === SURV_MAP.ENEMY ||
-						mob.type === SURV_MAP.FEMALE ||
-						mob.type === SURV_MAP.UNRESPONSIVE) {
-					mob.sprite.update();
-				}
+			if(mob === null || mob.hidden) {
+				// save some indentation of the code by this...
+				continue;
+			}
 
-				if(mob.type !== SURV_MAP.PLACEHOLDER) {
-					if(this._pos_changed || mob.sprite.is_new_frame()) {
-						this._movs_to_render.add(JSON.stringify([x, y]));
-						this._tiles_to_render.add(JSON.stringify([x, y]));
+			// PLAYER and PREDATOR are updated by survival and can move.
+			// All others (ENEMY, FEMALE, UNRESPONSIVE) need an update but can't move.
+			if(mob.type === SURV_MAP.PLAYER || mob.type === SURV_MAP.PREDATOR) {
+				if(this._pos_changed || mob.sprite.is_new_frame()) {
+					const mov = mob.movement ? mob.movement : mob.last_movement;
+					if(mov) {
+						let old_x = mob.tile[0];
+						let old_y = mob.tile[1];
+						switch (mov) {
+							case DIR.N:
+								old_y++;
+								break;
+							case DIR.S:
+								old_y--;
+								break;
+							case DIR.E:
+								old_x++;
+								break;
+							case DIR.W:
+								old_x--;
+								break;
+						}
+
+						this._tiles_to_render.add(JSON.stringify([old_x, old_y]));
 					}
 				}
-				else { // if mob.type === SURV_MAP.PLACEHOLDER
-					const fx = mob.from_x;
-					const fy = mob.from_y;
+			}
+			else {
+				mob.sprite.update();
+			}
 
-					// Render sprites that are outside the camera but are about to move into the camera (usually enemies)
-					// The placeholder indicates where the object comes from that will occupy the spot
-					if(this._pos_changed || this.level.mobmap[fy][fx].sprite.is_new_frame()) {
-						this._movs_to_render.add(JSON.stringify([fx, fy]));
-						this._tiles_to_render.add(JSON.stringify([fx, fy]));
-						this._tiles_to_render.add(JSON.stringify([x, y]));
-					}
-				}
+			if(this._pos_changed || mob.sprite.is_new_frame()) {
+				this._movs_to_render.add(JSON.stringify([x, y]));
+				this._tiles_to_render.add(JSON.stringify([x, y]));
 			}
 		}
 	}
@@ -121,7 +126,7 @@ Camera.prototype.render = function(force=false) {
 				this._tiles_to_render.add(JSON.stringify([x, y]));
 
 				const mob = this.level.mobmap[y][x];
-				if(mob !== null && !mob.hidden && mob.type !== SURV_MAP.PLACEHOLDER) {
+				if(mob !== null && !mob.hidden) {
 					this._movs_to_render.add(JSON.stringify([x, y]));
 				}
 			}
@@ -139,6 +144,7 @@ Camera.prototype.render = function(force=false) {
 		if(this.level.bg_sprites[y][x] === null) {
 			this.level.request_sprite(x, y);
 		}
+
 		this.level.bg_sprites[y][x].render(ctx,
 			[x * this.tile_dim[0] - this.cpos[0],
 			y * this.tile_dim[1] - this.cpos[1]]);

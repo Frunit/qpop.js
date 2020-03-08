@@ -515,6 +515,7 @@ function Character(species, tile) {
 	this.species = species;
 	this.rel_pos = [0, 0];
 	this.movement = 0;
+	this.last_movement = 0;	// last movement direction
 	this.invincible = false;
 	this.hidden = false;
 	this.steps = 40 + game.current_player.iq * 10;
@@ -535,7 +536,7 @@ function Predator(species, tile) {
 	this.species = species;
 	this.rel_pos = [0, 0];
 	this.movement = 0;		// current movement direction
-	this.last_movement = 0;	// last movement direction (important, because they can't move back)
+	this.last_movement = 0;	// last movement direction
 	this.hidden = false;
 
 	this.url = 'gfx/pred' + (species+1) + '.png';
@@ -576,11 +577,4 @@ function Enemy(species, tile) {
 	this.anims = anims_players[species];
 
 	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.enem_still.soffset, this.anims.enem_still.frames);
-}
-
-
-function Placeholder(from_tile) {
-	this.type = SURV_MAP.PLACEHOLDER;
-	this.from_x = from_tile[0];
-	this.from_y = from_tile[1];
 }

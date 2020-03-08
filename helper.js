@@ -35,6 +35,7 @@ const ATTR = Object.freeze({
 
 // Directions
 const DIR = Object.freeze({
+	X: 0,
 	N: 1,
 	E: 2,
 	S: 3,
@@ -57,7 +58,6 @@ const PRED = Object.freeze({
 
 // Living objects on survival map
 const SURV_MAP = Object.freeze({
-	PLACEHOLDER:  0,
 	PLAYER:       1,
 	PREDATOR:     2,
 	ENEMY:        3,
