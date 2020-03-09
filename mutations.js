@@ -57,7 +57,8 @@ function Mutations() {
 
 
 Mutations.prototype.initialize = function() {
-	this.redraw();
+	//this.redraw();
+	this.next_player();
 };
 
 
@@ -74,11 +75,7 @@ Mutations.prototype.next_player = function() {
 		for(let i = 0; i < this.plant_counts.length; i++) {
 			this.plant_counts[i] = Math.round(this.plant_counts[i] / total_count * 12);
 		}
-		this.draw_avatar();
-		this.draw_evo_score();
-		for(let i = 0; i < 13; i++) {
-			this.draw_bar(i);
-		}
+		this.redraw();
 	}
 };
 
@@ -158,14 +155,13 @@ Mutations.prototype.redraw = function() {
 			blur: () => {}
 		});
 	}
-
-	this.draw_avatar();
-
 	write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
 
+	this.draw_avatar();
 	this.draw_evo_score();
-
-	this.next_player();
+	for(let i = 0; i < 13; i++) {
+		this.draw_bar(i);
+	}
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.next(), 'reset': true},
