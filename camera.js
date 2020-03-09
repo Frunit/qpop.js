@@ -48,19 +48,19 @@ Camera.prototype.move_to = function(obj) {
 Camera.prototype.update_visible_level = function() {
 	if(this.survival.action !== null) {
 		for(let tile of this.survival.action.tiles) {
-			this._tiles_to_render.add(JSON.stringify(tile));
+			this._tiles_to_render.add(tile[0] * 100 + tile[1]);
 		}
 	}
 
 	for(let y of this.y_tiles) {
 		for(let x of this.x_tiles) {
 			if(this.level.bg_sprites[y][x] === null) {
-				this._tiles_to_render.add(JSON.stringify([x, y]));
+				this._tiles_to_render.add(x * 100 + y);
 			}
 			else {
 				this.level.bg_sprites[y][x].update();
 				if(this._pos_changed || this.level.bg_sprites[y][x].is_new_frame()) {
-					this._tiles_to_render.add(JSON.stringify([x, y]));
+					this._tiles_to_render.add(x * 100 + y);
 				}
 			}
 
@@ -94,7 +94,7 @@ Camera.prototype.update_visible_level = function() {
 								break;
 						}
 
-						this._tiles_to_render.add(JSON.stringify([old_x, old_y]));
+						this._tiles_to_render.add(old_x * 100 + old_y);
 					}
 				}
 			}
@@ -103,8 +103,8 @@ Camera.prototype.update_visible_level = function() {
 			}
 
 			if(this._pos_changed || mob.sprite.is_new_frame()) {
-				this._movs_to_render.add(JSON.stringify([x, y]));
-				this._tiles_to_render.add(JSON.stringify([x, y]));
+				this._movs_to_render.add(x * 100 + y);
+				this._tiles_to_render.add(x * 100 + y);
 			}
 		}
 	}
@@ -121,11 +121,11 @@ Camera.prototype.render = function(force=false) {
 	if(force) {
 		for(let y of this.y_tiles) {
 			for(let x of this.x_tiles) {
-				this._tiles_to_render.add(JSON.stringify([x, y]));
+				this._tiles_to_render.add(x * 100 + y);
 
 				const mob = this.level.mobmap[y][x];
 				if(mob !== null && !mob.hidden) {
-					this._movs_to_render.add(JSON.stringify([x, y]));
+					this._movs_to_render.add(x * 100 + y);
 				}
 			}
 		}
@@ -137,15 +137,11 @@ Camera.prototype.render = function(force=false) {
 	}
 
 	for(let coord of this._tiles_to_render) {
-		const [x, y] = JSON.parse(coord);
+		const x = Math.floor(coord / 100);
+		const y = coord % 100;
 
 		if(this.level.bg_sprites[y][x] === null) {
 			this.level.request_sprite(x, y);
-		}
-
-		const mob = this.level.mobmap[y][x];
-		if(mob !== null && !mob.hidden) {
-			this._movs_to_render.add(JSON.stringify([x, y]));
 		}
 
 		this.level.bg_sprites[y][x].render(ctx,
@@ -154,7 +150,8 @@ Camera.prototype.render = function(force=false) {
 	}
 
 	for(let coord of this._movs_to_render) {
-		const [x, y] = JSON.parse(coord);
+		const x = Math.floor(coord / 100);
+		const y = coord % 100;
 		const mov = this.level.mobmap[y][x];
 		mov.sprite.render(ctx,
 			[Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.cpos[0]),
