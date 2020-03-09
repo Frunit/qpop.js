@@ -325,7 +325,7 @@ Survival.prototype.draw_symbols = function() {
 
 
 Survival.prototype.render = function() {
-	this.camera.render(this.movement_just_finished);
+	this.camera.render(true || this.movement_just_finished); // DEBUG
 
 	if(this.movement_just_finished) {
 		this.movement_just_finished = false;
@@ -852,8 +852,13 @@ Survival.prototype.update = function() {
 		}
 	}
 
-	if(this.action !== null && this.action.finished) {
-		this.action.callback();
+	if(this.action !== null) {
+		if(this.action.finished) {
+			this.action.callback();
+		}
+		else {
+			this.action.update();
+		}
 	}
 
 	debug6.value = 'mvmnt act: ' + this.movement_active + '; act: ' + this.action;

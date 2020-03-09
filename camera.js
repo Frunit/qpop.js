@@ -1,7 +1,7 @@
 'use strict';
 
 
-// TODO: When the player stands still, the last predator move frame is not properly cleared (only after another frame)
+// TODO: Camera has some issues with predators when the player is not moving. left/right moving predators glitch and predators on the edge of the screen disappear suddenly (e.g. left edge going left). This is fixed by force rendering for now.
 
 
 function Camera(level, survival, tile_dim, window_dim, offset) {
@@ -21,7 +21,7 @@ function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.cpos = [0, 0]; // Camera position in pixel
 
 	this.move_to(level.character);
-	this.update_visible_level();
+	//this.update_visible_level();
 }
 
 
@@ -33,14 +33,14 @@ Camera.prototype.move_to = function(obj) {
 		this.cpos[0] = new_x;
 		this._pos_changed = true;
 		this.x_tiles = range(Math.floor(this.cpos[0] / this.tile_dim[0]),
-			Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]));
+			Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + 1);
 	}
 
 	if(new_y !== this.cpos[1]) {
 		this.cpos[1] = new_y;
 		this._pos_changed = true;
 		this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
-			Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]));
+			Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]) + 1);
 	}
 };
 
@@ -50,8 +50,6 @@ Camera.prototype.update_visible_level = function() {
 		for(let tile of this.survival.action.tiles) {
 			this._tiles_to_render.add(JSON.stringify(tile));
 		}
-
-		this.survival.action.update();
 	}
 
 	for(let y of this.y_tiles) {
@@ -143,6 +141,11 @@ Camera.prototype.render = function(force=false) {
 
 		if(this.level.bg_sprites[y][x] === null) {
 			this.level.request_sprite(x, y);
+		}
+
+		const mob = this.level.mobmap[y][x];
+		if(mob !== null && !mob.hidden) {
+			this._movs_to_render.add(JSON.stringify([x, y]));
 		}
 
 		this.level.bg_sprites[y][x].render(ctx,
