@@ -52,8 +52,3 @@ When playing with less than six players (human or ai), you could not get the max
 I spent many hours extracting survival maps from RAM and running statistics on them. I hope that I managed to resemble the survival maps as closely as possible, but there will probably be differences.
 
 One deliberate difference is the presence of craters in survival maps. In the original game, there is a graphics tile for a crater, but it was never used in any survival map. In this remake, craters appear if the player has individuals on the world map close to the impact site(s) created by the meteor catastrophe. They don't serve any purpose other than blocking the movement.
-
-
-#### Electro flower and other behaviour
-
-The electro flower and other rare events may work differently than in the original game. Since they are so rare, I don't have much data on them.
