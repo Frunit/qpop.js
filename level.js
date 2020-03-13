@@ -519,7 +519,7 @@ function Character(species, tile) {
 	this.invincible = false;
 	this.hidden = false;
 	this.steps = 40 + game.current_player.iq * 10;
-	this.time = 2000; // ms per turn TODO RESEARCH: Is this correct?
+	//this.time = 3000; // ms per turn TODO RESEARCH: Is this correct?
 
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];

@@ -53,15 +53,18 @@ function Survival() {
 	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
 
 	this.eating_div = 37;
+	this.max_time = 54;
 	// CONST_END
 
 	this.action = null;
 	this.movement_active = false;
 	this.movement_just_finished = false;
+	this.player_started = false;
 	this.moving_predators = [];
 
 	this.delay = anim_delays.movement;
 	this.delay_counter = 0;
+	this.time = this.max_time;
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -85,6 +88,8 @@ Survival.prototype.initialize = function() {
 
 	this.level = new Level();
 	this.camera = new Camera(this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
+	this.player_started = false;
+	this.time = this.max_time;
 
 	this.redraw();
 };
@@ -263,7 +268,7 @@ Survival.prototype.draw_steps = function() {
 
 
 Survival.prototype.draw_time = function() {
-	const width = 40; // TODO
+	const width = Math.floor(120 * this.time / this.max_time); // TODO: Test
 
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
@@ -326,6 +331,7 @@ Survival.prototype.draw_symbols = function() {
 
 Survival.prototype.render = function() {
 	this.camera.render(true || this.movement_just_finished); // DEBUG
+	this.draw_time();
 
 	if(this.movement_just_finished) {
 		this.movement_just_finished = false;
@@ -414,6 +420,7 @@ Survival.prototype.finish_movement = function() {
 	char.hidden = false;
 	this.action = null;
 	this.movement_active = false;
+	this.time = this.max_time;
 
 	for(let predator of this.moving_predators) {
 		this.resolve_movement(predator, true);
@@ -548,6 +555,7 @@ Survival.prototype.start_movement = function(dir) {
 	const char = this.level.character;
 	char.movement = dir;
 	this.delay = anim_delays.movement;
+	this.player_started = true;
 
 	if(dir !== DIR.X) {
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
@@ -834,6 +842,15 @@ Survival.prototype.update = function() {
 			else {
 				this.action = new Electro(DIR.W, char, () => this.player_death(true));
 			}
+		}
+
+		else if(this.player_started) {
+			this.time--;
+
+			if(this.time === 0) {
+				this.time = this.max_time;
+				this.start_movement(DIR.X);
+			};
 		}
 	}
 
