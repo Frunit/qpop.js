@@ -13,4 +13,4 @@ The licensing is a bit complicated. I did not decide on a license for the code, 
 
 I made an own repository for the original graphics here: [github.com/Frunit/qpop-ressourcen](https://github.com/Frunit/qpop-ressourcen)
 
-The current version can be played here: [frunit.de/qpop/play](https://frunit.de/qpop/play). Many things work, but many things don't (yet). There is no sound whatsoever, no animations and the survival part is ... very rudimental.
+The current version can be played here: [frunit.de/qpop/play](https://frunit.de/qpop/play). There is no sound at all and the options menu is not included. Most other things mostly work, but random bugs can occur at any time. If the game should freeze, please open the browser console (press F12; depending on the browser, you must choose the *console* tab) and copy everything that is written there. Then open a new [issue](https://github.com/Frunit/qpop.js/issues), paste the content of the console and describe what you were doing when the game froze. Of course, I would also appreciate reports on any other bugs!
