@@ -673,6 +673,11 @@ World.prototype.wm_click = function(x, y, raw = true) {
 		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 	}
 
+	// This can happen when the mouse is moved too fast
+	if(x < 0 || x >= this.dim[0] || y < 0 || y >= this.dim[1]) {
+		return;
+	}
+
 	this.wm_clickpos = [x, y];
 
 	// Clicked on own individual -> take it
