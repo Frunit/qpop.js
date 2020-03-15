@@ -434,6 +434,7 @@ Survival.prototype.finish_movement = function() {
 
 	if(this.steps <= 0) {
 		this.next_popup(1);
+		return;
 	}
 
 	this.draw_steps();
@@ -1000,7 +1001,7 @@ Survival.prototype.next_popup = function(answer) {
 		this.calc_outcome();
 		if(game.current_player.individuals === 0) {
 			game.current_player.is_dead = true;
-			open_popup(lang.popup_title, game.current_player.id, lang.dead, game.next_stage, lang.next);
+			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => game.next_stage(), lang.next);
 		}
 		else {
 			game.next_stage();

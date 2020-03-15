@@ -593,8 +593,8 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 	this.animation = null;
 
 	if(enemy.individuals === 0) {
-		open_popup(lang.popup_title, enemy.id, lang.dead, () => {}, lang.next);
 		enemy.is_dead = true;
+		open_popup(lang.popup_title, enemy.id, lang.dead, () => {}, lang.next);
 	}
 };
 
