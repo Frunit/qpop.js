@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: Credits don't look nice, yet!
+
 
 function Credits() {
 	this.id = SCENE.CREDITS;

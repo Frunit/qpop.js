@@ -3,6 +3,7 @@
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
 // TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. Isno has 9 frames. How to handle predators?
+// TODO: Action animations seem to be off by one frame (either one too much or one too little)
 
 
 function Survival() {
