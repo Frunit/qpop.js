@@ -1,5 +1,6 @@
 'use strict';
 
+// MAYBE: Subtitles for intro texts
 
 function Intro() {
 	this.id = SCENE.INTRO;

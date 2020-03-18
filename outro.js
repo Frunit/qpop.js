@@ -2,6 +2,8 @@
 
 
 // MAYBE: At the moment, the outro is not cancelable. Should it be? What should happen?
+// MAYBE: Allow restart without reloading the page.
+// TODO: Add me/Frunit to the credits in the outro
 
 
 function Outro(winner) {

@@ -279,7 +279,8 @@ World.prototype.next = function() {
 
 World.prototype.next_popup = function(answer) {
 	if(answer === 1) {
-		this.test_if_dead();
+		// TODO: If a player died, the popup with lang.dead will appear and then game.stage (below) will be triggered, yielding a "wrong scene error" since the popup is still open while the next stage is triggered.
+		game.test_if_dead();
 
 		if(this.catastrophe_status === 3) {
 			// The catastrophe is finished, distribute evolution points.
@@ -309,20 +310,6 @@ World.prototype.next_popup = function(answer) {
 		}
 
 		game.next_stage();
-	}
-};
-
-
-World.prototype.test_if_dead = function() {
-	if(game.turn === 0) {
-		return;
-	}
-
-	for(let player of game.players) {
-		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
-			player.is_dead = true;
-			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
-		}
 	}
 };
 
@@ -488,7 +475,7 @@ World.prototype.catastrophe_finish = function() {
 		}
 	}
 
-	this.test_if_dead();
+	game.test_if_dead();
 
 	this.redraw();
 
@@ -805,6 +792,7 @@ World.prototype.ai_end = function() {
 	game.current_player.toplace = 0;
 	game.current_player.tomove = 0;
 	this.ai_active = false;
+	this.draw_minispec();
 	canvas.style.cursor = 'default';
 	if(options.wm_ai_auto_continue && !game.is_last_player()) {
 		this.next();

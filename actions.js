@@ -1,7 +1,8 @@
 'use strict';
 
 // TODO: Test all actions ... with all species ... in low frame rate -.-
-// That is: Eat normal food, power food, poison; love, fight against predator (win and lose!) and enemy; quicksand; wait; electro flower (when it's finished).
+// That is: Move in all directions; eat normal food, power food, poison; love, fight against predator (win and lose!) and enemy; wait; quicksand; electro flower.
+// Enemies also movement and fight (both in all directions)
 
 
 function Love(dir, character, partner, callback) {
@@ -17,6 +18,7 @@ function Love(dir, character, partner, callback) {
 	this.cloud_offset = [0, 0];
 	this.sprites = [];
 	this.offspring_sprite = new Sprite(partner.url, [64, 64], anim_delays.offspring, partner.anims.offspring.soffset, partner.anims.offspring.frames);
+	this.pre_offspring = null;
 
 	this.sprites = [
 		new Sprite(partner.url, [64, 64], 0, partner.anims.female_pre_love.soffset, partner.anims.female_pre_love.frame),
@@ -30,22 +32,22 @@ function Love(dir, character, partner, callback) {
 	switch(dir) {
 		case DIR.N:
 			this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, 0, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, true);
 			this.cloud_offset = [0, 14];
 			break;
 		case DIR.S:
 			this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, anim_delays.cloud, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.size, 0, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, true);
 			this.cloud_offset = [0, 14];
 			break;
 		case DIR.W:
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, 0, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, true);
 			this.cloud_offset = [14, 0];
 			break;
 		case DIR.E:
 			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, anim_delays.cloud, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.size, 0, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, true);
 			this.cloud_offset = [14, 0];
 			break;
 	}
@@ -53,59 +55,48 @@ function Love(dir, character, partner, callback) {
 
 
 Love.prototype.update = function() {
-	for(let sprite of this.sprites) {
-		sprite.update();
-	}
-	if(this.draw_cloud) {
-		this.cloud_sprite.update();
-	}
-
 	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
+
+		for(let sprite of this.sprites) {
+			sprite.update();
+		}
+		if(this.draw_cloud) {
+			this.cloud_sprite.update();
+			if(this.cloud_sprite.finished) {
+				this.draw_cloud = false;
+			}
+		}
 	}
 	else {
 		return;
 	}
 
-	switch(this.frame) {
-		case 1:
-			this.sprites = [];
-			this.draw_cloud = true;
-			break;
-		case 10:
-			this.sprites = [];
+	if(this.frame === 1) {
+		this.sprites = [];
+		this.draw_cloud = true;
+	}
+	else if(this.frame === 10) {
+		this.sprites = [];
 
-			if(this.partner.anims.hasOwnProperty('pre_offspring')) {
-				this.sprites.push(new Sprite(this.partner.url, [64, 64], anim_delays.cloud, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames));
-			}
-			else {
-				this.sprites.push(new Sprite(this.partner.url, [64, 64], anim_delays.cloud, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames));
-			}
+		if(this.partner.anims.hasOwnProperty('pre_offspring')) {
+			this.pre_offspring = new Sprite(this.partner.url, [64, 64], 0, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames, true);
+			this.sprites.push(this.pre_offspring);
+		}
+		else {
+			this.sprites.push(new Sprite(this.partner.url, [64, 64], 0, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames));
+		}
 
-			this.sprites.push(new Sprite(this.character.url, [64, 64], 0, this.character.anims.still.soffset, this.character.anims.still.frames));
+		this.sprites.push(new Sprite(this.character.url, [64, 64], 0, this.character.anims.still.soffset, this.character.anims.still.frames));
 
-			if(this.dir === DIR.S || this.dir === DIR.E) {
-				this.sprites.reverse();
-			}
-
-			break;
-		case 12:
-			if(this.partner.anims.hasOwnProperty('pre_offspring')) {
-				for(let sprite of this.sprites) {
-					sprite.delay = anim_delays.offspring;
-				}
-				this.delay = anim_delays.offspring;
-				this.draw_cloud = false;
-			}
-			else {
-				this.finished = true;
-			}
-			break;
-		case 14:
-			this.finished = true;
-			break;
+		if(this.dir === DIR.S || this.dir === DIR.E) {
+			this.sprites.reverse();
+		}
+	}
+	else if(this.frame > 10 && this.cloud_sprite.finished && (this.pre_offspring === null || this.pre_offspring.finished)) {
+		this.finished = true;
 	}
 };
 
@@ -275,16 +266,16 @@ function Feeding(character, level, food_type, callback) {
 
 	this.tiles = [this.character.tile];
 
-	this.sprite = new Sprite(character.url, [64, 64], anim_delays.feeding, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
+	this.sprite = new Sprite(character.url, [64, 64], 0, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
 }
 
 
 Feeding.prototype.update = function() {
-	this.sprite.update();
 	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
+		this.sprite.update();
 	}
 	else {
 		return;
@@ -308,12 +299,14 @@ Feeding.prototype.update = function() {
 		}
 		// Poison
 		else if(this.food_type >= 88 && this.food_type <= 93) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.poison, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
+			this.delay = anim_delays.poison;
+			this.sprite = new Sprite(this.character.url, [64, 64], 0, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
 		}
 		// Power food
 		else if(this.food_type >= 118) {
-			this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.power_food, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
+			this.delay = anim_delays.power_food;
+			this.sprite = new Sprite(this.character.url, [64, 64], 0, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
 		}
 	}

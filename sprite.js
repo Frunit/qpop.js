@@ -25,6 +25,7 @@ Sprite.prototype.update = function() {
 			this.idx++;
 
 			if(this.once && this.idx === this.frames.length) {
+				this.idx--; // Let the index point to the last frame (i.e. this.frames.length - 1)
 				this.finished = true;
 			}
 		}

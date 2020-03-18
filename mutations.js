@@ -1,6 +1,5 @@
 'use strict';
 
-// MAYBE: Show on which plants the player stands to help distributing the points
 
 function Mutations() {
 	this.id = SCENE.MUTATION;
@@ -352,7 +351,6 @@ Mutations.prototype.add = function(attribute, value) {
 };
 
 
-// TODO RESEARCH: Check if this fits to the behaviour in Q-Pop savegames
 Mutations.prototype.ai = function() {
 	const choosable_plants = [];
 	const choosable_nonplants = [];
