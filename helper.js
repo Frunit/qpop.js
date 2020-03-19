@@ -151,6 +151,7 @@ function download(data, filename, type) {
 
 
 function upload_dialog() {
+	// TODO: The upload dialog does not come up!
 	const input = document.createElement('input');
 	input.type = 'file';
 	input.accept = '.qpp';

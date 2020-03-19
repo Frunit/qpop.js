@@ -466,8 +466,7 @@ Survival.prototype.finish_movement = function() {
 
 Survival.prototype.does_player_win = function(opponent) {
 	// The player wins if the character is invincible, fights against an enemy, or has a high defense.
-	// DEBUG
-	return true || this.level.character.invincible ||
+	return this.level.character.invincible ||
 		opponent.type === SURV_MAP.ENEMY ||
 		random_int(0, opponent.attack) <= game.current_player.stats[ATTR.DEFENSE];
 };
@@ -725,7 +724,8 @@ Survival.prototype.start_predator_movement = function() {
 				predator.movement = target_dirs[1];
 			}
 			else {
-				predator.movement = 0;
+				predator.movement = DIR.X;
+				predator.last_movement = DIR.X;
 			}
 		}
 		// Otherwise move to a random position, if possible.
@@ -902,36 +902,23 @@ Survival.prototype.test_movement_input = function() {
 		return;
 	}
 
-	if(input.isDown('DOWN')) {
-		//input.reset('DOWN');
-		if(this.level.is_unblocked(this.level.character.tile, DIR.S)) {
-			this.start_movement(DIR.S);
-		}
+	if(input.isDown('DOWN') && this.level.is_unblocked(this.level.character.tile, DIR.S)) {
+		this.start_movement(DIR.S);
 	}
 
-	else if(input.isDown('UP')) {
-		//input.reset('UP');
-		if(this.level.is_unblocked(this.level.character.tile, DIR.N)) {
-			this.start_movement(DIR.N);
-		}
+	else if(input.isDown('UP') && this.level.is_unblocked(this.level.character.tile, DIR.N)) {
+		this.start_movement(DIR.N);
 	}
 
-	else if(input.isDown('LEFT')) {
-		//input.reset('LEFT');
-		if(this.level.is_unblocked(this.level.character.tile, DIR.W)) {
-			this.start_movement(DIR.W);
-		}
+	else if(input.isDown('LEFT') && this.level.is_unblocked(this.level.character.tile, DIR.W)) {
+		this.start_movement(DIR.W);
 	}
 
-	else if(input.isDown('RIGHT')) {
-		//input.reset('RIGHT');
-		if(this.level.is_unblocked(this.level.character.tile, DIR.E)) {
-			this.start_movement(DIR.E);
-		}
+	else if(input.isDown('RIGHT') && this.level.is_unblocked(this.level.character.tile, DIR.E)) {
+		this.start_movement(DIR.E);
 	}
 
 	else if(input.isDown('SPACE')) {
-		//input.reset('SPACE');
 		this.start_movement(0);
 	}
 

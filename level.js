@@ -573,6 +573,7 @@ function Enemy(species, tile) {
 
 	this.url = 'gfx/enemies.png';
 	this.anims = anims_players[species];
+	this.defeated = this.anims.defeated;
 
 	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.enem_still.soffset, this.anims.enem_still.frames);
 }
