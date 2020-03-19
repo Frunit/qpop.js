@@ -279,8 +279,11 @@ World.prototype.next = function() {
 
 World.prototype.next_popup = function(answer) {
 	if(answer === 1) {
-		// TODO: If a player died, the popup with lang.dead will appear and then game.stage (below) will be triggered, yielding a "wrong scene error" since the popup is still open while the next stage is triggered.
-		game.test_if_dead();
+		if(game.current_player.individuals === 0 && !game.current_player.is_dead) {
+			player.is_dead = true;
+			open_popup(lang.popup_title, player.id, lang.dead, () => this.next_popup(1), lang.next);
+			return;
+		}
 
 		if(this.catastrophe_status === 3) {
 			// The catastrophe is finished, distribute evolution points.
@@ -475,7 +478,13 @@ World.prototype.catastrophe_finish = function() {
 		}
 	}
 
-	game.test_if_dead();
+	for(let player of game.players) {
+		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
+			player.is_dead = true;
+			open_popup(lang.popup_title, player.id, lang.dead, () => this.catastrophe_finish(), lang.next);
+			return;
+		}
+	}
 
 	this.redraw();
 

@@ -403,20 +403,6 @@ Game.prototype.select_evo_points = function() {
 };
 
 
-Game.prototype.test_if_dead = function() {
-	if(game.turn === 0) {
-		return;
-	}
-
-	for(let player of game.players) {
-		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
-			player.is_dead = true;
-			open_popup(lang.popup_title, player.id, lang.dead, () => {}, lang.next);
-		}
-	}
-};
-
-
 Game.prototype.save_game = function() {
 	const save_file = new ArrayBuffer(4172);
 	const content = new DataView(save_file);

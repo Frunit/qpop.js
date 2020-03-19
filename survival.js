@@ -985,8 +985,9 @@ Survival.prototype.next = function() {
 Survival.prototype.next_popup = function(answer) {
 	if(answer === 1) {
 		this.calc_outcome();
-		if(game.current_player.individuals === 0) {
-			game.test_if_dead();
+		if(game.current_player.individuals === 0 && !game.current_player.is_dead) {
+			game.current_player.is_dead = true;
+			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => this.next_popup(1), lang.next);
 		}
 		else {
 			game.next_stage();
