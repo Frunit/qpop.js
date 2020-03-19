@@ -355,7 +355,7 @@ const anims_players = Object.freeze([
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
 	},
-	{   // Chuck Berry TODO: Some positions of the sprites in the png file are off a little
+	{   // Chuck Berry
 		still: {
 			soffset: [0, 0],
 			frames: [[0, 0]],
@@ -378,7 +378,7 @@ const anims_players = Object.freeze([
 					},
 		feeding: {
 			soffset: [0, 0],
-			frames: [[576, 0], [0, 64], [128, 64], [0, 64], [576, 0]],
+			frames: [[576, 0], [0, 64], [0, 64], [64, 64], [64, 64], [0, 64], [0, 64], [576, 0]],
 					},
 		power_food: {
 			soffset: [0, 0],

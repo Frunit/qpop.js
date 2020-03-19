@@ -2,7 +2,6 @@
 
 // TODO: Animations with errors:
 // Pesci: quicksand swimming
-// Chuck: Feeding jumps. Power and win must check jump height.
 // Almost all poisoning animations need to extend the last frame. Check with real game.
 
 
