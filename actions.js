@@ -1,9 +1,5 @@
 'use strict';
 
-// TODO: Animations with errors:
-// Pesci: quicksand swimming
-// Almost all poisoning animations need to extend the last frame. Check with real game.
-
 
 function Love(dir, character, partner, callback) {
 	this.dir = dir;
@@ -302,7 +298,7 @@ Feeding.prototype.update = function() {
 			this.step++;
 		}
 		// Power food
-		else if(this.food_type >= 118) {
+		else {
 			this.delay = anim_delays.power_food;
 			this.sprite = new Sprite(this.character.url, [64, 64], 0, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
@@ -321,7 +317,12 @@ Feeding.prototype.render = function(ctx, dim, cpos) {
 function Quicksand(character, callback) {
 	this.character = character;
 	this.callback = callback;
-	this.delay = anim_delays.quicksand;
+	if(character.species === 2) {
+		this.delay = anim_delays.feeding;
+	}
+	else {
+		this.delay = anim_delays.quicksand;
+	}
 	this.delay_counter = 0;
 	this.frame = -1;
 	this.mov = [0, 0];
@@ -330,17 +331,16 @@ function Quicksand(character, callback) {
 	this.tiles = [this.character.tile];
 
 	const qs = anims_players[this.character.species].quicksand;
-	this.sprite = new Sprite(this.character.url, [64, 64], anim_delays.quicksand, qs.soffset, qs.frames, true);
+	this.sprite = new Sprite(this.character.url, [64, 64], 0, qs.soffset, qs.frames, true);
 }
 
 
 Quicksand.prototype.update = function() {
-	this.sprite.update();
-
 	this.delay_counter++;
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
 		this.frame++;
+		this.sprite.update();
 	}
 	else {
 		return;
@@ -353,16 +353,19 @@ Quicksand.prototype.update = function() {
 	// Super special stuff for Pesciodyphus
 	// TODO: This has to be tested!!!
 	if(this.character.species === 2) {
-		if(this.frame >= 6 && this.frame <= 12) {
+		if(this.frame <= 9) {
+			this.mov = [0, 0];
+		}
+		else if(this.frame <= 17) {
 			this.mov[0] += 3;
 		}
-		else if(this.frame >= 12 && this.frame <= 18) {
+		else if(this.frame <= 25) {
 			this.mov[1] -= 3;
 		}
-		else if(this.frame >= 18 && this.frame <= 24) {
-			this.mov[0] -= 3;
+		else if(this.frame <= 33) {
+			this.mov[0] -= 4; // or 5
 		}
-		else if(this.frame >= 24 && this.frame <= 30) {
+		else if(this.frame <= 41) {
 			this.mov[1] += 3;
 		}
 		else {
