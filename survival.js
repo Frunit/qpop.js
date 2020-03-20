@@ -2,7 +2,7 @@
 
 
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
-// TODO RESEARCH: Chuck Berry feeding has only 5 (instead of 8) frames. Isno has 9 frames. How to handle predators?
+// TODO RESEARCH: Isno has 9 (instead of 8) frames. Is that true? If so, how to handle predators?
 
 
 function Survival() {
@@ -72,8 +72,7 @@ function Survival() {
 	this.rightclickareas = [];
 	this.keys = [];
 
-	this.cam_clickpos = null;
-	this.cam_rightclickpos = null;
+	this.clickdir = -1;
 }
 
 
@@ -122,29 +121,34 @@ Survival.prototype.redraw = function() {
 	// Black border around camera
 	draw_black_rect([this.camera_offset[0] - 1, this.camera_offset[1] - 1], [this.camera_dim[0] + 1, this.camera_dim[1] + 1]);
 
-	// TODO: Click on camera
-	/*this.clickareas.push({
+	// Click on camera:
+	// Arrows override click
+	// On click on character, feed/wait
+	// On click around the character, move into that direction (if possible)
+	// On rightclick *up* on character: suicide
+	// Rightclicks on other regions don't do anything
+	this.clickareas.push({
 		x1: this.camera_offset[0],
 		y1: this.camera_offset[1],
 		x2: this.camera_offset[0] + this.camera_dim[0],
 		y2: this.camera_offset[1] + this.camera_dim[1],
 		down: (x, y) => this.cam_click(x, y),
-		up: () => this.cam_clickup(),
-		blur: () => this.cam_clickup(),
-		move: (x, y) => this.cam_move(x, y),
+		up: () => this.cam_click(-1, -1),
+		blur: () => this.cam_click(-1, -1),
+		move: (x, y) => this.cam_click(x, y),
 		default_pointer: true
-	});*/
+	});
 
-	/*this.rightclickareas.push({
+	this.rightclickareas.push({
 		x1: this.camera_offset[0],
 		y1: this.camera_offset[1],
 		x2: this.camera_offset[0] + this.camera_dim[0],
 		y2: this.camera_offset[1] + this.camera_dim[1],
-		down: (x, y) => this.cam_rightclick(x, y),
-		up: (x, y) => this.cam_rightclickup(),
-		blur: (x, y) => this.cam_rightclickup(),
-		move: (x, y) => this.cam_rightmove(x, y)
-	});*/
+		down: (x, y) => this.cam_rightclickup(x, y),
+		up: (x, y) => this.cam_rightclickup(x, y),
+		blur: () => {},
+		move: () => {}
+	});
 
 	// Minimap
 	this.draw_minimap();
@@ -897,6 +901,52 @@ Survival.prototype.update = function() {
 };
 
 
+Survival.prototype.cam_click = function(x, y) {
+	x -= this.camera_offset[0];
+	y -= this.camera_offset[1];
+
+	if(x < 0 || y < 0) {
+		this.clickdir = -1;
+		return;
+	}
+
+	if(x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 &&
+			y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
+		this.clickdir = DIR.X;
+		return;
+	}
+
+	// Center around 0 to make calculations easier
+	x -= this.tile_dim[0] * 3.5;
+	y -= this.tile_dim[1] * 3.5;
+
+	if(y < 0 && Math.abs(y) >= Math.abs(x)) {
+		this.clickdir = DIR.N;
+	}
+	else if(y > 0 && Math.abs(y) >= Math.abs(x)) {
+		this.clickdir = DIR.S;
+	}
+	else if(x < 0 && Math.abs(x) > Math.abs(y)) {
+		this.clickdir = DIR.W;
+	}
+	else if(x > 0 && Math.abs(x) > Math.abs(y)) {
+		this.clickdir = DIR.E;
+	}
+
+};
+
+
+Survival.prototype.cam_rightclickup = function(x, y) {
+	x -= this.camera_offset[0];
+	y -= this.camera_offset[1];
+
+	if(x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 &&
+			y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
+		this.suicide();
+	}
+};
+
+
 Survival.prototype.test_movement_input = function() {
 	if(this.movement_active || this.action !== null) {
 		return;
@@ -920,6 +970,10 @@ Survival.prototype.test_movement_input = function() {
 
 	else if(input.isDown('SPACE')) {
 		this.start_movement(0);
+	}
+
+	else if(this.clickdir === 0 || (this.clickdir > 0 && this.level.is_unblocked(this.level.character.tile, this.clickdir))) {
+		this.start_movement(this.clickdir);
 	}
 
 	else {
