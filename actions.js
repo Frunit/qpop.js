@@ -351,8 +351,18 @@ Quicksand.prototype.update = function() {
 	}
 
 	// Super special stuff for Pesciodyphus
-	// TODO: This has to be tested!!!
 	if(this.character.species === 2) {
+
+		if(this.frame === 17) {
+			this.mov = [0, 0];
+		}
+		else if(this.frame === 25) {
+			this.mov = [6, -30];
+		}
+		else if(this.frame === 33) {
+			this.mov = [0, -22];
+		}
+
 		if(this.frame <= 9) {
 			this.mov = [0, 0];
 		}
@@ -362,8 +372,11 @@ Quicksand.prototype.update = function() {
 		else if(this.frame <= 25) {
 			this.mov[1] -= 3;
 		}
+		else if(this.frame <= 27) {
+			this.mov[0] -= 4;
+		}
 		else if(this.frame <= 33) {
-			this.mov[0] -= 4; // or 5
+			this.mov[0] -= 5;
 		}
 		else if(this.frame <= 41) {
 			this.mov[1] += 3;
