@@ -802,23 +802,3 @@ const version = 'pre-alpha';
 const game = new Game();
 
 game.start();
-
-
-// TODO: The dragover and drop should only be possible after the loader is finished.
-canvas.addEventListener('dragover', function(event) {
-	event.stopPropagation();
-	event.preventDefault();
-	event.dataTransfer.dropEffect = 'copy';
-});
-
-canvas.addEventListener('drop', function(event) {
-	event.stopPropagation();
-	event.preventDefault();
-	const file = event.dataTransfer.files[0];
-	const reader = new FileReader();
-	reader.readAsArrayBuffer(file);
-
-	reader.addEventListener('load', readerEvent => {
-		game.load_game(readerEvent.target.result);
-	});
-});

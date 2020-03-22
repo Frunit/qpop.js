@@ -339,6 +339,25 @@ Loader.prototype.finished_loading = function(self) {
 		['anim_gfx/statuen.png', 'image'],
 		['anim_gfx/tafeldec.png', 'image'],
 	]);
+
+	// Activate loading of save games by drag and drop
+	canvas.addEventListener('dragover', function(event) {
+		event.stopPropagation();
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
+	});
+
+	canvas.addEventListener('drop', function(event) {
+		event.stopPropagation();
+		event.preventDefault();
+		const file = event.dataTransfer.files[0];
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(file);
+
+		reader.addEventListener('load', readerEvent => {
+			game.load_game(readerEvent.target.result);
+		});
+	});
 };
 
 
