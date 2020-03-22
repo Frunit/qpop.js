@@ -1,9 +1,6 @@
 'use strict';
 
-
 // TODO: Enemies, Females and Offspring must have randomized sprite animations
-// TODO RESEARCH: Isno has 9 (instead of 8) frames. Is that true? If so, how to handle predators?
-
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;
