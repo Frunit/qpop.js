@@ -143,7 +143,7 @@ Init.prototype.redraw = function() {
 			x2: panel_offset[0] + this.type_offset[0] + this.type_dim[0],
 			y2: panel_offset[1] + this.type_offset[1] + this.type_dim[1],
 			down: () => {},
-			up: () => this.change_type(playernum, 1),
+			up: () => this.change_type(playernum, 0),
 			blur: () => {}
 		});
 
@@ -154,7 +154,7 @@ Init.prototype.redraw = function() {
 			x2: panel_offset[0] + this.type_offset[0] + this.type_dim[0],
 			y2: panel_offset[1] + this.type_offset[1] + this.type_dim[1],
 			down: () => {},
-			up: () => this.change_type(playernum, 0),
+			up: () => this.change_type(playernum, 1),
 			blur: () => {}
 		});
 
