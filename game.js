@@ -725,7 +725,9 @@ Game.prototype.toggle_credits = function() {
 		game.stage.redraw();
 	}
 	else {
-		game.backstage.push(game.stage);
+		if(game.stage.id !== SCENE.OPTIONS) {
+			game.backstage.push(game.stage);
+		}
 		game.stage = new Credits();
 		game.stage.initialize();
 	}
@@ -739,10 +741,11 @@ Game.prototype.toggle_options = function() {
 		game.stage.redraw();
 	}
 	else {
-		open_popup(lang.popup_title, 'dino_cries', 'Options are not implemented, yet.', () => {}, lang.debug_too_bad);
-		/*game.backstage.push(game.stage);
+		if(game.stage.id !== SCENE.CREDITS) {
+			game.backstage.push(game.stage);
+		}
 		game.stage = new Options();
-		game.stage.initialize();*/
+		game.stage.initialize();
 	}
 };
 
