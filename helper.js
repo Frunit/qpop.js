@@ -314,7 +314,7 @@ function draw_black_rect(pos, dim, fill=false) {
 }
 
 
-function draw_rect(pos, dim, black_line=true, clicked=false) {
+function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -327,7 +327,7 @@ function draw_rect(pos, dim, black_line=true, clicked=false) {
 		dim = [dim[0] - 2, dim[1] - 2];
 	}
 
-	ctx.strokeStyle = clicked ? '#828282' : '#c3c3c3';
+	ctx.strokeStyle = light ? '#ffffff' : (clicked ? '#828282' : '#c3c3c3');
 	ctx.beginPath();
 	ctx.moveTo(pos[0] + dim[0] - 1, pos[1]);
 	ctx.lineTo(pos[0], pos[1]);

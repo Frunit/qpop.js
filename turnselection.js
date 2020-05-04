@@ -134,7 +134,8 @@ Turnselection.prototype.redraw = function() {
 
 	for(let i = 0; i < 2; i++) {
 		// Background panels
-		ctx.drawImage(this.bg, this.panel_offsets[i][0], this.panel_offsets[i][1]);
+		draw_rect(this.panel_offsets[i], this.panel_dim, true, false, true);
+		ctx.drawImage(this.bg, this.panel_offsets[i][0] + 3, this.panel_offsets[i][1] + 3);
 	}
 
 	for(let i = 0; i < 2; i++) {

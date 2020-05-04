@@ -1,31 +1,23 @@
 'use strict';
 
-// TODO: Credits don't look nice, yet!
-
-
 function Credits() {
 	this.id = SCENE.CREDITS;
 	this.bg = resources.get('gfx/light_bg.png');
 
 	// CONST_START
-	this.upper_panel_dim = [620, 211];
-	this.lower_panel_dim = [150, 211]; // Actual dimension is twice as wide!
+	this.upper_panel_dim = [620, 130];
+	this.lower_panel_dim = [305, 280];
 	this.close_dim = [181, 22];
 
-	this.upper_panel_offset = [9, 27];
+	this.upper_panel_offset = [9, 29];
+	this.left_panel_offset = [9, 168];
+	this.right_panel_offset = [324, 168];
 	this.close_offset = [459, 458];
-	this.info_text_offset = [20, 50];
-	this.original_text_offset = [20, 274];
-	this.remake_text_offset = [341, 274];
-
-	this.panel_left_soffset = [150, 211];
-	this.panel_right_soffset = [470, 211];
+	this.text_rel_offset = [10, 22];
 
 	this.max_text_width = 600;
 	this.line_height = 20;
 	// CONST_END
-
-	this.lower_panel_offsets = [[9, 241], [330, 241]];
 
 	this.text = multiline(lang.information, this.max_text_width);
 
@@ -61,34 +53,34 @@ Credits.prototype.redraw = function() {
 	});
 
 	// Background panels
-	ctx.drawImage(this.bg, this.upper_panel_offset[0], this.upper_panel_offset[1]);
+	ctx.save();
+	const rep = ctx.createPattern(this.bg, 'repeat');
+	ctx.fillStyle = rep;
 
-	for(let i = 0; i < 2; i++) {
-		ctx.drawImage(this.bg,
-			this.panel_left_soffset[0], this.panel_left_soffset[1],
-			this.lower_panel_dim[0], this.lower_panel_dim[1],
-			this.lower_panel_offsets[i][0], this.lower_panel_offsets[i][1],
-			this.lower_panel_dim[0], this.lower_panel_dim[1]);
+	draw_rect(this.upper_panel_offset, this.upper_panel_dim, true, false, true);
+	ctx.fillRect(this.upper_panel_offset[0]+3, this.upper_panel_offset[1]+3, this.upper_panel_dim[0]-6, this.upper_panel_dim[1]-6);
 
-		ctx.drawImage(this.bg,
-			this.panel_right_soffset[0], this.panel_right_soffset[1],
-			this.lower_panel_dim[0], this.lower_panel_dim[1],
-			this.lower_panel_offsets[i][0] + this.lower_panel_dim[0], this.lower_panel_offsets[i][1],
-			this.lower_panel_dim[0], this.lower_panel_dim[1]);
-	}
+	draw_rect(this.left_panel_offset, this.lower_panel_dim, true, false, true);
+	ctx.fillRect(this.left_panel_offset[0]+3, this.left_panel_offset[1]+3, this.lower_panel_dim[0]-6, this.lower_panel_dim[1]-6);
+
+	draw_rect(this.right_panel_offset, this.lower_panel_dim, true, false, true);
+	ctx.fillRect(this.right_panel_offset[0]+3, this.right_panel_offset[1]+3, this.lower_panel_dim[0]-6, this.lower_panel_dim[1]-6);
+
+
+	ctx.restore();
 
 	// Info text
 	for(let i = 0; i < this.text.length; i++) {
-		write_text(this.text[i], [this.info_text_offset[0], this.info_text_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
+		write_text(this.text[i], [this.text_rel_offset[0] + this.upper_panel_offset[0], this.text_rel_offset[1] + this.upper_panel_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
 	}
 
 	// Credits for original game
 	let line = 0;
 	for(let i = 0; i < lang.credits_original.length; i++) {
-		write_text(lang.credits_original[i][0], [this.original_text_offset[0], this.original_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+		write_text(lang.credits_original[i][0], [this.text_rel_offset[0] + this.left_panel_offset[0], this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 		line++;
 		for(let j = 0; j < lang.credits_original[i][1].length; j++) {
-			write_text(lang.credits_original[i][1][j], [this.original_text_offset[0] + 30, this.original_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			write_text(lang.credits_original[i][1][j], [this.text_rel_offset[0] + this.left_panel_offset[0] + 30, this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 			line++;
 		}
 	}
@@ -96,10 +88,10 @@ Credits.prototype.redraw = function() {
 	// Credits for remake
 	line = 0;
 	for(let i = 0; i < lang.credits_remake.length; i++) {
-		write_text(lang.credits_remake[i][0], [this.remake_text_offset[0], this.remake_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+		write_text(lang.credits_remake[i][0], [this.text_rel_offset[0] + this.right_panel_offset[0], this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 		line++;
 		for(let j = 0; j < lang.credits_remake[i][1].length; j++) {
-			write_text(lang.credits_remake[i][1][j], [this.remake_text_offset[0] + 30, this.remake_text_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			write_text(lang.credits_remake[i][1][j], [this.text_rel_offset[0] + this.right_panel_offset[0] + 30, this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 			line++;
 		}
 	}
