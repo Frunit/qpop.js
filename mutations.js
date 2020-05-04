@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: There must be a light grey border above and on the side of the continue button.
 
 function Mutations() {
 	this.id = SCENE.MUTATION;

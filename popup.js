@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: There must be a light grey border above the two lower buttons and if there is only one button, the border must also be on the side.
+
 function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.id = SCENE.POPUP;
 	this.bg = resources.get('gfx/dark_bg.png');
@@ -29,25 +31,24 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.left_answer = left_answer;
 	this.callback = callback;
 
+	this.spec_positions = {
+		0: [[0, 0]],
+		1: [[64, 0]],
+		2: [[128, 0]],
+		3: [[192, 0]],
+		4: [[256, 0]],
+		5: [[320, 0]],
+		dino: [[0, 64], [64, 64]],
+		chuck_berry: [[128, 64], [192, 64]],
+		dino_cries: [[256, 64], [320, 64]],
+	};
+
 	this.sprite = new Sprite('gfx/species.png', this.spec_dim, anim_delays.popups, [0, 0], this.spec_positions[image]);
 
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
 }
-
-
-Popup.prototype.spec_positions = {
-	0: [[0, 0]],
-	1: [[64, 0]],
-	2: [[128, 0]],
-	3: [[192, 0]],
-	4: [[256, 0]],
-	5: [[320, 0]],
-	dino: [[0, 64], [64, 64]],
-	chuck_berry: [[128, 64], [192, 64]],
-	dino_cries: [[256, 64], [320, 64]],
-};
 
 
 Popup.prototype.initialize = function() {
@@ -62,7 +63,7 @@ Popup.prototype.redraw = function() {
 		this.offset[0], this.offset[1],
 		this.dim[0], this.dim[1]);
 
-	draw_black_rect([this.offset[0], this.offset[1]], [this.dim[0]-1, this.dim[1]-1]);
+	draw_rect([this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] + 1], true);
 
 	this.clickareas = [];
 
