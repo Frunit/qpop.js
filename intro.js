@@ -20,6 +20,7 @@ function Intro() {
 
 
 Intro.prototype.initialize = function() {
+	audio.play_music('intro');
 	canvas.style.cursor = 'default';
 	this.animation = new Animation(intro_frames[this.num], this.anim_offset);
 	this.redraw();

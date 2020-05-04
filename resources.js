@@ -7,15 +7,16 @@
 	const loading = [];
 	const load_status = {};
 	let loaded = 0;
+	let sound_enabled = true;
 
-	let best_audio_type = null;
+	let best_audio_suffix = null;
 	const context = new AudioContext();
 	const music_node = context.createGain();
 	const sound_node = context.createGain();
 	const musics = {};
 	const sounds = {};
 	let currently_playing_music = '';
-	const currently_playing_sound = new Set();
+	const currently_playing_sounds = new Set();
 
 
 	// Load an array of resources
@@ -28,10 +29,11 @@
 
 			// determine audio format. If no audio is possible, load nothing.
 			if(type === 'audio') {
-				url = _get_best_audio_url(url);
-				if(!url) {
+				if(best_audio_suffix === null || !sound_enabled) {
 					continue;
 				}
+
+				url += best_audio_suffix;
 			}
 
 			_load(url, name, type);
@@ -55,7 +57,7 @@
 						context.decodeAudioData(request.response, (buffer) => {
 							resource_cache[name] = buffer;
 							loaded++;
-							_update_load_status(url, event.loaded);
+							_update_load_status(name, event.loaded);
 
 							if(_is_ready()) {
 								ready_callback(ready_param);
@@ -95,29 +97,31 @@
 		load_status[name] = bytes;
 	}
 
-	function _get_best_audio_url(url) {
-		if(best_audio_type === null) {
+	function get_suffix() {
+		if(best_audio_suffix === null) {
 			const mimes = [
+				['.m4a', 'audio/m4a; codecs="aac"'],
+				['.m4a', 'audio/aac; codecs="aac"'],
+				['.ogg', 'audio/ogg; codecs="vorbis"'],
 				['.mp3', 'audio/mp3; codecs="mp3"'],
 				['.mp3', 'audio/mp4; codecs="mp3"'],
 				['.mp3', 'audio/mpeg; codecs="mp3"'],
-				['.ogg', 'audio/ogg; codecs="vorbis"'],
 			];
 
 			const audio_elem = document.createElement('audio');
 			for(let mime of mimes) {
 				if(audio_elem.canPlayType(mime[1]) === 'probably') {
-					best_audio_type = mime[0];
+					best_audio_suffix = mime[0];
 					break;
 				}
 			}
+
+			if(best_audio_suffix === null) {
+				return '';
+			}
 		}
 
-		if(!best_audio_type) {
-			return '';
-		}
-
-		return url + best_audio_type;
+		return best_audio_suffix;
 	}
 
 	function get(name) {
@@ -156,7 +160,7 @@
 
 
 		musics[name] = context.createBufferSource();
-		musics[name].connect(music_node).connect(context.destination); // Should the connection music_node -> context.destination be made more than once???? Or only once in the beginning?
+		musics[name].connect(music_node).connect(context.destination);
 		musics[name].loop = true;
 		musics[name].buffer = get(name);
 
@@ -170,25 +174,21 @@
 			context.resume();
 		}
 
-		if(currently_playing_sound.has(name)) {
+		if(currently_playing_sounds.has(name)) {
 			sounds[name].stop();
-			currently_playing_sound.delete(name);
-		}
-
-		if(sounds[name]) {
-			sounds[name].stop();
+			currently_playing_sounds.delete(name);
 		}
 
 		sounds[name] = context.createBufferSource();
-		sounds[name].connect(sound_node).connect(context.destination); // Should the connection music_node -> context.destination be made more than once???? Or only once in the beginning?
+		sounds[name].connect(sound_node).connect(context.destination);
 		sounds[name].buffer = get(name);
 		sounds[name].addEventListener('ended',
-			(event) => {currently_playing_sound.delete(name);}
+			(event) => {currently_playing_sounds.delete(name);}
 		);
 		sounds[name].loop = loop;
 		sounds[name].start(0, 0);
 
-		currently_playing_sound.add(name);
+		currently_playing_sounds.add(name);
 	}
 
 	function stop_music() {
@@ -200,16 +200,28 @@
 
 	function stop_sound(name=null) {
 		if(name === null) {
-			for(let elem of currently_playing_sound) {
+			for(let elem of currently_playing_sounds) {
 				sounds[elem].stop();
 			}
-			currently_playing_sound.clear();
+			currently_playing_sounds.clear();
 		}
 
 		if(sounds[name]) {
 			sounds[name].stop();
-			currently_playing_sound.delete(name);
+			currently_playing_sounds.delete(name);
 		}
+	}
+
+	function set_music_volume(volume) {
+		music_node.gain.value = volume;
+	}
+
+	function set_sound_volume(volume) {
+		sound_node.gain.value = volume;
+	}
+
+	function disable_sound() {
+		sound_enabled = false;
 	}
 
 	window.resources = {
@@ -224,5 +236,9 @@
 		play_sound: play_sound,
 		stop_music: stop_music,
 		stop_sound: stop_sound,
+		set_music_volume: set_music_volume,
+		set_sound_volume: set_sound_volume,
+		get_suffix: get_suffix,
+		disable_sound: disable_sound,
 	};
 })();

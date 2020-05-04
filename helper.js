@@ -56,6 +56,16 @@ const PRED = Object.freeze({
 	HUMAN:    2,
 });
 
+// Predators
+const SPECIES = Object.freeze({
+	PURPLUS:      0,
+	KIWIOPTERYX:  1,
+	PESCIODYPHUS: 2,
+	ISNOBUG:      3,
+	AMORPH:       4,
+	CHUCKBERRY:   5,
+});
+
 // Living objects on survival map
 const SURV_MAP = Object.freeze({
 	PLAYER:       1,

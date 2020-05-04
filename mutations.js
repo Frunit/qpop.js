@@ -56,7 +56,6 @@ function Mutations() {
 
 
 Mutations.prototype.initialize = function() {
-	//this.redraw();
 	this.next_player();
 };
 
@@ -69,6 +68,7 @@ Mutations.prototype.next_player = function() {
 		this.next_popup(1);
 	}
 	else {
+		audio.play_music('spec' + game.current_player.id);
 		this.plant_counts = game.count_plants();
 		const total_count = this.plant_counts.reduce((a, b) => a+b);
 		for(let i = 0; i < this.plant_counts.length; i++) {

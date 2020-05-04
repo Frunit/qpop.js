@@ -41,6 +41,7 @@ function Init() {
 
 
 Init.prototype.initialize = function() {
+	audio.play_music('intro');
 	this.redraw();
 };
 

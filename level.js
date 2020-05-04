@@ -509,6 +509,33 @@ Level.prototype.is_unblocked = function(pos, dir=0) {
 };
 
 
+Level.prototype.get_sounds = function() {
+	const sounds = new Set();
+	const [player_x, player_y] = this.character.tile;
+
+	for(let y = player_y - 2; y <= player_y + 2; y++) {
+		for(let x = player_x - 2; x <= player_x + 2; x++) {
+			const tile = this.map[y][x];
+			if(tile >= 36 && tile <= 43) {
+				sounds.add('swamp');
+			}
+			else if(tile >= 44 && tile <= 49) {
+				sounds.add('volcano');
+			}
+			else if(tile >= 100 && tile <= 103) {
+				sounds.add('human_base');
+			}
+
+			if(this.mobmap[y][x] !== null && this.mobmap[y][x].hasOwnProperty('env_sound') && this.mobmap[y][x].env_sound !== null) {
+				sounds.add(this.mobmap[y][x].env_sound);
+			}
+		}
+	}
+
+	return sounds;
+};
+
+
 function Character(species, tile) {
 	this.type = SURV_MAP.PLAYER;
 	this.tile = tile;
@@ -556,6 +583,9 @@ function Female(species, tile) {
 	this.rel_pos = [0, 0];
 	this.has_offspring = false;
 	this.hidden = false;
+	if(species !== SPECIES.ISNOBUG) {
+		this.env_sound = 'female_' + ['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][species];
+	}
 
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];

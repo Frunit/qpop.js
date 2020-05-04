@@ -78,6 +78,7 @@ function Ranking() {
 
 
 Ranking.prototype.initialize = function() {
+	audio.play_music('intro');
 	this.sprites = [];
 	for(let i = 0; i < 6; i++) {
 		this.sprites.push(

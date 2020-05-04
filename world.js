@@ -77,6 +77,8 @@ function World() {
 
 
 World.prototype.initialize = function() {
+	audio.play_music('spec' + game.current_player.id);
+
 	if(game.height_map === null) {
 		game.height_map = this.create_height_map();
 		game.world_map = this.create_world_map();
@@ -97,6 +99,7 @@ World.prototype.initialize = function() {
 
 
 World.prototype.next_player = function() {
+	audio.play_music('spec' + game.current_player.id);
 	this.draw_avatar();
 	this.draw_minispec();
 
@@ -572,6 +575,8 @@ World.prototype.fight = function(x, y) {
 		true, () => this.fight_end(winner, enemy, x, y));
 
 	this.animation_pos = [[x, y]];
+
+	audio.play_sound('world_fight');
 };
 
 

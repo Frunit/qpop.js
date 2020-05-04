@@ -65,6 +65,8 @@ function Survival() {
 	this.steps = 10;
 	this.max_steps = 10;
 
+	this.active_sounds = new Set();
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -83,6 +85,8 @@ Survival.prototype.initialize = function() {
 		this.ai();
 		return;
 	}
+
+	audio.play_music('spec' + game.current_player.id);
 
 	this.level = new Level();
 	this.camera = new Camera(this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
@@ -427,6 +431,8 @@ Survival.prototype.finish_movement = function() {
 	this.movement_active = false;
 	this.time = this.max_time;
 
+	this.update_environment_sound();
+
 	for(let predator of this.moving_predators) {
 		this.resolve_movement(predator, true);
 	}
@@ -453,6 +459,9 @@ Survival.prototype.finish_movement = function() {
 		this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
 		this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]].hidden = true;
 
+		adjacent.env_sound = null;
+		this.update_environment_sound();
+
 		return;
 	}
 
@@ -462,6 +471,30 @@ Survival.prototype.finish_movement = function() {
 
 	// Nothing happened, end movement
 	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
+};
+
+
+Survival.prototype.update_environment_sound = function() {
+	const current_sounds = this.level.get_sounds();
+	const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x))
+	const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x))
+
+	if(to_stop.length) {
+		console.log('to_stop', to_stop);
+	}
+	if(to_start.length) {
+		console.log('to_start', to_start);
+	}
+
+	for(let sound of to_stop) {
+		audio.stop_sound(sound);
+	}
+
+	for(let sound of to_start) {
+		audio.play_sound(sound, true);
+	}
+
+	this.active_sounds = current_sounds;
 };
 
 
@@ -500,6 +533,9 @@ Survival.prototype.finish_love = function(partner) {
 	this.level.character.hidden = false;
 	partner.type = SURV_MAP.UNRESPONSIVE;
 	partner.sprite = this.action.offspring_sprite;
+	if(partner.hasOwnProperty('env_sound')) {
+		partner.env_sound = 'offspring_' + ['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][partner.species];
+	}
 	game.current_player.loved++;
 	if(game.current_player.loved > 10) {
 		game.current_player.loved = 10;
@@ -526,6 +562,10 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 		this.level.character.hidden = false;
 		opponent.type = SURV_MAP.UNRESPONSIVE;
 		opponent.sprite = this.action.final_opponent_sprite;
+		// Mega dirty hack to enable crying sound *only* for crying dino
+		if(opponent.species === PRED.DINO && opponent.sprite.offset[0] === 320) {
+			opponent.env_sound = 'dino_cry';
+		}
 		this.draw_symbols();
 		this.finish_movement();
 	}
@@ -1041,6 +1081,7 @@ Survival.prototype.next_popup = function(answer) {
 			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => this.next_popup(1), lang.next);
 		}
 		else {
+			audio.stop_sound();
 			game.next_stage();
 		}
 	}

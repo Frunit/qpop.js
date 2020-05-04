@@ -3,7 +3,7 @@
 
 // MAYBE: At the moment, the outro is not cancelable. Should it be? What should happen?
 // MAYBE: Allow restart without reloading the page.
-// TODO: Add me/Frunit to the credits in the outro
+// MAYBE: Add me/Frunit to the credits in the outro
 
 
 function Outro(winner) {
@@ -24,6 +24,7 @@ function Outro(winner) {
 
 
 Outro.prototype.initialize = function() {
+	audio.play_music('outro');
 	canvas.style.cursor = 'default';
 	const num = (this.winner >= 0) ? this.winner : 6;
 	this.animation = new Animation(outro_frames[num], this.anim_offset);

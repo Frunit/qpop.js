@@ -29,6 +29,7 @@ function Catastrophe(callback) {
 
 
 Catastrophe.prototype.initialize = function() {
+	audio.play_music('catastrophe');
 	canvas.style.cursor = 'default';
 	this.animation = new Animation(catastrophe_frames[this.type], this.anim_offset);
 	this.redraw();

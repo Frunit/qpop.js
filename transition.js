@@ -21,6 +21,7 @@ function Transition(pic, id) {
 
 
 Transition.prototype.initialize = function() {
+	audio.stop_music(); // MAYBE: Fade out
 	canvas.style.cursor = 'default';
 	this.redraw();
 };

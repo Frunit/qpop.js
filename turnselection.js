@@ -47,6 +47,7 @@ function Turnselection() {
 
 
 Turnselection.prototype.initialize = function() {
+	audio.play_music('intro');
 	this.redraw();
 };
 

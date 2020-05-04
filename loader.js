@@ -22,8 +22,15 @@ function Loader() {
 
 	this.emptybar_soffset = [300, 80];
 
-	this.max_value = 1236114; // TODO: Update when resources to load are changed in the source
+	// TODO: Update sizes, when resources to load are changed in the source
+	this.img_size = 1230723;
+	this.mp3_size = 8611893;
+	this.ogg_size = 5598714;
+	this.m4a_size = 4166319;
 	// CONST_END
+
+	this.max_size = 0;
+	this.suffix = '.mp3';
 
 	this.bar_soffsets = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
 
@@ -42,6 +49,21 @@ Loader.prototype.initialize = function() {
 	this.phase = 0;
 	this.percentage = 0;
 	this.redraw();
+
+	this.suffix = audio.get_suffix();
+	this.max_size = this.img_size;
+	if(this.suffix === '.m4a') {
+		this.max_size += this.m4a_size;
+	}
+	else if(suffix === '.ogg') {
+		this.max_size += this.ogg_size;
+	}
+	else if(this.suffix === '.mp3') {
+		this.max_size += this.mp3_size;
+	}
+	else {
+		game.disable_audio();
+	}
 
 	resources.on_ready(this.finished_preloading, this);
 	resources.load([
@@ -199,7 +221,7 @@ Loader.prototype.finished_preloading = function(self) {
 	self.redraw();
 
 	resources.on_ready(self.finished_loading, self);
-	resources.load([ // TODO: All sounds, except catastrophes and outros
+	resources.load([
 		['gfx/background.png', 'image'],
 		['gfx/clouds.png', 'image'],
 		['gfx/electro.png', 'image'],
@@ -225,6 +247,44 @@ Loader.prototype.finished_preloading = function(self) {
 		['gfx/world_gui.png', 'image'],
 		['gfx/world.png', 'image'],
 		['gfx/wreath.png', 'image'],
+		['sfx/intro', 'audio', 'intro'], // Music
+		['sfx/spec1', 'audio', 'spec0'],
+		['sfx/spec2', 'audio', 'spec1'],
+		['sfx/spec3', 'audio', 'spec2'],
+		['sfx/spec4', 'audio', 'spec3'],
+		['sfx/spec5', 'audio', 'spec4'],
+		['sfx/spec6', 'audio', 'spec5'],
+		['sfx/dino_cry', 'audio', 'dino_cry'], // Sounds
+		['sfx/dino_win', 'audio', 'dino_win'],
+		['sfx/electro', 'audio', 'electro'],
+		['sfx/feeding_chuck', 'audio', 'feeding_chuck'],
+		['sfx/feeding_kiwi', 'audio', 'feeding_kiwi'],
+		['sfx/feeding', 'audio', 'feeding'],
+		['sfx/female_amorph', 'audio', 'female_amorph'],
+		['sfx/female_chuck', 'audio', 'female_chuck'],
+		['sfx/female_kiwi', 'audio', 'female_kiwi'],
+		['sfx/female_pesci', 'audio', 'female_pesci'],
+		['sfx/female_purplus', 'audio', 'female_purplus'],
+		['sfx/human_base', 'audio', 'human_base'],
+		['sfx/human_win', 'audio', 'human_win'],
+		['sfx/love', 'audio', 'love'],
+		['sfx/mushroom_win', 'audio', 'mushroom_win'],
+		['sfx/offspring_amorph', 'audio', 'offspring_amorph'],
+		['sfx/offspring_chuck', 'audio', 'offspring_chuck'],
+		['sfx/offspring_kiwi', 'audio', 'offspring_kiwi'],
+		['sfx/offspring_pesci', 'audio', 'offspring_pesci'],
+		['sfx/offspring_purplus', 'audio', 'offspring_purplus'],
+		['sfx/poison', 'audio', 'poison'],
+		['sfx/posion_chuck', 'audio', 'poison_chuck'],
+		['sfx/power_food', 'audio', 'power_food'],
+		['sfx/quicksand', 'audio', 'quicksand'],
+		['sfx/survival_fight', 'audio', 'survival_fight'],
+		['sfx/swamp', 'audio', 'swamp'],
+		['sfx/volcano', 'audio', 'volcano'],
+		['sfx/win_kiwi', 'audio', 'win_kiwi'],
+		['sfx/win_pesci', 'audio', 'win_pesci'],
+		['sfx/win', 'audio', 'win'],
+		['sfx/world_fight', 'audio', 'world_fight'],
 		['anim_gfx/alpha.png', 'image'], // Intro gfx
 		['anim_gfx/amoesaug.png', 'image'],
 		['anim_gfx/amoeweg.png', 'image'],
@@ -267,7 +327,10 @@ Loader.prototype.finished_loading = function(self) {
 	self.redraw();
 
 	resources.on_ready(self.finished_postloading, self);
-	resources.load([ // TODO: missing sounds
+	resources.load([
+		['sfx/catastrophe', 'audio', 'catastrophe'], // Music
+		['sfx/ranking', 'audio', 'ranking'],
+		['sfx/outro', 'audio', 'outro'],
 		['anim_gfx/amoegro.png', 'image'], // Catastrophe gfx
 		['anim_gfx/baumbebe.png', 'image'],
 		['anim_gfx/baumbe.png', 'image'],
@@ -366,6 +429,9 @@ Loader.prototype.finished_postloading = function(self) {
 		self.phase = 3;
 		self.percentage = 100;
 		console.info('All resources finished loading.')
+		if(resources.get_status() - self.max_size !== 0) {
+			console.warn('Expected size not real size. Diff is ' + (resources.get_status() - self.max_size) + ' Bytes');
+		}
 
 		self.redraw();
 	}
@@ -389,7 +455,7 @@ Loader.prototype.render = function() {
 
 Loader.prototype.update = function() {
 	if(this.phase < 3) {
-		this.percentage = (resources.get_status() / this.max_value) * 100;
+		this.percentage = (resources.get_status() / this.max_size) * 100;
 	}
 };
 

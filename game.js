@@ -10,9 +10,8 @@ const debug7 = document.getElementById('debug7');
 const debug8 = document.getElementById('debug8');
 
 /*
- * Master-TODO: All sounds
- * Master-TODO: Background music
  * Master-TODO: All options
+ * Master-TODO: Save/load game in browser storage and file
  */
 
 const options = {
@@ -25,6 +24,7 @@ const options = {
 	music: 100, // Music volume (0 - 100)
 	sound_on: true,
 	sound: 100, // Sound volume (0 - 100)
+	sound_enabled: true,
 	update_freq: 1/18, // Screen update frequency
 };
 
@@ -523,6 +523,21 @@ Game.prototype.load_game = function(save_file) {
 	options.sound_on = !!content.getUint8(0x12 + mp);
 	options.sound = content.getUint8(0x13 + mp);
 
+	// MAYBE: Should loading a game really change sound settings?
+	if(options.music_on) {
+		audio.set_music_volume = options.music;
+	}
+	else {
+		audio.set_music_volume = 0;
+	}
+
+	if(options.sound_on) {
+		audio.set_sound_volume = options.sound;
+	}
+	else {
+		audio.set_sound_volume = 0;
+	}
+
 	for(let i = 0; i < game.players.length; i++) {
 		const p = game.players[i];
 		p.type = content.getUint8(0x14 + 2*i + mp);
@@ -733,16 +748,49 @@ Game.prototype.toggle_options = function() {
 
 
 Game.prototype.toggle_sound = function() {
+	if(options.sound_enabled) {
+		options.sound_on = !options.sound_on;
+		if(options.sound_on) {
+			audio.set_sound_volume(options.sound / 100);
+		}
+		else {
+			audio.set_sound_volume(0);
+		}
+	}
+
 	draw_rect([576, 0], [22, 21]);
-	options.sound_on = !options.sound_on;
 	game.stage.redraw();
 };
 
 
 Game.prototype.toggle_music = function() {
+	if(options.sound_enabled) {
+		options.music_on = !options.music_on;
+		if(options.music_on) {
+			audio.set_music_volume(options.music / 100);
+		}
+		else {
+			audio.set_music_volume(0);
+		}
+	}
+
 	draw_rect([597, 0], [22, 21]);
-	options.music_on = !options.music_on;
 	game.stage.redraw();
+};
+
+
+Game.prototype.disable_sound = function() {
+	options.music_on = false;
+	options.sound_on = false;
+	audio.set_music_volume(0);
+	audio.set_sound_volume(0);
+
+	audio.disable_sound();
+	options.sound_enabled = false;
+
+	if(game.stage) {
+		game.stage.redraw();
+	}
 };
 
 
@@ -760,8 +808,8 @@ Game.prototype.next_language = function(direction) {
 function Player(num) {
 	this.id = num;
 	this.iq = 2;
-	//this.type = (num === 1) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
-	this.type = (num === 0) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
+	this.type = (num === SPECIES.PESCIODYPHUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
+	//this.type = (num === SPECIES.PURPLUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
 	this.individuals = 0;
 	this.toplace = 10;
 	this.tomove = 0;
@@ -800,5 +848,12 @@ else {
 
 const version = 'pre-alpha';
 const game = new Game();
+
+// MAYBE: Handle GET parameters properly
+// This is a dirty hack to prevent any audio files from loading.
+// Append "?noaudio" to the url (without ")
+if(location.search.includes('noaudio')) {
+	game.disable_sound();
+}
 
 game.start();

@@ -47,6 +47,8 @@ function Love(dir, character, partner, callback) {
 			this.cloud_offset = [14, 0];
 			break;
 	}
+
+	audio.play_sound('love');
 }
 
 
@@ -186,6 +188,7 @@ Fight.prototype.update = function() {
 
 	switch(this.frame) {
 		case 2:
+			audio.play_sound('survival_fight');
 			this.sprites = [];
 			this.draw_cloud = true;
 			break;
@@ -195,16 +198,16 @@ Fight.prototype.update = function() {
 			if(this.player_wins) {
 				const an = this.opponent.defeated;
 
-				this.final_opponent_sprite = new Sprite(this.opponent.url, [64, 64], anim_delays.cloud, an.soffset, an.frames);
+				this.final_opponent_sprite = new Sprite(this.opponent.url, [64, 64], 0, an.soffset, an.frames);
 
 				this.sprites = [
 					this.final_opponent_sprite,
-					new Sprite(this.character.url, [64, 64], anim_delays.cloud, this.character.anims.winner.soffset, this.character.anims.winner.frames),
+					new Sprite(this.character.url, [64, 64], 0, this.character.anims.winner.soffset, this.character.anims.winner.frames),
 				];
 			}
 			else {
 				this.sprites = [
-					new Sprite(this.opponent.url, [64, 64], anim_delays.cloud, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
+					new Sprite(this.opponent.url, [64, 64], 0, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
 					null,
 				];
 			}
@@ -222,6 +225,33 @@ Fight.prototype.update = function() {
 			}
 			this.delay = anim_delays.winner;
 			this.draw_cloud = false;
+
+			if(this.player_wins) { // TODO: Unsure if here or after frame 20
+				switch(this.character.species) {
+					case SPECIES.KIWIOPTERYX:
+						audio.play_sound('win_kiwi');
+						break;
+					case SPECIES.PESCIODYPHUS:
+						audio.play_sound('win_pesci');
+						break;
+					default:
+						audio.play_sound('win');
+						break;
+				}
+			}
+			else {
+				switch(this.opponent.species) {
+					case PRED.DINO:
+						audio.play_sound('dino_win');
+						break;
+					case PRED.MUSHROOM:
+						audio.play_sound('mushroom_win');
+						break;
+					case PRED.HUMAN:
+						audio.play_sound('human_win');
+						break;
+				}
+			}
 			break;
 		case 56:
 			this.finished = true;
@@ -261,6 +291,18 @@ function Feeding(character, level, food_type, callback) {
 	this.tiles = [this.character.tile];
 
 	this.sprite = new Sprite(character.url, [64, 64], 0, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, true);
+
+	switch(character.species) {
+		case SPECIES.KIWIOPTERYX:
+			audio.play_sound('feeding_kiwi');
+			break;
+		case SPECIES.CHUCKBERRY:
+			audio.play_sound('feeding_chuck');
+			break;
+		default:
+			audio.play_sound('feeding');
+			break;
+	}
 }
 
 
@@ -296,12 +338,19 @@ Feeding.prototype.update = function() {
 			this.delay = anim_delays.poison;
 			this.sprite = new Sprite(this.character.url, [64, 64], 0, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, true);
 			this.step++;
+			if(this.character.species === SPECIES.CHUCKBERRY) {
+				audio.play_sound('poison_chuck');
+			}
+			else {
+				audio.play_sound('poison');
+			}
 		}
 		// Power food
 		else {
 			this.delay = anim_delays.power_food;
 			this.sprite = new Sprite(this.character.url, [64, 64], 0, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, true);
 			this.step++;
+			audio.play_sound('power_food');
 		}
 	}
 };
@@ -317,7 +366,7 @@ Feeding.prototype.render = function(ctx, dim, cpos) {
 function Quicksand(character, callback) {
 	this.character = character;
 	this.callback = callback;
-	if(character.species === 2) {
+	if(this.character.species === SPECIES.PESCIODYPHUS) {
 		this.delay = anim_delays.feeding;
 	}
 	else {
@@ -332,6 +381,8 @@ function Quicksand(character, callback) {
 
 	const qs = anims_players[this.character.species].quicksand;
 	this.sprite = new Sprite(this.character.url, [64, 64], 0, qs.soffset, qs.frames, true);
+
+	audio.play_sound('quicksand');
 }
 
 
@@ -351,7 +402,7 @@ Quicksand.prototype.update = function() {
 	}
 
 	// Super special stuff for Pesciodyphus
-	if(this.character.species === 2) {
+	if(this.character.species === SPECIES.PESCIODYPHUS) {
 
 		if(this.frame === 17) {
 			this.mov = [0, 0];
@@ -456,6 +507,8 @@ function Electro(dir, character, callback) {
 			new Sprite('gfx/electro.png', [64, 64], anim_delays.electro, [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [256, 64], [256, 64], [0, 128], [0, 128], [256, 64], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], true),
 		];
 	}
+
+	audio.play_sound('electro');
 }
 
 
