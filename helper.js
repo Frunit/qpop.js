@@ -139,6 +139,30 @@ function remove_from_array(arr, element) {
 }
 
 
+function parse_bool(s) {
+	// Try to parse a string for boolean-like values.
+	// Following reasoning:
+	// Language | trueish | falseish
+	// num      |       1 | 0
+	// geek ;)  |    true | false
+	// Czech    |     ano | ne
+	// German   |      ja | nein
+	// English  |     yes | no
+	// Spanish  |      sí | non
+	// French   |     oui | non
+	// Italian  |      sì | non
+	// Russian  |      da | nyet
+	// So if the string starts with a 0, f, or n, it is negative. Any other start
+	// is supposed to be positive. Sorry for Greek users, where "nai" is "yes"!
+
+	if(!s || '0fn'.includes(s[0].toLowerCase())) {
+		return false
+	}
+
+	return true
+}
+
+
 function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 

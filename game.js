@@ -839,21 +839,30 @@ canvas.addEventListener('contextmenu', function(e) {
 });
 
 let lang = null;
+
+const version = 'pre-alpha';
+const game = new Game();
+
+// GET parameter handling
+const search_params = new URL(document.location.href.toLowerCase()).searchParams;
+
+// If "audio" is defined and falseish, disable audio and prevent loading of audio files.
+//   Also disable audio, if "noaudio" is defined (no matter what it is set to).
+if(search_params.has('noaudio') || !parse_bool(search_params.get('audio'))) {
+	game.disable_sound();
+}
+
+// If "lang[uage]" is defined and set to a supported language, use that language.
+//   Otherwise try to determine the browser language. Otherwise default to English.
+options.language = search_params.get('lang') || search_params.get('language') || navigator.language || navigator.userLanguage;
+options.language = options.language.substring(0, 2).toUpperCase();
+
 if(i18n.hasOwnProperty(options.language)) {
 	lang = i18n[options.language];
 }
 else {
 	lang = i18n.EN;
-}
-
-const version = 'pre-alpha';
-const game = new Game();
-
-// MAYBE: Handle GET parameters properly
-// This is a dirty hack to prevent any audio files from loading.
-// Append "?noaudio" to the url (without ")
-if(location.search.includes('noaudio')) {
-	game.disable_sound();
+	options.language = 'EN';
 }
 
 game.start();
