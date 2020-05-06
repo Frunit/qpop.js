@@ -2,7 +2,7 @@
 
 
 const i18n = Object.freeze({
-	DE: {
+	DE: Object.freeze({
 		title: 'Q-POP',
 		subtitle: 'Evolution im Weltraum',
 		next: 'Weiter',
@@ -48,9 +48,20 @@ const i18n = Object.freeze({
 			['Reverse Engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
 			['Neue Grafiken', ['Eike Strahtmann']],
 		],
+		options_music: 'Musik',
+		options_sound: 'Geräusche',
+		options_lang: 'Sprache',
+		options_this_lang: 'DE Deutsch',
+		options_auto_continue: 'Automatisch weiter klicken nach Computerzug auf der Weltkarte',
+		options_click_hold: 'Maustaste gedrückt halten um Einheiten auf der Weltkarte zu platzieren',
+		options_plants: 'Verteilung eigener Pflanzen auf Mutationsübersicht zeigen',
+		options_predators: 'Besiegte Fleischfresser als Symbole in der Überlebensphase zeigen',
+		options_debug: 'Debugging information in der Browserconsole zeigen (nur Englisch)',
+		options_ai_speed: 'Computergeschwindigkeit auf der Weltkarte',
+		options_transition: 'Anzeigedauer der Übergangsbildschirme',
 		debug_too_bad: 'Schade',
-	},
-	EN: {
+	}),
+	EN: Object.freeze({
 		title: 'Q-POP',
 		subtitle: 'Evolution in space',
 		next: 'Continue',  // "continue" is a protected word, so "next" is used as variable name
@@ -97,6 +108,17 @@ const i18n = Object.freeze({
 			['New graphics', ['Eike Strahtmann']],
 			['English translation', ['Mathias Bockwoldt']],
 		],
+		options_music: 'Music',
+		options_sound: 'Sound',
+		options_lang: 'Language',
+		options_this_lang: 'EN English',
+		options_auto_continue: 'Auto continue after AI placement on world map',
+		options_click_hold: 'Click and hold to place or remove units from world map',
+		options_plants: 'Show distribution of plants on mutation screen',
+		options_predators: 'Show vanquished predator symbols in survival',
+		options_debug: 'Show debugging info in the browser console', // For non-English, please note that the debugging info is in English only!
+		options_ai_speed: 'AI speed on world map',
+		options_transition: 'View duration of transition screen',
 		debug_too_bad: 'Too bad!',
-	}
+	}),
 });

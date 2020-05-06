@@ -163,6 +163,19 @@ function parse_bool(s) {
 }
 
 
+function debug_out(s) {
+	// Print s if debug output is active
+	if(options.debug) {
+		console.log(s);
+	}
+}
+
+
+function clamp(num, min, max) {
+	return num <= min ? min : (num >= max ? max : num);
+}
+
+
 function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 

@@ -16,8 +16,13 @@ const debug8 = document.getElementById('debug8');
 
 const options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
+	wm_ai_delay_idx: 2, // Internal index of wm_ai_delay
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
+	wm_click_and_hold: true, // Enable click and hold to place/remove units from world map
+	plant_distribtion: true, // Show plant distribution on mutation screen
+	show_predators: true, // Show vanquished predators in survival
+	debug: true, // Show debugging information in browser console
 	transition_delay: 36, // How many frames to show the transition screens
 	surv_move_speed: 8, // Speed of the player figure in survival in pixel per updated frame
 	music_on: true,
@@ -277,7 +282,7 @@ Game.prototype.set_to_next_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player = this.players[i];
-			console.log('Active player is: ' + this.current_player.id);
+			debug_out('Active player is: ' + this.current_player.id);
 			return true;
 		}
 	}
@@ -290,7 +295,7 @@ Game.prototype.set_to_first_player = function() {
 	for(let i = 0; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player = this.players[i];
-			console.log('Active player is: ' + this.current_player.id);
+			debug_out('Active player is: ' + this.current_player.id);
 			return false;
 		}
 	}
@@ -711,7 +716,7 @@ Game.prototype.next_stage = function() {
 	case SCENE.OUTRO: // Outro
 		// This should never happen
 	default:
-		console.log(this.stage);
+		console.warn(this.stage);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!',
 					() => {}, lang.debug_too_bad);
 	}
@@ -798,6 +803,7 @@ Game.prototype.disable_sound = function() {
 
 
 Game.prototype.next_language = function(direction) {
+	// direction is either 1 or -1
 	draw_rect([545, 0], [32, 21]);
 	const lang_list = Object.keys(i18n);
 	const current_lang = lang_list.indexOf(options.language);
