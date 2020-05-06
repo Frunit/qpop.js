@@ -43,6 +43,7 @@ function Mutations() {
 	this.pie_soffset = [376, 96];
 
 	this.deltay = 26;
+	this.last_bit_width = 3;
 	// CONST_END
 
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
@@ -239,7 +240,7 @@ Mutations.prototype.draw_bar = function(num) {
 		this.bar_offset[0], this.bar_offset[1] + this.deltay*num,
 		this.bar_dim[0], this.bar_dim[1]);
 
-	const length = this.stats[num] * 3 - 3;
+	const length = this.stats[num] * 3 - this.last_bit_width;
 
 	if(length > 0) {
 		const soffset = this.bar_soffsets[Math.min(9, Math.floor(this.stats[num]/10))];
@@ -252,10 +253,10 @@ Mutations.prototype.draw_bar = function(num) {
 			length, this.bar_dim[1]);
 		// Last bit
 		ctx.drawImage(this.pics,
-			soffset[0] + this.bar_dim[0] - 3, soffset[1],
-			3, this.bar_dim[1],
+			soffset[0] + this.bar_dim[0] - this.last_bit_width, soffset[1],
+			this.last_bit_width, this.bar_dim[1],
 			this.bar_offset[0] + length, this.bar_offset[1] + this.deltay*num,
-			3, this.bar_dim[1]);
+			this.last_bit_width, this.bar_dim[1]);
 	}
 
 	// Pie chart
@@ -286,7 +287,7 @@ Mutations.prototype.draw_evo_score = function() {
 		this.evobar_offset[0], this.evobar_offset[1],
 		this.bar_dim[0], this.bar_dim[1]);
 
-	const length = game.current_player.evo_score * 3 - 3;
+	const length = game.current_player.evo_score * 3 - this.last_bit_width;
 	// Main bar
 	if(length) {
 		ctx.drawImage(this.pics,
@@ -298,10 +299,10 @@ Mutations.prototype.draw_evo_score = function() {
 	// Last bit
 	if(length >= 0) {
 		ctx.drawImage(this.pics,
-			this.evobar_soffset[0] + this.bar_dim[0] - 3, this.evobar_soffset[1],
-			3, this.bar_dim[1],
+			this.evobar_soffset[0] + this.bar_dim[0] - this.last_bit_width, this.evobar_soffset[1],
+			this.last_bit_width, this.bar_dim[1],
 			this.evobar_offset[0] + length, this.evobar_offset[1],
-			3, this.bar_dim[1]);
+			this.last_bit_width, this.bar_dim[1]);
 	}
 };
 
