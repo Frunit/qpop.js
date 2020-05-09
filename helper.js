@@ -438,3 +438,13 @@ function open_popup(title, image, text, callback, right_answer, left_answer=null
 	game.stage = new Popup(title, image, callback, text, right_answer, left_answer);
 	game.stage.initialize();
 }
+
+
+function debug_draw_clickareas() {
+	ctx.save();
+	ctx.fillStyle = '#0000ff';
+	for(let ca of game.stage.clickareas) {
+		ctx.fillRect(ca.x1, ca.y1, ca.x2 - ca.x1, ca.y2 - ca.y1);
+	}
+	ctx.restore();
+}
