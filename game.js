@@ -766,7 +766,6 @@ Game.prototype.toggle_sound = function() {
 		}
 	}
 
-	draw_rect([576, 0], [22, 21]);
 	game.stage.redraw();
 };
 
@@ -782,7 +781,6 @@ Game.prototype.toggle_music = function() {
 		}
 	}
 
-	draw_rect([597, 0], [22, 21]);
 	game.stage.redraw();
 };
 

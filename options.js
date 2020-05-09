@@ -109,13 +109,107 @@ Options.prototype.redraw = function() {
 	this.draw_checkbox([this.checkbox_x, this.ys.music], options.music_on);
 	write_text(lang.options_music, [this.text_x, this.ys.music + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.music], options.music);
-	// TODO: clicks
+	this.clickareas.push({
+		x1: this.checkbox_x,
+		y1: this.ys.music,
+		x2: this.checkbox_x + this.x_dim[0] + 2,
+		y2: this.ys.music + this.x_dim[1] + 2,
+		down: () => {},
+		up: () => game.toggle_music(),
+		blur: () => {}
+	});
+	this.clickareas.push({
+		x1: this.secondary_x_offset + 1,
+		y1: this.ys.music + 1,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
+		y2: this.ys.music + this.plusminus_dim[1] - 1,
+		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.music]),
+		up: () => this.change_music_volume(-1),
+		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.music])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0],
+		y1: this.ys.music,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.49,
+		y2: this.ys.music + this.plusminus_dim[1],
+		down: () => {},
+		up: () => this.change_music_volume(-10),
+		blur: () => {}
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		y1: this.ys.music + 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		y2: this.ys.music + this.plusminus_dim[1] - 1,
+		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.music]),
+		up: () => this.change_music_volume(1),
+		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.music])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
+		y1: this.ys.music,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
+		y2: this.ys.music + this.plusminus_dim[1],
+		down: () => {},
+		up: () => this.change_music_volume(10),
+		blur: () => {}
+	});
 
 	// Sound
 	this.draw_checkbox([this.checkbox_x, this.ys.sound], options.sound_on);
 	write_text(lang.options_sound, [this.text_x, this.ys.sound + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.sound], options.sound);
-	// TODO: clicks
+	this.clickareas.push({
+		x1: this.checkbox_x,
+		y1: this.ys.sound,
+		x2: this.checkbox_x + this.x_dim[0] + 2,
+		y2: this.ys.sound + this.x_dim[1] + 2,
+		down: () => {},
+		up: () => game.toggle_sound(),
+		blur: () => {}
+	});
+	this.clickareas.push({
+		x1: this.secondary_x_offset + 1,
+		y1: this.ys.sound + 1,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
+		y2: this.ys.sound + this.plusminus_dim[1] - 1,
+		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.sound]),
+		up: () => this.change_sound_volume(-1),
+		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.sound])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0],
+		y1: this.ys.sound,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.49,
+		y2: this.ys.sound + this.plusminus_dim[1],
+		down: () => {},
+		up: () => this.change_sound_volume(-10),
+		blur: () => {}
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		y1: this.ys.sound + 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		y2: this.ys.sound + this.plusminus_dim[1] - 1,
+		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.sound]),
+		up: () => this.change_sound_volume(1),
+		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.sound])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
+		y1: this.ys.sound,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
+		y2: this.ys.sound + this.plusminus_dim[1],
+		down: () => {},
+		up: () => this.change_sound_volume(10),
+		blur: () => {}
+	});
 
 	// AI speed
 	write_text(lang.options_ai_speed, [this.text_x, this.ys.ai_speed + this.text_y_offset], '#000000', '#ffffff', 'left');
@@ -192,10 +286,10 @@ Options.prototype.redraw = function() {
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay);
 	this.clickareas.push({
-		x1: this.secondary_x_offset,
-		y1: this.ys.transition + this.line_height,
-		x2: this.secondary_x_offset + this.plusminus_dim[0],
-		y2: this.ys.transition + this.line_height + this.plusminus_dim[1],
+		x1: this.secondary_x_offset + 1,
+		y1: this.ys.transition + this.line_height + 1,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
+		y2: this.ys.transition + this.line_height + this.plusminus_dim[1] - 1,
 		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.transition + this.line_height]),
 		up: () => this.change_transition_delay(-1),
 		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.transition + this.line_height])
@@ -212,10 +306,10 @@ Options.prototype.redraw = function() {
 	});
 
 	this.clickareas.push({
-		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
-		y1: this.ys.transition + this.line_height,
-		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0],
-		y2: this.ys.transition + this.line_height + this.plusminus_dim[1],
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		y1: this.ys.transition + this.line_height + 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		y2: this.ys.transition + this.line_height + this.plusminus_dim[1] - 1,
 		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.transition + this.line_height]),
 		up: () => this.change_transition_delay(1),
 		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.transition + this.line_height])
@@ -331,6 +425,26 @@ Options.prototype.change_transition_delay = function(value) {
 		this.secondary_x_offset, this.text_y_offset + 2);
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay);
+};
+
+
+Options.prototype.change_music_volume = function(value) {
+	options.music = clamp(options.music + value, 0, 100);
+	this.draw_bar([this.secondary_x_offset, this.ys.music], options.music);
+
+	if(options.music_on) {
+		audio.set_music_volume(options.music / 100);
+	}
+};
+
+
+Options.prototype.change_sound_volume = function(value) {
+	options.sound = clamp(options.sound + value, 0, 100);
+	this.draw_bar([this.secondary_x_offset, this.ys.sound], options.sound);
+
+	if(options.sound_on) {
+		audio.set_music_volume(options.sound / 100);
+	}
 };
 
 
