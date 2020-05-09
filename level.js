@@ -322,14 +322,14 @@ Level.prototype.populate = function() {
 		num_enemies = 100;
 	}
 
-	console.info('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
+	debug_out('Creating ' + num_predators + ' predators, ' + num_females + ' females, and ' + num_enemies + ' enemies');
 
 	this.mobmap = Array.from(Array(100), () => Array(100).fill(null));
 	let pos;
 
 	// Place the player somewhere around the center
 	this.place_player([49, 49]);
-	console.log('Player placed at: ', this.character.tile);  // DEBUG
+	debug_out('Player placed at: ', this.character.tile);
 
 	let free_tiles = this.find_free_tiles();
 
