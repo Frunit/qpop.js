@@ -24,7 +24,6 @@ const options = {
 	show_predators: true, // Show vanquished predators in survival
 	debug: true, // Show debugging information in browser console
 	transition_delay: 36, // How many frames to show the transition screens
-	surv_move_speed: 8, // Speed of the player figure in survival in pixel per updated frame
 	music_on: true,
 	music: 100, // Music volume (0 - 100)
 	sound_on: true,

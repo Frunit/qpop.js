@@ -51,6 +51,7 @@ function Survival() {
 
 	this.eating_div = 37;
 	this.max_time = 54;
+	this.speed = 8;
 	// CONST_END
 
 	this.action = null;
@@ -666,24 +667,23 @@ Survival.prototype.resolve_movement = function(obj, force=false) {
 
 	let finished_move = false;
 
-	const speed = options.surv_move_speed;
 	obj.sprite.update();
 
 	switch (obj.movement) {
 		case DIR.S:
-			obj.rel_pos[1] += speed;
+			obj.rel_pos[1] += this.speed;
 			finished_move = obj.rel_pos[1] >= 0;
 			break;
 		case DIR.N:
-			obj.rel_pos[1] -= speed;
+			obj.rel_pos[1] -= this.speed;
 			finished_move = obj.rel_pos[1] <= 0;
 			break;
 		case DIR.W:
-			obj.rel_pos[0] -= speed;
+			obj.rel_pos[0] -= this.speed;
 			finished_move = obj.rel_pos[0] <= 0;
 			break;
 		case DIR.E:
-			obj.rel_pos[0] += speed;
+			obj.rel_pos[0] += this.speed;
 			finished_move = obj.rel_pos[0] >= 0;
 			break;
 	}
