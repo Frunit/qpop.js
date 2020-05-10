@@ -229,7 +229,7 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
-	// Click and hold; TODO: Option must be read by worldmap
+	// Click and hold; TODO: Test if option works as expected (world.js line 711)
 	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
 	write_text(lang.options_click_hold, [this.text_x, this.ys.click_hold + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
@@ -242,7 +242,7 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
-	// Plant distribution; TODO: Option must be read by mutation
+	// Plant distribution
 	this.draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
 	write_text(lang.options_plants, [this.text_x, this.ys.plants + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
@@ -255,7 +255,7 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
-	// Show vanquished predators; TODO: Option must be read by survival
+	// Show vanquished predators
 	this.draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
 	write_text(lang.options_predators, [this.text_x, this.ys.predators + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
@@ -268,7 +268,7 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
-	// Show debug info; TODO: Option must be read by all output
+	// Show debug info
 	this.draw_checkbox([this.checkbox_x, this.ys.debug], options.debug);
 	write_text(lang.options_debug, [this.text_x, this.ys.debug + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({

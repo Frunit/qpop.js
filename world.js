@@ -455,7 +455,7 @@ World.prototype.catastrophe_exec = function() {
 		break;
 		}
 	default:
-		console.log(this.catastrophe_type);
+		console.warn(this.catastrophe_type);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
 					() => {}, lang.debug_too_bad);
 	}
@@ -565,8 +565,6 @@ World.prototype.fight = function(x, y) {
 
 	const enemy = game.players[game.map_positions[y][x]];
 	const defense = enemy.stats[ATTR.DEFENSE] + enemy.stats[ATTR.INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WORLD_MAP.RANGONES];
-
-	//console.log("Attacker:", game.map_positions[y][x], " with attack ", attack, "; Defender: ", game.current_player.id, " with defense ", defense)
 
 	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
@@ -708,7 +706,7 @@ World.prototype.wm_clickup = function() {
 
 
 World.prototype.wm_move = function(x, y) {
-	if(this.wm_clickpos !== null) {
+	if(this.wm_clickpos !== null && options.wm_click_and_hold) {
 		x = Math.floor((x - this.map_offset[0]) / this.tile_dim[0]);
 		y = Math.floor((y - this.map_offset[1]) / this.tile_dim[1]);
 

@@ -480,10 +480,10 @@ Survival.prototype.update_environment_sound = function() {
 	const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x))
 
 	if(to_stop.length) {
-		console.log('to_stop', to_stop);
+		console.log('to_stop', to_stop); // DEBUG
 	}
 	if(to_start.length) {
-		console.log('to_start', to_start);
+		console.log('to_start', to_start); // DEBUG
 	}
 
 	for(let sound of to_stop) {
@@ -553,7 +553,7 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 			if(opponent.type === SURV_MAP.ENEMY) {
 				this.level.character.victories.push(opponent.species);
 			}
-			else { // Predator
+			else if(options.show_predators) { // Predator
 				this.level.character.victories.push(opponent.species + 6);
 			}
 		}

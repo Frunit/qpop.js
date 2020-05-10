@@ -260,7 +260,7 @@ Mutations.prototype.draw_bar = function(num) {
 	}
 
 	// Pie chart
-	if(num <= 5) {
+	if(options.plant_distribtion && num <= 5) {
 		ctx.drawImage(this.pics,
 			this.pie_soffset[0] + this.pie_dim[0]*this.plant_counts[num], this.pie_soffset[1],
 			this.pie_dim[0], this.pie_dim[1],

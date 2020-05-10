@@ -138,13 +138,6 @@ Popup.prototype.update = function() {
 
 
 Popup.prototype.clicked = function(answer) {
-	/*console.log('STAGE');
-	console.log(game.stage);
-	for(let i = 0; i < game.backstage.length; i++) {
-		console.log('BACKSTAGE ' + i);
-		console.log(game.backstage[i]);
-	}*/
-
 	game.stage = game.backstage.pop();
 	game.stage.redraw();
 	this.callback(answer);

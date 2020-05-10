@@ -274,7 +274,7 @@ Level.prototype.generate_map = function() {
 		}
 	}
 
-	//console.log(mainpart.join(','));
+	//console.log(mainpart.join(',')); // DEBUG
 
 	// Shuffle everything and create the actual map
 	shuffle(mainpart);

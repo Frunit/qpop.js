@@ -10,8 +10,8 @@ const debug7 = document.getElementById('debug7');
 const debug8 = document.getElementById('debug8');
 
 /*
- * Master-TODO: All options
  * Master-TODO: Save/load game in browser storage and file
+ * Master-TODO: Tutorial
  */
 
 const options = {
