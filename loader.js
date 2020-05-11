@@ -20,7 +20,7 @@ function Loader() {
 
 	this.emptybar_soffset = [300, 80];
 
-	this.img_size = 1230492;
+	this.img_size = 1233063;
 	this.mp3_size = 8611893;
 	this.ogg_size = 5598714;
 	this.m4a_size = 4166319;
@@ -244,6 +244,7 @@ Loader.prototype.finished_preloading = function(self) {
 		['gfx/world_gui.png', 'image'],
 		['gfx/world.png', 'image'],
 		['gfx/wreath.png', 'image'],
+		['gfx/github.png', 'image'],
 		['sfx/intro', 'audio', 'intro'], // Music
 		['sfx/spec1', 'audio', 'spec0'],
 		['sfx/spec2', 'audio', 'spec1'],

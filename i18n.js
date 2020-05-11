@@ -35,7 +35,7 @@ const i18n = Object.freeze({
 		transition_survival: '',	// Fressen und gefressen werden
 		transition_world: '',		// Der Krieg der Arten
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
-		information: 'TODO: Dies ist ein längerer Text über Q-Pop',
+		information: 'Dies ist eine neue Version des Spiels Q-Pop, das 1995 in Deutschland veröffentlicht wurde. Diese Version sollte das Originalspiel so gut wie möglich kopieren und einige praktische Funktionen hinzufügen. Sie sollte auf allen modernen Browsern laufen, die Javascript aktiviert haben. Der Quelltext ist auf Github frei verfügbar.',
 		credits_original: [
 			['Herausgeber und Entwickler', ['von Wendt Konzept GmbH']],
 			['Idee', ['Karl-L. von Wendt']],
@@ -95,7 +95,7 @@ const i18n = Object.freeze({
 		transition_survival: 'Eat and Be Eaten',
 		transition_world: 'The War of the Species',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
-		information: 'TODO: This is a lengthy text about Q-Pop',
+		information: 'This game is a remake of the original Q-Pop game, released in Germany in 1995 by von Wendt Konzept GmbH. This remake should be as close as possible to the original game with some added convenience functions. It should run on all modern browsers that have Javascript enabled. The source code is freely available on Github.',
 		credits_original: [
 			['Publisher and developer', ['von Wendt Konzept GmbH']],
 			['Game design', ['Karl-L. von Wendt']],

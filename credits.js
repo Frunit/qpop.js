@@ -3,23 +3,24 @@
 function Credits() {
 	this.id = SCENE.CREDITS;
 	this.bg = resources.get('gfx/light_bg.png');
+	this.github = resources.get('gfx/github.png');
 
 	// CONST_START
 	this.upper_panel_dim = [620, 130];
 	this.lower_panel_dim = [305, 280];
 	this.close_dim = [181, 22];
+	this.github_dim = [64, 83];
 
 	this.upper_panel_offset = [9, 29];
 	this.left_panel_offset = [9, 168];
 	this.right_panel_offset = [324, 168];
 	this.close_offset = [459, 458];
 	this.text_rel_offset = [10, 22];
+	this.github_offset = [538, 50];
 
-	this.max_text_width = 600;
+	this.max_text_width = 500;
 	this.line_height = 20;
 	// CONST_END
-
-	this.text = multiline(lang.information, this.max_text_width);
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -71,9 +72,22 @@ Credits.prototype.redraw = function() {
 	ctx.restore();
 
 	// Info text
-	for(let i = 0; i < this.text.length; i++) {
-		write_text(this.text[i], [this.text_rel_offset[0] + this.upper_panel_offset[0], this.text_rel_offset[1] + this.upper_panel_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
+	const text = multiline(lang.information, this.max_text_width);
+	for(let i = 0; i < text.length; i++) {
+		write_text(text[i], [this.text_rel_offset[0] + this.upper_panel_offset[0], this.text_rel_offset[1] + this.upper_panel_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
 	}
+
+	// Github logo
+	ctx.drawImage(this.github, this.github_offset[0], this.github_offset[1]);
+	this.clickareas.push({
+		x1: this.github_offset[0],
+		y1: this.github_offset[1],
+		x2: this.github_offset[0] + this.github_dim[0],
+		y2: this.github_offset[1] + this.github_dim[1],
+		down: () => {},
+		up: () => window.open('https://www.github.com/Frunit/qpop.js', '_blank'),
+		blur: () => {}
+	});
 
 	// Credits for original game
 	let line = 0;
