@@ -102,6 +102,9 @@ Survival.prototype.initialize = function() {
 
 
 Survival.prototype.redraw = function() {
+	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
+		return;
+	}
 	draw_base();
 	this.clickareas = game.clickareas.slice();
 	this.rightclickareas = game.rightclickareas.slice();
@@ -1062,7 +1065,7 @@ Survival.prototype.next = function() {
 		return;
 	}
 
-	if(this.level.character.steps > 0) {
+	if(this.steps > 0) {
 		open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
 	}
 	else {
@@ -1076,7 +1079,7 @@ Survival.prototype.next_popup = function(answer) {
 		this.calc_outcome();
 		if(game.current_player.individuals === 0 && !game.current_player.is_dead) {
 			game.current_player.is_dead = true;
-			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => this.next_popup(1), lang.next);
+			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => game.next_stage(), lang.next);
 		}
 		else {
 			audio.stop_sound();

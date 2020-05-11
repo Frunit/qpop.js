@@ -268,7 +268,7 @@ World.prototype.next = function() {
 		return;
 	}
 
-	if(game.current_player.toplace === 0) {
+	if(this.catastrophe_status === 3 || game.current_player.toplace === 0) {
 		this.next_popup(1);
 	}
 	else if(game.current_player.individuals === 0) {
@@ -320,6 +320,7 @@ World.prototype.next_popup = function(answer) {
 
 
 World.prototype.catastrophe_start = function() {
+	const self = this;
 	game.backstage.push(game.stage);
 	game.stage = new Catastrophe(self.catastrophe_callback);
 	game.stage.initialize();
@@ -372,7 +373,6 @@ World.prototype.catastrophe_exec = function() {
 		}
 
 		// Big Explosion
-		// TODO RESEARCH: Check if frames and speed are correct
 		this.animation = new Sprite('gfx/world.png', [0, 32],
 		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]], anim_delays.world, [48, 48],
 		true, () => this.comet_finish());
@@ -494,7 +494,7 @@ World.prototype.catastrophe_finish = function() {
 
 
 World.prototype.comet_finish = function() {
-	const [x, y] = self.animation_pos[0];
+	const [x, y] = this.animation_pos[0];
 	for(let xx = x; xx <= x + 2; xx++) {
 		for(let yy = y; yy <= y + 2; yy++) {
 			game.height_map[yy][xx] = 100;
@@ -508,7 +508,7 @@ World.prototype.comet_finish = function() {
 
 
 World.prototype.humans_finish = function() {
-	const [x, y] = self.animation_pos[0];
+	const [x, y] = this.animation_pos[0];
 	game.world_map[y][x] = WORLD_MAP.HUMANS;
 	game.humans_present = true;
 	this.catastrophe_finish();

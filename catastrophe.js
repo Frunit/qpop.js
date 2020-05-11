@@ -52,6 +52,9 @@ Catastrophe.prototype.redraw = function() {
 				this.title_offset[1] + 15],
 				'white', 'black');
 
+	// Rect around main part
+	draw_rect([this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] + 1], true);
+
 	// Rect around animation
 	draw_inv_rect([this.anim_offset[0] - 1, this.anim_offset[1] - 1], [this.anim_dim[0] + 2, this.anim_dim[1] + 2]);
 

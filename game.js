@@ -274,11 +274,11 @@ Game.prototype.handle_input = function() {
 Game.prototype.is_last_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-			return true;
+			return false;
 		}
 	}
 
-	return false;
+	return true;
 };
 
 
@@ -672,7 +672,7 @@ Game.prototype.next_stage = function() {
 			this.stage.next_player();
 		}
 		else {
-			if(this.turn === 0) {
+			if(this.turn === 10) { //DEBUG
 				this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				this.stage.initialize();
 			}
