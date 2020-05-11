@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: There must be a light grey border above and on the side of the continue button.
 
 function Mutations() {
 	this.id = SCENE.MUTATION;
@@ -87,6 +86,7 @@ Mutations.prototype.redraw = function() {
 	draw_rect([0, 20], [640, 76]); // Upper rectangle
 	draw_rect([0, 95], [640, 385]); // Lower rectangle
 	draw_rect(this.next_offset, this.next_dim); // Continue
+	draw_upper_left_border(this.next_offset, this.next_dim);
 	write_text(lang.next, [549, 473], 'white', 'black');
 
 	this.clickareas = game.clickareas.slice();

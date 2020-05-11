@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: There must be a light grey border above the two lower buttons and if there is only one button, the border must also be on the side.
 
 function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.id = SCENE.POPUP;
@@ -95,20 +94,33 @@ Popup.prototype.redraw = function() {
 		});
 	}
 
-	// Right answer (button) if present
-	if(this.right_answer !== null) {
-		draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
-		write_text(this.right_answer, [this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0]/2, this.offset[1] + this.right_answer_offset[1] + 15], 'white', 'black');
+	// Right answer (button)
+	draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
+	write_text(this.right_answer, [this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0]/2, this.offset[1] + this.right_answer_offset[1] + 15], 'white', 'black');
 
-		this.clickareas.push({
-			x1: this.offset[0] + this.right_answer_offset[0],
-			y1: this.offset[1] + this.right_answer_offset[1],
-			x2: this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0],
-			y2: this.offset[1] + this.right_answer_offset[1] + this.right_answer_dim[1],
-			down: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim, true, true),
-			up: () => this.clicked(0),
-			blur: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim)
-		});
+	this.clickareas.push({
+		x1: this.offset[0] + this.right_answer_offset[0],
+		y1: this.offset[1] + this.right_answer_offset[1],
+		x2: this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0],
+		y2: this.offset[1] + this.right_answer_offset[1] + this.right_answer_dim[1],
+		down: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim, true, true),
+		up: () => this.clicked(0),
+		blur: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim)
+	});
+
+	// Grey border
+	if(this.left_answer === null) {
+		draw_upper_left_border([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
+	}
+	else {
+		ctx.save();
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = '#828282';
+		ctx.beginPath();
+		ctx.moveTo(this.offset[0] + this.left_answer_offset[0] + 1, this.offset[1] + this.left_answer_offset[1] - 1);
+		ctx.lineTo(this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0] - 1, this.offset[1] + this.right_answer_offset[1] - 1);
+		ctx.stroke();
+		ctx.restore();
 	}
 
 	this.keys = [

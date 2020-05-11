@@ -364,6 +364,20 @@ function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
 }
 
 
+function draw_upper_left_border(pos, dim) {
+	ctx.save();
+	ctx.translate(-1, -1);
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = '#828282';
+	ctx.beginPath();
+	ctx.moveTo(pos[0], pos[1] + dim[1]);
+	ctx.lineTo(pos[0], pos[1]);
+	ctx.lineTo(pos[0] + dim[0], pos[1]);
+	ctx.stroke();
+	ctx.restore();
+}
+
+
 function draw_inv_rect(pos, dim, black_line=true) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();

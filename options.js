@@ -66,6 +66,7 @@ Options.prototype.redraw = function() {
 
 	draw_rect([0, 20], [640, 460]); // Main rectangle
 	draw_rect(this.close_offset, this.close_dim); // Close
+	draw_upper_left_border(this.close_offset, this.close_dim);
 	write_text(lang.close, [549, 473], 'white', 'black');
 
 	this.clickareas = game.clickareas.slice();
