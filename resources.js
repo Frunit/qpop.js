@@ -183,7 +183,7 @@
 		sounds[name].connect(sound_node).connect(context.destination);
 		sounds[name].buffer = get(name);
 		sounds[name].addEventListener('ended',
-			(event) => {currently_playing_sounds.delete(name);}
+			() => {currently_playing_sounds.delete(name);}
 		);
 		sounds[name].loop = loop;
 		sounds[name].start(0, 0);

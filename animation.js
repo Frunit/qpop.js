@@ -117,7 +117,7 @@ Animation.prototype.step = function() {
 				// If the move is marked as fixed, the current state will be saved and redrawn every frame.
 				// seq.img is the reference to the actual image, move.img is the number of the "subimage"
 				if(move.fixed) {
-					this.animation.fixed.push({seq_img: seq.img, move_img: move.img, x: x, y: y})
+					this.animation.fixed.push({seq_img: seq.img, move_img: move.img, x: x, y: y});
 				}
 			}
 			// If a delay is active, don't interpret anything.

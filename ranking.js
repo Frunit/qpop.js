@@ -45,7 +45,6 @@ function Ranking() {
 	this.sym_dna_soffset = [400, 480];
 	this.sym_total_soffset = [384, 480];
 
-	this.pillartop_dx = 51;
 	this.sign_dx = 100;
 	this.walk_y = 252;
 
@@ -277,8 +276,6 @@ Ranking.prototype.render = function() {
 			this.walk_y - this.heights[i]]
 		);
 	}
-
-	debug1.value = this.lead_x;
 
 	ctx.restore();
 };

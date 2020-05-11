@@ -41,19 +41,19 @@ function Survival() {
 	this.sym_won_soffset = [0, 24];
 	this.icon_steps_soffset = [48, 0];
 	this.icon_time_soffset = [68, 0];
-	this.minispec_soffset = [0, 24];
 
 	this.sym_food_delta = [8, 25];
 	this.sym_dx = 17;
 
-	this.minimap_width = 21;
-	this.minimap_center = 10; // === (this.minimap_width - 1) / 2
+	this.minimap_center = 10;
 
 	this.eating_div = 37;
 	this.max_time = 54;
 	this.speed = 8;
 	// CONST_END
 
+	this.level = null;
+	this.camera = null;
 	this.action = null;
 	this.movement_active = false;
 	this.movement_just_finished = false;
@@ -477,8 +477,8 @@ Survival.prototype.finish_movement = function() {
 
 Survival.prototype.update_environment_sound = function() {
 	const current_sounds = this.level.get_sounds();
-	const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x))
-	const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x))
+	const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x));
+	const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x));
 
 	if(to_stop.length) {
 		console.log('to_stop', to_stop); // DEBUG
@@ -904,7 +904,7 @@ Survival.prototype.update = function() {
 			if(this.time <= 0) {
 				this.time = this.max_time;
 				this.start_movement(DIR.X);
-			};
+			}
 		}
 	}
 
@@ -931,8 +931,6 @@ Survival.prototype.update = function() {
 			this.action.update();
 		}
 	}
-
-	debug6.value = 'mvmnt act: ' + this.movement_active + '; act: ' + this.action;
 
 	this.camera.update_visible_level();
 };
@@ -986,7 +984,7 @@ Survival.prototype.cam_rightclickup = function(x, y) {
 
 Survival.prototype.test_movement_input = function() {
 	if(this.movement_active || this.action !== null) {
-		return;
+		return false;
 	}
 
 	if(input.isDown('DOWN') && this.level.is_unblocked(this.level.character.tile, DIR.S)) {

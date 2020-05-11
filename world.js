@@ -283,8 +283,8 @@ World.prototype.next = function() {
 World.prototype.next_popup = function(answer) {
 	if(answer === 1) {
 		if(game.current_player.individuals === 0 && !game.current_player.is_dead) {
-			player.is_dead = true;
-			open_popup(lang.popup_title, player.id, lang.dead, () => this.next_popup(1), lang.next);
+			game.current_player.is_dead = true;
+			open_popup(lang.popup_title, game.current_player.id, lang.dead, () => this.next_popup(1), lang.next);
 			return;
 		}
 
@@ -293,7 +293,6 @@ World.prototype.next_popup = function(answer) {
 			// The first turn has no catastrophe, but the evolution points are fixed to 100, so no special condition here
 
 			const scores = [];
-			const points = [0, 0, 0, 0, 0, 0];
 			for(let i = 0; i < 6; i++) {
 				scores.push([i, game.players[i].individuals]);
 			}
@@ -321,7 +320,6 @@ World.prototype.next_popup = function(answer) {
 
 
 World.prototype.catastrophe_start = function() {
-	self = this
 	game.backstage.push(game.stage);
 	game.stage = new Catastrophe(self.catastrophe_callback);
 	game.stage.initialize();
@@ -447,7 +445,7 @@ World.prototype.catastrophe_exec = function() {
 		for(let player of game.players) {
 			if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead) {
 				const stats = player.stats.slice();
-				shuffle(stats)
+				shuffle(stats);
 				player.stats = stats.slice();
 			}
 		}

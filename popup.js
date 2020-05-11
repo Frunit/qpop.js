@@ -5,7 +5,6 @@
 function Popup(title, image, callback, text, right_answer, left_answer) {
 	this.id = SCENE.POPUP;
 	this.bg = resources.get('gfx/dark_bg.png');
-	this.spec_pics = resources.get('gfx/species.png');
 
 	// CONST_START
 	this.line_height = 18;

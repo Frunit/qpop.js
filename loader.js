@@ -8,12 +8,10 @@ function Loader() {
 	this.bar_pic = null;
 
 	// CONST_START
-	this.bg_dim = [640, 480];
 	this.header_dim = [236, 78];
 	this.bar_dim = [300, 16];
 	this.start_dim = [200, 50];
 
-	this.bg_offset = [0, 0];
 	this.header_offset = [202, 50];
 	this.subtitle_offset = [320, 190];
 	this.bar_offset = [170, 350];
@@ -55,7 +53,7 @@ Loader.prototype.initialize = function() {
 	if(this.suffix === '.m4a') {
 		this.max_size += this.m4a_size;
 	}
-	else if(suffix === '.ogg') {
+	else if(this.suffix === '.ogg') {
 		this.max_size += this.ogg_size;
 	}
 	else if(this.suffix === '.mp3') {
@@ -165,7 +163,7 @@ Loader.prototype.redraw = function() {
 };
 
 
-Loader.prototype.draw_bar = function(num) {
+Loader.prototype.draw_bar = function() {
 	if(this.phase === 0) {
 		ctx.save();
 		ctx.translate(0.5, 0.5);
@@ -428,7 +426,7 @@ Loader.prototype.finished_postloading = function(self) {
 	if(game.stage.id === SCENE.LOADING) {
 		self.phase = 3;
 		self.percentage = 100;
-		debug_out('All resources finished loading.')
+		debug_out('All resources finished loading.');
 		if(resources.get_status() - self.max_size !== 0 && options.sound_enabled) {
 			console.warn('Expected size not real size. Diff is ' + (resources.get_status() - self.max_size) + ' Bytes');
 		}

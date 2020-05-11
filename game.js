@@ -1,13 +1,6 @@
 'use strict';
 
 const debug1 = document.getElementById('debug1');
-const debug2 = document.getElementById('debug2');
-const debug3 = document.getElementById('debug3');
-const debug4 = document.getElementById('debug4');
-const debug5 = document.getElementById('debug5');
-const debug6 = document.getElementById('debug6');
-const debug7 = document.getElementById('debug7');
-const debug8 = document.getElementById('debug8');
 
 /*
  * Master-TODO: Save/load game in browser storage and file
@@ -46,6 +39,18 @@ function Game() {
 	this.evo_points = [0, 0, 0, 0, 0, 0];
 	this.clickareas = [];
 	this.rightclickareas = [];
+	this.max_turns = 5;
+	this.turn = 0;
+	this.humid = 50;
+	this.temp = 50;
+	this.water_level = 20;
+	this.mountain_level = 80;
+	this.humans_present = false;
+	this.infinite_game = false;
+	this.current_player = null;
+	this.height_map = null;
+	this.world_map = null;
+	this.map_positions = null;
 }
 
 
@@ -74,7 +79,7 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug4.value = 'FPS: ' + this.frames;
+		debug1.value = 'FPS: ' + this.frames;
 		this.frames = 0;
 		this.last_fps = now;
 	}
@@ -295,7 +300,7 @@ Game.prototype.set_to_first_player = function() {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player = this.players[i];
 			debug_out('Active player is: ' + this.current_player.id);
-			return false;
+			return;
 		}
 	}
 };

@@ -248,7 +248,7 @@ Turnselection.prototype.end_animation = function(animation_type) {
 
 Turnselection.prototype.amorph_eye = function() {
 	this.animations[2] = new Sprite(this.pics_url, this.anim_part_dim, anim_delays.turn_selection*4, [660, 270],
-			[[120, 0], [0, 90]], false)
+			[[120, 0], [0, 90]], false);
 };
 
 

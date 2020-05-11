@@ -156,10 +156,10 @@ function parse_bool(s) {
 	// is supposed to be positive. Sorry for Greek users, where "nai" is "yes"!
 
 	if(!s || '0fn'.includes(s[0].toLowerCase())) {
-		return false
+		return false;
 	}
 
-	return true
+	return true;
 }
 
 

@@ -36,7 +36,7 @@ Sprite.prototype.update = function() {
 Sprite.prototype.reset = function() {
 	this.idx = 0;
 	this.delay_counter = 0;
-	this.finished = this.frame.length === 1;
+	this.finished = this.frames.length === 1;
 };
 
 

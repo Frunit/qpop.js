@@ -131,11 +131,6 @@ Camera.prototype.render = function(force=false) {
 		}
 	}
 
-	if(this._tiles_to_render.size || this._movs_to_render.size) {
-		debug1.value = 'tiles rndr: ' + this._tiles_to_render.size;
-		debug5.value = 'moves rndr: ' + this._movs_to_render.size;
-	}
-
 	for(let coord of this._tiles_to_render) {
 		const x = Math.floor(coord / 100);
 		const y = coord % 100;

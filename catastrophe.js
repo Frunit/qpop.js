@@ -15,8 +15,6 @@ function Catastrophe(callback) {
 	this.offset = [140, 90];
 	this.title_offset = [140, 90];
 	this.anim_offset = [160, 130];
-
-	this.anim_soffset = [0, 0];
 	// CONST_END
 
 	this.clickareas = [];
