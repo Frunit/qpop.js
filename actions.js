@@ -115,6 +115,7 @@ Love.prototype.render = function(ctx, dim, cpos) {
 
 
 function Fight(dir, character, opponent, player_wins, callback) {
+	// TODO: Player win animation seems to have a strange speed
 	this.dir = dir;
 	this.character = character;
 	this.opponent = opponent;

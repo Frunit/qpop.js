@@ -9,7 +9,7 @@ const debug1 = document.getElementById('debug1');
 
 const options = {
 	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
-	wm_ai_delay_idx: 2, // Internal index of wm_ai_delay
+	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
 	wm_click_and_hold: true, // Enable click and hold to place/remove units from world map

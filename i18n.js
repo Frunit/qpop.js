@@ -58,6 +58,7 @@ const i18n = Object.freeze({
 		options_predators: 'Besiegte Fleischfresser als Symbole in der Überlebensphase zeigen',
 		options_debug: 'Debugging information in der Browserconsole zeigen (nur Englisch)',
 		options_ai_speed: 'Computergeschwindigkeit auf der Weltkarte',
+		options_ai_speeds: ['extrem langsam', 'sehr langsam', 'langsam', 'schnell', 'augenblicklich'],
 		options_transition: 'Anzeigedauer der Übergangsbildschirme',
 		debug_too_bad: 'Schade',
 	}),
@@ -118,6 +119,7 @@ const i18n = Object.freeze({
 		options_predators: 'Show vanquished predator symbols in survival',
 		options_debug: 'Show debugging info in the browser console', // For non-English, please note that the debugging info is in English only!
 		options_ai_speed: 'AI speed on world map',
+		options_ai_speeds: ['extremly slow', 'very slow', 'slow', 'fast', 'instantaneous'],
 		options_transition: 'View duration of transition screen',
 		debug_too_bad: 'Too bad!',
 	}),

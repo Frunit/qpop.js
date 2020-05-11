@@ -32,7 +32,7 @@ function Options() {
 	this.checkbox_x = 30;
 	this.text_x = 50;
 	this.text_y_offset = 12;
-	this.secondary_x_offset = 150;
+	this.secondary_x_offset = 175;
 	// CONST_END
 
 	this.ys = Object.freeze({
@@ -48,7 +48,7 @@ function Options() {
 		transition: 315,
 	});
 
-	this.wm_ai_delays = [100, 10, 4, 0];
+	this.wm_ai_delays = [36, 18, 9, 4, 0];
 
 	this.clickareas = [];
 	this.rightclickareas = [];
@@ -125,8 +125,8 @@ Options.prototype.redraw = function() {
 		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
 		y2: this.ys.music + this.plusminus_dim[1] - 1,
 		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.music]),
-		up: () => this.change_music_volume(-1),
-		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.music])
+		up: () => this.change_music_volume(-10),
+		blur: () => this.draw_minus([this.secondary_x_offset, this.ys.music])
 	});
 
 	this.clickareas.push({
@@ -140,19 +140,19 @@ Options.prototype.redraw = function() {
 	});
 
 	this.clickareas.push({
-		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 1,
 		y1: this.ys.music + 1,
-		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 3,
 		y2: this.ys.music + this.plusminus_dim[1] - 1,
 		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.music]),
-		up: () => this.change_music_volume(1),
-		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.music])
+		up: () => this.change_music_volume(10),
+		blur: () => this.draw_plus([this.secondary_x_offset, this.ys.music])
 	});
 
 	this.clickareas.push({
 		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
 		y1: this.ys.music,
-		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 2,
 		y2: this.ys.music + this.plusminus_dim[1],
 		down: () => {},
 		up: () => this.change_music_volume(10),
@@ -178,8 +178,8 @@ Options.prototype.redraw = function() {
 		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
 		y2: this.ys.sound + this.plusminus_dim[1] - 1,
 		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.sound]),
-		up: () => this.change_sound_volume(-1),
-		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.sound])
+		up: () => this.change_sound_volume(-10),
+		blur: () => this.draw_minus([this.secondary_x_offset, this.ys.sound])
 	});
 
 	this.clickareas.push({
@@ -193,19 +193,19 @@ Options.prototype.redraw = function() {
 	});
 
 	this.clickareas.push({
-		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 1,
 		y1: this.ys.sound + 1,
-		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 3,
 		y2: this.ys.sound + this.plusminus_dim[1] - 1,
 		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.sound]),
-		up: () => this.change_sound_volume(1),
-		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.sound])
+		up: () => this.change_sound_volume(10),
+		blur: () => this.draw_plus([this.secondary_x_offset, this.ys.sound])
 	});
 
 	this.clickareas.push({
 		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
 		y1: this.ys.sound,
-		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 2,
 		y2: this.ys.sound + this.plusminus_dim[1],
 		down: () => {},
 		up: () => this.change_sound_volume(10),
@@ -215,7 +215,46 @@ Options.prototype.redraw = function() {
 	// AI speed
 	write_text(lang.options_ai_speed, [this.text_x, this.ys.ai_speed + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
-	// TODO: clicks
+	write_text(lang.options_ai_speeds[options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+	this.clickareas.push({
+		x1: this.secondary_x_offset + 1,
+		y1: this.ys.ai_speed + this.line_height + 1,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
+		y2: this.ys.ai_speed + this.plusminus_dim[1] + this.line_height - 1,
+		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.ai_speed + this.line_height]),
+		up: () => this.change_ai_speed(-1),
+		blur: () => this.draw_minus([this.secondary_x_offset, this.ys.ai_speed + this.line_height])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0],
+		y1: this.ys.ai_speed + this.line_height,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.49,
+		y2: this.ys.ai_speed + this.plusminus_dim[1] + this.line_height,
+		down: () => {},
+		up: () => this.change_ai_speed(-1),
+		blur: () => {}
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		y1: this.ys.ai_speed + this.line_height + 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 3,
+		y2: this.ys.ai_speed + this.plusminus_dim[1] + this.line_height - 1,
+		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.ai_speed + this.line_height]),
+		up: () => this.change_ai_speed(1),
+		blur: () => this.draw_plus([this.secondary_x_offset, this.ys.ai_speed + this.line_height])
+	});
+
+	this.clickareas.push({
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
+		y1: this.ys.ai_speed + this.line_height,
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 2,
+		y2: this.ys.ai_speed + this.plusminus_dim[1] + this.line_height,
+		down: () => {},
+		up: () => this.change_ai_speed(1),
+		blur: () => {}
+	});
 
 	// Auto continue
 	this.draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
@@ -230,7 +269,7 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
-	// Click and hold; TODO: Test if option works as expected (world.js line 711)
+	// Click and hold
 	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
 	write_text(lang.options_click_hold, [this.text_x, this.ys.click_hold + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
@@ -285,15 +324,15 @@ Options.prototype.redraw = function() {
 	// Transition delay
 	write_text(lang.options_transition, [this.text_x, this.ys.transition + this.text_y_offset], '#000000', '#ffffff', 'left');
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
-	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay);
+	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
 	this.clickareas.push({
 		x1: this.secondary_x_offset + 1,
 		y1: this.ys.transition + this.line_height + 1,
 		x2: this.secondary_x_offset + this.plusminus_dim[0] - 1,
 		y2: this.ys.transition + this.line_height + this.plusminus_dim[1] - 1,
 		down: () => this.draw_minusdown([this.secondary_x_offset, this.ys.transition + this.line_height]),
-		up: () => this.change_transition_delay(-1),
-		blur: () => this.draw_minus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.transition + this.line_height])
+		up: () => this.change_transition_delay(-9),
+		blur: () => this.draw_minus([this.secondary_x_offset, this.ys.transition + this.line_height])
 	});
 
 	this.clickareas.push({
@@ -302,32 +341,29 @@ Options.prototype.redraw = function() {
 		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.49,
 		y2: this.ys.transition + this.line_height + this.plusminus_dim[1],
 		down: () => {},
-		up: () => this.change_transition_delay(-9),
+		up: () => this.change_transition_delay(-18),
 		blur: () => {}
 	});
 
 	this.clickareas.push({
-		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] + 1,
+		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 1,
 		y1: this.ys.transition + this.line_height + 1,
-		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 1,
+		x2: this.secondary_x_offset + 2 * this.plusminus_dim[0] + this.bar_dim[0] - 3,
 		y2: this.ys.transition + this.line_height + this.plusminus_dim[1] - 1,
 		down: () => this.draw_plusdown([this.secondary_x_offset, this.ys.transition + this.line_height]),
-		up: () => this.change_transition_delay(1),
-		blur: () => this.draw_plus([this.secondary_x_offset + this.plusminus_dim[0]], [this.ys.transition + this.line_height])
+		up: () => this.change_transition_delay(9),
+		blur: () => this.draw_plus([this.secondary_x_offset, this.ys.transition + this.line_height])
 	});
 
 	this.clickareas.push({
 		x1: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] * 0.51,
 		y1: this.ys.transition + this.line_height,
-		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0],
+		x2: this.secondary_x_offset + this.plusminus_dim[0] + this.bar_dim[0] - 2,
 		y2: this.ys.transition + this.line_height + this.plusminus_dim[1],
 		down: () => {},
-		up: () => this.change_transition_delay(9),
+		up: () => this.change_transition_delay(18),
 		blur: () => {}
 	});
-
-
-	write_text('TODO: Button [Copy the original Q-Pop as closely as possible]', [30, 400], '#000000', '#ffffff', 'left');
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.close(), 'reset': true},
@@ -357,7 +393,7 @@ Options.prototype.draw_bar = function(pos, percent) {
 	ctx.drawImage(this.bar,
 		this.emptybar_soffset[0], this.emptybar_soffset[1],
 		this.bar_dim[0], this.bar_dim[1],
-		pos[0] + this.plusminus_dim[0], pos[1],
+		pos[0] + this.plusminus_dim[0] - 1, pos[1],
 		this.bar_dim[0], this.bar_dim[1]);
 
 	const length = percent * 3 - this.last_bit_width;
@@ -367,13 +403,13 @@ Options.prototype.draw_bar = function(pos, percent) {
 		ctx.drawImage(this.bar,
 			this.bar_soffset[0], this.bar_soffset[1],
 			length, this.bar_dim[1],
-			pos[0] + this.plusminus_dim[0], pos[1],
+			pos[0] + this.plusminus_dim[0] - 1, pos[1],
 			length, this.bar_dim[1]);
 		// Last bit
 		ctx.drawImage(this.bar,
 			this.bar_soffset[0] + this.bar_dim[0] - this.last_bit_width, this.bar_soffset[1],
 			this.last_bit_width, this.bar_dim[1],
-			pos[0] + this.plusminus_dim[0] + length, pos[1],
+			pos[0] + this.plusminus_dim[0] + length - 1, pos[1],
 			this.last_bit_width, this.bar_dim[1]);
 	}
 
@@ -385,7 +421,7 @@ Options.prototype.draw_plus = function(pos) {
 	ctx.drawImage(this.bar,
 		this.plus_soffset[0], this.plus_soffset[1],
 		this.plusminus_dim[0], this.plusminus_dim[1],
-		pos[0] + this.plusminus_dim[0] + this.bar_dim[0], pos[1],
+		pos[0] + this.plusminus_dim[0] + this.bar_dim[0] - 2, pos[1],
 		this.plusminus_dim[0], this.plusminus_dim[1]);
 };
 
@@ -394,7 +430,7 @@ Options.prototype.draw_plusdown = function(pos) {
 	ctx.drawImage(this.bar,
 		this.plusdown_soffset[0], this.plusdown_soffset[1],
 		this.plusminus_dim[0], this.plusminus_dim[1],
-		pos[0] + this.plusminus_dim[0] + this.bar_dim[0], pos[1],
+		pos[0] + this.plusminus_dim[0] + this.bar_dim[0] - 2, pos[1],
 		this.plusminus_dim[0], this.plusminus_dim[1]);
 };
 
@@ -418,7 +454,7 @@ Options.prototype.draw_minusdown = function(pos) {
 
 
 Options.prototype.change_transition_delay = function(value) {
-	options.transition_delay = clamp(options.transition_delay + value, 0, 100);
+	options.transition_delay = clamp(options.transition_delay + value, 0, 90);
 	// Overwrite old number with background
 	ctx.drawImage(this.bg,
 		this.text_x - 1, this.ys.transition + this.line_height - 1,
@@ -426,7 +462,7 @@ Options.prototype.change_transition_delay = function(value) {
 		this.text_x - 1, this.ys.transition + this.line_height - 1,
 		this.secondary_x_offset, this.text_y_offset + 2);
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
-	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay);
+	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
 };
 
 
@@ -447,6 +483,20 @@ Options.prototype.change_sound_volume = function(value) {
 	if(options.sound_on) {
 		audio.set_music_volume(options.sound / 100);
 	}
+};
+
+
+Options.prototype.change_ai_speed = function(value) {
+	options.wm_ai_delay_idx = clamp(options.wm_ai_delay_idx + value, 0, 4);
+	options.wm_ai_delay = this.wm_ai_delays[options.wm_ai_delay_idx];
+	// Overwrite old value with background
+	ctx.drawImage(this.bg,
+		this.text_x - 1, this.ys.ai_speed + this.line_height - 1,
+		this.secondary_x_offset, this.text_y_offset + 6,
+		this.text_x - 1, this.ys.ai_speed + this.line_height - 1,
+		this.secondary_x_offset, this.text_y_offset + 6);
+	write_text(lang.options_ai_speeds[options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+	this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
 };
 
 
