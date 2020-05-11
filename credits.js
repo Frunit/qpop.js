@@ -99,6 +99,7 @@ Credits.prototype.redraw = function() {
 
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.close(), 'reset': true},
+		{'key': 'ESCAPE', 'action': () => this.close(), 'reset': true},
 	];
 };
 
