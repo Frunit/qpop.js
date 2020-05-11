@@ -81,7 +81,7 @@ Ranking.prototype.initialize = function() {
 	this.sprites = [];
 	for(let i = 0; i < 6; i++) {
 		this.sprites.push(
-			new Sprite(this.pics_url, [64, 64], anim_delays.ranking, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames)
+			new Sprite(this.pics_url, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames, anim_delays.ranking)
 		);
 	}
 
@@ -356,7 +356,7 @@ Ranking.prototype.next_phase = function() {
 		this.sprites = [];
 		for(let i = 0; i < 6; i++) {
 			this.sprites.push(
-				new Sprite(this.pics_url, [64, 64], 0, [0, 0], [anim_ranking.standing[i]])
+				new Sprite(this.pics_url, anim_ranking.standing[i])
 			);
 		}
 
@@ -364,7 +364,7 @@ Ranking.prototype.next_phase = function() {
 	}
 	else {
 		for(let winner of this.winners) {
-			this.sprites[winner] = new Sprite(this.pics_url, [64, 64], anim_delays.ranking_winner, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames);
+			this.sprites[winner] = new Sprite(this.pics_url, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames, anim_delays.ranking_winner);
 		}
 
 		this.delay = anim_delays.ranking_winner;

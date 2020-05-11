@@ -373,8 +373,8 @@ World.prototype.catastrophe_exec = function() {
 
 		// Big Explosion
 		// TODO RESEARCH: Check if frames and speed are correct
-		this.animation = new Sprite('gfx/world.png', [48, 48], anim_delays.world, [0, 32],
-		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]],
+		this.animation = new Sprite('gfx/world.png', [0, 32],
+		[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]], anim_delays.world, [48, 48],
 		true, () => this.comet_finish());
 		break;
 		}
@@ -436,8 +436,8 @@ World.prototype.catastrophe_exec = function() {
 		const [x, y] = random_element(land);
 		this.animation_pos = [[x, y]];
 
-		this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
-			[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
+		this.animation = new Sprite('gfx/world.png', [512, 16],
+			[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]], anim_delays.world, [16, 16],
 			true, () => this.humans_finish());
 		break;
 		}
@@ -531,8 +531,8 @@ World.prototype.volcano_step = function(volcanos_left, positions) {
 		}
 	}
 
-	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
-		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
+	this.animation = new Sprite('gfx/world.png', [512, 16],
+		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]], anim_delays.world, [16, 16],
 		true, () => this.volcano_step(volcanos_left - 1, positions));
 	this.animation_pos = [[x, y]];
 };
@@ -566,8 +566,8 @@ World.prototype.fight = function(x, y) {
 
 	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
 
-	this.animation = new Sprite('gfx/world.png', [16, 16], anim_delays.world, [512, 16],
-		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]],
+	this.animation = new Sprite('gfx/world.png', [512, 16],
+		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]], anim_delays.world, [16, 16],
 		true, () => this.fight_end(winner, enemy, x, y));
 
 	this.animation_pos = [[x, y]];

@@ -42,7 +42,7 @@ function Popup(title, image, callback, text, right_answer, left_answer) {
 		dino_cries: [[256, 64], [320, 64]],
 	};
 
-	this.sprite = new Sprite('gfx/species.png', this.spec_dim, anim_delays.popups, [0, 0], this.spec_positions[image]);
+	this.sprite = new Sprite('gfx/species.png', [0, 0], this.spec_positions[image], anim_delays.popups);
 
 	this.clickareas = [];
 	this.rightclickareas = [];

@@ -445,12 +445,12 @@ Level.prototype.request_sprite = function(x, y) {
 	const type = this.map[y][x];
 
 	if(survival_background.hasOwnProperty(type)) {
-		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [0, 0], survival_background[type]);
+		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [0, 0], survival_background[type], anim_delays.background);
 	}
 	else {
 		const xx = Math.floor(type % 10);
 		const yy = Math.floor(type / 10);
-		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [64, 64], anim_delays.background, [xx*64, yy*64]);
+		this.bg_sprites[y][x] = new Sprite('gfx/background.png', [xx*64, yy*64]);
 	}
 };
 
@@ -552,7 +552,7 @@ function Character(species, tile) {
 
 	this.victories = [];
 
-	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.still.soffset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, this.anims.still.soffset, this.anims.still.frames);
 }
 
 
@@ -569,7 +569,7 @@ function Predator(species, tile) {
 	this.anims = anims_predators[species];
 	this.defeated = random_element(this.anims.defeated);
 
-	this.sprite = new Sprite(this.url, [64, 64], 0, this.anims.still.soffset, this.anims.still.frames);
+	this.sprite = new Sprite(this.url, this.anims.still.soffset, this.anims.still.frames);
 
 	//             dino, mushroom, human
 	this.attack = [250 ,   350   ,  150][species];
@@ -591,7 +591,7 @@ function Female(species, tile) {
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.female.soffset, this.anims.female.frames);
+	this.sprite = new Sprite(this.url, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
 }
 
 
@@ -606,5 +606,5 @@ function Enemy(species, tile) {
 	this.anims = anims_players[species];
 	this.defeated = this.anims.defeated;
 
-	this.sprite = new Sprite(this.url, [64, 64], anim_delays.female, this.anims.enem_still.soffset, this.anims.enem_still.frames);
+	this.sprite = new Sprite(this.url, this.anims.enem_still.soffset, this.anims.enem_still.frames, anim_delays.female);
 }

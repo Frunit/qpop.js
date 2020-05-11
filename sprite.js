@@ -1,7 +1,7 @@
 'use strict';
 
 
-function Sprite(url, size, delay=1, offset=[0,0], frames=[[0,0]], once=false, callback=null) {
+function Sprite(url, offset=[0,0], frames=[[0,0]], delay=0, size=[64, 64], once=false, callback=null) {
 	this.pic = resources.get(url);
 	this.offset = offset;
 	this.size = size;

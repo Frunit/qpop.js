@@ -471,7 +471,7 @@ Survival.prototype.finish_movement = function() {
 	}
 
 	// Nothing happened, end movement
-	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
+	char.sprite = new Sprite(char.url, char.anims.still.soffset, char.anims.still.frames);
 };
 
 
@@ -571,7 +571,7 @@ Survival.prototype.finish_fight = function(player_wins, opponent) {
 		this.finish_movement();
 	}
 	else {
-		opponent.sprite = new Sprite(opponent.url, [64, 64], 0, opponent.anims.still.soffset, opponent.anims.still.frames);
+		opponent.sprite = new Sprite(opponent.url, opponent.anims.still.soffset, opponent.anims.still.frames);
 		this.player_death();
 	}
 };
@@ -617,22 +617,22 @@ Survival.prototype.start_movement = function(dir) {
 
 	switch(dir) {
 		case DIR.S:
-			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.south.soffset, char.anims.south.frames);
+			char.sprite = new Sprite(char.url, char.anims.south.soffset, char.anims.south.frames);
 			char.tile[1]++;
 			char.rel_pos = [0, -this.tile_dim[1]];
 			break;
 		case DIR.N:
-			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.north.soffset, char.anims.north.frames);
+			char.sprite = new Sprite(char.url, char.anims.north.soffset, char.anims.north.frames);
 			char.tile[1]--;
 			char.rel_pos = [0, this.tile_dim[1]];
 			break;
 		case DIR.E:
-			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.east.soffset, char.anims.east.frames);
+			char.sprite = new Sprite(char.url, char.anims.east.soffset, char.anims.east.frames);
 			char.tile[0]++;
 			char.rel_pos = [-this.tile_dim[0], 0];
 			break;
 		case DIR.W:
-			char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.west.soffset, char.anims.west.frames);
+			char.sprite = new Sprite(char.url, char.anims.west.soffset, char.anims.west.frames);
 			char.tile[0]--;
 			char.rel_pos = [this.tile_dim[0], 0];
 			break;
@@ -697,7 +697,7 @@ Survival.prototype.resolve_movement = function(obj, force=false) {
 			this.finish_movement();
 		}
 		else {
-			obj.sprite = new Sprite(obj.url, [64, 64], 0, obj.anims.still.soffset, obj.anims.still.frames);
+			obj.sprite = new Sprite(obj.url, obj.anims.still.soffset, obj.anims.still.frames);
 		}
 	}
 };
@@ -787,28 +787,28 @@ Survival.prototype.start_predator_movement = function() {
 			case DIR.N:
 				pos[1]--;
 				if(dist <= 5) {
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.north.soffset, predator.anims.north.frames);
+					predator.sprite = new Sprite(predator.url, predator.anims.north.soffset, predator.anims.north.frames, anim_delay);
 					predator.rel_pos = [0, this.tile_dim[1]];
 				}
 				break;
 			case DIR.S:
 				pos[1]++;
 				if(dist <= 5) {
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.south.soffset, predator.anims.south.frames);
+					predator.sprite = new Sprite(predator.url, predator.anims.south.soffset, predator.anims.south.frames, anim_delay);
 					predator.rel_pos = [0, -this.tile_dim[1]];
 				}
 				break;
 			case DIR.W:
 				pos[0]--;
 				if(dist <= 5) {
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.west.soffset, predator.anims.west.frames);
+					predator.sprite = new Sprite(predator.url, predator.anims.west.soffset, predator.anims.west.frames, anim_delay);
 					predator.rel_pos = [this.tile_dim[0], 0];
 				}
 				break;
 			case DIR.E:
 				pos[0]++;
 				if(dist <= 5) {
-					predator.sprite = new Sprite(predator.url, [64, 64], anim_delay, predator.anims.east.soffset, predator.anims.east.frames);
+					predator.sprite = new Sprite(predator.url, predator.anims.east.soffset, predator.anims.east.frames, anim_delay);
 					predator.rel_pos = [-this.tile_dim[0], 0];
 				}
 				break;
@@ -848,7 +848,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 		this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 	}
 	this.level.place_player([random_int(20, 80), random_int(20, 80)]);
-	char.sprite = new Sprite(char.url, [64, 64], 0, char.anims.still.soffset, char.anims.still.frames);
+	char.sprite = new Sprite(char.url, char.anims.still.soffset, char.anims.still.frames);
 	this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 	char.hidden = false;
 	this.action = null;
