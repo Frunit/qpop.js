@@ -7,7 +7,7 @@
 	const loading = [];
 	const load_status = {};
 	let loaded = 0;
-	let sound_enabled = true;
+	let audio_enabled = true;
 
 	let best_audio_suffix = null;
 	const context = new AudioContext();
@@ -29,7 +29,7 @@
 
 			// determine audio format. If no audio is possible, load nothing.
 			if(type === 'audio') {
-				if(best_audio_suffix === null || !sound_enabled) {
+				if(best_audio_suffix === null || !audio_enabled) {
 					continue;
 				}
 
@@ -98,6 +98,10 @@
 	}
 
 	function get_suffix() {
+		if(!audio_enabled) {
+			return '';
+		}
+
 		if(best_audio_suffix === null) {
 			const mimes = [
 				['.m4a', 'audio/m4a; codecs="aac"'],
@@ -220,8 +224,8 @@
 		sound_node.gain.value = volume;
 	}
 
-	function disable_sound() {
-		sound_enabled = false;
+	function disable_audio() {
+		audio_enabled = false;
 	}
 
 	window.resources = {
@@ -239,6 +243,6 @@
 		set_music_volume: set_music_volume,
 		set_sound_volume: set_sound_volume,
 		get_suffix: get_suffix,
-		disable_sound: disable_sound,
+		disable_audio: disable_audio,
 	};
 })();

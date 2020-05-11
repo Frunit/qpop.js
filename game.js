@@ -21,7 +21,7 @@ const options = {
 	music: 100, // Music volume (0 - 100)
 	sound_on: true,
 	sound: 100, // Sound volume (0 - 100)
-	sound_enabled: true,
+	audio_enabled: true,
 	update_freq: 1/18, // Screen update frequency
 };
 
@@ -760,7 +760,7 @@ Game.prototype.toggle_options = function() {
 
 
 Game.prototype.toggle_sound = function() {
-	if(options.sound_enabled) {
+	if(options.audio_enabled) {
 		options.sound_on = !options.sound_on;
 		if(options.sound_on) {
 			audio.set_sound_volume(options.sound / 100);
@@ -775,7 +775,7 @@ Game.prototype.toggle_sound = function() {
 
 
 Game.prototype.toggle_music = function() {
-	if(options.sound_enabled) {
+	if(options.audio_enabled) {
 		options.music_on = !options.music_on;
 		if(options.music_on) {
 			audio.set_music_volume(options.music / 100);
@@ -789,14 +789,14 @@ Game.prototype.toggle_music = function() {
 };
 
 
-Game.prototype.disable_sound = function() {
+Game.prototype.disable_audio = function() {
 	options.music_on = false;
 	options.sound_on = false;
 	audio.set_music_volume(0);
 	audio.set_sound_volume(0);
 
-	audio.disable_sound();
-	options.sound_enabled = false;
+	audio.disable_audio();
+	options.audio_enabled = false;
 
 	if(game.stage) {
 		game.stage.redraw();
@@ -859,8 +859,8 @@ const search_params = new URL(document.location.href.toLowerCase()).searchParams
 
 // If "audio" is defined and falseish, disable audio and prevent loading of audio files.
 //   Also disable audio, if "noaudio" is defined (no matter what it is set to).
-if(search_params.has('noaudio') || !parse_bool(search_params.get('audio'))) {
-	game.disable_sound();
+if(search_params.has('noaudio') || (search_params.get('audio') !== null && !parse_bool(search_params.get('audio')))) {
+	game.disable_audio();
 }
 
 // If "lang[uage]" is defined and set to a supported language, use that language.

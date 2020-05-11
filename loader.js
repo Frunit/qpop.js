@@ -20,8 +20,7 @@ function Loader() {
 
 	this.emptybar_soffset = [300, 80];
 
-	// TODO: Update sizes, when resources to load are changed in the source
-	this.img_size = 1230723;
+	this.img_size = 1230492;
 	this.mp3_size = 8611893;
 	this.ogg_size = 5598714;
 	this.m4a_size = 4166319;
@@ -427,7 +426,7 @@ Loader.prototype.finished_postloading = function(self) {
 		self.phase = 3;
 		self.percentage = 100;
 		debug_out('All resources finished loading.');
-		if(resources.get_status() - self.max_size !== 0 && options.sound_enabled) {
+		if(resources.get_status() - self.max_size !== 0) {
 			console.warn('Expected size not real size. Diff is ' + (resources.get_status() - self.max_size) + ' Bytes');
 		}
 
