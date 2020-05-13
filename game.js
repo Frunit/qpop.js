@@ -527,25 +527,7 @@ Game.prototype.load_game = function(save_file) {
 		return;
 	}
 
-	options.music_on = !!content.getUint8(0x10 + mp);
-	options.music = content.getUint8(0x11 + mp);
-	options.sound_on = !!content.getUint8(0x12 + mp);
-	options.sound = content.getUint8(0x13 + mp);
-
-	// MAYBE: Should loading a game really change sound settings?
-	if(options.music_on) {
-		audio.set_music_volume = options.music;
-	}
-	else {
-		audio.set_music_volume = 0;
-	}
-
-	if(options.sound_on) {
-		audio.set_sound_volume = options.sound;
-	}
-	else {
-		audio.set_sound_volume = 0;
-	}
+	// This version deliberatly does not load the audio settings from the save file
 
 	for(let i = 0; i < game.players.length; i++) {
 		const p = game.players[i];
