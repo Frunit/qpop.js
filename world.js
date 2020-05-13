@@ -461,12 +461,9 @@ World.prototype.catastrophe_exec = function() {
 
 
 World.prototype.catastrophe_finish = function() {
-	if(game.temp > 100) { game.temp = 100; }
-	else if (game.temp < 0) { game.temp = 0; }
-	if(game.humid > 100) { game.humid = 100; }
-	else if (game.humid < 0) { game.humid = 0; }
-	if(game.water_level > 100) { game.water_level = 100; }
-	else if (game.water_level < 0) { game.water_level = 0; }
+	game.temp  = clamp(game.temp, 0, 100)
+	game.humid  = clamp(game.humid, 0, 100)
+	game.water_level  = clamp(game.water_level, 0, 100)
 
 	this.animation = null;
 	game.world_map = this.create_world_map();
@@ -920,6 +917,7 @@ World.prototype.create_height_map = function() {
 
 World.prototype.create_world_map = function() {
 	const map = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(0));
+	// TODO: The generated maps are not 100% the same as the original maps!
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
@@ -945,21 +943,8 @@ World.prototype.find_tile = function(height, y) {
 		return WORLD_MAP.MOUNTAIN;
 	}
 
-	let temp = game.temp + (y - this.dim[1] / 2) * 3 - height + 50;
-	if(temp < 0) {
-		temp = 0;
-	}
-	else if(temp > 100) {
-		temp = 100;
-	}
-
-	let humid = game.humid - height + 50;
-	if(humid < 0) {
-		humid = 0;
-	}
-	else if(humid > 100) {
-		humid = 100;
-	}
+	const temp = clamp(game.temp + (y - this.dim[1] / 2) * 3 - height + 50, 0, 100);
+	const humid = clamp(game.humid - height + 50, 0, 100);
 
 	let delta = Infinity;
 	let tile = 0;
