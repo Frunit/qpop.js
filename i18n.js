@@ -46,7 +46,7 @@ const i18n = Object.freeze({
 		credits_remake: [
 			['Programmierung', ['Mathias Bockwoldt']],
 			['Reverse Engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
-			['Neue Grafiken', ['Eike Strahtmann']],
+			['Neue Grafiken', ['Eike Strathmann']],
 		],
 		options_music: 'Musik',
 		options_sound: 'Geräusche',
@@ -106,7 +106,7 @@ const i18n = Object.freeze({
 		credits_remake: [
 			['Programming', ['Mathias Bockwoldt']],
 			['Reverse engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
-			['New graphics', ['Eike Strahtmann']],
+			['New graphics', ['Eike Strathmann']],
 			['English translation', ['Mathias Bockwoldt']],
 		],
 		options_music: 'Music',
