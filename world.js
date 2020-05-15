@@ -917,7 +917,6 @@ World.prototype.create_height_map = function() {
 
 World.prototype.create_world_map = function() {
 	const map = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(0));
-	// TODO: The generated maps are not 100% the same as the original maps!
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
@@ -943,7 +942,7 @@ World.prototype.find_tile = function(height, y) {
 		return WORLD_MAP.MOUNTAIN;
 	}
 
-	const temp = clamp(game.temp + (y - this.dim[1] / 2) * 3 - height + 50, 0, 100);
+	const temp = clamp(game.temp + y * 3 - height + 11, 0, 100);
 	const humid = clamp(game.humid - height + 50, 0, 100);
 
 	let delta = Infinity;
