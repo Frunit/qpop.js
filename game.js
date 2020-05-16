@@ -16,6 +16,7 @@ const options = {
 	plant_distribtion: true, // Show plant distribution on mutation screen
 	show_predators: true, // Show vanquished predators in survival
 	debug: true, // Show debugging information in browser console
+	tutorial: true, // Show the tutorial
 	transition_delay: 36, // How many frames to show the transition screens
 	music_on: true,
 	music: 100, // Music volume (0 - 100)
@@ -39,6 +40,7 @@ function Game() {
 	this.evo_points = [0, 0, 0, 0, 0, 0];
 	this.clickareas = [];
 	this.rightclickareas = [];
+	this.seen_tutorials = new Set();
 	this.max_turns = 5;
 	this.turn = 0;
 	this.humid = 50;

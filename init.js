@@ -34,6 +34,34 @@ function Init() {
 	this.iq_soffsets = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 
+	this.tutorials = [
+		{
+			'name': 'welcome',
+			'pos': [150, 150],
+			'arrows': [],
+			'highlight': [160, 160, 161, 161],
+		},
+		{
+			'name': 'change_language',
+			'pos': [278, 45],
+			'arrows': [{dir: DIR.N, offset: 275}, {dir: DIR.N, offset: 340}],
+			'highlight': [545, 0, 640, 21],
+		},
+		{
+			'name': 'player_select',
+			'pos': [35, 190],
+			'arrows': [{dir: DIR.N, offset: 80}, {dir: DIR.N, offset: 128}],
+			'highlight': [8, 27, 316,167],
+		},
+		{
+			'name': 'next',
+			'pos': [278, 435],
+			'low_anchor': true,
+			'arrows': [{dir: DIR.S, offset: 290}],
+			'highlight': [this.next_offset[0], this.next_offset[1], this.next_offset[0] + this.next_dim[0], this.next_offset[1] + this.next_dim[1]],
+		},
+	];
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -43,6 +71,7 @@ function Init() {
 Init.prototype.initialize = function() {
 	audio.play_music('intro');
 	this.redraw();
+	this.tutorial();
 };
 
 
@@ -239,6 +268,19 @@ Init.prototype.next = function() {
 	}
 
 	game.next_stage();
+};
+
+
+Init.prototype.tutorial = function() {
+	if(options.tutorial) {
+		for(let tut of this.tutorials) {
+			if(!game.seen_tutorials.has(tut.name)) {
+				game.seen_tutorials.add(tut.name);
+				open_tutorial(tut);
+				break;
+			}
+		}
+	}
 };
 
 

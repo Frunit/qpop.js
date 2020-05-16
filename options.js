@@ -45,7 +45,8 @@ function Options() {
 		plants: 240,
 		predators: 265,
 		debug: 290,
-		transition: 315,
+		tutorial: 315,
+		transition: 340,
 	});
 
 	this.wm_ai_delays = [36, 18, 9, 4, 0];
@@ -321,6 +322,19 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
+	// Show tutorial
+	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
+	write_text(lang.options_tutorial, [this.text_x, this.ys.tutorial + this.text_y_offset], '#000000', '#ffffff', 'left');
+	this.clickareas.push({
+		x1: this.checkbox_x,
+		y1: this.ys.tutorial,
+		x2: this.checkbox_x + this.x_dim[0] + 2,
+		y2: this.ys.tutorial + this.x_dim[1] + 2,
+		down: () => {},
+		up: () => this.toggle_tutorial(),
+		blur: () => {}
+	});
+
 	// Transition delay
 	write_text(lang.options_transition, [this.text_x, this.ys.transition + this.text_y_offset], '#000000', '#ffffff', 'left');
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
@@ -527,6 +541,12 @@ Options.prototype.toggle_show_predators = function() {
 Options.prototype.toggle_debug = function() {
 	options.debug = !options.debug;
 	this.draw_checkbox([this.checkbox_x, this.ys.debug], options.debug);
+};
+
+
+Options.prototype.toggle_tutorial = function() {
+	options.tutorial = !options.tutorial;
+	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
 };
 
 

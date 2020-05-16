@@ -20,7 +20,7 @@ function Loader() {
 
 	this.emptybar_soffset = [300, 80];
 
-	this.img_size = 1233063;
+	this.img_size = 1236659;
 	this.mp3_size = 8611893;
 	this.ogg_size = 5598714;
 	this.m4a_size = 4166319;
@@ -223,6 +223,7 @@ Loader.prototype.finished_preloading = function(self) {
 		['gfx/clouds.png', 'image'],
 		['gfx/electro.png', 'image'],
 		['gfx/enemies.png', 'image'],
+		['gfx/github.png', 'image'],
 		['gfx/init.png', 'image'],
 		['gfx/light_bg.png', 'image'],
 		['gfx/pred1.png', 'image'],
@@ -241,10 +242,10 @@ Loader.prototype.finished_preloading = function(self) {
 		['gfx/transition_survival.png', 'image'],
 		['gfx/transition_world.png', 'image'],
 		['gfx/turns.png', 'image'],
+		['gfx/tutorial.png', 'image'],
 		['gfx/world_gui.png', 'image'],
 		['gfx/world.png', 'image'],
 		['gfx/wreath.png', 'image'],
-		['gfx/github.png', 'image'],
 		['sfx/intro', 'audio', 'intro'], // Music
 		['sfx/spec1', 'audio', 'spec0'],
 		['sfx/spec2', 'audio', 'spec1'],

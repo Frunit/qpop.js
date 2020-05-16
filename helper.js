@@ -91,6 +91,7 @@ const SCENE = Object.freeze({
 	OUTRO:          12,
 	POPUP:          20,
 	CATASTROPHE:    21,
+	TUTORIAL:       22,
 	CREDITS:        30,
 	OPTIONS:        31,
 });
@@ -450,6 +451,31 @@ function open_popup(title, image, text, callback, right_answer, left_answer=null
 	// The callback function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
 	game.backstage.push(game.stage);
 	game.stage = new Popup(title, image, callback, text, right_answer, left_answer);
+	game.stage.initialize();
+}
+
+
+function open_tutorial(tutorial) {
+	// Highlight
+	ctx.save();
+	ctx.translate(0.5, 0,5);
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+	if(tutorial.highlight[0] !== 0) {
+		ctx.fillRect(0, tutorial.highlight[1], tutorial.highlight[0], tutorial.highlight[3] - tutorial.highlight[1]);
+	}
+	if(tutorial.highlight[1] !== 0) {
+		ctx.fillRect(0, 0, 640, tutorial.highlight[1]);
+	}
+	if(tutorial.highlight[2] !== 640) {
+		ctx.fillRect(tutorial.highlight[2], tutorial.highlight[1], 640 - tutorial.highlight[2], tutorial.highlight[3] - tutorial.highlight[1]);
+	}
+	if(tutorial.highlight[3] !== 480) {
+		ctx.fillRect(0, tutorial.highlight[3], 640, 480 - tutorial.highlight[3]);
+	}
+	ctx.restore();
+
+	game.backstage.push(game.stage);
+	game.stage = new Tutorial(tutorial);
 	game.stage.initialize();
 }
 
