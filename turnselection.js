@@ -38,6 +38,16 @@ function Turnselection() {
 	this.turns = [5, 10, 20, 255];
 	this.turn_index = 0;
 
+	this.tutorials = [
+		{
+			'name': 'turns',
+			'pos': [140, 300],
+			'low_anchor': true,
+			'arrows': [],
+			'highlight': [95, 328, 538, 371],
+		},
+	]
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -49,6 +59,7 @@ function Turnselection() {
 Turnselection.prototype.initialize = function() {
 	audio.play_music('intro');
 	this.redraw();
+	game.tutorial();
 };
 
 

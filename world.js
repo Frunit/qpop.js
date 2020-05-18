@@ -60,6 +60,15 @@ function World() {
 	this.animation = null;
 	this.animation_pos = [[0, 0]];
 
+	this.tutorials = [
+		{
+			'name': 'wm_units',
+			'pos': [75, 155],
+			'arrows': [{dir: DIR.N, offset: 42}, {dir: DIR.N, offset: 154}, {dir: DIR.N, offset: 266}, {dir: DIR.E, offset: 130}],
+			'highlight': [0, 0, 640, 480],
+		},
+	];
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -89,6 +98,17 @@ World.prototype.initialize = function() {
 	}
 
 	this.redraw();
+
+	if(game.turn === 1) {
+		this.tutorials.push({
+			'name': 'wm_shadows',
+			'pos': [80, 240],
+			'arrows': [{dir: DIR.E, offset: 100}],
+			'highlight': [this.tomove_offset[0], this.tomove_offset[1], this.tomove_offset[0] + this.minispec_delta[0]*10, this.tomove_offset[1] + this.minispec_delta[1]],
+		});
+	}
+
+	game.tutorial();
 
 	if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
 		this.ai();

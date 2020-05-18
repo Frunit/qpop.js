@@ -50,6 +50,21 @@ function Mutations() {
 	this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 	this.plant_counts = [0, 0, 0, 0, 0, 0];
 
+	this.tutorials = [
+		{
+			'name': 'mutation_start',
+			'pos': [5, 100],
+			'arrows': [{dir: DIR.N, offset: 310}],
+			'highlight': [0, 20, 640, 96],
+		},
+		{
+			'name': 'mutation_plant',
+			'pos': [140, 150],
+			'arrows': [{dir: DIR.N, offset: 250}],
+			'highlight': [0, 0, 640, 480],
+		},
+	];
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -58,6 +73,22 @@ function Mutations() {
 
 Mutations.prototype.initialize = function() {
 	this.next_player();
+
+	// Make sure tutorial points to the best plant
+	if(!game.seen_tutorials.has('mutation_plant')) {
+		let best = 0;
+		let best_idx = 0;
+		for(let i = 0; i < this.plant_counts.length; i++) {
+			if(this.plant_counts[i] > best) {
+				best = this.plant_counts[i];
+				best_idx = i;
+			}
+		}
+
+		this.tutorials[1].pos = [170, this.bar_offset[1] + this.deltay*best_idx + 33];
+		this.tutorials[1].highlight = [0, this.symbol_offset[1] + this.deltay*best_idx, 640, this.symbol_offset[1] + this.deltay*(best_idx + 1)];
+	}
+	game.tutorial();
 };
 
 
