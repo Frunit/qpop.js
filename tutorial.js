@@ -15,7 +15,6 @@ function Tutorial(tut) {
 	this.spec_dim = [34, 79];
 	this.abort_dim = [180, 22];
 	this.continue_dim = [181, 22];
-	this.arrow_dim = [30, 30];
 
 	this.title_offset = [0, 0];
 	this.spec_offset = [35, 45];
@@ -115,30 +114,30 @@ Tutorial.prototype.redraw = function() {
 			case DIR.N:
 				ctx.drawImage(this.gfx,
 					this.arrow_soffsets[0][0], this.arrow_soffsets[0][1],
-					this.arrow_dim[0], this.arrow_dim[1],
-					this.offset[0] + arrow.offset, this.offset[1] - this.arrow_dim[1] + 3,
-					this.arrow_dim[0], this.arrow_dim[1]);
+					this.arrow_dims[0][0], this.arrow_dims[0][1],
+					this.offset[0] + arrow.offset, this.offset[1] - this.arrow_dims[0][1] + 3,
+					this.arrow_dims[0][0], this.arrow_dims[0][1]);
 				break;
 			case DIR.E:
 				ctx.drawImage(this.gfx,
 					this.arrow_soffsets[1][0], this.arrow_soffsets[1][1],
-					this.arrow_dim[0], this.arrow_dim[1],
+					this.arrow_dims[1][0], this.arrow_dims[1][1],
 					this.offset[0] + this.dim[0] - 3, this.offset[1] + arrow.offset,
-					this.arrow_dim[0], this.arrow_dim[1]);
+					this.arrow_dims[1][0], this.arrow_dims[1][1]);
 				break;
 			case DIR.S:
 				ctx.drawImage(this.gfx,
 					this.arrow_soffsets[2][0], this.arrow_soffsets[2][1],
-					this.arrow_dim[0], this.arrow_dim[1],
+					this.arrow_dims[2][0], this.arrow_dims[2][1],
 					this.offset[0] + arrow.offset, this.offset[1] + this.dim[1] - 3,
-					this.arrow_dim[0], this.arrow_dim[1]);
+					this.arrow_dims[2][0], this.arrow_dims[2][1]);
 				break;
 			case DIR.W:
 				ctx.drawImage(this.gfx,
 					this.arrow_soffsets[3][0], this.arrow_soffsets[3][1],
-					this.arrow_dim[0], this.arrow_dim[1],
-					this.offset[0] - this.arrow_dim[0] + 3, this.offset[1] + arrow.offset,
-					this.arrow_dim[0], this.arrow_dim[1]);
+					this.arrow_dims[3][0], this.arrow_dims[3][1],
+					this.offset[0] - this.arrow_dims[3][0] + 3, this.offset[1] + arrow.offset,
+					this.arrow_dims[3][0], this.arrow_dims[3][1]);
 				break;
 		}
 	}
@@ -166,5 +165,5 @@ Tutorial.prototype.next = function(abort=false) {
 	}
 	game.stage = game.backstage.pop();
 	game.stage.redraw();
-	game.stage.tutorial();
+	game.tutorial();
 };

@@ -656,7 +656,7 @@ Game.prototype.next_stage = function() {
 			this.stage.next_player();
 		}
 		else {
-			if(this.turn === 10) { //DEBUG
+			if(this.turn === 0) {
 				this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				this.stage.initialize();
 			}
@@ -707,6 +707,19 @@ Game.prototype.next_stage = function() {
 		console.warn(this.stage);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!',
 					() => {}, lang.debug_too_bad);
+	}
+};
+
+
+Game.prototype.tutorial = function() {
+	if(options.tutorial) {
+		for(let tut of this.stage.tutorials) {
+			if(!this.seen_tutorials.has(tut.name)) {
+				this.seen_tutorials.add(tut.name);
+				open_tutorial(tut);
+				break;
+			}
+		}
 	}
 };
 
@@ -803,8 +816,7 @@ Game.prototype.next_language = function(direction) {
 function Player(num) {
 	this.id = num;
 	this.iq = 2;
-	this.type = (num === SPECIES.PESCIODYPHUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.NOBODY;  // DEBUG
-	//this.type = (num === SPECIES.PURPLUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
+	this.type = (num === SPECIES.PURPLUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
 	this.individuals = 0;
 	this.toplace = 10;
 	this.tomove = 0;

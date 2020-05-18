@@ -37,7 +37,7 @@ function Init() {
 	this.tutorials = [
 		{
 			'name': 'welcome',
-			'pos': [150, 150],
+			'pos': [140, 150],
 			'arrows': [],
 			'highlight': [160, 160, 161, 161],
 		},
@@ -71,7 +71,7 @@ function Init() {
 Init.prototype.initialize = function() {
 	audio.play_music('intro');
 	this.redraw();
-	this.tutorial();
+	game.tutorial();
 };
 
 
@@ -268,19 +268,6 @@ Init.prototype.next = function() {
 	}
 
 	game.next_stage();
-};
-
-
-Init.prototype.tutorial = function() {
-	if(options.tutorial) {
-		for(let tut of this.tutorials) {
-			if(!game.seen_tutorials.has(tut.name)) {
-				game.seen_tutorials.add(tut.name);
-				open_tutorial(tut);
-				break;
-			}
-		}
-	}
 };
 
 
