@@ -68,6 +68,33 @@ function Survival() {
 
 	this.active_sounds = new Set();
 
+	this.tutorials = [
+		{
+			'name': 'survival_start',
+			'pos': [275, 100],
+			'arrows': [{dir: DIR.W, offset: 140}],
+			'highlight': [this.camera_offset[0], this.camera_offset[1], this.camera_offset[0] + this.camera_dim[0], this.camera_offset[1] + this.camera_dim[1]],
+		},
+		{
+			'name': 'survival_goals',
+			'pos': [275, 100],
+			'arrows': [],
+			'highlight': [this.camera_offset[0], this.camera_offset[1], this.camera_offset[0] + this.camera_dim[0], this.camera_offset[1] + this.camera_dim[1]],
+		},
+		{
+			'name': 'survival_time',
+			'pos': [85, 140],
+			'arrows': [{dir: DIR.E, offset: 68}, {dir: DIR.E, offset: 106}],
+			'highlight': [this.right_rect_offset[0], this.steps_offset[1] - 3, 640, this.time_offset[1] + this.time_dim[1] + 3],
+		},
+		{
+			'name': 'survival_radar',
+			'pos': [85, 30],
+			'arrows': [{dir: DIR.E, offset: 70}],
+			'highlight': [this.minimap_offset[0], this.minimap_offset[1], this.minimap_offset[0] + this.minimap_dim[0], this.minimap_offset[1] + this.minimap_dim[1]],
+		},
+	];
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -98,6 +125,7 @@ Survival.prototype.initialize = function() {
 	this.max_steps = this.steps;
 
 	this.redraw();
+	game.tutorial();
 };
 
 

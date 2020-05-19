@@ -56,6 +56,16 @@ function Ranking() {
 	this.rel_dx = [0, 106, 206, 306, 406, 504];
 	this.max_heights = [167, 128, 104, 80, 56, 32];
 
+	this.tutorials = [
+		{
+			'name': 'ranking',
+			'pos': [220, 435],
+			'low_anchor': true,
+			'arrows': [{dir: DIR.S, offset: 55}],
+			'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0], this.save_offset[1] + this.save_dim[1]],
+		},
+	];
+
 	this.clickareas = [];
 	this.rightclickareas = [];
 	this.keys = [];
@@ -87,6 +97,7 @@ Ranking.prototype.initialize = function() {
 
 	this.determine_best();
 	this.redraw();
+	game.tutorial();
 };
 
 

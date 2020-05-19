@@ -158,7 +158,7 @@ const i18n = Object.freeze({
 			survival_goals: 'Try to eat as many plants as possible. Plants that your species is adapted to will yield more nutrition. You should fill at least one food bar. In addition, you should try to reproduce by walking next to a female. Finally, try to avoid predators.',
 			survival_time: 'You have a limited amount of steps and a limited amount of time for each step. If you die, you will continue with another individual, but every death affects the distribution of your species on the world map.',
 			survival_radar: 'Use the senses of your species to see promising food patches, mating partners, other herbivores and predators. You can increase the range of the senses by mutations.',
-			catastrophe: 'Catastrophes happen every turn. They can change various aspects of the world. After the catastrophe, you should check whether your units still occupy the same plants as before. You can right click on a unit to see the plant below it.',
+			catastrophe: 'Catastrophes happen every turn. They can change various aspects of the world. You should check whether your units still occupy the same plants as before. You can right click on a unit to see the plant below it.',
 			ranking: 'Here, you can see your ranking in the world. This is also the only chance to save the game.',
 		},
 		debug_too_bad: 'Too bad!',

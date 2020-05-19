@@ -4,7 +4,6 @@ const debug1 = document.getElementById('debug1');
 
 /*
  * Master-TODO: Save/load game in browser storage and file
- * Master-TODO: Tutorial
  */
 
 const options = {
@@ -134,7 +133,7 @@ Game.prototype.start = function() {
 		blur: () => {draw_rect([545, 0], [32, 21]);}
 	});
 
-	this.clickareas.push({ // Sound
+	this.clickareas.push({ // Sound; TODO: If the sound was disabled, a popup with info should come up, explaining this. Same with music.
 		x1: 577, y1: 1,
 		x2: 597, y2: 20,
 		down: () => {draw_rect([576, 0], [22, 21], true, true);},

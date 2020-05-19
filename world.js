@@ -507,6 +507,17 @@ World.prototype.catastrophe_finish = function() {
 	this.redraw();
 
 	this.catastrophe_status = 3;
+
+	if(!game.seen_tutorials.has('catastrophe')) {
+		this.tutorials.push({
+			'name': 'catastrophe',
+			'pos': [140, 150],
+			'arrows': [],
+			'highlight': [0, 0, 640, 480],
+		});
+
+		game.tutorial();
+	}
 };
 
 
