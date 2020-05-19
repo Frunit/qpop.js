@@ -87,6 +87,8 @@ function Ranking() {
 
 
 Ranking.prototype.initialize = function() {
+	game.local_save();
+
 	audio.play_music('intro');
 	this.sprites = [];
 	for(let i = 0; i < 6; i++) {
@@ -397,6 +399,18 @@ Ranking.prototype.load_game = function() {
 
 
 Ranking.prototype.save_game = function() {
-	draw_rect(this.load_offset, this.load_dim);
+	draw_rect(this.save_offset, this.save_dim);
+	if(!game.seen_tutorials.has('save')) {
+		this.tutorials.push({
+			'name': 'save',
+			'pos': [220, 435],
+			'low_anchor': true,
+			'arrows': [{dir: DIR.S, offset: 55}],
+			'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0], this.save_offset[1] + this.save_dim[1]],
+		});
+
+		game.tutorial();
+	}
+
 	game.save_game();
 };

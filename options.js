@@ -477,6 +477,8 @@ Options.prototype.change_transition_delay = function(value) {
 		this.secondary_x_offset, this.text_y_offset + 2);
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
+
+	localStorage.setItem('transition_delay', options.transition_delay);
 };
 
 
@@ -487,6 +489,8 @@ Options.prototype.change_music_volume = function(value) {
 	if(options.music_on) {
 		audio.set_music_volume(options.music / 100);
 	}
+
+	localStorage.setItem('music', options.music);
 };
 
 
@@ -497,6 +501,8 @@ Options.prototype.change_sound_volume = function(value) {
 	if(options.sound_on) {
 		audio.set_music_volume(options.sound / 100);
 	}
+
+	localStorage.setItem('sound', options.sound);
 };
 
 
@@ -511,42 +517,57 @@ Options.prototype.change_ai_speed = function(value) {
 		this.secondary_x_offset, this.text_y_offset + 6);
 	write_text(lang.options_ai_speeds[options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
+
+	localStorage.setItem('wm_ai_delay_idx', options.wm_ai_delay_idx);
+	localStorage.setItem('wm_ai_delay', options.wm_ai_delay);
 };
 
 
 Options.prototype.toggle_auto_continue = function() {
 	options.wm_ai_auto_continue = !options.wm_ai_auto_continue;
 	this.draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
+
+	localStorage.setItem('wm_ai_auto_continue', options.wm_ai_auto_continue);
 };
 
 
 Options.prototype.toggle_click_and_hold = function() {
 	options.wm_click_and_hold = !options.wm_click_and_hold;
 	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
+
+	localStorage.setItem('wm_click_and_hold', options.wm_click_and_hold);
 };
 
 
 Options.prototype.toggle_plant_distribtion = function() {
 	options.plant_distribtion = !options.plant_distribtion;
 	this.draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
+
+	localStorage.setItem('plant_distribtion', options.plant_distribtion);
 };
 
 
 Options.prototype.toggle_show_predators = function() {
 	options.show_predators = !options.show_predators;
 	this.draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
+
+	localStorage.setItem('show_predators', options.show_predators);
 };
 
 
 Options.prototype.toggle_debug = function() {
 	options.debug = !options.debug;
 	this.draw_checkbox([this.checkbox_x, this.ys.debug], options.debug);
+
+	localStorage.setItem('debug', options.debug);
 };
 
 
 Options.prototype.toggle_tutorial = function() {
 	options.tutorial = !options.tutorial;
 	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
+
+	localStorage.setItem('tutorial', options.tutorial);
 };
 
 

@@ -2,12 +2,8 @@
 
 const debug1 = document.getElementById('debug1');
 
-/*
- * Master-TODO: Save/load game in browser storage and file
- */
-
 const options = {
-	language: 'DE', // Language of the game. Currently one of ['DE', 'EN']
+	language: 'EN', // Language of the game. Currently one of ['DE', 'EN']
 	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
@@ -158,6 +154,48 @@ Game.prototype.start = function() {
 	});
 
 	this.main();
+};
+
+
+Game.prototype.initialize = function() {
+	// GET parameter handling
+	const search_params = new URL(document.location.href.toLowerCase()).searchParams;
+
+	// If "audio" is defined and falseish, disable audio and prevent loading of audio files.
+	//   Also disable audio, if "noaudio" is defined (no matter what it is set to).
+	if(search_params.has('noaudio') || (search_params.get('audio') !== null && !parse_bool(search_params.get('audio')))) {
+		game.disable_audio();
+	}
+
+	// If "lang[uage]" is defined and set to a supported language, use that language.
+	//   Otherwise try to determine the browser language. Otherwise default to English.
+	options.language = search_params.get('lang') || search_params.get('language') || localStorage.getItem('language') || navigator.language || navigator.userLanguage;
+	options.language = options.language.substring(0, 2).toUpperCase();
+
+	if(i18n.hasOwnProperty(options.language)) {
+		lang = i18n[options.language];
+	}
+	else {
+		lang = i18n.EN;
+		options.language = 'EN';
+	}
+
+	for(let option of Object.keys(options)) {
+		if(localStorage.getItem(option) === null) {
+			localStorage.setItem(option, options[option]);
+		}
+		else if(option !== 'language') { // language is handled above
+			options[option] = localStorage.getItem(option);
+		}
+	}
+
+	const seen_tutorials = localStorage.getItem('seen_tutorials');
+	if(seen_tutorials !== null) {
+		this.seen_tutorials = new Set(JSON.parse(seen_tutorials));
+	}
+	else {
+		this.seen_tutorials = new Set();
+	}
 };
 
 
@@ -410,6 +448,67 @@ Game.prototype.select_evo_points = function() {
 	else {
 		this.evo_points = [30, 25, 20, 15, 10, 5];
 	}
+};
+
+
+Game.prototype.local_save = function() {
+	const save = {
+		'players': game.players,
+		'world_map': game.world_map,
+		'height_map': game.height_map,
+		'map_positions': game.map_positions,
+		'turn': game.turn,
+		'max_turns': game.max_turns,
+		'humans_present': game.humans_present,
+		'water_level': game.water_level,
+		'humid': game.humid,
+		'temp': game.temp,
+		'infinite_game': game.infinite_game,
+	};
+
+	let save_array = localStorage.getItem('save');
+	if(save_array === null) {
+		save_array = new Array(10).fill(null);
+	}
+	else {
+		save_array = JSON.parse(save_array);
+	}
+
+	save_array.unshift(save);
+	save_array.pop(); // remove oldest save
+
+	localStorage.setItem('save', JSON.stringify(save_array));
+};
+
+
+Game.prototype.local_load = function(num) {
+	let save_array = localStorage.getItem('save');
+	if(save_array === null) {
+		return;
+	}
+
+	save_array = JSON.parse(save_array);
+
+	if(num >= save_array.length) {
+		return;
+	}
+
+	const save = save_array[num];
+
+	game.players = save.players;
+	game.world_map = save.world_map;
+	game.height_map = save.height_map;
+	game.map_positions = save.map_positions;
+	game.turn = save.turn;
+	game.max_turns = save.max_turns;
+	game.humans_present = save.humans_present;
+	game.water_level = save.water_level;
+	game.humid = save.humid;
+	game.temp = save.temp;
+	game.infinite_game = save.infinite_game;
+
+	game.stage = new Ranking();  // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
+	game.stage.initialize();
 };
 
 
@@ -715,6 +814,7 @@ Game.prototype.tutorial = function() {
 		for(let tut of this.stage.tutorials) {
 			if(!this.seen_tutorials.has(tut.name)) {
 				this.seen_tutorials.add(tut.name);
+				localStorage.setItem('seen_tutorials', JSON.stringify([...this.seen_tutorials]));
 				open_tutorial(tut);
 				break;
 			}
@@ -766,6 +866,8 @@ Game.prototype.toggle_sound = function() {
 		}
 	}
 
+	localStorage.setItem('sound_on', options.sound_on);
+
 	game.stage.redraw();
 };
 
@@ -781,11 +883,14 @@ Game.prototype.toggle_music = function() {
 		}
 	}
 
+	localStorage.setItem('music_on', options.music_on);
+
 	game.stage.redraw();
 };
 
 
 Game.prototype.disable_audio = function() {
+	// This does not change localStorage!
 	options.music_on = false;
 	options.sound_on = false;
 	audio.set_music_volume(0);
@@ -807,6 +912,7 @@ Game.prototype.next_language = function(direction) {
 	const current_lang = lang_list.indexOf(options.language);
 
 	options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
+	localStorage.setItem('language', options.language);
 	lang = i18n[options.language];
 	game.stage.redraw();
 };
@@ -848,27 +954,5 @@ let lang = null;
 
 const version = 'pre-alpha';
 const game = new Game();
-
-// GET parameter handling
-const search_params = new URL(document.location.href.toLowerCase()).searchParams;
-
-// If "audio" is defined and falseish, disable audio and prevent loading of audio files.
-//   Also disable audio, if "noaudio" is defined (no matter what it is set to).
-if(search_params.has('noaudio') || (search_params.get('audio') !== null && !parse_bool(search_params.get('audio')))) {
-	game.disable_audio();
-}
-
-// If "lang[uage]" is defined and set to a supported language, use that language.
-//   Otherwise try to determine the browser language. Otherwise default to English.
-options.language = search_params.get('lang') || search_params.get('language') || navigator.language || navigator.userLanguage;
-options.language = options.language.substring(0, 2).toUpperCase();
-
-if(i18n.hasOwnProperty(options.language)) {
-	lang = i18n[options.language];
-}
-else {
-	lang = i18n.EN;
-	options.language = 'EN';
-}
-
+game.initialize();
 game.start();
