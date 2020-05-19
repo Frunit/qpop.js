@@ -218,7 +218,7 @@ Level.prototype.scan_world_map = function() {
 		wtable[i] *= wfactor;
 	}
 
-	for(let i = 0; i < 5; i++) {
+	for(let i = 0; i <= 5; i++) {
 		if(wtable[i] > 0) {
 			const factor = Math.floor(wtable[i]/mod_density);
 			const plant_offset = i*6;
