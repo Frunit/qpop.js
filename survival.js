@@ -383,6 +383,7 @@ Survival.prototype.render = function() {
 
 
 Survival.prototype.ai = function() {
+	// TODO: The ai is *extremely* bad in survival, at least at standard iq
 	const iq = 5 - game.current_player.iq;
 	game.current_player.experience = random_int(0, iq);
 

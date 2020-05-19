@@ -102,9 +102,9 @@ World.prototype.initialize = function() {
 	if(game.turn === 1) {
 		this.tutorials.push({
 			'name': 'wm_shadows',
-			'pos': [80, 240],
+			'pos': [80, 235],
 			'arrows': [{dir: DIR.E, offset: 100}],
-			'highlight': [this.tomove_offset[0], this.tomove_offset[1], this.tomove_offset[0] + this.minispec_delta[0]*10, this.tomove_offset[1] + this.minispec_delta[1]],
+			'highlight': [this.right_rect_offset[0], this.tomove_offset[1] - 3, 640, this.tomove_offset[1] + this.tile_dim[1] + 3],
 		});
 	}
 
