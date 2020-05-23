@@ -129,7 +129,7 @@ Game.prototype.start = function() {
 		blur: () => {draw_rect([545, 0], [32, 21]);}
 	});
 
-	this.clickareas.push({ // Sound; TODO: If the sound was disabled, a popup with info should come up, explaining this. Same with music.
+	this.clickareas.push({ // Sound
 		x1: 577, y1: 1,
 		x2: 597, y2: 20,
 		down: () => {draw_rect([576, 0], [22, 21], true, true);},
@@ -864,11 +864,16 @@ Game.prototype.toggle_sound = function() {
 		else {
 			audio.set_sound_volume(0);
 		}
+
+		localStorage.setItem('sound_on', options.sound_on);
+
+		game.stage.redraw();
+	}
+	else {
+		game.stage.redraw();
+		open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => {}, lang.close);
 	}
 
-	localStorage.setItem('sound_on', options.sound_on);
-
-	game.stage.redraw();
 };
 
 
@@ -881,11 +886,15 @@ Game.prototype.toggle_music = function() {
 		else {
 			audio.set_music_volume(0);
 		}
+
+		localStorage.setItem('music_on', options.music_on);
+
+		game.stage.redraw();
 	}
-
-	localStorage.setItem('music_on', options.music_on);
-
-	game.stage.redraw();
+	else {
+		game.stage.redraw();
+		open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => {}, lang.close);
+	}
 };
 
 
