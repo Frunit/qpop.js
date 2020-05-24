@@ -273,5 +273,5 @@ Init.prototype.next = function() {
 
 Init.prototype.load_game = function() {
 	draw_rect(this.load_offset, this.load_dim);
-	upload_dialog();
+	open_load_dialog();
 };

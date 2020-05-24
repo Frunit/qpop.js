@@ -35,6 +35,7 @@ const i18n = Object.freeze({
 		transition_survival: '',	// Fressen und gefressen werden
 		transition_world: '',		// Der Krieg der Arten
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
+		no_local_saves: 'Keine Speicherstände im Browser gefunden',
 		sound_disabled: 'Der Ton wurde komplett ausgeschaltet. Dies kann daran liegen, dass Ihr Browser keinen Ton abspielen kann oder dass „audio=no“ in der Adresszeile steht.',
 		information: 'Dies ist eine neue Version des Spiels Q-Pop, das 1995 in Deutschland veröffentlicht wurde. Diese Version sollte das Originalspiel so gut wie möglich kopieren und einige praktische Funktionen hinzufügen. Sie sollte auf allen modernen Browsern laufen, die Javascript aktiviert haben. Der Quelltext ist auf Github frei verfügbar.',
 		credits_original: [
@@ -117,6 +118,7 @@ const i18n = Object.freeze({
 		transition_survival: 'Eat and Be Eaten',
 		transition_world: 'The War of the Species',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
+		no_local_saves: 'No save games found in browser',
 		sound_disabled: 'The sound was disabled. Your browser cannot play any sound or “audio=no” is in the address bar.',
 		information: 'This game is a remake of the original Q-Pop game, released in Germany in 1995 by von Wendt Konzept GmbH. This remake should be as close as possible to the original game with some added convenience functions. It should run on all modern browsers that have Javascript enabled. The source code is freely available on Github.',
 		credits_original: [

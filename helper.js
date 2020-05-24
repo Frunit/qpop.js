@@ -94,6 +94,7 @@ const SCENE = Object.freeze({
 	TUTORIAL:       22,
 	CREDITS:        30,
 	OPTIONS:        31,
+	LOAD_GAME:      32,
 });
 
 const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46]);
@@ -198,8 +199,12 @@ function download(data, filename, type) {
 }
 
 
-function upload_dialog() {
-	// TODO: Write the upload dialog as an own class with the choice for local or file load
+function open_load_dialog() {
+	game.backstage.push(game.stage);
+	game.stage = new Load();
+	game.stage.initialize();
+
+	/* DEBUG: This is just for reference
 	const input = document.createElement('input');
 	input.type = 'file';
 	input.accept = '.qpp';
@@ -214,7 +219,7 @@ function upload_dialog() {
 		});
 	});
 
-	input.click();
+	input.click();*/
 }
 
 

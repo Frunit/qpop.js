@@ -464,6 +464,7 @@ Game.prototype.local_save = function() {
 		'humid': game.humid,
 		'temp': game.temp,
 		'infinite_game': game.infinite_game,
+		'datetime': (new Date()).toISOString(),
 	};
 
 	let save_array = localStorage.getItem('save');

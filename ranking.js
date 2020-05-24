@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO: Don't save game when it was just loaded
+
 function Ranking() {
 	this.id = SCENE.RANKING;
 	this.bg_pic = resources.get('gfx/dark_bg.png');
@@ -394,7 +396,7 @@ Ranking.prototype.next = function() {
 
 Ranking.prototype.load_game = function() {
 	draw_rect(this.load_offset, this.load_dim);
-	upload_dialog();
+	open_load_dialog();
 };
 
 
