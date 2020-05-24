@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: Don't save game when it was just loaded
 
 function Ranking() {
 	this.id = SCENE.RANKING;
@@ -88,8 +87,10 @@ function Ranking() {
 }
 
 
-Ranking.prototype.initialize = function() {
-	game.local_save();
+Ranking.prototype.initialize = function(autosave=true) {
+	if(autosave) {
+		game.local_save();
+	}
 
 	audio.play_music('intro');
 	this.sprites = [];

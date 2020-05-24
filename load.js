@@ -1,7 +1,5 @@
 'use strict';
 
-
-// TODO: LocalStorage save games must be clickable (and, hence, loadable)
 // TODO: A save game file must be uploadable
 
 
@@ -10,15 +8,17 @@ function Load() {
 	this.bg = resources.get('gfx/dark_bg.png');
 
 	// CONST_START
-	this.dim = [460, 350];
+	this.dim = [460, 284];
 	this.title_dim = [460, 21];
 	this.abort_dim = [181, 22];
 	this.button_dim = [250, 22];
 
 	this.offset = [90, 75];
 	this.title_offset = [0, 0];
-	this.abort_offset = [279, 328];
-	this.saves_offset = [8, 37];
+	this.abort_offset = [279, 262];
+	this.saves_offset = [8, 28];
+
+	this.button_y_dist = 25;
 	// CONST_END
 
 	this.clickareas = [];
@@ -63,8 +63,18 @@ Load.prototype.redraw = function() {
 			if(save_array[i] === null) {
 				break;
 			}
-			draw_rect([this.offset[0] + this.saves_offset[0], this.offset[1] + this.saves_offset[1] + (this.button_dim[1] + 3)*i], this.button_dim);
-			write_text((new Date(save_array[i].datetime)).toLocaleString(), [this.offset[0] + this.saves_offset[0] + this.button_dim[0]/2, this.offset[1] + this.saves_offset[1] + (this.button_dim[1] + 3) * i + 15], 'white', 'black');
+			draw_rect([this.offset[0] + this.saves_offset[0], this.offset[1] + this.saves_offset[1] + this.button_y_dist*i], this.button_dim);
+			write_text((new Date(save_array[i].datetime)).toLocaleString(), [this.offset[0] + this.saves_offset[0] + this.button_dim[0]/2, this.offset[1] + this.saves_offset[1] + this.button_y_dist * i + 15], 'white', 'black');
+
+			this.clickareas.push({
+				x1: this.offset[0] + this.saves_offset[0],
+				y1: this.offset[1] + this.saves_offset[1] + this.button_y_dist*i,
+				x2: this.offset[0] + this.saves_offset[0] + this.button_dim[0],
+				y2: this.offset[1] + this.saves_offset[1] + this.button_dim[1] + this.button_y_dist*i,
+				down: () => draw_rect([this.offset[0] + this.saves_offset[0], this.offset[1] + this.saves_offset[1] + this.button_y_dist*i], this.button_dim, true, true),
+				up: () => this.load(i),
+				blur: () => draw_rect([this.offset[0] + this.saves_offset[0], this.offset[1] + this.saves_offset[1] + this.button_y_dist*i], this.button_dim)
+			});
 		}
 	}
 
@@ -100,6 +110,12 @@ Load.prototype.render = function() {
 
 Load.prototype.update = function() {
 
+};
+
+
+Load.prototype.load = function(num) {
+	game.backstage = [];
+	game.local_load(num);
 };
 
 
