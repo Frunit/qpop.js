@@ -568,6 +568,12 @@ Options.prototype.toggle_tutorial = function() {
 	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
 
 	localStorage.setItem('tutorial', options.tutorial);
+
+	// Reset seen tutorials when tutorials are switched on again
+	if(options.tutorial) {
+		game.seen_tutorials = new Set();
+		localStorage.setItem('seen_tutorials', '[]');
+	}
 };
 
 

@@ -162,6 +162,7 @@ Tutorial.prototype.update = function() {
 Tutorial.prototype.next = function(abort=false) {
 	if(abort) {
 		options.tutorial = false;
+		localStorage.setItem('tutorial', false);
 	}
 	game.stage = game.backstage.pop();
 	game.stage.redraw();
