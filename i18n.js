@@ -34,6 +34,7 @@ const i18n = Object.freeze({
 		transition_mutations: '',	// Monstren und Mutationen
 		transition_survival: '',	// Fressen und gefressen werden
 		transition_world: '',		// Der Krieg der Arten
+		upload: 'qpp-Datei hochladen',
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
 		no_local_saves: 'Keine Speicherstände im Browser gefunden',
 		sound_disabled: 'Der Ton wurde komplett ausgeschaltet. Dies kann daran liegen, dass Ihr Browser keinen Ton abspielen kann oder dass „audio=no“ in der Adresszeile steht.',
@@ -117,6 +118,7 @@ const i18n = Object.freeze({
 		transition_mutations: 'Monsters and Mutants',
 		transition_survival: 'Eat and Be Eaten',
 		transition_world: 'The War of the Species',
+		upload: 'Upload qpp file',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
 		no_local_saves: 'No save games found in browser',
 		sound_disabled: 'The sound was disabled. Your browser cannot play any sound or “audio=no” is in the address bar.',

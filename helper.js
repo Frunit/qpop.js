@@ -199,30 +199,6 @@ function download(data, filename, type) {
 }
 
 
-function open_load_dialog() {
-	game.backstage.push(game.stage);
-	game.stage = new Load();
-	game.stage.initialize();
-
-	/* DEBUG: This is just for reference
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = '.qpp';
-
-	input.addEventListener('change', (event) => {
-		const file = event.target.files[0];
-		const reader = new FileReader();
-		reader.readAsArrayBuffer(file);
-
-		reader.addEventListener('load', readerEvent => {
-			game.load_game(readerEvent.target.result);
-		});
-	});
-
-	input.click();*/
-}
-
-
 function multiline(text, maxwidth) {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
@@ -483,6 +459,43 @@ function open_tutorial(tutorial) {
 	game.stage = new Tutorial(tutorial);
 	game.stage.initialize();
 }
+
+
+function open_load_dialog() {
+	game.backstage.push(game.stage);
+	game.stage = new Load();
+	game.stage.initialize();
+}
+
+
+function init_upload(e) {
+	const pos_x = e.x - canvas_pos.left;
+	const pos_y = e.y - canvas_pos.top;
+
+	// Remember to update the values here when they change in Load
+	if(pos_x >= 90 + 300 &&
+		pos_x <= 90 + 300 + 150 &&
+		pos_y >= 75 + 100 &&
+		pos_y <= 75 + 100 + 44)
+	{
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.qpp';
+
+		input.addEventListener('change', (event) => {
+			canvas.removeEventListener('mouseup', init_upload);
+			const file = event.target.files[0];
+			const reader = new FileReader();
+			reader.readAsArrayBuffer(file);
+
+			reader.addEventListener('load', readerEvent => {
+				game.load_game(readerEvent.target.result);
+			});
+		});
+
+		input.click();
+	}
+};
 
 
 function debug_draw_clickareas() {
