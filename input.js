@@ -1,5 +1,5 @@
 'use strict';
-// https://github.com/jlongster/canvas-game-bootstrap
+
 
 (function() {
 	let pressedKeys = {};

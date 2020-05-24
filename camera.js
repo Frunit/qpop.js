@@ -2,6 +2,7 @@
 
 
 // MAYBE: Camera optimization has some issues with predators when the player is not moving. left/right moving predators glitch and predators on the edge of the screen disappear suddenly (e.g. left edge going left). This is fixed by force rendering for now, but it would be nice to put optimizations in place again.
+// TODO: Sometimes, predators that move away on the edge of the screen in another direction than the player suddenly disappear (visually)
 
 
 function Camera(level, survival, tile_dim, window_dim, offset) {
