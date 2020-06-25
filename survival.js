@@ -121,7 +121,8 @@ Survival.prototype.initialize = function() {
 	this.player_started = false;
 	this.time = this.max_time;
 
-	this.steps = 40 + game.current_player.iq * 10;
+	// Higher difficulty (iq) means less steps
+	this.steps = 40 + (5 - game.current_player.iq) * 10;
 	this.max_steps = this.steps;
 
 	this.redraw();
@@ -383,8 +384,8 @@ Survival.prototype.render = function() {
 
 
 Survival.prototype.ai = function() {
-	// TODO: The ai is *extremely* bad in survival, at least at standard iq
-	const iq = 5 - game.current_player.iq;
+	// TODO: The ai is *extremely* bad in survival, independent of iq
+	const iq = game.current_player.iq;
 	game.current_player.experience = random_int(0, iq);
 
 	// MAYBE correct: This does not include the density that affects human players. For human players: Higher density -> less food

@@ -305,7 +305,7 @@ Level.prototype.generate_map = function() {
 Level.prototype.populate = function() {
 	// More predators for higher difficulty and more individuals on world map.
 	// (More individuals attract more predators.)
-	let num_predators = 30 + (5 - game.current_player.iq) * this.individuals;
+	let num_predators = 30 + game.current_player.iq * this.individuals;
 	if(num_predators > 240) {
 		num_predators = 240;
 	}

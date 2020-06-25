@@ -1,5 +1,6 @@
 'use strict';
 
+
 const debug1 = document.getElementById('debug1');
 
 const options = {
@@ -531,7 +532,9 @@ Game.prototype.save_game = function() {
 	for(let i = 0; i < game.players.length; i++) {
 		const p = game.players[i];
 		content.setUint8(0x14 + 2*i, p.type);
-		content.setUint8(0x15 + 2*i, p.iq);
+		// In original Q-Pop: iq 1 = best;  iq 4 = worst
+		// This remake:       iq 1 = worst; iq 4 = best
+		content.setUint8(0x15 + 2*i, 5 - p.iq);
 
 		const offset = 0x17 * i;
 		content.setUint8(0x20 + offset, p.stats[ATTR.ATTACK]);
@@ -634,7 +637,9 @@ Game.prototype.load_game = function(save_file) {
 	for(let i = 0; i < game.players.length; i++) {
 		const p = game.players[i];
 		p.type = content.getUint8(0x14 + 2*i + mp);
-		p.iq = content.getUint8(0x15 + 2*i + mp);
+		// In original Q-Pop: iq 1 = best;  iq 4 = worst
+		// This remake:       iq 1 = worst; iq 4 = best
+		p.iq = 5 - content.getUint8(0x15 + 2*i + mp);
 
 		const offset = 0x17 * i + mp;
 		p.stats[ATTR.ATTACK] = content.getUint8(0x20 + offset);
