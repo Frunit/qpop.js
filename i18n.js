@@ -121,7 +121,7 @@ const i18n = Object.freeze({
 		upload: 'Upload qpp file',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
 		no_local_saves: 'No save games found in browser',
-		sound_disabled: 'The sound was disabled. Your browser cannot play any sound or “audio=no” is in the address bar.',
+		sound_disabled: 'The sound was disabled. Either your browser cannot play any sound or the address bar contains “audio=no”.',
 		information: 'This game is a remake of the original Q-Pop game, released in Germany in 1995 by von Wendt Konzept GmbH. This remake should be as close as possible to the original game with some added convenience functions. It should run on all modern browsers that have Javascript enabled. The source code is freely available on Github.',
 		credits_original: [
 			['Publisher and developer', ['von Wendt Konzept GmbH']],
