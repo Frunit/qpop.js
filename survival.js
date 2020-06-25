@@ -634,9 +634,6 @@ Survival.prototype.get_adjacent = function() {
 
 
 Survival.prototype.start_movement = function(dir) {
-	if(this.movement_active) { // DEBUG
-		return;                // DEBUG
-	}                          // DEBUG
 	const char = this.level.character;
 	char.movement = dir;
 	this.delay = anim_delays.movement;
@@ -766,12 +763,17 @@ Survival.prototype.start_predator_movement = function() {
 		const dirs = this.level.get_dirs(predator.tile, predator.last_movement);
 		const target_dirs = [0, 0];
 
+		// If the player is right next to the predator, don't move.
+		if(dist === 1) {
+			predator.movement = DIR.X;
+			predator.last_movement = DIR.X;
+		}
 		// If the predator scents the player, try to get closer or don't move at all:
 		// If possible, move closer on the axis where the predator is further away.
 		// If not, move close on the other axis.
 		// If both axes are equally close, prefer DIR.N/DIR.S over DIR.E/DIR.W.
 		// If a move would put the predator further away from the player, don't move (that's not necessarily very smart, but the original behaviour).
-		if(scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance-1) > evasion)) {
+		else if(scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance-1) > evasion)) {
 			if(pos[1] - player_pos[1] > 0) {
 				target_dirs[0] = DIR.N;
 			}
@@ -1036,7 +1038,7 @@ Survival.prototype.test_movement_input = function() {
 	}
 
 	else if(input.isDown('SPACE')) {
-		this.start_movement(0);
+		this.start_movement(DIR.X);
 	}
 
 	else if(this.clickdir === 0 || (this.clickdir > 0 && this.level.is_unblocked(this.level.character.tile, this.clickdir))) {
