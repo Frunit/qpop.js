@@ -115,7 +115,6 @@ Love.prototype.render = function(ctx, dim, cpos) {
 
 
 function Fight(dir, character, opponent, player_wins, callback) {
-	// TODO: Player win animation seems to have a strange speed
 	this.dir = dir;
 	this.character = character;
 	this.opponent = opponent;
@@ -219,15 +218,10 @@ Fight.prototype.update = function() {
 
 			break;
 		case 24:
-			for(let sprite of this.sprites) {
-				if(sprite !== null) {
-					sprite.delay = anim_delays.winner;
-				}
-			}
 			this.delay = anim_delays.winner;
 			this.draw_cloud = false;
 
-			if(this.player_wins) { // TODO: Unsure if here or after frame 20
+			if(this.player_wins) { // TODO: Unsure if sound plays here or after frame 20
 				switch(this.character.species) {
 					case SPECIES.KIWIOPTERYX:
 						audio.play_sound('win_kiwi');
