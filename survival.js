@@ -227,7 +227,7 @@ Survival.prototype.draw_minimap = function() {
 	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
 
 	for(let y = -10; y < 10; y++) {
-		const real_y = this.level.character.tile[1] + y;
+		const real_y = clamp(this.level.character.tile[1] + y, 0, this.level.height - 1);
 		for(let x = -10; x < 10; x++) {
 
 			// If the range is too low, don't show anything here
@@ -235,7 +235,7 @@ Survival.prototype.draw_minimap = function() {
 				continue;
 			}
 
-			const real_x = this.level.character.tile[0] + x;
+			const real_x = clamp(this.level.character.tile[0] + x, 0, this.level.width - 1);
 			let sym;
 			let draw = false;
 
