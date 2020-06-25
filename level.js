@@ -330,7 +330,7 @@ Level.prototype.populate = function() {
 
 	// Place the player somewhere around the center
 	this.place_player([49, 49]);
-	debug_out('Player placed at: ', this.character.tile);
+	debug_out('Player placed at: ', this.character.tile[0], this.character.tile[1]);
 
 	let free_tiles = this.find_free_tiles();
 
@@ -369,9 +369,6 @@ Level.prototype.place_player = function(ideal_pos) {
 
 	const pos = random_element(this.find_free_player_tiles([ideal_pos[0] - 5, ideal_pos[1] - 5], 3, 11));
 	if(pos === null) {
-		this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
-		this.character.tile = ideal_pos;
-
 		// 65 exists more often to make it more likely to choose it
 		const empty_tiles = [65, 65, 65, 65, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79];
 
@@ -381,6 +378,9 @@ Level.prototype.place_player = function(ideal_pos) {
 				this.map[y][x] = random_element(empty_tiles);
 			}
 		}
+
+		this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
+		this.character.tile = ideal_pos;
 	}
 	else {
 		this.mobmap[pos[1]][pos[0]] = this.character;
