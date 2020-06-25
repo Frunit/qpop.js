@@ -19,7 +19,7 @@ function Camera(level, survival, tile_dim, window_dim, offset) {
 	this.x_tiles = [];
 	this.y_tiles = [];
 
-	this.cpos = [0, 0]; // Camera position in pixel
+	this.camera_pos = [0, 0]; // Camera position in pixel
 
 	this.move_to(level.character);
 	//this.update_visible_level();
@@ -30,18 +30,18 @@ Camera.prototype.move_to = function(obj) {
 	const new_x = obj.tile[0] * this.tile_dim[0] + obj.rel_pos[0] + this.tile_dim[0]/2 - Math.floor(this.cwidth/2);
 	const new_y = obj.tile[1] * this.tile_dim[1] + obj.rel_pos[1] + this.tile_dim[1]/2 - Math.floor(this.cheight/2);
 
-	if(new_x !== this.cpos[0]) {
-		this.cpos[0] = new_x;
+	if(new_x !== this.camera_pos[0]) {
+		this.camera_pos[0] = new_x;
 		this._pos_changed = true;
-		this.x_tiles = range(Math.floor(this.cpos[0] / this.tile_dim[0]),
-			Math.ceil((this.cpos[0] + this.cwidth) / this.tile_dim[0]) + 1);
+		this.x_tiles = range(Math.floor(this.camera_pos[0] / this.tile_dim[0]),
+			Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 1);
 	}
 
-	if(new_y !== this.cpos[1]) {
-		this.cpos[1] = new_y;
+	if(new_y !== this.camera_pos[1]) {
+		this.camera_pos[1] = new_y;
 		this._pos_changed = true;
-		this.y_tiles = range(Math.floor(this.cpos[1] / this.tile_dim[1]),
-			Math.ceil((this.cpos[1] + this.cheight) / this.tile_dim[1]) + 1);
+		this.y_tiles = range(Math.floor(this.camera_pos[1] / this.tile_dim[1]),
+			Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 1);
 	}
 };
 
@@ -141,8 +141,8 @@ Camera.prototype.render = function(force=false) {
 		}
 
 		this.level.bg_sprites[y][x].render(ctx,
-			[x * this.tile_dim[0] - this.cpos[0],
-			y * this.tile_dim[1] - this.cpos[1]]);
+			[x * this.tile_dim[0] - this.camera_pos[0],
+			y * this.tile_dim[1] - this.camera_pos[1]]);
 	}
 
 	for(let coord of this._movs_to_render) {
@@ -150,12 +150,12 @@ Camera.prototype.render = function(force=false) {
 		const y = coord % 100;
 		const mov = this.level.mobmap[y][x];
 		mov.sprite.render(ctx,
-			[Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.cpos[0]),
-			Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.cpos[1])]);
+			[Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.camera_pos[0]),
+			Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.camera_pos[1])]);
 	}
 
 	if(this.survival.action !== null) {
-		this.survival.action.render(ctx, this.tile_dim, this.cpos);
+		this.survival.action.render(ctx, this.tile_dim, this.camera_pos);
 	}
 
 	ctx.restore();
