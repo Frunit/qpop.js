@@ -771,6 +771,12 @@ World.prototype.ai = function() {
 			}
 		}
 	}
+
+	// In the first turn, give AI a high score for a random plant to force it to
+	// stick to that plant. The high score is removed at the end of AI movement.
+	if(game.turn === 0) {
+		game.current_player.stats[random_int(0, 5)] = 100;
+	}
 };
 
 
@@ -790,7 +796,7 @@ World.prototype.ai_step = function() {
 		}
 	}
 
-	let depth = 4 - game.current_player.iq;
+	let depth = game.current_player.iq;
 	if(game.turn === 0) {
 		depth = 4; // Make the AI smarter in the first turn to avoid islands etc.
 	}
@@ -827,6 +833,13 @@ World.prototype.ai_step = function() {
 
 
 World.prototype.ai_end = function() {
+	// The AI gets a high score for one random plant to force it to select one
+	// plant. This is reset here.
+	if(game.turn === 0) {
+		for(let i = 0; i <= 5; i++) {
+			game.current_player.stats[i] = 10;
+		}
+	}
 	game.current_player.toplace = 0;
 	game.current_player.tomove = 0;
 	this.ai_active = false;
@@ -840,13 +853,11 @@ World.prototype.ai_end = function() {
 
 World.prototype.ai_rate_move = function(x, y, depth) {
 	let value = 0;
-	let weight = 0;
-	let winning_chance = 0;
 
 	for(let xx = Math.max(1, x - depth); xx < Math.min(this.dim[0] - 1, x + depth); xx++) {
 		for(let yy = Math.max(1, y - depth); yy < Math.min(this.dim[1] - 1, y + depth); yy++) {
 			// Closer fields are more important
-			weight = depth + 1 - Math.max(Math.abs(xx - x), Math.abs(yy - y));
+			const weight = depth + 1 - Math.max(Math.abs(xx - x), Math.abs(yy - y));
 
 			// Not too close to water to protect from catastrophes
 			if(game.world_map[yy][xx] === WORLD_MAP.WATER) {
@@ -860,14 +871,14 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 				else {
 					const player = game.current_player;
 					const enemy = game.players[game.map_positions[yy][xx]];
-					winning_chance = player.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] +
+					const winning_chance = player.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] +
 						player.stats[ATTR.ATTACK] + player.stats[ATTR.INTELLIGENCE]/4 -
 						enemy.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] -
 						enemy.stats[ATTR.DEFENSE] - enemy.stats[ATTR.INTELLIGENCE]/4;
 					value += winning_chance * weight;
 				}
 			}
-			else if(game.world_map[yy][xx] > WORLD_MAP.RANGONES && game.world_map[yy][xx] <= WORLD_MAP.DESERT) {
+			else if(game.world_map[yy][xx] >= WORLD_MAP.RANGONES && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
 				value += game.players[game.current_player.id].stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] * weight;
 			}
 		}
