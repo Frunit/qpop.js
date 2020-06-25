@@ -169,7 +169,7 @@ Game.prototype.initialize = function() {
 
 	// If "lang[uage]" is defined and set to a supported language, use that language.
 	//   Otherwise try to determine the browser language. Otherwise default to English.
-	options.language = search_params.get('lang') || search_params.get('language') || localStorage.getItem('language') || navigator.language || navigator.userLanguage;
+	options.language = search_params.get('lang') || search_params.get('language') || JSON.parse(localStorage.getItem('language')) || navigator.language || navigator.userLanguage;
 	options.language = options.language.substring(0, 2).toUpperCase();
 
 	if(i18n.hasOwnProperty(options.language)) {
@@ -182,10 +182,11 @@ Game.prototype.initialize = function() {
 
 	for(let option of Object.keys(options)) {
 		if(localStorage.getItem(option) === null) {
-			localStorage.setItem(option, options[option]);
+			localStorage.setItem(option, JSON.stringify(options[option]));
 		}
-		else if(option !== 'language') { // language is handled above
-			options[option] = localStorage.getItem(option);
+		// language and seen_tutorials are handled above and below, respectively
+		else if(option !== 'language' && option !== 'seen_tutorials') {
+			options[option] = JSON.parse(localStorage.getItem(option));
 		}
 	}
 
@@ -866,7 +867,7 @@ Game.prototype.toggle_sound = function() {
 			audio.set_sound_volume(0);
 		}
 
-		localStorage.setItem('sound_on', options.sound_on);
+		localStorage.setItem('sound_on', JSON.stringify(options.sound_on));
 
 		game.stage.redraw();
 	}
@@ -888,7 +889,7 @@ Game.prototype.toggle_music = function() {
 			audio.set_music_volume(0);
 		}
 
-		localStorage.setItem('music_on', options.music_on);
+		localStorage.setItem('music_on', JSON.stringify(options.music_on));
 
 		game.stage.redraw();
 	}
@@ -922,7 +923,7 @@ Game.prototype.next_language = function(direction) {
 	const current_lang = lang_list.indexOf(options.language);
 
 	options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
-	localStorage.setItem('language', options.language);
+	localStorage.setItem('language', JSON.stringify(options.language));
 	lang = i18n[options.language];
 	game.stage.redraw();
 };
