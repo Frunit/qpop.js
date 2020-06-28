@@ -318,7 +318,7 @@ Feeding.prototype.update = function() {
 
 	const tile = this.character.tile;
 
-	if(this.frame === 2) {
+	if(this.frame === 1) {
 		this.level.eat_tile(tile);
 	}
 
