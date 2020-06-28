@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: Enemies, Females and Offspring must have randomized sprite animations
 
 function Survival() {
 	this.id = SCENE.SURVIVAL;

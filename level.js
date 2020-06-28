@@ -591,7 +591,12 @@ function Female(species, tile) {
 	this.url = 'gfx/spec' + (species+1) + '.png';
 	this.anims = anims_players[species];
 
-	this.sprite = new Sprite(this.url, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
+	if(species === SPECIES.PURPLUS) {
+		this.sprite = new RandomSprite(this.url, this.anims.female.soffset, this.anims.female.frames, this.anims.female.transitions, anim_delays.female);
+	}
+	else {
+		this.sprite = new Sprite(this.url, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
+	}
 }
 
 
@@ -606,5 +611,5 @@ function Enemy(species, tile) {
 	this.anims = anims_players[species];
 	this.defeated = this.anims.defeated;
 
-	this.sprite = new Sprite(this.url, this.anims.enem_still.soffset, this.anims.enem_still.frames, anim_delays.female);
+	this.sprite = new RandomSprite(this.url, this.anims.enem_boasting.soffset, this.anims.enem_boasting.frames, this.anims.enem_boasting.transitions, anim_delays.female);
 }

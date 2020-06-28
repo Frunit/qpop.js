@@ -36,7 +36,8 @@ const anims_players = Object.freeze([
 					},
 		female: {
 			soffset: [0, 256],
-			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]],
+			frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]], [[192, 0], [192, 0]]],
+			transitions: [[0.8, 0.9, 0.95, 1], [0.5, 0.85, 0.93, 1], [0.5, 0.57, 0.93, 1], [0.5, 0.57, 0.64, 1]],
 					},
 		female_pre_love: {
 			soffset: [0, 256],
@@ -44,7 +45,8 @@ const anims_players = Object.freeze([
 					},
 		offspring: {
 			soffset: [256, 256],
-			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [64, 0], [64, 0], [0, 0], [0, 0], [128, 0], [128, 0], [0, 0], [0, 0], [128, 0], [128, 0]],
+			frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]]],
+			transitions: [[0.7, 0.85, 1], [0.4, 0.8, 1], [0.4, 0.6, 1]],
 					},
 		quicksand: {
 			soffset: [0, 0],
@@ -63,8 +65,9 @@ const anims_players = Object.freeze([
 			frames: [[0, 0]],
 					},
 		enem_boasting: {
-			soffset: [320, 0],
-			frames: [[0, 0], [0, 64]],
+			soffset: [0, 0],
+			frames: [[[0, 0], [0, 0]], [[320, 0], [320, 0]], [[384, 0], [384, 0]]],
+			transitions: [[0.8, 0.9, 1], [0.1, 0.95, 1], [0.1, 0.15, 1]],
 					},
 		defeated: {
 			soffset: [64, 0],
@@ -106,7 +109,7 @@ const anims_players = Object.freeze([
 					},
 		female: {
 			soffset: [128, 256],
-			frames: [[0, 0], [64, 0]],
+			frames: [[0, 0], [0, 0], [64, 0], [64, 0]],
 					},
 		female_pre_love: {
 			soffset: [128, 256],
@@ -118,7 +121,7 @@ const anims_players = Object.freeze([
 					},
 		offspring: {
 			soffset: [512, 256],
-			frames: [[0, 0], [64, 0]],
+			frames: [[0, 0], [0, 0], [64, 0], [64, 0]],
 					},
 		quicksand: {
 			soffset: [0, 192],
@@ -137,8 +140,9 @@ const anims_players = Object.freeze([
 			frames: [[0, 0]],
 					},
 		enem_boasting: {
-			soffset: [320, 64],
-			frames: [[0, 0], [0, 64]],
+			soffset: [0, 64],
+			frames: [[[0, 0]], [[384, 0], [320, 0]]],
+			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 64],
@@ -180,7 +184,7 @@ const anims_players = Object.freeze([
 					},
 		female: {
 			soffset: [192, 256],
-			frames: [[0, 0], [320, 0]],
+			frames: [[0, 0], [0, 0], [320, 0], [320, 0]],
 					},
 		female_pre_love: {
 			soffset: [192, 256],
@@ -188,7 +192,7 @@ const anims_players = Object.freeze([
 					},
 		offspring: {
 			soffset: [256, 256],
-			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
+			frames: [[0, 0], [0, 0], [64, 0], [64, 0], [128, 0], [128, 0], [192, 0], [192, 0]],
 					},
 		quicksand: {
 			soffset: [64, 128],
@@ -207,8 +211,9 @@ const anims_players = Object.freeze([
 			frames: [[0, 0]],
 					},
 		enem_boasting: {
-			soffset: [320, 128],
-			frames: [[0, 0], [0, 64]],
+			soffset: [0, 128],
+			frames: [[[0, 0]], [[320, 0], [384, 0]]],
+			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 128],
@@ -277,8 +282,9 @@ const anims_players = Object.freeze([
 			frames: [[0, 0]],
 					},
 		enem_boasting: {
-			soffset: [320, 192],
-			frames: [[0, 0], [0, 64]],
+			soffset: [0, 192],
+			frames: [[[0, 0]], [[320, 0], [384, 0]]],
+			transitions: [[0.95, 1], [0.5, 1]],
 					},
 		defeated: {
 			soffset: [64, 192],
@@ -342,13 +348,14 @@ const anims_players = Object.freeze([
 			soffset: [0, 64],
 			frames: [[576, 0], [0, 64]],
 					},
-		enem_boasting: {
+		enem_still: {
 			soffset: [0, 256],
 			frames: [[0, 0]],
 					},
-		enem_still: {
-			soffset: [320, 256],
-			frames: [[0, 0], [64, 0]],
+		enem_boasting: {
+			soffset: [0, 256],
+			frames: [[[0, 0]], [[320, 0], [384, 0]]],
+			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 256],
@@ -417,8 +424,9 @@ const anims_players = Object.freeze([
 			frames: [[0, 0]],
 					},
 		enem_boasting: {
-			soffset: [320, 320],
-			frames: [[0, 0], [0, 64]],
+			soffset: [0, 320],
+			frames: [[[0, 0]], [[320, 0], [384, 0]]],
+			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 320],

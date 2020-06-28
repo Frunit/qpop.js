@@ -36,6 +36,7 @@ Sprite.prototype.update = function() {
 Sprite.prototype.reset = function() {
 	this.idx = 0;
 	this.delay_counter = 0;
+	this.fresh = true;
 	this.finished = this.frames.length === 1;
 };
 
@@ -59,4 +60,48 @@ Sprite.prototype.render = function(ctx, pos) {
 				this.size[0], this.size[1],
 				pos[0], pos[1],
 				this.size[0], this.size[1]);
+};
+
+
+function RandomSprite(url, offset=[0,0], frames=[[[0,0]]], transitions=[[1]], delay=0, size=[64, 64]) {
+	this.transitions = transitions;
+	this.finished = false;
+	this.current_idx = 0;
+	this.sprites = [];
+	for(let sprite_frames of frames) {
+		this.sprites.push(new Sprite(url, offset, sprite_frames, delay, size, true));
+	}
+	this.current_sprite = this.sprites[this.current_idx];
+}
+
+
+RandomSprite.prototype.update = function() {
+	this.current_sprite.update();
+	if(this.current_sprite.finished) {
+		const rand = Math.random();
+		const trans = this.transitions[this.current_idx];
+		for(let new_idx = 0; new_idx < trans.length; new_idx++) {
+			if(rand < trans[new_idx]) {
+				this.current_idx = new_idx;
+				this.current_sprite = this.sprites[new_idx];
+				this.current_sprite.reset();
+				break;
+			}
+		}
+	}
+};
+
+
+RandomSprite.prototype.reset = function() {
+	this.current_sprite.reset();
+};
+
+
+RandomSprite.prototype.is_new_frame = function() {
+	return this.current_sprite.is_new_frame();
+};
+
+
+RandomSprite.prototype.render = function(ctx, pos) {
+	this.current_sprite.render(ctx, pos);
 };

@@ -13,8 +13,13 @@ function Love(dir, character, partner, callback) {
 	this.draw_cloud = false;
 	this.cloud_offset = [0, 0];
 	this.sprites = [];
-	this.offspring_sprite = new Sprite(partner.url, partner.anims.offspring.soffset, partner.anims.offspring.frames, anim_delays.offspring);
 	this.pre_offspring = null;
+	if(character.species === SPECIES.PURPLUS) {
+		this.offspring_sprite = new RandomSprite(partner.url, partner.anims.offspring.soffset, partner.anims.offspring.frames, partner.anims.offspring.transitions, anim_delays.offspring);
+	}
+	else {
+		this.offspring_sprite = new Sprite(partner.url, partner.anims.offspring.soffset, partner.anims.offspring.frames, anim_delays.offspring);
+	}
 
 	this.sprites = [
 		new Sprite(partner.url, partner.anims.female_pre_love.soffset, partner.anims.female_pre_love.frames),
@@ -79,7 +84,10 @@ Love.prototype.update = function() {
 	else if(this.frame === 20) {
 		this.sprites = [];
 
-		if(this.partner.anims.hasOwnProperty('pre_offspring')) {
+		if(this.character.species === SPECIES.PURPLUS) {
+			this.sprites.push(new RandomSprite(this.partner.url, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames, this.partner.anims.offspring.transitions));
+		}
+		else if(this.partner.anims.hasOwnProperty('pre_offspring')) {
 			this.pre_offspring = new Sprite(this.partner.url, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames, 0, [64, 64], true);
 			this.sprites.push(this.pre_offspring);
 		}
@@ -249,6 +257,9 @@ Fight.prototype.update = function() {
 			}
 			break;
 		case 40:
+			if(this.final_opponent_sprite) {
+				this.final_opponent_sprite.delay = anim_delays.defeated;
+			}
 			this.finished = true;
 			break;
 	}

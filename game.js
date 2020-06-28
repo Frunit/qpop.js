@@ -991,7 +991,7 @@ canvas.addEventListener('contextmenu', function(e) {
 
 let lang = null;
 
-const version = [0, 8, 0];
+const version = [0, 8, 1];
 const game = new Game();
 game.initialize();
 game.start();
