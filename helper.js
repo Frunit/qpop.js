@@ -262,7 +262,7 @@ function draw_base() {
 
 	// Middle
 	draw_rect([21, 0], [525, 21]);
-	write_text(lang.title + ' ' + version, [320, 14], 'white', 'black');
+	write_text(lang.title + ' v' + version.join('.'), [320, 14], 'white', 'black');
 
 	// Language
 	draw_rect([545, 0], [32, 21]);

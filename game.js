@@ -168,9 +168,18 @@ Game.prototype.initialize = function() {
 		game.disable_audio();
 	}
 
+	if(localStorage.getItem('version') === null) {
+		// Clear localStorage for beta testers to avoid errors due to JSON parsing
+		localStorage.clear();
+		localStorage.setItem('version', JSON.stringify(version))
+	}
+	else if(JSON.parse(localStorage.getItem('version')) !== version) {
+		localStorage.setItem('version', JSON.stringify(version))
+	}
+
 	// If "lang[uage]" is defined and set to a supported language, use that language.
 	//   Otherwise try to determine the browser language. Otherwise default to English.
-	options.language = search_params.get('lang') || search_params.get('language') || JSON.parse(localStorage.getItem('language')) || navigator.language || navigator.userLanguage;
+	options.language = search_params.get('lang') || search_params.get('language') || (localStorage.getItem('language') && JSON.parse(localStorage.getItem('language'))) || navigator.language || navigator.userLanguage;
 	options.language = options.language.substring(0, 2).toUpperCase();
 
 	if(i18n.hasOwnProperty(options.language)) {
@@ -982,7 +991,7 @@ canvas.addEventListener('contextmenu', function(e) {
 
 let lang = null;
 
-const version = 'pre-alpha';
+const version = [0, 8, 0];
 const game = new Game();
 game.initialize();
 game.start();
