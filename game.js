@@ -198,6 +198,20 @@ Game.prototype.initialize = function() {
 	else {
 		this.seen_tutorials = new Set();
 	}
+
+	if(options.music_on) {
+		audio.set_music_volume(options.music / 100);
+	}
+	else {
+		audio.set_music_volume(0);
+	}
+
+	if(options.sound_on) {
+		audio.set_sound_volume(options.sound / 100);
+	}
+	else {
+		audio.set_sound_volume(0);
+	}
 };
 
 
