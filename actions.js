@@ -221,7 +221,7 @@ Fight.prototype.update = function() {
 			this.delay = anim_delays.winner;
 			this.draw_cloud = false;
 
-			if(this.player_wins) { // TODO: Unsure if sound plays here or after frame 20
+			if(this.player_wins) {
 				switch(this.character.species) {
 					case SPECIES.KIWIOPTERYX:
 						audio.play_sound('win_kiwi');
@@ -248,7 +248,7 @@ Fight.prototype.update = function() {
 				}
 			}
 			break;
-		case 56:
+		case 40:
 			this.finished = true;
 			break;
 	}
