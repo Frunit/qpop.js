@@ -384,7 +384,6 @@ Survival.prototype.render = function() {
 
 
 Survival.prototype.ai = function() {
-	// TODO: The ai is *extremely* bad in survival, independent of iq
 	const iq = game.current_player.iq;
 	game.current_player.experience = random_int(0, iq);
 
@@ -394,20 +393,21 @@ Survival.prototype.ai = function() {
 	for(let x = 1; x <= 26; x++) {
 		for(let y = 1; y <= 26; y++) {
 			if(game.map_positions[y][x] === game.current_player.id) {
-				food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[game.world_map[y][x]] / (3 * this.eating_div);
+				food += (20 + iq*20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[game.world_map[y][x] - 1] / 3;
 			}
 		}
 	}
 
 	food = Math.floor(food / game.current_player.individuals);
 
-	if(food > 40) {
-		food = 40;
+	if(food > 1480) {
+		food = 1480;
 	}
+	game.current_player.eaten = food;
 
-	let death = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5;
+	let deaths = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5;
 	let saved = 0;
-	for(let i = 0; i < death; i++) {
+	for(let i = 0; i < deaths; i++) {
 		if(random_int(0, 600) < game.current_player.stats[ATTR.SPEED] ||
 				random_int(0, 300) < game.current_player.stats[ATTR.CAMOUFLAGE] ||
 				random_int(0, 1000) < game.current_player.stats[ATTR.INTELLIGENCE] ||
@@ -417,40 +417,10 @@ Survival.prototype.ai = function() {
 			saved++;
 		}
 	}
+	game.current_player.deaths = deaths - saved;
 
-	death -= saved;
-	let death_prob = death * 0.05;
-	if(food < 20) {
-		death_prob += (20 - food) * 0.05;
-	}
-	if(death_prob > 0.9) {
-		death_prob = 0.9;
-	}
-
-	for(let x = 1; x <= 26; x++) {
-		for(let y = 1; y <= 26; y++) {
-			if(game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
-				game.map_positions[y][x] = -1;
-				game.current_player.individuals--;
-			}
-		}
-	}
-
-	// This does not take into account density. For a human player: Higher density > more females
-	let loved = random_int(0, iq * 2 + 2);
-	if(food > 20) {
-		loved += Math.floor((food - 20) / 10);
-	}
-
-	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATTR.REPRODUCTION] / 20);
-	if(game.current_player.toplace > 20) {
-		game.current_player.toplace = 20;
-	}
-	else if(game.current_player.toplace < loved) {
-		game.current_player.toplace = loved;
-	}
-
-	game.current_player.tomove = Math.floor(game.current_player.stats[ATTR.SPEED] / 5);
+	// MAYBE correct: This does not take into account density. For a human player: Higher density > more females
+	game.current_player.loved = random_int(0, iq * 2 + 2);
 
 	this.next_popup(1);
 };
@@ -765,7 +735,7 @@ Survival.prototype.start_predator_movement = function() {
 		const target_dirs = [0, 0];
 
 		// If the player is right next to the predator, don't move.
-		if(dist === 1) {
+		if(dx + dy === 1) {
 			predator.movement = DIR.X;
 			predator.last_movement = DIR.X;
 		}
