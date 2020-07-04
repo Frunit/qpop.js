@@ -102,7 +102,7 @@ const i18n = Object.freeze({
 		iqs: ['Charles Darwin', 'Darwin’s helper', 'Darwin’s aunt', 'Darwin’s dog'],
 		popup_title: 'Q-POP Security Service',
 		catastrophe: 'Catastrophe',
-		turns: ['5 turns', '10 turns', '20 turns', 'To the bitter end'],  // In original, the texts have some more info
+		turns: ['Short (5 turns)', 'Medium (10 turns)', 'Long (20 turns)', 'To the bitter end'],
 		turn_finished: 'Is your turn really finished?',
 		dead: 'Sorry, but you’re history now!\nYour species is gone...',
 		last_turn: 'Gong! The last turn begins!',
@@ -112,7 +112,7 @@ const i18n = Object.freeze({
 		suicide: 'Do you really want to kill this individual?',
 		game_over: 'IT’S ALL OVER NOW!!\nAll human players are dead, the game is over!',
 		evo_score: 'Evolution Score',
-		traits: ['Adaption to Rangones', 'Adaption to Blueleaf', 'Adaption to Hushrooms', 'Adaption to Stinkballs', 'Adaption to Snakeroots', 'Adaption to Firegrass', 'Reproduction Rate', 'Attack Strength', 'Defense Strength', 'Camouflage', 'Speed', 'Perception', 'Intelligence'],
+		traits: ['Adaption to Rangones', 'Adaption to Blueleaf', 'Adaption to Hushrooms', 'Adaption to Stinkballs', 'Adaption to Snakeroots', 'Adaption to Firegrass', 'Reproduction Rate', 'Attack Strength', 'Defence Strength', 'Camouflage', 'Speed', 'Perception', 'Intelligence'],
 		transition_mutations: 'Monsters and Mutants',
 		transition_survival: 'Eat and Be Eaten',
 		transition_world: 'The War of the Species',
