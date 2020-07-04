@@ -59,7 +59,6 @@ const i18n = Object.freeze({
 		options_click_hold: 'Maustaste gedrückt halten um Einheiten auf der Weltkarte zu platzieren',
 		options_plants: 'Verteilung eigener Pflanzen auf Mutationsübersicht zeigen',
 		options_predators: 'Besiegte Fleischfresser als Symbole in der Überlebensphase zeigen',
-		options_debug: 'Debugging information in der Browserconsole zeigen (nur Englisch)',
 		options_tutorial: 'Tutorial zum Spiel anzeigen',
 		options_ai_speed: 'Computergeschwindigkeit auf der Weltkarte',
 		options_ai_speeds: ['extrem langsam', 'sehr langsam', 'langsam', 'schnell', 'augenblicklich'],
@@ -84,7 +83,6 @@ const i18n = Object.freeze({
 			ranking: 'Hier kannst du den Erfolg der verschiedenen Spezies sehen. Außerdem wird das Spiel automatisch im Browser gespeichert. Wenn du einen Spielstand runterladen willst, kannst du das hier tun.',
 			save: 'Der Spielstand, den du eben runterladen konntest, kann wieder in diesem Spiel geladen werden. Außerdem ist er kompatibel mit dem Originalspiel!',
 		},
-		debug_too_bad: 'Schade',
 	}),
 	EN: Object.freeze({
 		title: 'Q-POP',
@@ -144,7 +142,6 @@ const i18n = Object.freeze({
 		options_click_hold: 'Click and hold to place or remove units from world map',
 		options_plants: 'Show distribution of plants on mutation screen',
 		options_predators: 'Show vanquished predator symbols in survival',
-		options_debug: 'Show debugging info in the browser console', // For non-English, please note that the debugging info is in English only!
 		options_tutorial: 'Show game tutorial',
 		options_ai_speed: 'AI speed on world map',
 		options_ai_speeds: ['extremly slow', 'very slow', 'slow', 'fast', 'instantaneous'],
@@ -169,6 +166,5 @@ const i18n = Object.freeze({
 			ranking: 'Here, you can see your ranking in the world. In addition, the game is automatically saved in the browser. If you want to download a savegame, you can do that here.',
 			save: 'The savegame you were just offered can be loaded again in this game. But it is also compatible with the original game!',
 		},
-		debug_too_bad: 'Too bad!',
 	}),
 });

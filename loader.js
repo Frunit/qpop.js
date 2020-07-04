@@ -427,7 +427,6 @@ Loader.prototype.finished_postloading = function(self) {
 	if(game.stage.id === SCENE.LOADING) {
 		self.phase = 3;
 		self.percentage = 100;
-		debug_out('All resources finished loading.');
 		if(resources.get_status() - self.max_size !== 0) {
 			console.warn('Expected size not real size. Diff is ' + (resources.get_status() - self.max_size) + ' Bytes');
 		}

@@ -11,7 +11,6 @@ const options = {
 	wm_click_and_hold: true, // Enable click and hold to place/remove units from world map
 	plant_distribtion: true, // Show plant distribution on mutation screen
 	show_predators: true, // Show vanquished predators in survival
-	debug: true, // Show debugging information in browser console
 	tutorial: true, // Show the tutorial
 	transition_delay: 36, // How many frames to show the transition screens
 	music_on: true,
@@ -350,7 +349,6 @@ Game.prototype.set_to_next_player = function() {
 	for(let i = this.current_player.id + 1; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player = this.players[i];
-			debug_out('Active player is: ' + this.current_player.id);
 			return true;
 		}
 	}
@@ -363,7 +361,6 @@ Game.prototype.set_to_first_player = function() {
 	for(let i = 0; i < 6; i++) {
 		if(!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
 			this.current_player = this.players[i];
-			debug_out('Active player is: ' + this.current_player.id);
 			return;
 		}
 	}
@@ -834,7 +831,7 @@ Game.prototype.next_stage = function() {
 	default:
 		console.warn(this.stage);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!',
-					() => {}, lang.debug_too_bad);
+					() => {}, 'Oh no!');
 	}
 };
 

@@ -475,7 +475,7 @@ World.prototype.catastrophe_exec = function() {
 	default:
 		console.warn(this.catastrophe_type);
 		open_popup(lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
-					() => {}, lang.debug_too_bad);
+					() => {}, 'Oh no!');
 	}
 };
 

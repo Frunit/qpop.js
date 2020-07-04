@@ -839,7 +839,6 @@ Survival.prototype.suicide = function() {
 
 
 Survival.prototype.player_death = function(delete_sprite = false) {
-	debug_out('Player ' + game.current_player.id + ' died');
 	game.current_player.deaths++;
 	if(game.current_player.deaths > 10) {
 		game.current_player.deaths = 10;
@@ -874,7 +873,6 @@ Survival.prototype.update = function() {
 		if(Math.random() <= 0.000055 &&
 				[0, 12, 18, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 119, 121].includes(this.level.map[char.tile[1]][char.tile[0]]))
 		{
-			debug_out('Quicksand!');
 			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 			this.action = new Quicksand(char, () => this.player_death(true));
 		}
@@ -888,7 +886,6 @@ Survival.prototype.update = function() {
 				(this.level.map[char.tile[1]][char.tile[0] + 1] === 65 &&
 				this.level.mobmap[char.tile[1]][char.tile[0] + 1] === null)))
 		{
-			debug_out('Electro flower!');
 			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 
 			// If the left (western) field is empty, use that. Otherwise use the right field.
