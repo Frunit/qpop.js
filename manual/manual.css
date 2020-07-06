@@ -68,11 +68,11 @@ a {
 	text-decoration: none;
 }
 
-a: visited {
+a:visited {
 	color: #1756a9;
 }
 
-a: hover {
+a:hover {
 	color: #111;
 	text-decoration: underline;
 }
