@@ -465,10 +465,10 @@ function init_upload(e) {
 	const pos_y = e.y - canvas_pos.top;
 
 	// Remember to update the values here when they change in Load
-	if(pos_x >= 90 + 300 &&
-		pos_x <= 90 + 300 + 150 &&
-		pos_y >= 75 + 100 &&
-		pos_y <= 75 + 100 + 44)
+	if(pos_x >= 120 + 8 &&
+		pos_x <= 120 + 8 + 90 &&
+		pos_y >= 65 + 28 &&
+		pos_y <= 65 + 28 + 66)
 	{
 		const input = document.createElement('input');
 		input.type = 'file';

@@ -10,10 +10,11 @@ const i18n = Object.freeze({
 		no: 'Nein',
 		turn: 'Runde',
 		close: 'Schließen',
-		load_game: 'Lade Spielstand',
-		save_game: 'Speichere Spielstand',
+		load_game: 'Spielstand laden',
+		save_game: 'Spielstand speichern',
 		start_game: 'Spiel starten',
 		loading: 'lädt',
+		load: 'laden',
 		player: 'Spieler {num}',
 		species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
 		iq: 'IQ',
@@ -34,6 +35,7 @@ const i18n = Object.freeze({
 		transition_mutations: '',	// Monstren und Mutationen
 		transition_survival: '',	// Fressen und gefressen werden
 		transition_world: '',		// Der Krieg der Arten
+		upload_description: 'Hier können Sie einen originalen oder heruntergeladenen Speicherstand laden.',
 		upload: 'qpp-Datei hochladen',
 		not_a_savegame: 'Die Datei ist kein gültiger Q-Pop-Speicherstand.',
 		no_local_saves: 'Keine Speicherstände im Browser gefunden',
@@ -96,6 +98,7 @@ const i18n = Object.freeze({
 		save_game: 'Save game',
 		start_game: 'start game',
 		loading: 'loading',
+		load: 'load',
 		player: 'Player {num}',
 		species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
 		iq: 'IQ',
@@ -116,6 +119,7 @@ const i18n = Object.freeze({
 		transition_mutations: 'Monsters and Mutants',
 		transition_survival: 'Eat and Be Eaten',
 		transition_world: 'The War of the Species',
+		upload_description: 'Here, you can upload an original or downloaded savegame.',
 		upload: 'Upload qpp file',
 		not_a_savegame: 'The file is not a valid Q-Pop save game.',
 		no_local_saves: 'No save games found in browser',
