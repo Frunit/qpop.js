@@ -90,7 +90,8 @@ Credits.prototype.redraw = function() {
 	});
 
 	// Credits for original game
-	let line = 0;
+	let line = 1;
+	write_text('1995', [this.left_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.left_panel_offset[1]], '#000000', '#ffffff', 'right');
 	for(let i = 0; i < lang.credits_original.length; i++) {
 		write_text(lang.credits_original[i][0], [this.text_rel_offset[0] + this.left_panel_offset[0], this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 		line++;
@@ -101,7 +102,8 @@ Credits.prototype.redraw = function() {
 	}
 
 	// Credits for remake
-	line = 0;
+	line = 1;
+	write_text('2020', [this.right_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.right_panel_offset[1]], '#000000', '#ffffff', 'right');
 	for(let i = 0; i < lang.credits_remake.length; i++) {
 		write_text(lang.credits_remake[i][0], [this.text_rel_offset[0] + this.right_panel_offset[0], this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 		line++;
