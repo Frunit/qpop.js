@@ -76,7 +76,9 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug1.value = 'FPS: ' + this.frames;
+		if(debug1 !== null) {
+			debug1.value = 'FPS: ' + this.frames;
+		}
 		this.frames = 0;
 		this.last_fps = now;
 	}
