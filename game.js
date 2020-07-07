@@ -85,8 +85,7 @@ Game.prototype.update_fps = function(now) {
 };
 
 
-Game.prototype.start = function() {
-	ctx.font = 'bold 12px sans-serif';
+Game.prototype.reset = function() {
 	this.players = [];
 	for(let i = 0; i < 6; i++) {
 		this.players.push(new Player(i));
@@ -103,6 +102,11 @@ Game.prototype.start = function() {
 	this.height_map = null;
 	this.world_map = null;
 	this.map_positions = null;
+};
+
+
+Game.prototype.start = function() {
+	ctx.font = 'bold 12px sans-serif';
 	this.stage = new Loader();
 	this.stage.initialize();
 	this.last_time = Date.now();
@@ -758,6 +762,7 @@ Game.prototype.next_stage = function() {
 		this.stage.initialize();
 		break;
 	case SCENE.INTRO: // Intro
+	case SCENE.OUTRO: // Outro (restart game without reloading)
 		this.stage = new Init(this.players);
 		this.stage.initialize();
 		break;
@@ -828,12 +833,10 @@ Game.prototype.next_stage = function() {
 			this.stage.initialize();
 		}
 		break;
-	case SCENE.OUTRO: // Outro
-		// This should never happen
 	default:
+		// This should never happen
 		console.warn(this.stage);
-		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!',
-					() => {}, 'Oh no!');
+		open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!', () => {}, 'Oh no!');
 	}
 };
 

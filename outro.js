@@ -1,8 +1,6 @@
 'use strict';
 
 
-// MAYBE: At the moment, the outro is not cancelable. Should it be? What should happen?
-// MAYBE: Allow restart without reloading the page.
 // MAYBE: Add me/Frunit to the credits in the outro
 
 
@@ -35,13 +33,28 @@ Outro.prototype.initialize = function() {
 Outro.prototype.redraw = function() {
 	draw_base();
 
-	this.clickareas = game.clickareas.slice();
-	this.rightclickareas = game.rightclickareas.slice();
-
 	draw_rect([0, 20], [640, 460]); // Main rectangle
 
 	// Inverted rectangle around the picture
 	draw_inv_rect([this.anim_offset[0] - 1, this.anim_offset[1] - 1], [this.anim_dim[0] + 2, this.anim_dim[1] + 2]);
+
+	this.clickareas = game.clickareas.slice();
+	this.rightclickareas = game.rightclickareas.slice();
+
+	this.clickareas.push({
+		x1: this.anim_offset[0],
+		y1: this.anim_offset[1],
+		x2: this.anim_offset[0] + this.anim_dim[0],
+		y2: this.anim_offset[1] + this.anim_dim[1],
+		down: () => {},
+		up: () => game.next_stage(),
+		blur: () => {}
+	});
+
+	this.keys = [
+		{'key': 'ENTER', 'action': () => game.next_stage(), 'reset': true},
+		{'key': 'ESCAPE', 'action': () => game.next_stage(), 'reset': true},
+	];
 };
 
 
@@ -51,7 +64,10 @@ Outro.prototype.render = function() {
 
 
 Outro.prototype.update = function() {
-	if(!this.animation.has_stopped) {
+	if(this.animation.has_stopped) {
+		game.next_stage();
+	}
+	else {
 		this.animation.step();
 	}
 };
