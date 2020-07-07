@@ -240,6 +240,15 @@ World.prototype.redraw = function() {
 
 	// Picture of current species
 	this.draw_avatar();
+	this.clickareas.push({
+		x1: this.spec_offset[0],
+		y1: this.spec_offset[1],
+		x2: this.spec_offset[0] + this.spec_dim[0],
+		y2: this.spec_offset[1] + this.spec_dim[1],
+		down: () => this.avatar_click(),
+		up: () => this.avatar_clickup(),
+		blur: () => this.avatar_clickup(),
+	});
 
 	// Bar with number of individuals
 	this.draw_bar();
@@ -256,7 +265,7 @@ World.prototype.redraw = function() {
 World.prototype.render = function() {
 	if(this.animation) {
 		for(let pos of this.animation_pos) {
-			this.redraw_wm_part(pos[0], pos[1], false);
+			this.draw_wm_part(pos[0], pos[1], false);
 		}
 		this.animation.render(ctx, [this.map_offset[0] + this.animation_pos[0][0]*this.tile_dim[0], this.map_offset[1] + this.animation_pos[0][1]*this.tile_dim[1]]);
 	}
@@ -582,7 +591,7 @@ World.prototype.take_individual = function(x, y) {
 	game.current_player.individuals--;
 	this.draw_bar();
 	this.draw_minispec();
-	this.redraw_wm_part(x, y);
+	this.draw_wm_part(x, y);
 };
 
 
@@ -611,7 +620,7 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 		game.current_player.individuals++;
 	}
 	game.current_player.toplace--;
-	this.redraw_wm_part(x, y);
+	this.draw_wm_part(x, y);
 	this.draw_bar();
 	this.draw_minispec();
 
@@ -641,7 +650,7 @@ World.prototype.set_individual = function(x, y) {
 	game.current_player.individuals++;
 	this.draw_bar();
 	this.draw_minispec();
-	this.redraw_wm_part(x, y);
+	this.draw_wm_part(x, y);
 };
 
 
@@ -659,7 +668,7 @@ World.prototype.wm_rightclick = function(x, y, raw = true) {
 
 	// Clicked on individual -> hide it
 	if(game.map_positions[y][x] >= 0) {
-		this.redraw_wm_part(x, y, false);
+		this.draw_wm_part(x, y, false);
 	}
 };
 
@@ -670,7 +679,7 @@ World.prototype.wm_rightclickup = function() {
 		this.wm_rightclickpos = null;
 
 		// Show the individual again
-		this.redraw_wm_part(x, y, true);
+		this.draw_wm_part(x, y, true);
 	}
 };
 
@@ -740,6 +749,16 @@ World.prototype.wm_move = function(x, y) {
 			this.wm_click(x, y, false);
 		}
 	}
+};
+
+
+World.prototype.avatar_click = function() {
+	this.draw_worldmap(true);
+};
+
+
+World.prototype.avatar_clickup = function() {
+	this.draw_worldmap(false);
 };
 
 
@@ -1079,16 +1098,16 @@ World.prototype.draw_minispec = function() {
 };
 
 
-World.prototype.draw_worldmap = function() {
+World.prototype.draw_worldmap = function(shadow=false) {
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
-			this.redraw_wm_part(x, y, true);
+			this.draw_wm_part(x, y, true, shadow);
 		}
 	}
 };
 
 
-World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
+World.prototype.draw_wm_part = function(x, y, show_spec=true, shadow=false) {
 	let tile = 0;
 	if(game.world_map[y][x] === WORLD_MAP.WATER) {
 		tile = this.coast_tile(x, y);
@@ -1106,11 +1125,18 @@ World.prototype.redraw_wm_part = function(x, y, show_spec=true) {
 		this.tile_dim[0], this.tile_dim[1]);
 
 	if(show_spec && game.map_positions[y][x] >= 0) {
+		const shadow_offset = shadow ? 6 : 0;
+
+		ctx.save();
+		ctx.globalAlpha = shadow ? 0.3 : 1;
+
 		ctx.drawImage(this.map_pics,
-			this.minispec_soffset[0] + this.tile_dim[0]*game.map_positions[y][x], this.minispec_soffset[1],
+			this.minispec_soffset[0] + this.tile_dim[0]*(game.map_positions[y][x] + shadow_offset), this.minispec_soffset[1],
 			this.tile_dim[0], this.tile_dim[1],
 			this.map_offset[0] + x*this.tile_dim[0], this.map_offset[1] + y*this.tile_dim[1],
 			this.tile_dim[0], this.tile_dim[1]);
+
+		ctx.restore();
 	}
 };
 

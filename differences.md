@@ -37,6 +37,11 @@ When choosing the player type, you can right click to circle backwards instead o
 In the original game, you had to click for each individual to be placed. Now, you can click and hold to place multiple individuals by moving the mouse.
 
 
+#### All units on the world map can be made semitransparent
+
+On the world map, if you click on the avatar below the calendar, all units a displayed semitransparent as long as you keep the mouse button pushed. This helps to see what plants the units stand on.
+
+
 #### World map properties on the mutation screen
 
 The mutation screen now shows the distribution of own individuals among the plants of the world map to make it easier to choose the appropriate traits to improve.
