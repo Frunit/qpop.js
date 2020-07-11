@@ -487,7 +487,7 @@ function init_upload(e) {
 
 		input.click();
 	}
-};
+}
 
 
 function debug_draw_clickareas() {

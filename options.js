@@ -26,7 +26,6 @@ function Options() {
 	this.bar_soffset = [0, 64];
 	this.emptybar_soffset = [300, 80];
 
-	this.max_text_width = 600;
 	this.line_height = 20;
 	this.last_bit_width = 3;
 	this.checkbox_x = 30;

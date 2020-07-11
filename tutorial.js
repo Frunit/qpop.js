@@ -4,7 +4,6 @@
 function Tutorial(tut) {
 	this.id = SCENE.TUTORIAL;
 	this.bg = resources.get('gfx/dark_bg.png');
-	this.sym_x = resources.get('gfx/gui.png');
 	this.gfx = resources.get('gfx/tutorial.png');
 
 	// CONST_START

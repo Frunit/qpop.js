@@ -176,10 +176,10 @@ Game.prototype.initialize = function() {
 	if(localStorage.getItem('version') === null) {
 		// Clear localStorage for beta testers to avoid errors due to JSON parsing
 		localStorage.clear();
-		localStorage.setItem('version', JSON.stringify(version))
+		localStorage.setItem('version', JSON.stringify(version));
 	}
 	else if(JSON.parse(localStorage.getItem('version')) !== version) {
-		localStorage.setItem('version', JSON.stringify(version))
+		localStorage.setItem('version', JSON.stringify(version));
 	}
 
 	// If "lang[uage]" is defined and set to a supported language, use that language.

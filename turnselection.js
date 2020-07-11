@@ -46,7 +46,7 @@ function Turnselection() {
 			'arrows': [],
 			'highlight': [95, 328, 538, 371],
 		},
-	]
+	];
 
 	this.clickareas = [];
 	this.rightclickareas = [];
