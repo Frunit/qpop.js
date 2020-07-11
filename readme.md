@@ -9,7 +9,7 @@ Furthermore, I tried to stick to the original game as closely as possible except
 
 I would be happy to see pull requests and other constructive input from you! Any translations would also be very welcome! Please have a look at [i18n.js](i18n.js).
 
-The licensing is a bit complicated. I did not decide on a license for the code, but it will be an open license. The images and sounds are taken straight from the game and just reformated to a modern format. I managed to contact two of the three original creators of the game (Karl-L. von Wendt and Lars Hammer) and both allowed me to use any game resources for fair and non-profit use. I could not reach the third member of the team, Stefan Beyer, who did the wonderful graphics. Stefan, if you read this, please contact me (qpop¤frunit.de).
+The licensing is a bit complicated. The code is released under the [MIT license](LICENSE_CODE). The images and sounds are taken straight from the game and just reformated to a modern format. I managed to contact two of the three original creators of the game (Karl-L. von Wendt and Lars Hammer) and both allowed me to use any game resources for fair and non-profit use. I could not reach the third member of the team, Stefan Beyer, who did the wonderful graphics. Stefan, if you read this, please contact me (qpop¤frunit.de).
 
 I made an own repository for the original graphics here: [github.com/Frunit/qpop-ressourcen](https://github.com/Frunit/qpop-ressourcen)
 
