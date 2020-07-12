@@ -497,7 +497,7 @@ function handle_visibility_change() {
 
 	game.toggle_pause(document.hidden);
 
-};
+}
 
 /*
 function debug_draw_clickareas() {
