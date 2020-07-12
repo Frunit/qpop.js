@@ -858,6 +858,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	this.movement_active = false;
 	this.movement_just_finished = true;
 	this.delay_counter = 0;
+	this.time = this.max_time;
 	this.camera.move_to(char);
 };
 
@@ -876,7 +877,6 @@ Survival.prototype.update = function() {
 			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 			this.action = new Quicksand(char, () => this.player_death(true));
 		}
-
 
 		// Test for Electro flower
 		// The field left or right must be empty (tile 65) and no unit may be on it
