@@ -8,6 +8,7 @@
 	const load_status = {};
 	let loaded = 0;
 	let audio_enabled = true;
+	let initial_play = true;
 
 	let best_audio_suffix = null;
 	const context = new AudioContext();
@@ -150,8 +151,12 @@
 	}
 
 	function play_music(name) {
-		if(context.state === 'suspended') {
-			context.resume();
+		if(initial_play) {
+			initial_play = false;
+
+			if(context.state === 'suspended') {
+				context.resume();
+			}
 		}
 
 		if(currently_playing_music) {
@@ -161,7 +166,6 @@
 
 			musics[currently_playing_music].stop();
 		}
-
 
 		musics[name] = context.createBufferSource();
 		musics[name].connect(music_node).connect(context.destination);
@@ -174,8 +178,12 @@
 	}
 
 	function play_sound(name, loop=false) {
-		if(context.state === 'suspended') {
-			context.resume();
+		if(initial_play) {
+			initial_play = false;
+
+			if(context.state === 'suspended') {
+				context.resume();
+			}
 		}
 
 		if(currently_playing_sounds.has(name)) {
@@ -224,6 +232,18 @@
 		sound_node.gain.value = volume;
 	}
 
+	function pause() {
+		if(context.state === 'running') {
+			context.suspend();
+		}
+	}
+
+	function unpause() {
+		if(context.state === 'suspended') {
+			context.resume();
+		}
+	}
+
 	function disable_audio() {
 		audio_enabled = false;
 	}
@@ -240,6 +260,8 @@
 		play_sound: play_sound,
 		stop_music: stop_music,
 		stop_sound: stop_sound,
+		pause: pause,
+		unpause: unpause,
 		set_music_volume: set_music_volume,
 		set_sound_volume: set_sound_volume,
 		get_suffix: get_suffix,

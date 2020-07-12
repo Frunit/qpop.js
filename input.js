@@ -12,27 +12,30 @@
 		switch(code) {
 		case 'Space':
 		case ' ': // Older browsers: also 'Spacebar'
-			key = 'SPACE'; break; // ' ' 1B
+			key = 'SPACE'; break;
 		case 'Enter':
-			key = 'ENTER'; break; // '⏎' 3B
+			key = 'ENTER'; break;
 		case 'Escape': // Older browsers: also 'Esc'
-			key = 'ESCAPE'; break; // '␛' 3B
+			key = 'ESCAPE'; break;
 		case 'KeyA':
 		case 'ArrowLeft':
 		case 'a':
-			key = 'LEFT'; break; // '←' 3B
+			key = 'LEFT'; break;
 		case 'KeyW':
 		case 'ArrowUp':
 		case 'w':
-			key = 'UP'; break; // '↑' 3B
+			key = 'UP'; break;
 		case 'KeyD':
 		case 'ArrowRight':
 		case 'd':
-			key = 'RIGHT'; break; // '→' 3B
+			key = 'RIGHT'; break;
 		case 'KeyS':
 		case 'ArrowDown':
 		case 's':
-			key = 'DOWN'; break; // '↓' 3B
+			key = 'DOWN'; break;
+		case 'KeyP':
+		case 'p':
+			key = 'PAUSE'; break;
 		}
 
 		pressedKeys[key] = status;
@@ -59,7 +62,7 @@
 		else if(e.button === 2) {
 			pressedKeys['RCLICK'] = mousePos;
 		}
-		pressedKeys['MOUSE'] = true; // '🖰' 4B
+		pressedKeys['MOUSE'] = true;
 	});
 
 	canvas.addEventListener('mousemove', setMousePos);

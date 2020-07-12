@@ -27,6 +27,7 @@ function Game() {
 	this.last_fps = 0;
 	this.frames = 0;
 	this.time = 0;
+	this.paused = false;
 	this.clicked_element = null;
 	this.right_clicked_element = null;
 	this.stage = null;
@@ -57,16 +58,18 @@ Game.prototype.main = function() {
 
 	this.handle_input();
 
-	this.time += (now - this.last_time) / 1000;
-	if(this.time > options.update_freq) {
-		this.time %= options.update_freq;
-		this.stage.update();
-		this.stage.render();
+	if(!this.paused) {
+		this.time += (now - this.last_time) / 1000;
+		if(this.time > options.update_freq) {
+			this.time %= options.update_freq;
+			this.stage.update();
+			this.stage.render();
+		}
+
+		this.update_fps(now);
+
+		this.last_time = now;
 	}
-
-	this.update_fps(now);
-
-	this.last_time = now;
 
 	requestAnimationFrame(() => this.main());
 };
@@ -328,6 +331,10 @@ Game.prototype.handle_input = function() {
 		}
 	}
 
+	if(input.isDown('PAUSE')) {
+		input.reset('PAUSE');
+		this.toggle_pause();
+	}
 
 	for(let key of game.stage.keys) {
 		if(input.isDown(key.key)) {
@@ -851,6 +858,18 @@ Game.prototype.tutorial = function() {
 				break;
 			}
 		}
+	}
+};
+
+
+Game.prototype.toggle_pause = function(force=null) {
+	if(game.paused === true || force === false) {
+		game.paused = false;
+		audio.unpause();
+	}
+	else {
+		game.paused = true;
+		audio.pause();
 	}
 };
 
