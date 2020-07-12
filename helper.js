@@ -166,6 +166,7 @@ function parse_bool(s) {
 
 
 function clamp(num, min, max) {
+	// Ensure num is between min and max (both inclusive)
 	return num <= min ? min : (num >= max ? max : num);
 }
 
@@ -489,7 +490,16 @@ function init_upload(e) {
 	}
 }
 
+function handle_visibility_change() {
+	if(game === undefined) {
+		return;
+	}
 
+	game.toggle_pause(document.hidden);
+
+};
+
+/*
 function debug_draw_clickareas() {
 	ctx.save();
 	ctx.fillStyle = '#0000ff';
@@ -498,3 +508,4 @@ function debug_draw_clickareas() {
 	}
 	ctx.restore();
 }
+*/

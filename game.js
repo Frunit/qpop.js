@@ -862,14 +862,16 @@ Game.prototype.tutorial = function() {
 };
 
 
-Game.prototype.toggle_pause = function(force=null) {
-	if(game.paused === true || force === false) {
-		game.paused = false;
-		audio.unpause();
+Game.prototype.toggle_pause = function(force_pause=null) {
+	if(force_pause === null) {
+		game.paused = !game.paused;
 	}
-	else {
-		game.paused = true;
+
+	if(game.paused || force_pause === true) {
 		audio.pause();
+	}
+	else if(!game.paused) {
+		audio.unpause();
 	}
 };
 
@@ -1009,6 +1011,8 @@ canvas.addEventListener('contextmenu', function(e) {
 	e.preventDefault();
 	return false;
 });
+
+document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 

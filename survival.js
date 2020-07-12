@@ -483,13 +483,6 @@ Survival.prototype.update_environment_sound = function() {
 	const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x));
 	const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x));
 
-	if(to_stop.length) {
-		console.log('to_stop', to_stop); // DEBUG
-	}
-	if(to_start.length) {
-		console.log('to_start', to_start); // DEBUG
-	}
-
 	for(let sound of to_stop) {
 		audio.stop_sound(sound);
 	}
