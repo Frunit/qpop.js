@@ -48,7 +48,7 @@ function Love(dir, character, partner, callback) {
 			break;
 		case DIR.E:
 			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
-			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.frames, true);
+			this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
 			this.cloud_offset = [14, 0];
 			break;
 	}
