@@ -55,6 +55,8 @@ Outro.prototype.redraw = function() {
 		{'key': 'ENTER', 'action': () => game.next_stage(), 'reset': true},
 		{'key': 'ESCAPE', 'action': () => game.next_stage(), 'reset': true},
 	];
+
+	this.render();
 };
 
 
