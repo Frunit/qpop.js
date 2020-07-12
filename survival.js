@@ -126,6 +126,7 @@ Survival.prototype.initialize = function() {
 
 	this.redraw();
 	game.tutorial();
+	this.update_environment_sound();
 };
 
 
@@ -863,6 +864,7 @@ Survival.prototype.player_death = function(delete_sprite = false) {
 	this.movement_just_finished = true;
 	this.delay_counter = 0;
 	this.time = this.max_time;
+	this.update_environment_sound();
 	this.camera.move_to(char);
 };
 
