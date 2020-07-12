@@ -834,6 +834,10 @@ Survival.prototype.start_predator_movement = function() {
 
 
 Survival.prototype.suicide = function() {
+	if(this.movement_active || this.action !== null) {
+		return;
+	}
+
 	open_popup(lang.popup_title, 'chuck_berry', lang.suicide, (x) => {if(x===1) {this.player_death(true);}}, lang.no, lang.yes);
 };
 
