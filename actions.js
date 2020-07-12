@@ -130,7 +130,8 @@ function Fight(dir, character, opponent, player_wins, callback) {
 	this.finished = false;
 	this.delay = anim_delays.winner;
 	this.delay_counter = 0;
-	this.frame = opponent.type === SURV_MAP.PREDATOR ? -2 : 0;  // Predators show the attack frame before attacking
+	// Predators show the attack frame before attacking
+	this.frame = opponent.type === SURV_MAP.PREDATOR ? -2 : 0;
 	this.player_wins = player_wins;
 	this.draw_cloud = false;
 	this.cloud_offset = [0, 0];
@@ -293,6 +294,7 @@ function Feeding(character, level, food_type, callback) {
 	this.frame = -1;
 	this.step = 0;
 	this.finished = false;
+	this.awaiting_power_food_sound = false;
 
 	this.tiles = [this.character.tile];
 
@@ -333,6 +335,12 @@ Feeding.prototype.update = function() {
 		this.level.eat_tile(tile);
 	}
 
+	// Power food as a delayed sound effect
+	else if(this.awaiting_power_food_sound && this.frame === 17) {
+		this.awaiting_power_food_sound = false;
+		audio.play_sound('power_food');
+	}
+
 	// This is depended on the species, so no fixed frame
 	else if(this.sprite.finished) {
 		// Special animation done or normal food -> We are finished
@@ -341,7 +349,6 @@ Feeding.prototype.update = function() {
 		}
 		// Poison
 		else if(this.food_type < 118) {
-			this.delay = anim_delays.poison;
 			this.sprite = new Sprite(this.character.url, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, 0, [64, 64], true);
 			this.step++;
 			if(this.character.species === SPECIES.CHUCKBERRY) {
@@ -353,10 +360,9 @@ Feeding.prototype.update = function() {
 		}
 		// Power food
 		else {
-			this.delay = anim_delays.power_food;
 			this.sprite = new Sprite(this.character.url, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, 0, [64, 64], true);
 			this.step++;
-			audio.play_sound('power_food');
+			this.awaiting_power_food_sound = true;
 		}
 	}
 };
@@ -513,8 +519,6 @@ function Electro(dir, character, callback) {
 			new Sprite('gfx/electro.png', [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [256, 64], [256, 64], [0, 128], [0, 128], [256, 64], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], anim_delays.electro, [64, 64], true),
 		];
 	}
-
-	audio.play_sound('electro');
 }
 
 
@@ -535,7 +539,8 @@ Electro.prototype.update = function() {
 	const sprite_pos = 1*(this.dir === DIR.E);
 
 	if(this.frame === 15) {
-		this.sprites[sprite_pos] = new Sprite(this.character.url, this.character.anims.zapped.soffset, this.character.anims.zapped.frame, anim_delays.electros, [64, 64], true);
+		this.sprites[sprite_pos] = new Sprite(this.character.url, this.character.anims.zapped.soffset, this.character.anims.zapped.frames, anim_delays.electro, [64, 64], true);
+		audio.play_sound('electro');
 	}
 
 	this.finished = this.sprites[1*!sprite_pos].finished;

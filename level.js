@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: Number of tiles must be checked (compare original and remake distribution using the same savegame)
 
 function Level() {
 	this.map = null;
@@ -274,8 +273,6 @@ Level.prototype.generate_map = function() {
 			main_pos += tile_numbers[i];
 		}
 	}
-
-	//console.log(mainpart.join(',')); // DEBUG
 
 	// Shuffle everything and create the actual map
 	shuffle(mainpart);

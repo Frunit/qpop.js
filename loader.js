@@ -21,9 +21,9 @@ function Loader() {
 	this.emptybar_soffset = [300, 80];
 
 	this.img_size = 1236659;
-	this.mp3_size = 8611893;
-	this.ogg_size = 5598714;
-	this.m4a_size = 4166319;
+	this.mp3_size = 8603397;
+	this.ogg_size = 5590506;
+	this.m4a_size = 4162489;
 	// CONST_END
 
 	this.max_size = 0;
