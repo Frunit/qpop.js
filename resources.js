@@ -239,7 +239,7 @@
 	}
 
 	function unpause() {
-		if(context.state === 'suspended') {
+		if(context.state === 'suspended' && audio_enabled) {
 			context.resume();
 		}
 	}
