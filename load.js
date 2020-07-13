@@ -87,9 +87,8 @@ Load.prototype.redraw = function() {
 
 	// Browser save game list
 	draw_rect([this.offset[0] + this.browser_area_offset[0], this.offset[1] + this.browser_area_offset[1]], this.browser_area_dim);
-	let save_array = localStorage.getItem('save');
-	if(save_array === null || JSON.parse(save_array)[0] === null) {
-		save_array = [];
+	const save_array = local_load('save');
+	if(!Array.isArray(save_array) || save_array[0] === null) {
 		const lines = multiline(lang.no_local_saves, this.upload_text_dim[0]);
 		const line_correction = this.line_height * (lines.length - 1) / 2;
 		for(let i = 0; i < lines.length; i++) {
@@ -97,8 +96,6 @@ Load.prototype.redraw = function() {
 		}
 	}
 	else {
-		save_array = JSON.parse(save_array);
-
 		for(let i = 0; i < save_array.length; i++) {
 			if(save_array[i] === null) {
 				break;
@@ -159,7 +156,7 @@ Load.prototype.update = function() {
 Load.prototype.load = function(num) {
 	canvas.removeEventListener('mouseup', init_upload);
 	game.backstage = [];
-	game.local_load(num);
+	game.load_locally(num);
 };
 
 

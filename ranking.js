@@ -89,7 +89,10 @@ function Ranking() {
 
 Ranking.prototype.initialize = function(autosave=true) {
 	if(autosave) {
-		game.local_save();
+		const saving_ok = game.save_locally();
+		if(!saving_ok) {
+			this.tutorials[0].name = 'ranking_no_save';
+		}
 	}
 
 	audio.play_music('intro');

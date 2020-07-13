@@ -176,18 +176,14 @@ Game.prototype.initialize = function() {
 		game.disable_audio();
 	}
 
-	if(localStorage.getItem('version') === null) {
-		// Clear localStorage for beta testers to avoid errors due to JSON parsing
-		localStorage.clear();
-		localStorage.setItem('version', JSON.stringify(version));
-	}
-	else if(JSON.parse(localStorage.getItem('version')) !== version) {
-		localStorage.setItem('version', JSON.stringify(version));
+	// Save version in case I need to account for different versions later
+	if(local_load('version') !== version) {
+		local_save('version', version);
 	}
 
 	// If "lang[uage]" is defined and set to a supported language, use that language.
 	//   Otherwise try to determine the browser language. Otherwise default to English.
-	options.language = search_params.get('lang') || search_params.get('language') || (localStorage.getItem('language') && JSON.parse(localStorage.getItem('language'))) || navigator.language || navigator.userLanguage;
+	options.language = search_params.get('lang') || search_params.get('language') || local_load('language') || navigator.language || navigator.userLanguage;
 	options.language = options.language.substring(0, 2).toUpperCase();
 
 	if(i18n.hasOwnProperty(options.language)) {
@@ -199,18 +195,18 @@ Game.prototype.initialize = function() {
 	}
 
 	for(let option of Object.keys(options)) {
-		if(localStorage.getItem(option) === null) {
-			localStorage.setItem(option, JSON.stringify(options[option]));
+		if(local_load(option) === null) {
+			local_save(option, options[option]);
 		}
 		// language and seen_tutorials are handled above and below, respectively
 		else if(option !== 'language' && option !== 'seen_tutorials') {
-			options[option] = JSON.parse(localStorage.getItem(option));
+			options[option] = local_load(option);
 		}
 	}
 
-	const seen_tutorials = localStorage.getItem('seen_tutorials');
+	const seen_tutorials = local_load('seen_tutorials');
 	if(seen_tutorials !== null) {
-		this.seen_tutorials = new Set(JSON.parse(seen_tutorials));
+		this.seen_tutorials = new Set(seen_tutorials);
 	}
 	else {
 		this.seen_tutorials = new Set();
@@ -486,7 +482,7 @@ Game.prototype.select_evo_points = function() {
 };
 
 
-Game.prototype.local_save = function() {
+Game.prototype.save_locally = function() {
 	const save = {
 		'players': game.players,
 		'world_map': game.world_map,
@@ -502,28 +498,23 @@ Game.prototype.local_save = function() {
 		'datetime': (new Date()).toISOString(),
 	};
 
-	let save_array = localStorage.getItem('save');
+	let save_array = local_load('save');
 	if(save_array === null) {
 		save_array = new Array(10).fill(null);
-	}
-	else {
-		save_array = JSON.parse(save_array);
 	}
 
 	save_array.unshift(save);
 	save_array.pop(); // remove oldest save
 
-	localStorage.setItem('save', JSON.stringify(save_array));
+	return local_save('save', save_array);
 };
 
 
-Game.prototype.local_load = function(num) {
-	let save_array = localStorage.getItem('save');
+Game.prototype.load_locally = function(num) {
+	let save_array = local_load('save');
 	if(save_array === null) {
 		return;
 	}
-
-	save_array = JSON.parse(save_array);
 
 	if(num >= save_array.length) {
 		return;
@@ -853,7 +844,7 @@ Game.prototype.tutorial = function() {
 		for(let tut of this.stage.tutorials) {
 			if(!this.seen_tutorials.has(tut.name)) {
 				this.seen_tutorials.add(tut.name);
-				localStorage.setItem('seen_tutorials', JSON.stringify([...this.seen_tutorials]));
+				local_save('seen_tutorials', [...this.seen_tutorials]);
 				open_tutorial(tut);
 				break;
 			}
@@ -918,7 +909,7 @@ Game.prototype.toggle_sound = function() {
 			audio.set_sound_volume(0);
 		}
 
-		localStorage.setItem('sound_on', JSON.stringify(options.sound_on));
+		local_save('sound_on', options.sound_on);
 
 		game.stage.redraw();
 	}
@@ -940,7 +931,7 @@ Game.prototype.toggle_music = function() {
 			audio.set_music_volume(0);
 		}
 
-		localStorage.setItem('music_on', JSON.stringify(options.music_on));
+		local_save('music_on', options.music_on);
 
 		game.stage.redraw();
 	}
@@ -952,7 +943,7 @@ Game.prototype.toggle_music = function() {
 
 
 Game.prototype.disable_audio = function() {
-	// This does not change localStorage!
+	// This does purposefully not change localStorage!
 	options.music_on = false;
 	options.sound_on = false;
 	audio.set_music_volume(0);
@@ -974,7 +965,7 @@ Game.prototype.next_language = function(direction) {
 	const current_lang = lang_list.indexOf(options.language);
 
 	options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
-	localStorage.setItem('language', JSON.stringify(options.language));
+	local_save('language', options.language);
 	lang = i18n[options.language];
 	game.stage.redraw();
 };
@@ -1016,7 +1007,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [0, 9, 0];
+const version = [0, 9, 1];
 const game = new Game();
 game.initialize();
 game.start();

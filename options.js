@@ -463,7 +463,7 @@ Options.prototype.change_transition_delay = function(value) {
 	write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
 
-	localStorage.setItem('transition_delay', JSON.stringify(options.transition_delay));
+	local_save('transition_delay', options.transition_delay);
 };
 
 
@@ -475,7 +475,7 @@ Options.prototype.change_music_volume = function(value) {
 		audio.set_music_volume(options.music / 100);
 	}
 
-	localStorage.setItem('music', JSON.stringify(options.music));
+	local_save('music', options.music);
 };
 
 
@@ -487,7 +487,7 @@ Options.prototype.change_sound_volume = function(value) {
 		audio.set_music_volume(options.sound / 100);
 	}
 
-	localStorage.setItem('sound', JSON.stringify(options.sound));
+	local_save('sound', options.sound);
 };
 
 
@@ -503,8 +503,8 @@ Options.prototype.change_ai_speed = function(value) {
 	write_text(lang.options_ai_speeds[options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
 
-	localStorage.setItem('wm_ai_delay_idx', JSON.stringify(options.wm_ai_delay_idx));
-	localStorage.setItem('wm_ai_delay', JSON.stringify(options.wm_ai_delay));
+	local_save('wm_ai_delay_idx', options.wm_ai_delay_idx);
+	local_save('wm_ai_delay', options.wm_ai_delay);
 };
 
 
@@ -512,7 +512,7 @@ Options.prototype.toggle_auto_continue = function() {
 	options.wm_ai_auto_continue = !options.wm_ai_auto_continue;
 	this.draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
 
-	localStorage.setItem('wm_ai_auto_continue', JSON.stringify(options.wm_ai_auto_continue));
+	local_save('wm_ai_auto_continue', options.wm_ai_auto_continue);
 };
 
 
@@ -520,7 +520,7 @@ Options.prototype.toggle_click_and_hold = function() {
 	options.wm_click_and_hold = !options.wm_click_and_hold;
 	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
 
-	localStorage.setItem('wm_click_and_hold', JSON.stringify(options.wm_click_and_hold));
+	local_save('wm_click_and_hold', options.wm_click_and_hold);
 };
 
 
@@ -528,7 +528,7 @@ Options.prototype.toggle_plant_distribtion = function() {
 	options.plant_distribtion = !options.plant_distribtion;
 	this.draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
 
-	localStorage.setItem('plant_distribtion', JSON.stringify(options.plant_distribtion));
+	local_save('plant_distribtion', options.plant_distribtion);
 };
 
 
@@ -536,7 +536,7 @@ Options.prototype.toggle_show_predators = function() {
 	options.show_predators = !options.show_predators;
 	this.draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
 
-	localStorage.setItem('show_predators', JSON.stringify(options.show_predators));
+	local_save('show_predators', options.show_predators);
 };
 
 
@@ -544,12 +544,12 @@ Options.prototype.toggle_tutorial = function() {
 	options.tutorial = !options.tutorial;
 	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
 
-	localStorage.setItem('tutorial', JSON.stringify(options.tutorial));
+	local_save('tutorial', options.tutorial);
 
 	// Reset seen tutorials when tutorials are switched on again
 	if(options.tutorial) {
 		game.seen_tutorials = new Set();
-		localStorage.setItem('seen_tutorials', JSON.stringify([]));
+		local_save('seen_tutorials', []);
 	}
 };
 

@@ -490,6 +490,29 @@ function init_upload(e) {
 	}
 }
 
+
+function local_save(key, value) {
+	try {
+		localStorage.setItem(key, JSON.stringify(value));
+	}
+	catch (e) {
+		return false;
+	}
+
+	return true;
+}
+
+
+function local_load(key) {
+	try {
+		return JSON.parse(localStorage.getItem(key));
+	}
+	catch (e) {
+		return null;
+	}
+}
+
+
 function handle_visibility_change() {
 	if(game === undefined) {
 		return;
