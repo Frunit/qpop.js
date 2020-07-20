@@ -45,6 +45,7 @@ function Options() {
 		predators: 265,
 		tutorial: 290,
 		transition: 315,
+		restart: 400,
 	});
 
 	this.wm_ai_delays = [36, 18, 9, 4, 0];
@@ -364,6 +365,19 @@ Options.prototype.redraw = function() {
 		blur: () => {}
 	});
 
+	// Restart game
+	write_text(lang.options_restart, [this.text_x + this.lang_dim[0]/2, this.ys.restart + this.text_y_offset + 3], '#ffffff', '#000000', 'center');
+	draw_rect([this.text_x, this.ys.restart], this.lang_dim);
+	this.clickareas.push({
+		x1: this.text_x,
+		y1: this.ys.restart,
+		x2: this.text_x + this.lang_dim[0],
+		y2: this.ys.restart + this.lang_dim[1],
+		down: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim, true, true),
+		up: () => open_popup(lang.popup_title, 'chuck_berry', lang.really_restart, (x) => this.restart_game(x), lang.no, lang.yes),
+		blur: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim)
+	});
+
 	this.keys = [
 		{'key': 'ENTER', 'action': () => this.close(), 'reset': true},
 		{'key': 'ESCAPE', 'action': () => this.close(), 'reset': true},
@@ -550,6 +564,14 @@ Options.prototype.toggle_tutorial = function() {
 	if(options.tutorial) {
 		game.seen_tutorials = new Set();
 		local_save('seen_tutorials', []);
+	}
+};
+
+
+Options.prototype.restart_game = function(x) {
+	if(x === 1) {
+		game.stage = new Init();
+		game.stage.initialize();
 	}
 };
 

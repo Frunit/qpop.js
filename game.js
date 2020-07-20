@@ -761,7 +761,7 @@ Game.prototype.next_stage = function() {
 		break;
 	case SCENE.INTRO: // Intro
 	case SCENE.OUTRO: // Outro (restart game without reloading)
-		this.stage = new Init(this.players);
+		this.stage = new Init();
 		this.stage.initialize();
 		break;
 	case SCENE.INIT: // Init screen (choose players)
