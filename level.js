@@ -55,10 +55,10 @@ Level.prototype.update_tile_numbers = function(x, y, numbers) {
 	for(let xpos = Math.max(0, x-2); xpos <= Math.min(27, x+2); xpos++) {
 		for(let ypos = Math.max(0, y-2); ypos <= Math.min(27, y+2); ypos++) {
 			if(game.world_map[ypos][xpos] === WORLD_MAP.HUMANS) {
-				bases += [0, 2, 1][Math.max(Math.abs(xpos), Math.abs(ypos))];
+				bases += [0, 2, 1][Math.max(Math.abs(x - xpos), Math.abs(y - ypos))];
 			}
 			else if(game.world_map[ypos][xpos] === WORLD_MAP.CRATER) {
-				craters += [0, 2, 1][Math.max(Math.abs(xpos), Math.abs(ypos))];
+				craters += [0, 2, 1][Math.max(Math.abs(x - xpos), Math.abs(y - ypos))];
 			}
 		}
 	}
