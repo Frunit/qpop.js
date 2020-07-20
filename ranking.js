@@ -101,6 +101,8 @@ Ranking.prototype.initialize = function(autosave=true) {
 		this.sprites.push(
 			new Sprite(this.pics_url, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames, anim_delays.ranking)
 		);
+
+		game.players[i].total_score = game.players[i].evo_score + game.players[i].stats.reduce((a, b) => a + b);
 	}
 
 	this.determine_best();
