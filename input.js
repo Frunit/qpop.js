@@ -5,8 +5,7 @@
 	let pressedKeys = {};
 	let mousePos = [0, 0];
 
-	function setKey(event, status) {
-		const code = event.code || event.key;
+	function setKey(code, status) {
 		let key;
 
 		switch(code) {
@@ -46,12 +45,17 @@
 		pressedKeys['MOVE'] = true;
 	}
 
-	document.addEventListener('keydown', function(e) {
-		setKey(e, true);
+	document.addEventListener('keydown', function(event) {
+		const code = event.code || event.key;
+		if(['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Space', ' '].includes(code)) {
+			event.preventDefault();
+		}
+		setKey(code, true);
 	});
 
-	document.addEventListener('keyup', function(e) {
-		setKey(e, false);
+	document.addEventListener('keyup', function(event) {
+		const code = event.code || event.key;
+		setKey(code, false);
 	});
 
 	canvas.addEventListener('mousedown', function(e) {
