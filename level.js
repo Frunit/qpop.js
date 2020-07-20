@@ -389,7 +389,7 @@ Level.prototype.find_free_tiles = function() {
 	// it is non-blocking.
 	for(let y = 3; y < 97; y++) {
 		for(let x = 3; x < 97; x++) {
-			if(this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null)
+			if(this.blocking[this.map[y][x]] === '0' && this.edible[this.map[y][x]] === '0' && this.mobmap[y][x] === null)
 			{
 				free_tiles.push([x, y]);
 			}
