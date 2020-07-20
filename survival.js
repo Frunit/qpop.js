@@ -276,7 +276,9 @@ Survival.prototype.draw_minimap = function() {
 						threshold = 110;
 				}
 
-				if(game.current_player.stats[Math.floor(this.level.map[real_y][real_x] / 6)] > threshold) {
+				// Mapping from survival food to stats food.
+				const food_type = [0, 2, 5, 1, 3, 4][Math.floor(this.level.map[real_y][real_x] / 6)];
+				if(game.current_player.stats[food_type] > threshold) {
 					draw = true;
 					sym = MM_FOOD;
 				}
