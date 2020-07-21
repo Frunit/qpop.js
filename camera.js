@@ -33,14 +33,14 @@ Camera.prototype.move_to = function(obj) {
 		this.camera_pos[0] = new_x;
 		this._pos_changed = true;
 		this.x_tiles = range(Math.max(Math.floor(this.camera_pos[0] / this.tile_dim[0]) - 1, 0),
-			Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, this.level.width - 1));
+			Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, this.level.width));
 	}
 
 	if(new_y !== this.camera_pos[1]) {
 		this.camera_pos[1] = new_y;
 		this._pos_changed = true;
 		this.y_tiles = range(Math.max(Math.floor(this.camera_pos[1] / this.tile_dim[1]) - 1, 0),
-			Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, this.level.height - 1));
+			Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, this.level.height));
 	}
 };
 

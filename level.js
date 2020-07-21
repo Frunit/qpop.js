@@ -366,20 +366,19 @@ Level.prototype.place_player = function(ideal_pos) {
 		// 65 exists more often to make it more likely to choose it
 		const empty_tiles = [65, 65, 65, 65, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79];
 
-		for(let y = ideal_pos[1] -1; y <= ideal_pos[1] + 1; y++) {
-			for(let x = ideal_pos[0] -1; x <= ideal_pos[0] + 1; x++) {
+		for(let y = ideal_pos[1] - 1; y <= ideal_pos[1] + 1; y++) {
+			for(let x = ideal_pos[0] - 1; x <= ideal_pos[0] + 1; x++) {
 				this.mobmap[y][x] = null;
 				this.map[y][x] = random_element(empty_tiles);
 			}
 		}
-
-		this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
-		this.character.tile = ideal_pos;
 	}
 	else {
-		this.mobmap[pos[1]][pos[0]] = this.character;
-		this.character.tile = pos;
+		ideal_pos = pos;
 	}
+
+	this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
+	this.character.tile = ideal_pos;
 };
 
 
@@ -405,7 +404,15 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 	const good_positions = [];
 
 	for(let y = 0; y < search_size; y++) {
+		if(y + pos[1] < 0 || y + pos[1] >= this.height) {
+			continue;
+		}
+
 		for(let x = 0; x < search_size; x++) {
+			if(x + pos[0] < 0 || x + pos[0] >= this.width) {
+				continue;
+			}
+
 			let count;
 			if(this.blocking[this.map[y + pos[1]][x + pos[0]]] === '0' && this.mobmap[y + pos[1]][x + pos[0]] === null)
 			{
