@@ -225,14 +225,14 @@ Survival.prototype.draw_minimap = function() {
 	const MM_PREDATOR = 3;
 	const MM_ENEMY = 4;
 
-	const range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
+	const radar_range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
 
 	for(let y = -10; y < 10; y++) {
 		const real_y = clamp(this.level.character.tile[1] + y, 0, this.level.height - 1);
 		for(let x = -10; x < 10; x++) {
 
 			// If the range is too low, don't show anything here
-			if(range <= Math.sqrt(y**2 + x**2) * 10 - 30) {
+			if(radar_range <= Math.sqrt(y**2 + x**2) * 10 - 30) {
 				continue;
 			}
 

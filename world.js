@@ -422,8 +422,7 @@ World.prototype.catastrophe_exec = function() {
 		// MAYBE: This could be animated such that not all creatures disappear simultaneously but one after the other
 		for(let xx = x - 3; xx <= x + 3; xx++) {
 			for(let yy = y - 3; yy <= y + 3; yy++) {
-				const player_num = game.map_positions[yy][xx];
-				if(player_num >= 0 && random_int(0, 1)) {
+				if(game.map_positions[yy][xx] >= 0 && random_int(0, 1)) {
 					this.kill_individual(xx, yy);
 				}
 			}
@@ -499,7 +498,7 @@ World.prototype.catastrophe_finish = function() {
 
 	for(let y = 1; y < this.dim[1] - 1; y++) {
 		for(let x = 1; x < this.dim[0] - 1; x++) {
-			if((!game.world_map[y][x] || game.world_map[y][x] >= WORLD_MAP.MOUNTAIN) && game.map_positions[y][x] >= 0) {
+			if(game.map_positions[y][x] >= 0 && (!game.world_map[y][x] || game.world_map[y][x] >= WORLD_MAP.MOUNTAIN)) {
 				this.kill_individual(x, y);
 			}
 		}
@@ -636,11 +635,10 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 World.prototype.set_individual = function(x, y) {
 	// Fight against another player
 	if(game.map_positions[y][x] >= 0) {
-		if(game.turn === 0) {
+		if(game.turn !== 0) {
 			// No one may attack during the first turn
-			return;
+			this.fight(x, y);
 		}
-		this.fight(x, y);
 		return;
 	}
 
@@ -981,7 +979,7 @@ World.prototype.create_world_map = function() {
 
 	for(let y = 0; y < this.dim[1]; y++) {
 		for(let x = 0; x < this.dim[0]; x++) {
-			if(!game.world_map || game.world_map[y][x] < WORLD_MAP.MOUNTAIN) {
+			if(!game.world_map || game.world_map[y][x] <= WORLD_MAP.MOUNTAIN) {
 				map[y][x] = this.find_tile(game.height_map[y][x], y);
 			}
 			else {
