@@ -448,6 +448,7 @@ World.prototype.catastrophe_exec = function() {
 		this.catastrophe_finish();
 		break;
 	case 6: // Earthquake
+		game.world_map = null;
 		game.height_map = this.create_height_map();
 		this.catastrophe_finish();
 		break;
