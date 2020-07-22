@@ -489,9 +489,9 @@ World.prototype.catastrophe_exec = function() {
 
 
 World.prototype.catastrophe_finish = function() {
-	game.temp  = clamp(game.temp, 0, 100);
-	game.humid  = clamp(game.humid, 0, 100);
-	game.water_level  = clamp(game.water_level, 0, 100);
+	game.temp = clamp(game.temp, 0, 100);
+	game.humid = clamp(game.humid, 0, 100);
+	game.water_level = clamp(game.water_level, 0, 100);
 
 	this.animation = null;
 	game.world_map = this.create_world_map();

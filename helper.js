@@ -240,8 +240,8 @@ function draw_base() {
 	ctx.save();
 	ctx.beginPath();
 	ctx.rect(0.5, 0.5, canvas.width-1, canvas.height-1);
-    ctx.strokeStyle = '#000000';
-    ctx.stroke();
+	ctx.strokeStyle = '#000000';
+	ctx.stroke();
 	ctx.restore();
 
 	// Info

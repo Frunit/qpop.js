@@ -701,7 +701,7 @@ Survival.prototype.resolve_movement = function(obj, force=false) {
 Survival.prototype.start_predator_movement = function() {
 	const player_pos = this.level.character.tile;
 	const anim_delay = 0;
-	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 +  game.current_player.stats[ATTR.INTELLIGENCE];
+	const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 + game.current_player.stats[ATTR.INTELLIGENCE];
 
 	this.moving_predators = [];
 
