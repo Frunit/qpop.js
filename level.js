@@ -13,12 +13,12 @@ function Level() {
 	this.height = 100;
 	this.width = 100;
 	this.enemies = [];
+	this.bg_sprites = Array.from(Array(100), () => Array(100).fill(null));
 
 	this.character = new Character(game.current_player.id, [49, 49]);
 
 	this.generate_map();
 	this.populate();
-	this.bg_sprites = Array.from(Array(100), () => Array(100).fill(null));
 }
 
 
@@ -405,16 +405,18 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 	const good_positions = [];
 
 	for(let y = 0; y < search_size; y++) {
-		if(y + pos[1] < 0 || y + pos[1] >= this.height) {
+		const y_pos = y + pos[1];
+		if(y_pos < 0 || y_pos >= this.height) {
 			continue;
 		}
 
 		for(let x = 0; x < search_size; x++) {
-			if(x + pos[0] < 0 || x + pos[0] >= this.width) {
+			const x_pos = x + pos[0];
+			if(x_pos < 0 || x_pos >= this.width) {
 				continue;
 			}
 
-			if(this.blocking[this.map[y + pos[1]][x + pos[0]]] === '0' && this.mobmap[y + pos[1]][x + pos[0]] === null)
+			if(this.blocking[this.map[y_pos][x_pos]] === '0' && this.mobmap[y_pos][x_pos] === null)
 			{
 				if(x > 0) {
 					left_counts[y][x] = left_counts[y][x-1] + 1;
@@ -429,8 +431,8 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 		}
 	}
 
-	for(let y = min_size-1; y < search_size; y++) {
-		for(let x = min_size-1; x < search_size; x++) {
+	for(let y = min_size - 1; y < search_size; y++) {
+		for(let x = min_size - 1; x < search_size; x++) {
 			if(left_counts[y][x] >= min_size && left_counts[y-1][x] >= min_size && left_counts[y-2][x] >= min_size) {
 				good_positions.push([x + pos[0] - 1, y + pos[1] - 1]); // I want to have the center of the square
 			}
