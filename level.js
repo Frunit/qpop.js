@@ -370,6 +370,7 @@ Level.prototype.place_player = function(ideal_pos) {
 			for(let x = ideal_pos[0] - 1; x <= ideal_pos[0] + 1; x++) {
 				this.mobmap[y][x] = null;
 				this.map[y][x] = random_element(empty_tiles);
+				this.bg_sprites[y][x] = null;
 			}
 		}
 	}
@@ -413,16 +414,14 @@ Level.prototype.find_free_player_tiles = function(pos, min_size, search_size) {
 				continue;
 			}
 
-			let count;
 			if(this.blocking[this.map[y + pos[1]][x + pos[0]]] === '0' && this.mobmap[y + pos[1]][x + pos[0]] === null)
 			{
 				if(x > 0) {
-					count = left_counts[y][x-1] + 1;
+					left_counts[y][x] = left_counts[y][x-1] + 1;
 				}
 				else {
-					count = 1;
+					left_counts[y][x] = 1;
 				}
-				left_counts[y][x] = count;
 			}
 			else {
 				left_counts[y][x] = 0;
