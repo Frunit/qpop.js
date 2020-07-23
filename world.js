@@ -819,7 +819,7 @@ World.prototype.ai_step = function() {
 		depth = 4; // Make the AI smarter in the first turn to avoid islands etc.
 	}
 	let value = 0;
-	let best_value = -Infinity;
+	let best_value = -99999;
 	let best_move = [];
 	let to_remove = 0;
 
@@ -871,6 +871,10 @@ World.prototype.ai_end = function() {
 
 World.prototype.ai_rate_move = function(x, y, depth) {
 	let value = 0;
+
+	if(game.turn === 0 && game.map_positions[y][x] !== -1) {
+		return -100000;
+	}
 
 	for(let xx = Math.max(1, x - depth); xx < Math.min(this.dim[0] - 1, x + depth); xx++) {
 		for(let yy = Math.max(1, y - depth); yy < Math.min(this.dim[1] - 1, y + depth); yy++) {
