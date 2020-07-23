@@ -379,6 +379,7 @@ Level.prototype.place_player = function(ideal_pos) {
 	}
 
 	this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
+	this.mobmap[this.character.tile[1]][this.character.tile[0]] = null;
 	this.character.tile = ideal_pos;
 };
 
