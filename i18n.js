@@ -93,8 +93,9 @@ const i18n = Object.freeze({
 			catastrophe6: 'Ein starkes Erdbeben hat die gesamte Oberfläche des Planeten verändert. Wo eben noch Seen waren, können jetzt Berge entstehen und umgekehrt.', // Earthquake
 			catastrophe7: 'Menschen sind auf dem Planeten gelandet! In ihrem unermüdlichen Bestreben, der bedrohten Natur zu helfen, bauen sie eine Forschungsstation auf dem Planeten und machen sich auf die Jagd nach Versuchstieren, um die Wesen „vor dem Aussterben zu bewahren“. Die Menschen verhalten sich wie Fleischfresser, sind aber schwerer abzuschütteln als die natürlichen Feinde.', // Humans
 			catastrophe8: 'Verstärktes Auftreten kosmischer Strahlung verändert die Arten durch Mutation. Als Folge ändern sich die Eigenschaftswerte jeder Spezies sprunghaft.', // Cosmic rays
-			ranking: 'Hier kannst du den Erfolg der verschiedenen Spezies sehen. Außerdem wird das Spiel automatisch im Browser gespeichert. Wenn du einen Spielstand runterladen willst, kannst du das hier tun.',
-			ranking_no_save: 'Hier kannst du den Erfolg der verschiedenen Spezies sehen. Wenn du einen Spielstand runterladen willst, kannst du das hier tun. Das Spiel wird nicht automatisch gespeichert.',
+			ranking: 'Hier kannst du den Erfolg der verschiedenen Spezies sehen. Am Anfang ist die Anzahl der Individuen auf der Weltkarte. Danach die Anzahl der zur Verfügung stehenden Mutationspunkte (abhängig von der Anzahl der Individuen) und dann die Siegpunkte. Siegpunkte sind die Gesamtanzahl an eingesetzten und verfügbaren Mutationspunkte.',
+			ranking_save: 'Das Spiel wird automatisch im Browser gespeichert. Wenn du einen Spielstand runterladen willst, kannst du das hier tun.',
+			ranking_no_save: 'Wenn du einen Spielstand runterladen willst, kannst du das hier tun. Das Spiel wird nicht automatisch gespeichert.',
 			save: 'Der Spielstand, den du eben runterladen konntest, kann wieder in diesem Spiel geladen werden. Außerdem ist er kompatibel mit dem Originalspiel!',
 		},
 	}),
@@ -190,8 +191,9 @@ const i18n = Object.freeze({
 			catastrophe6: 'A strong earthquake change the whole surface of the planet. Lakes may turn into mountains and vice versa.', // Earthquake
 			catastrophe7: 'Humans have landed on the planet! In their tireless efforts to help endangered nature, they build a research station on the planet and hunt for experimental animals “save them from extinction”. Humans behave like carnivores, but are more difficult to shake off than the natural enemies.', // Humans
 			catastrophe8: 'Increased occurrence of cosmic radiation changes all species by mutation. As a result, the traits of each species change dramatically.', // Cosmic rays
-			ranking: 'Here, you can see your ranking in the world. In addition, the game is automatically saved in the browser. If you want to download a savegame, you can do that here.',
-			ranking_no_save: 'Here, you can see your ranking in the world. If you want to download a savegame, you can do that here. The game will not be saved automatically.',
+			ranking: 'Here, you can see your ranking in the world. First is the number of individuals on the world map. Second is the amount of mutations points available this round. This depends on the number of individuals. Third is the victory points, that are all used and available mutation points added up.',
+			ranking_save: 'The game is automatically saved in the browser. If you want to download a savegame, you can do that here.',
+			ranking_no_save: 'If you want to download a savegame, you can do that here. The game will not be saved automatically.',
 			save: 'The savegame you were just offered can be loaded again in this game. But it is also compatible with the original game!',
 		},
 	}),

@@ -60,10 +60,17 @@ function Ranking() {
 	this.tutorials = [
 		{
 			'name': 'ranking',
+			'pos': [140, 335],
+			'low_anchor': true,
+			'arrows': [],
+			'highlight': [this.pillarbottom_offset[0], this.pillarbottom_offset[1], this.pillarbottom_offset[0] + this.pillarbottom_dim[0] * 6, this.pillarbottom_offset[1] + this.pillarbottom_dim[1]],
+		},
+		{
+			'name': 'ranking_save',
 			'pos': [220, 435],
 			'low_anchor': true,
 			'arrows': [{dir: DIR.S, offset: 55}],
-			'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0], this.save_offset[1] + this.save_dim[1]],
+			'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0] - 1, this.save_offset[1] + this.save_dim[1]],
 		},
 	];
 
@@ -91,7 +98,7 @@ Ranking.prototype.initialize = function(autosave=true) {
 	if(autosave) {
 		const saving_ok = game.save_locally();
 		if(!saving_ok) {
-			this.tutorials[0].name = 'ranking_no_save';
+			this.tutorials[1].name = 'ranking_no_save';
 		}
 	}
 
@@ -107,6 +114,7 @@ Ranking.prototype.initialize = function(autosave=true) {
 
 	this.determine_best();
 	this.redraw();
+	this.render();
 	game.tutorial();
 };
 
