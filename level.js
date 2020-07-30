@@ -375,8 +375,8 @@ Level.prototype.place_player = function(ideal_pos) {
 		}
 
 		const to_delete = [];
-		for(let i = 0; i < this.level.predators.length; i++) {
-			const predator = this.level.predators[i];
+		for(let i = 0; i < this.predators.length; i++) {
+			const predator = this.predators[i];
 			if(predator.tile[0] >= ideal_pos[0] - 1 &&
 					predator.tile[0] <= ideal_pos[0] + 1 &&
 					predator.tile[1] >= ideal_pos[1] - 1 &&
@@ -387,15 +387,15 @@ Level.prototype.place_player = function(ideal_pos) {
 		}
 		to_delete.reverse();
 		for(let candidate of to_delete) {
-			this.level.predators.splice(candidate, 1);
+			this.predators.splice(candidate, 1);
 		}
 	}
 	else {
 		ideal_pos = pos;
 	}
 
-	this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
 	this.mobmap[this.character.tile[1]][this.character.tile[0]] = null;
+	this.mobmap[ideal_pos[1]][ideal_pos[0]] = this.character;
 	this.character.tile = ideal_pos;
 };
 
