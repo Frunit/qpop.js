@@ -104,10 +104,24 @@ function random_element(arr) {
 	// Random element of array or null if array is empty
 
 	if(arr.length) {
-		return arr[Math.floor(Math.random()*arr.length)];
+		return arr[Math.floor(Math.random() * arr.length)];
 	}
 
 	return null;
+}
+
+
+function pop_random_element(arr) {
+	// Return and remove a random element from arr
+	if(arr.length === 0) {
+		return null;
+	}
+
+	const idx = Math.floor(Math.random() * arr.length);
+	const elem = arr[idx];
+	arr.splice(idx, 1);
+
+	return elem;
 }
 
 
@@ -129,15 +143,6 @@ function shuffle(arr) {
 function range(start, end) {
 	// Array with numbers from start (inclusive) to end (exclusive)
 	return Array.from(new Array(end - start), (x,i) => i + start);
-}
-
-
-function remove_from_array(arr, element) {
-	// Remove element from arr
-	const idx = arr.indexOf(element);
-	if(idx !== -1) {
-		arr.splice(idx, 1);
-	}
 }
 
 

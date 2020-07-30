@@ -825,8 +825,7 @@ World.prototype.ai_step = function() {
 
 	// Only use shadows (movements) if no individuals for placement are left
 	if(game.current_player.toplace === 0) {
-		to_remove = random_element(this.ai_own_individuals);
-		remove_from_array(this.ai_own_individuals, to_remove);
+		to_remove = pop_random_element(this.ai_own_individuals);
 		this.take_individual(to_remove[0], to_remove[1]);
 		return;
 	}

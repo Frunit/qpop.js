@@ -1007,7 +1007,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [0, 9, 4];
+const version = [0, 9, 5];
 const game = new Game();
 game.initialize();
 game.start();
