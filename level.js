@@ -373,6 +373,22 @@ Level.prototype.place_player = function(ideal_pos) {
 				this.bg_sprites[y][x] = null;
 			}
 		}
+
+		const to_delete = [];
+		for(let i = 0; i < this.level.predators.length; i++) {
+			const predator = this.level.predators[i];
+			if(predator.tile[0] >= ideal_pos[0] - 1 &&
+					predator.tile[0] <= ideal_pos[0] + 1 &&
+					predator.tile[1] >= ideal_pos[1] - 1 &&
+					predator.tile[1] <= ideal_pos[1] + 1)
+			{
+				to_delete.push(i);
+			}
+		}
+		to_delete.reverse();
+		for(let candidate of to_delete) {
+			this.level.predators.splice(candidate, 1);
+		}
 	}
 	else {
 		ideal_pos = pos;
