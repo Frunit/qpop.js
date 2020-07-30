@@ -524,9 +524,18 @@ World.prototype.catastrophe_finish = function() {
 			'arrows': [],
 			'highlight': [0, 0, 640, 480],
 		});
-
-		game.tutorial();
 	}
+
+	if(!game.seen_tutorials.has('catastrophe' + this.catastrophe_type)) {
+		this.tutorials.push({
+			'name': 'catastrophe' + this.catastrophe_type,
+			'pos': [140, 110],
+			'arrows': [],
+			'highlight': [0, 0, 640, 480],
+		});
+	}
+
+	game.tutorial();
 };
 
 
