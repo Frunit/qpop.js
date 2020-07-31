@@ -971,6 +971,22 @@ Game.prototype.next_language = function(direction) {
 };
 
 
+Game.prototype.toggle_tutorial = function(checkbox_pos = null) {
+	options.tutorial = !options.tutorial;
+	if(checkbox_pos !== null) {
+		draw_checkbox(checkbox_pos, options.tutorial);
+	}
+
+	local_save('tutorial', options.tutorial);
+
+	// Reset seen tutorials when tutorials are switched on again
+	if(options.tutorial) {
+		game.seen_tutorials = new Set();
+		local_save('seen_tutorials', []);
+	}
+};
+
+
 function Player(num) {
 	this.id = num;
 	this.iq = 2;
@@ -1007,7 +1023,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [0, 9, 5];
+const version = [0, 9, 6];
 const game = new Game();
 game.initialize();
 game.start();

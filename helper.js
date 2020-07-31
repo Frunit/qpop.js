@@ -394,6 +394,22 @@ function draw_inv_rect(pos, dim, black_line=true) {
 }
 
 
+function draw_checkbox(pos, checked) {
+	draw_inv_rect(pos, [14, 14], true);
+	ctx.save();
+	ctx.fillStyle = '#c3c3c3';
+	ctx.fillRect(pos[0] + 1, pos[1] + 1, 12, 12);
+	ctx.restore();
+	if(checked) {
+		ctx.drawImage(resources.get('gfx/gui.png'),
+			72, 0,
+			12, 12,
+			pos[0] + 1, pos[1] + 1,
+			12, 12);
+	}
+}
+
+
 function subtitle(x, y, text) {
 	const radius = 5;
 	const height = 30;

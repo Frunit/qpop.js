@@ -11,14 +11,19 @@ function Loader() {
 	this.header_dim = [236, 78];
 	this.bar_dim = [300, 16];
 	this.start_dim = [200, 50];
+	this.x_dim = [12, 12];
 
 	this.header_offset = [202, 50];
 	this.subtitle_offset = [320, 190];
 	this.bar_offset = [170, 350];
 	this.percent_offset = [320, 362];
 	this.start_offset = [220, 250];
-
 	this.emptybar_soffset = [300, 80];
+
+	this.checkbox_x = 30;
+	this.text_x = 50;
+	this.text_y_offset = 12;
+	this.tutorial_offset = 450;
 
 	this.img_size = 1236659;
 	this.mp3_size = 8603397;
@@ -153,6 +158,21 @@ Loader.prototype.redraw = function() {
 			down: () => draw_rect(this.start_offset, this.start_dim, true, true),
 			up: () => game.next_stage(),
 			blur: () => draw_rect(this.start_offset, this.start_dim)
+		});
+	}
+
+	if(this.phase > 0) {
+		// Show tutorial
+		draw_checkbox([this.checkbox_x, this.tutorial_offset], options.tutorial);
+		write_text(lang.options_tutorial, [this.text_x, this.tutorial_offset + this.text_y_offset], '#000000', '#ffffff', 'left');
+		this.clickareas.push({
+			x1: this.checkbox_x,
+			y1: this.tutorial_offset,
+			x2: this.checkbox_x + this.x_dim[0] + 2,
+			y2: this.tutorial_offset + this.x_dim[1] + 2,
+			down: () => {},
+			up: () => game.toggle_tutorial([this.checkbox_x, this.tutorial_offset]),
+			blur: () => {}
 		});
 	}
 

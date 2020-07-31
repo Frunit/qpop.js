@@ -107,7 +107,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Music
-	this.draw_checkbox([this.checkbox_x, this.ys.music], options.music_on);
+	draw_checkbox([this.checkbox_x, this.ys.music], options.music_on);
 	write_text(lang.options_music, [this.text_x, this.ys.music + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.music], options.music);
 	this.clickareas.push({
@@ -160,7 +160,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Sound
-	this.draw_checkbox([this.checkbox_x, this.ys.sound], options.sound_on);
+	draw_checkbox([this.checkbox_x, this.ys.sound], options.sound_on);
 	write_text(lang.options_sound, [this.text_x, this.ys.sound + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.draw_bar([this.secondary_x_offset, this.ys.sound], options.sound);
 	this.clickareas.push({
@@ -257,7 +257,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Auto continue
-	this.draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
+	draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
 	write_text(lang.options_auto_continue, [this.text_x, this.ys.auto_continue + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
 		x1: this.checkbox_x,
@@ -270,7 +270,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Click and hold
-	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
+	draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
 	write_text(lang.options_click_hold, [this.text_x, this.ys.click_hold + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
 		x1: this.checkbox_x,
@@ -283,7 +283,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Plant distribution
-	this.draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
+	draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
 	write_text(lang.options_plants, [this.text_x, this.ys.plants + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
 		x1: this.checkbox_x,
@@ -296,7 +296,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Show vanquished predators
-	this.draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
+	draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
 	write_text(lang.options_predators, [this.text_x, this.ys.predators + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
 		x1: this.checkbox_x,
@@ -309,7 +309,7 @@ Options.prototype.redraw = function() {
 	});
 
 	// Show tutorial
-	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
+	draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
 	write_text(lang.options_tutorial, [this.text_x, this.ys.tutorial + this.text_y_offset], '#000000', '#ffffff', 'left');
 	this.clickareas.push({
 		x1: this.checkbox_x,
@@ -317,7 +317,7 @@ Options.prototype.redraw = function() {
 		x2: this.checkbox_x + this.x_dim[0] + 2,
 		y2: this.ys.tutorial + this.x_dim[1] + 2,
 		down: () => {},
-		up: () => this.toggle_tutorial(),
+		up: () => game.toggle_tutorial([this.checkbox_x, this.ys.tutorial]),
 		blur: () => {}
 	});
 
@@ -382,22 +382,6 @@ Options.prototype.redraw = function() {
 		{'key': 'ENTER', 'action': () => this.close(), 'reset': true},
 		{'key': 'ESCAPE', 'action': () => this.close(), 'reset': true},
 	];
-};
-
-
-Options.prototype.draw_checkbox = function(pos, checked) {
-	draw_inv_rect(pos, [this.x_dim[0] + 2, this.x_dim[1] + 2], true);
-	ctx.save();
-	ctx.fillStyle = '#c3c3c3';
-	ctx.fillRect(pos[0] + 1, pos[1] + 1, this.x_dim[0], this.x_dim[1]);
-	ctx.restore();
-	if(checked) {
-		ctx.drawImage(this.symbols,
-			this.x_soffset[0], this.x_soffset[1],
-			this.x_dim[0], this.x_dim[1],
-			pos[0] + 1, pos[1] + 1,
-			this.x_dim[0], this.x_dim[1]);
-	}
 };
 
 
@@ -524,7 +508,7 @@ Options.prototype.change_ai_speed = function(value) {
 
 Options.prototype.toggle_auto_continue = function() {
 	options.wm_ai_auto_continue = !options.wm_ai_auto_continue;
-	this.draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
+	draw_checkbox([this.checkbox_x, this.ys.auto_continue], options.wm_ai_auto_continue);
 
 	local_save('wm_ai_auto_continue', options.wm_ai_auto_continue);
 };
@@ -532,7 +516,7 @@ Options.prototype.toggle_auto_continue = function() {
 
 Options.prototype.toggle_click_and_hold = function() {
 	options.wm_click_and_hold = !options.wm_click_and_hold;
-	this.draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
+	draw_checkbox([this.checkbox_x, this.ys.click_hold], options.wm_click_and_hold);
 
 	local_save('wm_click_and_hold', options.wm_click_and_hold);
 };
@@ -540,7 +524,7 @@ Options.prototype.toggle_click_and_hold = function() {
 
 Options.prototype.toggle_plant_distribtion = function() {
 	options.plant_distribtion = !options.plant_distribtion;
-	this.draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
+	draw_checkbox([this.checkbox_x, this.ys.plants], options.plant_distribtion);
 
 	local_save('plant_distribtion', options.plant_distribtion);
 };
@@ -548,23 +532,9 @@ Options.prototype.toggle_plant_distribtion = function() {
 
 Options.prototype.toggle_show_predators = function() {
 	options.show_predators = !options.show_predators;
-	this.draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
+	draw_checkbox([this.checkbox_x, this.ys.predators], options.show_predators);
 
 	local_save('show_predators', options.show_predators);
-};
-
-
-Options.prototype.toggle_tutorial = function() {
-	options.tutorial = !options.tutorial;
-	this.draw_checkbox([this.checkbox_x, this.ys.tutorial], options.tutorial);
-
-	local_save('tutorial', options.tutorial);
-
-	// Reset seen tutorials when tutorials are switched on again
-	if(options.tutorial) {
-		game.seen_tutorials = new Set();
-		local_save('seen_tutorials', []);
-	}
 };
 
 
