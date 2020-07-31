@@ -31,6 +31,8 @@ function Mutations() {
 	this.spec_offset = [23, 23];
 	this.next_offset = [459, 458];
 	this.pie_offset = [615, 111];
+	this.help_text_offset = [80, 10];
+	this.inner_help_text_offset = [10, 10];
 
 	this.symbol_soffset = [0, 96];
 	this.plus_soffset = [312, 96];
@@ -43,6 +45,8 @@ function Mutations() {
 
 	this.deltay = 26;
 	this.last_bit_width = 3;
+	this.line_height = 18;
+	this.max_text_width = 400;
 	// CONST_END
 
 	this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
@@ -185,6 +189,16 @@ Mutations.prototype.redraw = function() {
 			down: () => {},
 			up: () => this.add(i, 10),
 			blur: () => {}
+		});
+
+		this.rightclickareas.push({
+			x1: this.text_offset[0],
+			y1: this.bar_offset[1] + this.deltay*i,
+			x2: this.pie_offset[0],
+			y2: this.bar_offset[1] + this.bar_dim[1] + this.deltay*i,
+			down: () => this.show_info(i),
+			up: () => this.redraw(),
+			blur: () => this.redraw()
 		});
 	}
 	write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
@@ -434,6 +448,30 @@ Mutations.prototype.ai = function() {
 
 	game.current_player.evo_score = 0;
 	this.stats = game.current_player.stats;
+};
+
+
+Mutations.prototype.show_info = function(trait) {
+	const text = multiline(lang.trait_hints[trait], this.max_text_width);
+
+	const width = this.inner_help_text_offset[0] * 2 + this.max_text_width;
+	const height = this.inner_help_text_offset[1] + this.line_height * text.length;
+
+	let y;
+	if(trait < 9) {
+		y = this.symbol_offset[1] + this.deltay * (trait + 1) + this.help_text_offset[1];
+	}
+	else {
+		y = this.symbol_offset[1] + this.deltay * trait - this.help_text_offset[1] - height;
+	}
+
+	ctx.drawImage(this.bg_pic, this.help_text_offset[0], y, width, height);
+
+	draw_rect([this.help_text_offset[0], y], [width, height], true);
+
+	for(let i = 0; i < text.length; i++) {
+		write_text(text[i], [this.help_text_offset[0] + this.inner_help_text_offset[0], y + this.line_height * (i + 1)], 'white', 'black', 'left');
+	}
 };
 
 

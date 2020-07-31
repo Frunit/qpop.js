@@ -78,7 +78,7 @@ const i18n = Object.freeze({
 			wm_units: 'Setze deine Einheiten auf die Weltkarte. Nach der ersten Einheit kannst du weitere Einheiten nur direkt neben schon platzierte Einheiten setzen. Du kannst keine Einheiten auf Wasser oder Berge setzen. Pass also auf, dich nicht einzubauen! Am Anfang ist es ratsam, möglichst viele Pflanzen vom gleichen Typ zu besetzen.',
 			wm_shadows: 'Du kannst so viele Einheiten wieder aufnehmen, wie du Schatten hast. So kannst du Einheiten umplatzieren. Du bekommst mehr Schatten, wenn du die Geschwindigkeit der Spezies durch Mutationen verbesserst. Du kannst jetzt auch gegen benachbarte Einheiten einer anderen Art kämpfen, wenn du noch Einheiten übrig hast.',
 			mutation_start: 'Benutze Mutationspunkte um die Eigenschaften der Spezies zu verbessern. Zu Beginn hast du 100 Mutationspunkte, später wird die Anzahl von deinen Erfolgen im Spiel abhängen.',
-			mutation_plant: 'Die Spezies sollte mindestens 50% an die Pflanze angepasst sein, die sie auf der Weltkarte hauptsächlich besetzt. Andere Eigenschaften werden später im Spiel wichtiger.',
+			mutation_plant: 'Die Spezies sollte mindestens 50% an die Pflanze angepasst sein, die sie auf der Weltkarte hauptsächlich besetzt. Klicke mit rechts auf eine Eigenschaft um mehr zu erfahren.',
 			survival_start: 'In diesem Teil des Spiels kontrollierst du ein Individuum deiner Spezies in einer Umgebung, die auf der Verteilung der Spezies auf der Weltkarte basiert. Bewege das Individuum indem du auf die Karte in der Richtung klickst, in der es gehen soll. Du kannst auch die Pfeil- und WASD-Tasten verwenden. Du kannst fressen, indem du auf das Individuum klickst oder die Leertaste drückst. Solltest du in einer ausweglosen Situation sein, kannst du das Individuum umbringen, indem du mit rechts drauf klickst oder Escape drückst.',
 			survival_goals: 'Versuche, so viele wie möglich zu fressen. Pflanzen, an die deine Spezies gut angepasst bist, sind nahrhafter für sie. Versuche, mindestens eine Reihe mit Nahrung zu füllen. Außerdem solltest du versuchen, dich zu vermehren, indem du neben ein Weibchen läufst. Nimm dich vor Fleischfressern in Acht!',
 			survival_time: 'Du hast eine bestimmte Anzahl Schritte zur Verfügung und für jeden Schritt nur ein paar Sekunden Zeit. Wenn das Individuum sterben sollte, kannst du mit einem anderen weiter machen, solange du noch Schritte hast. Jeder Tod wirkt sich auf die Verteilung der Spezies auf der Weltkarte aus.',
@@ -98,6 +98,21 @@ const i18n = Object.freeze({
 			ranking_no_save: 'Wenn du einen Spielstand runterladen willst, kannst du das hier tun. Das Spiel wird nicht automatisch gespeichert.',
 			save: 'Der Spielstand, den du eben runterladen konntest, kann wieder in diesem Spiel geladen werden. Außerdem ist er kompatibel mit dem Originalspiel!',
 		},
+		trait_hints: [
+			'Anpassung an Rangonen verbessert die Nahrungsverwertung der Pflanze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Rangonenfeldern.', // Rangones
+			'Anpassung an Blaublatt verbessert die Nahrungsverwertung der Pflanze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Blaublattfeldern.', // Blueleaf
+			'Anpassung an Wulgpilze verbessert die Nahrungsverwertung der Pilze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Wulgpilzfeldern.', // Hushrooms
+			'Anpassung an Stinkbälle verbessert die Nahrungsverwertung der Pflanze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Stinkballfeldern.', // Stinkballs
+			'Anpassung an Schlingwurz verbessert die Nahrungsverwertung der Pflanze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Schlingwurzfeldern.', // Snakeroot
+			'Anpassung an Feuergras verbessert die Nahrungsverwertung der Pflanze. Außerdem verbessert sie die Kampffähigkeiten auf der Weltkarte auf Feuergrasfeldern.', // Firegrass
+			'Vermehrung erhöht den Effekt des Paarens und Nahrungssammelns in der Überlebensphase und ergibt so mehr Einheiten auf der Weltkarte.', // Reproduction
+			'Angriff verbessert die Chancen des Aggressors eines Kampfes auf der Weltkarte.', // Attack
+			'Verteidigung verbessert die Chancen des Verteidigers eines Kampfes auf der Weltkarte. Außerdem erhöht sie die Chancen gegen Fleischfresser.', // Defense
+			'Tarnung erhöht die Wahrscheinlichkeit, dass Fleischfresser die Fährte verlieren und einen nicht mehr verfolgen.', // Camouflage
+			'Geschwindigkeit gibt mehr Bewegungspunkte auf der Weltkarte. Außerdem erhöht sie ein wenig die Wahrscheinlichkeit, dass Fleischfresser die Fährte verlieren.', // Speed
+			'Sinnesorgane verbessern die Reichweite der kleinen Karte in der Überlebensrunde.', // Perception
+			'Intelligenz verbessert die meisten der anderen Eigenschaften ein bisschen.', // Intelligence
+		],
 	}),
 	EN: Object.freeze({
 		title: 'Q-POP',
@@ -176,7 +191,7 @@ const i18n = Object.freeze({
 			wm_units: 'Place your units on the world map. After the first unit, you can only place units adjacent to others. You cannot place units on mountains or water. So take care to not trap yourself close to the coast or in the mountains. In the beginning, it is favourable to place most units on the same type of plants.',
 			wm_shadows: 'You can pick up as many units as you have shadows. This way, you can move units on the world map. You can improve your speed trait in the mutations screen to get more shadows. From this turn on, you can fight against adjacent units of a different species if you have units left.',
 			mutation_start: 'Distribute mutation points to improve traits of your species. In the beginning, you have 100 mutation points but later in the game, the number will depend on your success in the game.',
-			mutation_plant: 'In the beginning, the adaptation to the plant you occupy most should have at least 50%. Other traits become more important later in the game.',
+			mutation_plant: 'In the beginning, the adaptation to the plant you occupy most should have at least 50%. Rightclick on any trait to learn more about it.',
 			survival_start: 'In this part of the game, you play one individual of your species in an environment that is created dependent on the positions you occupy on the world map. Move by clicking on the survival map or by using the arrow keys or WASD. You can eat by clicking on the individual or pressing space. If you should be in a hopeless situation, you can rightclick on the individual or press escape to kill it and start at a new position.',
 			survival_goals: 'Try to eat as many plants as possible. Plants that your species is adapted to will yield more nutrition. You should fill at least one food bar. In addition, you should try to reproduce by walking next to a female. Finally, try to avoid predators.',
 			survival_time: 'You have a limited amount of steps and a limited amount of time for each step. If you die, you will continue with another individual, but every death affects the distribution of your species on the world map.',
@@ -196,5 +211,20 @@ const i18n = Object.freeze({
 			ranking_no_save: 'If you want to download a savegame, you can do that here. The game will not be saved automatically.',
 			save: 'The savegame you were just offered can be loaded again in this game. But it is also compatible with the original game!',
 		},
+		trait_hints: [
+			'Adaptation to rangones improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on rangone fields.', // Rangones
+			'Adaptation to blueleaf improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on blueleaf fields.', // Blueleaf
+			'Adaptation to hushrooms improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on hushroom fields.', // Hushrooms
+			'Adaptation to stinkballs improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on stinkball fields.', // Stinkballs
+			'Adaptation to snakeroots improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on snakeroot fields.', // Snakeroot
+			'Adaptation to firegrass improves the food utilisation of the plant. In addition, the adaptation is an advantage in fights on the world map on firegrass fields.', // Firegrass
+			'The reproduction rate increases the effect of mating and feeding, yielding more units for the world map.', // Reproduction
+			'The attack strength increases the chances for the aggressor of a fight on the world map.', // Attack
+			'The defence strength increases the chances for the defender of a fight on the world map. Furthermore, it increases the probability of winning against predators.', // Defense
+			'Camouflage increases the probability that predators lose the trail and do not follow the player.', // Camouflage
+			'Speed grants more movement points on the world map. In addition, speed increases the probability that predators lose the trail by a small amount.', // Speed
+			'Perception improves the range of the mini map during survival.', // Perception
+			'Intelligence improves most of the other traits by a small amount.', // Intelligence
+		],
 	}),
 });
