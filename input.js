@@ -50,7 +50,9 @@
 		if(['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Space', ' '].includes(code)) {
 			event.preventDefault();
 		}
-		setKey(code, true);
+		if(!event.repeat) {
+			setKey(code, true);
+		}
 	});
 
 	document.addEventListener('keyup', function(event) {
