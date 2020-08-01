@@ -273,6 +273,7 @@ Loader.prototype.finished_preloading = function(self) {
 		['sfx/spec4', 'audio', 'spec3'],
 		['sfx/spec5', 'audio', 'spec4'],
 		['sfx/spec6', 'audio', 'spec5'],
+		['sfx/ranking', 'audio', 'ranking'],
 		['sfx/dino_cry', 'audio', 'dino_cry'], // Sounds
 		['sfx/dino_win', 'audio', 'dino_win'],
 		['sfx/electro', 'audio', 'electro'],
@@ -348,7 +349,6 @@ Loader.prototype.finished_loading = function(self) {
 	resources.on_ready(self.finished_postloading, self);
 	resources.load([
 		['sfx/catastrophe', 'audio', 'catastrophe'], // Music
-		['sfx/ranking', 'audio', 'ranking'],
 		['sfx/outro', 'audio', 'outro'],
 		['anim_gfx/amoegro.png', 'image'], // Catastrophe gfx
 		['anim_gfx/baumbebe.png', 'image'],

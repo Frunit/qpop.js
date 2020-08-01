@@ -102,7 +102,7 @@ Ranking.prototype.initialize = function(autosave=true) {
 		}
 	}
 
-	audio.play_music('intro');
+	audio.play_music('ranking');
 	this.sprites = [];
 	for(let i = 0; i < 6; i++) {
 		this.sprites.push(
