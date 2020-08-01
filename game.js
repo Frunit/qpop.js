@@ -741,7 +741,7 @@ Game.prototype.load_game = function(save_file) {
 
 
 Game.prototype.next_stage = function() {
-	if(this.stage.id > SCENE.TURN_SELECTION) {
+	if(this.stage.id > SCENE.TURN_SELECTION && this.stage.id !== SCENE.OUTRO) {
 		const finished = this.is_game_finished();
 		if(finished === null) {
 			return; // indecisive; wait for player to choose
