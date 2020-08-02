@@ -25,10 +25,11 @@ function Loader() {
 	this.text_y_offset = 12;
 	this.tutorial_offset = 450;
 
+	// Get size with `du -c -b *.m4a`
 	this.img_size = 1236659;
 	this.mp3_size = 8603397;
-	this.ogg_size = 5590506;
-	this.m4a_size = 4162489;
+	this.ogg_size = 12314468;
+	this.m4a_size = 22314449;
 	// CONST_END
 
 	this.max_size = 0;

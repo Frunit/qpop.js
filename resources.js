@@ -105,12 +105,12 @@
 
 		if(best_audio_suffix === null) {
 			const mimes = [
-				['.m4a', 'audio/m4a; codecs="aac"'],
-				['.m4a', 'audio/aac; codecs="aac"'],
-				['.ogg', 'audio/ogg; codecs="vorbis"'],
 				['.mp3', 'audio/mp3; codecs="mp3"'],
 				['.mp3', 'audio/mp4; codecs="mp3"'],
 				['.mp3', 'audio/mpeg; codecs="mp3"'],
+				['.ogg', 'audio/ogg; codecs="vorbis"'],
+				['.m4a', 'audio/m4a; codecs="aac"'],
+				['.m4a', 'audio/aac; codecs="aac"'],
 			];
 
 			const audio_elem = document.createElement('audio');
