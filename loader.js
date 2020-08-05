@@ -100,6 +100,17 @@ Loader.prototype.redraw = function() {
 		ctx.restore();
 	}
 	else { // phase is 1 or 2
+		// Delete previous drawings completely to avoid Q-POP graphic and
+		// text above each other if loading is asynchronous
+		ctx.save();
+		ctx.beginPath();
+		ctx.rect(0.5, 0.5, canvas.width-1, canvas.height-1);
+		ctx.fillStyle = '#a3a3a3';
+		ctx.strokeStyle = '#000000';
+		ctx.fill();
+		ctx.stroke();
+		ctx.restore();
+
 		draw_base();
 		draw_rect([0, 20], [640, 460]); // Main rectangle
 
