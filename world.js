@@ -102,9 +102,15 @@ World.prototype.initialize = function() {
 	if(game.turn === 1) {
 		this.tutorials.push({
 			'name': 'wm_shadows',
-			'pos': [80, 235],
-			'arrows': [{dir: DIR.E, offset: 100}],
+			'pos': [80, 205],
+			'arrows': [{dir: DIR.E, offset: 130}],
 			'highlight': [this.right_rect_offset[0], this.tomove_offset[1] - 3, 640, this.tomove_offset[1] + this.tile_dim[1] + 3],
+		});
+		this.tutorials.push({
+			'name': 'wm_rightclick',
+			'pos': [80, 50],
+			'arrows': [{dir: DIR.E, offset: 50}],
+			'highlight': [this.spec_offset[0], this.spec_offset[1], this.spec_offset[0] + this.spec_dim[0], this.spec_offset[1] + this.spec_dim[1]],
 		});
 	}
 
