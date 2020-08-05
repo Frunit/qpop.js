@@ -57,3 +57,13 @@ When playing with less than six players (human or ai), you could not get the max
 I spent many hours extracting survival maps from RAM and running statistics on them. I hope that I managed to resemble the survival maps as closely as possible, but there will probably be differences.
 
 One deliberate difference is the presence of craters in survival maps. In the original game, there is a graphics tile for a crater, but it was never used in any survival map. In this remake, craters appear if the player has individuals on the world map close to the impact site(s) created by the meteor catastrophe. They don't serve any purpose other than blocking the movement.
+
+
+#### No two-females bug
+
+In the original game, when two females stood next to each other with one space inbetween them, the player could walk through that space and keep walking. This resulted in a *third* female spawning. This bug is gone in the remake.
+
+
+### Slightly different predator behaviour
+
+In the remake, you can no longer be lucky to pass by a predator and maybe get away with it. If you step right next to a predator, it will now just stay where it is and attack you.
