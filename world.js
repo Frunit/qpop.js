@@ -64,7 +64,7 @@ function World() {
 		{
 			'name': 'wm_units',
 			'pos': [75, 155],
-			'arrows': [{dir: DIR.N, offset: 42}, {dir: DIR.N, offset: 154}, {dir: DIR.N, offset: 266}, {dir: DIR.E, offset: 130}],
+			'arrows': [{dir: DIR.E, offset: 130}],
 			'highlight': [0, 0, 640, 480],
 		},
 	];
@@ -1090,7 +1090,7 @@ World.prototype.draw_bar = function() {
 
 World.prototype.draw_minispec = function() {
 	const w = this.minispec_delta[0] * 10;
-	const h = this.tomove_offset[1] - this.toplace_offset[1] + this.minispec_delta[1] * 2;
+	const h = this.tomove_offset[1] - this.toplace_offset[1] + this.minispec_delta[1] * 3;
 	ctx.drawImage(this.bg_pic,
 		this.toplace_offset[0], this.toplace_offset[1],
 		w, h,
