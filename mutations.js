@@ -1,6 +1,9 @@
 'use strict';
 
 
+// MAYBE: Slowly fill up bar when mouse button is kept pressed
+
+
 function Mutations() {
 	this.id = SCENE.MUTATION;
 	this.bg_pic = resources.get('gfx/dark_bg.png');

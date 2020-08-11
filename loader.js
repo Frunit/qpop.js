@@ -29,7 +29,7 @@ function Loader() {
 	this.img_size = 1236659;
 	this.mp3_size = 8603397;
 	this.ogg_size = 12314468;
-	this.m4a_size = 22314449;
+	this.m4a_size = 8839096;
 	// CONST_END
 
 	this.max_size = 0;
