@@ -1,5 +1,4 @@
 screenshots/
-sfx/
 raw_sfx/
 old_stuff/
 min/
@@ -7,4 +6,5 @@ itch.io/
 *_old*
 *_debug*
 *.txt
+*.csv
 *.py
