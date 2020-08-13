@@ -553,3 +553,29 @@ function debug_draw_clickareas() {
 	ctx.restore();
 }
 */
+
+function debug_count_individuals() {
+	const nums = [0, 0, 0, 0, 0, 0];
+
+	if(game.map_positions === null) {
+		return [];
+	}
+
+	for(let y = 1; y < 27; y++) {
+		for(let x = 1; x < 27; x++) {
+			if(game.map_positions[y][x] >= 0) {
+				nums[game.map_positions[y][x]]++;
+			}
+		}
+	}
+
+	const wrong = [];
+
+	for(let i = 0; i < 6; i++) {
+		if(nums[i] !== game.players[i].individuals) {
+			wrong.push([i, nums[i], game.players[i].individuals]);
+		}
+	}
+
+	return wrong;
+};

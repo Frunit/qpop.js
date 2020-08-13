@@ -741,6 +741,20 @@ Game.prototype.load_game = function(save_file) {
 
 
 Game.prototype.next_stage = function() {
+	// DEBUG START
+	const wrong = debug_count_individuals();
+	if(wrong.length !== 0) {
+		const text = ['Die Anzahl der Individuen stimmt nicht.'];
+		for(let elem of wrong) {
+			text.push('Art ' + elem[0] + ': soll ' + elem[2] + ', ist ' + elem[1] + '.');
+		}
+		text.push('Bitte schreib mir eine eMail mit dem Fehler und was genau vorher passiert ist.');
+		open_popup('Kritischer Individuen-Fehler!', 'dino_cries', text.join(' '), () => game.next_stage(), 'MIST!');
+		return;
+	}
+	// DEBUG END
+
+
 	if(this.stage.id > SCENE.TURN_SELECTION && this.stage.id !== SCENE.OUTRO) {
 		const finished = this.is_game_finished();
 		if(finished === null) {
