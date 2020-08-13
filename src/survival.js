@@ -1046,12 +1046,7 @@ Survival.prototype.calc_outcome = function() {
 	}
 
 	game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATTR.REPRODUCTION] / 20);
-	if(game.current_player.toplace > 20) {
-		game.current_player.toplace = 20;
-	}
-	else if(game.current_player.toplace < loved) {
-		game.current_player.toplace = loved;
-	}
+	game.current_player.toplace = clamp(game.current_player.toplace, loved, 20);
 
 	game.current_player.tomove = Math.floor(game.current_player.stats[ATTR.SPEED] / 5);
 };

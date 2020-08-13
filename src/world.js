@@ -496,20 +496,25 @@ World.prototype.catastrophe_exec = function() {
 
 
 World.prototype.catastrophe_finish = function() {
-	game.temp = clamp(game.temp, 0, 100);
-	game.humid = clamp(game.humid, 0, 100);
-	game.water_level = clamp(game.water_level, 0, 100);
+	if(this.catastrophe_status !== 3) {
+		game.temp = clamp(game.temp, 0, 100);
+		game.humid = clamp(game.humid, 0, 100);
+		game.water_level = clamp(game.water_level, 0, 100);
 
-	this.animation = null;
-	game.world_map = this.create_world_map();
+		this.animation = null;
+		game.world_map = this.create_world_map();
 
-	for(let y = 1; y < this.dim[1] - 1; y++) {
-		for(let x = 1; x < this.dim[0] - 1; x++) {
-			if(game.map_positions[y][x] >= 0 && (!game.world_map[y][x] || game.world_map[y][x] >= WORLD_MAP.MOUNTAIN)) {
-				this.kill_individual(x, y);
+		for(let y = 1; y < this.dim[1] - 1; y++) {
+			for(let x = 1; x < this.dim[0] - 1; x++) {
+				if(game.map_positions[y][x] >= 0 && (game.world_map[y][x] === WORLD_MAP.WATER || game.world_map[y][x] >= WORLD_MAP.MOUNTAIN)) {
+					this.kill_individual(x, y);
+				}
 			}
 		}
 	}
+
+	this.redraw();
+	this.catastrophe_status = 3;
 
 	for(let player of game.players) {
 		if(player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
@@ -518,10 +523,6 @@ World.prototype.catastrophe_finish = function() {
 			return;
 		}
 	}
-
-	this.redraw();
-
-	this.catastrophe_status = 3;
 
 	if(!game.seen_tutorials.has('catastrophe')) {
 		this.tutorials.push({
@@ -616,7 +617,7 @@ World.prototype.fight = function(x, y) {
 	const enemy = game.players[game.map_positions[y][x]];
 	const defense = enemy.stats[ATTR.DEFENSE] + enemy.stats[ATTR.INTELLIGENCE]/2 + enemy.experience * 10 + enemy.stats[game.world_map[y][x] - WORLD_MAP.RANGONES];
 
-	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : game.map_positions[y][x];
+	const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? game.current_player.id : enemy.id;
 
 	this.animation = new Sprite('gfx/world.png', [512, 16],
 		[[0,0], [16,0], [32,0], [48,0], [0,0], [16,0], [32,0], [48,0]], anim_delays.world, [16, 16],
