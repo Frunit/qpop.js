@@ -179,19 +179,26 @@ function clamp(num, min, max) {
 function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 
+	console.log('03 Initializing download');
+
 	const file = new Blob([data], {type: type});
 	if(window.navigator.msSaveOrOpenBlob) { // IE10+
+		console.log('04 IE download');
 		window.navigator.msSaveOrOpenBlob(file, filename);
 	}
 	else { // Other browsers
+		console.log('04 non-IE download');
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(file);
 		a.download = filename;
 		document.body.appendChild(a);
+		console.log('05 Link created');
 		a.click();
+		console.log('06 Link clicked');
 		setTimeout(function() {
 			document.body.removeChild(a);
 			window.URL.revokeObjectURL(file);
+			console.log('07 Link removed');
 		}, 0);
 	}
 }

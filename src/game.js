@@ -540,6 +540,7 @@ Game.prototype.load_locally = function(num) {
 
 
 Game.prototype.save_game = function() {
+	console.log('01 Starting to save game');
 	const save_file = new ArrayBuffer(4172);
 	const content = new DataView(save_file);
 
@@ -632,6 +633,8 @@ Game.prototype.save_game = function() {
 	content.setUint8(0x104a, single);
 
 	content.setUint8(0x104b, 1); // scrolling option is always on
+
+	console.log('02 Save game content created');
 
 	download(save_file, 'qpop_save.qpp', 'application/octet-stream');
 };
