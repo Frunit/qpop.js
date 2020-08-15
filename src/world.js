@@ -56,6 +56,7 @@ function World() {
 	this.ai_active = false;
 	this.ai_frame = 0;
 	this.ai_own_individuals = [];
+	this.ai_fights = null;
 
 	this.animation = null;
 	this.animation_pos = [[0, 0]];
@@ -634,6 +635,9 @@ World.prototype.fight_end = function(winner, enemy, x, y) {
 		enemy.individuals--;
 		game.map_positions[y][x] = game.current_player.id;
 		game.current_player.individuals++;
+		if(game.current_player.type === PLAYER_TYPE.COMPUTER) {
+			this.ai_own_individuals.push([x, y]);
+		}
 	}
 	game.current_player.toplace--;
 	this.draw_wm_part(x, y);
@@ -656,7 +660,7 @@ World.prototype.set_individual = function(x, y) {
 			// No one may attack during the first turn
 			this.fight(x, y);
 		}
-		return;
+		return false;
 	}
 
 	// Normal click in the neighborhood
@@ -666,6 +670,8 @@ World.prototype.set_individual = function(x, y) {
 	this.draw_bar();
 	this.draw_minispec();
 	this.draw_wm_part(x, y);
+
+	return true;
 };
 
 
@@ -806,6 +812,8 @@ World.prototype.ai = function() {
 		}
 	}
 
+	this.ai_fights = Array.from(Array(this.dim[1]), () => Array(this.dim[0]).fill(0));
+
 	// In the first turn, give AI a high score for a random plant to force it to
 	// stick to that plant. The high score is removed at the end of AI movement.
 	if(game.turn === 0) {
@@ -828,26 +836,22 @@ World.prototype.ai_step = function() {
 			this.ai_end();
 			return;
 		}
+
+		// Only use shadows (movements) if no individuals for placement are left
+		const to_remove = pop_random_element(this.ai_own_individuals);
+		this.take_individual(to_remove[0], to_remove[1]);
+		return;
 	}
 
 	let depth = game.current_player.iq;
 	if(game.turn === 0) {
 		depth = 4; // Make the AI smarter in the first turn to avoid islands etc.
 	}
-	let value = 0;
 	let best_value = -99999;
 	let best_move = [];
-	let to_remove = 0;
-
-	// Only use shadows (movements) if no individuals for placement are left
-	if(game.current_player.toplace === 0) {
-		to_remove = pop_random_element(this.ai_own_individuals);
-		this.take_individual(to_remove[0], to_remove[1]);
-		return;
-	}
 
 	for(let move of this.ai_possible_moves(this.ai_own_individuals)) {
-		value = this.ai_rate_move(move[0], move[1], depth);
+		const value = this.ai_rate_move(move[0], move[1], depth);
 		if(value > best_value) {
 			best_value = value;
 			best_move = move;
@@ -860,8 +864,13 @@ World.prototype.ai_step = function() {
 		return;
 	}
 
-	this.set_individual(best_move[0], best_move[1]);
-	this.ai_own_individuals.push(best_move);
+	const was_set = this.set_individual(best_move[0], best_move[1]);
+	if(was_set) {
+		this.ai_own_individuals.push(best_move);
+	}
+	else {
+		this.ai_fights[best_move[1]][best_move[0]]++;
+	}
 };
 
 
@@ -913,6 +922,8 @@ World.prototype.ai_rate_move = function(x, y, depth) {
 						enemy.stats[game.world_map[yy][xx] - WORLD_MAP.RANGONES] -
 						enemy.stats[ATTR.DEFENSE] - enemy.stats[ATTR.INTELLIGENCE]/4;
 					value += winning_chance * weight;
+					// Discourage fights that were fought before
+					value -= this.ai_fights[yy][xx] * 100 * weight;
 				}
 			}
 			else if(game.world_map[yy][xx] >= WORLD_MAP.RANGONES && game.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
