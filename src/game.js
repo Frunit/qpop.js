@@ -1,8 +1,6 @@
 'use strict';
 
 
-const debug1 = document.getElementById('debug1');
-
 const options = {
 	language: 'EN', // Language of the game. Currently one of ['DE', 'EN']
 	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
@@ -24,8 +22,6 @@ const options = {
 
 function Game() {
 	this.last_time = 0;
-	this.last_fps = 0;
-	this.frames = 0;
 	this.time = 0;
 	this.paused = false;
 	this.clicked_element = null;
@@ -66,25 +62,10 @@ Game.prototype.main = function() {
 			this.stage.render();
 		}
 
-		this.update_fps(now);
-
 		this.last_time = now;
 	}
 
 	requestAnimationFrame(() => this.main());
-};
-
-
-Game.prototype.update_fps = function(now) {
-	// FPS will be shown as 1/s
-	this.frames++;
-	if(now - this.last_fps > 1000) {
-		if(debug1 !== null) {
-			debug1.value = 'FPS: ' + this.frames;
-		}
-		this.frames = 0;
-		this.last_fps = now;
-	}
 };
 
 
@@ -744,20 +725,6 @@ Game.prototype.load_game = function(save_file) {
 
 
 Game.prototype.next_stage = function() {
-	// DEBUG START
-	const wrong = debug_count_individuals();
-	if(wrong.length !== 0) {
-		const text = ['Die Anzahl der Individuen stimmt nicht.'];
-		for(let elem of wrong) {
-			text.push('Art ' + elem[0] + ': soll ' + elem[2] + ', ist ' + elem[1] + '.');
-		}
-		text.push('Bitte schreib mir eine eMail mit dem Fehler und was genau vorher passiert ist.');
-		open_popup('Kritischer Individuen-Fehler!', 'dino_cries', text.join(' '), () => game.next_stage(), 'MIST!');
-		return;
-	}
-	// DEBUG END
-
-
 	if(this.stage.id > SCENE.TURN_SELECTION && this.stage.id !== SCENE.OUTRO) {
 		const finished = this.is_game_finished();
 		if(finished === null) {
