@@ -515,6 +515,8 @@ Game.prototype.load_locally = function(num) {
 	game.temp = save.temp;
 	game.infinite_game = save.infinite_game;
 
+	this.select_evo_points();
+
 	game.stage = new Ranking();  // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
 	game.stage.initialize(false);
 };
@@ -1007,7 +1009,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [1, 0, 1];
+const version = [1, 0, 2];
 const game = new Game();
 game.initialize();
 game.start();
