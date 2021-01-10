@@ -5,7 +5,7 @@ const options = {
 	language: 'EN', // Language of the game. Currently one of ['DE', 'EN']
 	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
 	wm_ai_delay: 4, // How many frames between two moves of the AI
-	wm_ai_auto_continue: false, // After the AI finished, shall the "continue" button be pressed automatically?
+	wm_ai_auto_continue: true, // After the AI finished, shall the "continue" button be pressed automatically?
 	wm_click_and_hold: true, // Enable click and hold to place/remove units from world map
 	plant_distribtion: true, // Show plant distribution on mutation screen
 	show_predators: true, // Show vanquished predators in survival
@@ -1007,7 +1007,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [1, 0, 0];
+const version = [1, 0, 1];
 const game = new Game();
 game.initialize();
 game.start();
