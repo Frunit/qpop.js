@@ -216,8 +216,8 @@ Fight.prototype.update = function() {
 			}
 			else {
 				this.sprites = [
-					new Sprite(this.opponent.url, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
 					null,
+					new Sprite(this.opponent.url, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
 				];
 			}
 
