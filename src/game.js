@@ -383,7 +383,7 @@ Game.prototype.is_game_finished = function() {
 		return this.get_ranking(pcs_alive)[0][0];
 	}
 	// only one player left and no infinite game
-	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0 && this.max_turns > 100) {
+	else if(this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
 		// not asked, yet; indecisive
 		if(this.infinite_game === false) {
 			this.infinite_game = humans_alive[0];
@@ -1009,7 +1009,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [1, 0, 4];
+const version = [1, 0, 5];
 const game = new Game();
 game.initialize();
 game.start();
