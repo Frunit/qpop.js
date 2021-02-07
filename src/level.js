@@ -282,8 +282,8 @@ Level.prototype.generate_map = function() {
 	// If humans are in vicinity, a base is created at fixed coordinates, overwriting whatever there was before
 	const tiles_human_base = [104, 105, 106, 107, 108, 109];
 	if(tile_numbers[122] > 0) {
-		for(let x = 47; x <= 51; x++) {
-			for(let y = 37; y <= 41; y++) {
+		for(let x = 37; x <= 41; x++) {
+			for(let y = 47; y <= 51; y++) {
 				const r = Math.random();
 				if(r <= 0.2) {
 					// Radar station (on average 5)
