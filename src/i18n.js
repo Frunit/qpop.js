@@ -1,7 +1,5 @@
-'use strict';
 
-
-const i18n = Object.freeze({
+export const i18n = Object.freeze({
 	DE: Object.freeze({
 		title: 'Q-POP',
 		subtitle: 'Evolution im Weltraum',

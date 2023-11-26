@@ -1,4 +1,3 @@
-'use strict';
 
 (function() {
 	const resource_cache = {};

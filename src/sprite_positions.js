@@ -1,6 +1,5 @@
-'use strict';
 
-const anims_players = Object.freeze([
+export const anims_players = Object.freeze([
 	{   // Purplus
 		still: {
 			soffset: [0, 0],
@@ -435,7 +434,7 @@ const anims_players = Object.freeze([
 	},
 ]);
 
-const anims_predators = Object.freeze([
+export const anims_predators = Object.freeze([
 	{   // Dino
 		still: {
 			soffset: [0, 0],
@@ -570,7 +569,7 @@ const anims_predators = Object.freeze([
 	},
 ]);
 
-const anims_clouds = Object.freeze({
+export const anims_clouds = Object.freeze({
 	fight_hor: {
 		size: [100, 64],
 		offset: [14, 0],
@@ -597,7 +596,7 @@ const anims_clouds = Object.freeze({
 	},
 });
 
-const anim_ranking = Object.freeze({
+export const anim_ranking = Object.freeze({
 	walking: [
 		{
 			offset: [128, 0],
@@ -653,7 +652,7 @@ const anim_ranking = Object.freeze({
 	],
 });
 
-const anim_delays = Object.freeze({
+export const anim_delays = Object.freeze({
 	movement: 2,
 	electro: 3,
 	feeding: 3,
@@ -673,7 +672,7 @@ const anim_delays = Object.freeze({
 	popups: 12,
 });
 
-const survival_background = Object.freeze({
+export const survival_background = Object.freeze({
 	36: [[384, 192], [448, 192], [512, 192], [576, 192], [0, 256], [64, 256], [128, 256], [192, 256]], // Swamp
 	44: [[256, 256], [320, 256], [384, 256], [448, 256], [512, 256], [576, 256], [320, 256], [256, 256]], // Volcano
 	66: [[384, 384], [448, 384], [512, 384], [576, 384], [576, 384], [512, 384], [448, 384], [384, 384]], // Snail

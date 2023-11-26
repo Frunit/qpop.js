@@ -1,5 +1,3 @@
-'use strict';
-
 
 // World
 const WORLD_MAP = Object.freeze({
@@ -100,7 +98,7 @@ const SCENE = Object.freeze({
 const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46]);
 
 
-function random_element(arr) {
+export function random_element(arr) {
 	// Random element of array or null if array is empty
 
 	if(arr.length) {
@@ -111,7 +109,7 @@ function random_element(arr) {
 }
 
 
-function pop_random_element(arr) {
+export function pop_random_element(arr) {
 	// Return and remove a random element from arr
 	if(arr.length === 0) {
 		return null;
@@ -125,13 +123,13 @@ function pop_random_element(arr) {
 }
 
 
-function random_int(min, max) {
+export function random_int(min, max) {
 	// Random number between min and max (both inclusive)
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 
-function shuffle(arr) {
+export function shuffle(arr) {
 	// Shuffle array in place
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
@@ -140,13 +138,13 @@ function shuffle(arr) {
 }
 
 
-function range(start, end) {
+export function range(start, end) {
 	// Array with numbers from start (inclusive) to end (exclusive)
 	return Array.from(new Array(end - start), (x,i) => i + start);
 }
 
 
-function parse_bool(s) {
+export function parse_bool(s) {
 	// Try to parse a string for boolean-like values.
 	// Following reasoning:
 	// Language | trueish | falseish
@@ -170,13 +168,13 @@ function parse_bool(s) {
 }
 
 
-function clamp(num, min, max) {
+export function clamp(num, min, max) {
 	// Ensure num is between min and max (both inclusive)
 	return num <= min ? min : (num >= max ? max : num);
 }
 
 
-function download(data, filename, type) {
+export function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 
 	console.log('03 Initializing download');
@@ -204,7 +202,7 @@ function download(data, filename, type) {
 }
 
 
-function multiline(text, maxwidth) {
+export function multiline(text, maxwidth) {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
 	const words = text.split(' ');
@@ -232,7 +230,7 @@ function multiline(text, maxwidth) {
 }
 
 
-function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
+export function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
 	ctx.save();
 	ctx.textAlign = align;
 	if(bg) {
@@ -245,7 +243,7 @@ function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
 }
 
 
-function draw_base() {
+export function draw_base() {
 	const bg = resources.get('gfx/dark_bg.png');
 	const gui = resources.get('gfx/gui.png');
 	ctx.drawImage(bg, 0, 0);
@@ -298,7 +296,7 @@ function draw_base() {
 }
 
 
-function draw_black_rect(pos, dim, fill=false) {
+export function draw_black_rect(pos, dim, fill=false) {
 	ctx.save();
 	ctx.translate(0.5, 0.5);
 	ctx.lineWidth = 1;
@@ -314,7 +312,7 @@ function draw_black_rect(pos, dim, fill=false) {
 }
 
 
-function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
+export function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -351,7 +349,7 @@ function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
 }
 
 
-function draw_upper_left_border(pos, dim) {
+export function draw_upper_left_border(pos, dim) {
 	ctx.save();
 	ctx.translate(-1, -1);
 	ctx.lineWidth = 2;
@@ -365,7 +363,7 @@ function draw_upper_left_border(pos, dim) {
 }
 
 
-function draw_inv_rect(pos, dim, black_line=true) {
+export function draw_inv_rect(pos, dim, black_line=true) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -401,7 +399,7 @@ function draw_inv_rect(pos, dim, black_line=true) {
 }
 
 
-function draw_checkbox(pos, checked) {
+export function draw_checkbox(pos, checked) {
 	draw_inv_rect(pos, [14, 14], true);
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
@@ -417,7 +415,7 @@ function draw_checkbox(pos, checked) {
 }
 
 
-function subtitle(x, y, text) {
+export function subtitle(x, y, text) {
 	const radius = 5;
 	const height = 30;
 
@@ -449,15 +447,15 @@ function subtitle(x, y, text) {
 }
 
 
-function open_popup(title, image, text, callback, right_answer, left_answer=null) {
-	// The callback function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
+export function open_popup(title, image, text, callback, right_answer, left_answer=null) {
+	// The callback export function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
 	game.backstage.push(game.stage);
 	game.stage = new Popup(title, image, callback, text, right_answer, left_answer);
 	game.stage.initialize();
 }
 
 
-function open_tutorial(tutorial) {
+export function open_tutorial(tutorial) {
 	// Highlight
 	ctx.save();
 	ctx.translate(0.5, 0,5);
@@ -482,14 +480,14 @@ function open_tutorial(tutorial) {
 }
 
 
-function open_load_dialog() {
+export function open_load_dialog() {
 	game.backstage.push(game.stage);
 	game.stage = new Load();
 	game.stage.initialize();
 }
 
 
-function init_upload(e) {
+export function init_upload(e) {
 	const pos_x = e.x - canvas_pos.left;
 	const pos_y = e.y - canvas_pos.top;
 
@@ -519,7 +517,7 @@ function init_upload(e) {
 }
 
 
-function local_save(key, value) {
+export function local_save(key, value) {
 	try {
 		localStorage.setItem(key, JSON.stringify(value));
 	}
@@ -531,7 +529,7 @@ function local_save(key, value) {
 }
 
 
-function local_load(key) {
+export function local_load(key) {
 	try {
 		return JSON.parse(localStorage.getItem(key));
 	}
@@ -541,7 +539,7 @@ function local_load(key) {
 }
 
 
-function handle_visibility_change() {
+export function handle_visibility_change() {
 	if(game === undefined) {
 		return;
 	}
