@@ -16,3 +16,17 @@ The licensing is a bit complicated. The code is released under the [MIT license]
 I made an own repository for the original graphics here: [github.com/Frunit/qpop-ressourcen](https://github.com/Frunit/qpop-ressourcen)
 
 If you have any comments, suggestions, or bug reports, please open a new [issue](https://github.com/Frunit/qpop.js/issues).
+
+## Install, build and run
+
+To install dependencies:
+
+```bash
+bun install
+```
+
+To run:
+
+```bash
+bun run index.ts
+```

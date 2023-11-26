@@ -3,6 +3,7 @@ raw_sfx/
 old_stuff/
 min/
 itch.io/
+node_modules/
 *_old*
 *_debug*
 *.txt
