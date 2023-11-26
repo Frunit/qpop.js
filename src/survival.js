@@ -109,7 +109,7 @@ export class Survival {
 			return;
 		}
 
-		audio.play_music('spec' + game.current_player.id);
+		audio.play_music(`spec${game.current_player.id}`);
 
 		this.level = new Level();
 		this.camera = new Camera(this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
@@ -504,7 +504,7 @@ export class Survival {
 		partner.type = SURV_MAP.UNRESPONSIVE;
 		partner.sprite = this.action.offspring_sprite;
 		if (partner.hasOwnProperty('env_sound')) {
-			partner.env_sound = 'offspring_' + ['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][partner.species];
+			partner.env_sound = `offspring_${['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][partner.species]}`;
 		}
 		game.current_player.loved++;
 		if (game.current_player.loved > 10) {

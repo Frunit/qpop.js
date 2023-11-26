@@ -1,6 +1,6 @@
 
-export const i18n = Object.freeze({
-	DE: Object.freeze({
+export const i18n = {
+	DE: {
 		title: 'Q-POP',
 		subtitle: 'Evolution im Weltraum',
 		next: 'Weiter',
@@ -112,8 +112,8 @@ export const i18n = Object.freeze({
 			'Sinnesorgane verbessern die Reichweite der kleinen Karte in der Überlebensrunde.', // Perception
 			'Intelligenz verbessert die meisten der anderen Eigenschaften ein bisschen.', // Intelligence
 		],
-	}),
-	EN: Object.freeze({
+	},
+	EN: {
 		title: 'Q-POP',
 		subtitle: 'Evolution in space',
 		next: 'Continue',  // "continue" is a protected word, so "next" is used as variable name
@@ -226,5 +226,5 @@ export const i18n = Object.freeze({
 			'Perception improves the range of the mini map during survival.', // Perception
 			'Intelligence improves most of the other traits by a small amount.', // Intelligence
 		],
-	}),
-});
+	},
+} as const;

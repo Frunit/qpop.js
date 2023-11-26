@@ -99,7 +99,7 @@ export class Load {
 				write_text(lang.load, [this.offset[0] + this.saves_offset[0] + this.button_dim[0] / 2, this.offset[1] + this.saves_offset[1] + this.button_y_dist * i + 15], 'white', 'black');
 
 				// Description
-				write_text((new Date(save_array[i].datetime)).toLocaleString() + ' - ' + lang.turn + ' ' + save_array[i].turn, [this.offset[0] + this.browser_text_offset[0], this.offset[1] + this.browser_text_offset[1] + this.button_y_dist * i + 15], 'white', 'black', 'left');
+				write_text(`${(new Date(save_array[i].datetime)).toLocaleString()} - ${lang.turn} ${save_array[i].turn}`, [this.offset[0] + this.browser_text_offset[0], this.offset[1] + this.browser_text_offset[1] + this.button_y_dist * i + 15], 'white', 'black', 'left');
 
 				this.clickareas.push({
 					x1: this.offset[0] + this.saves_offset[0],

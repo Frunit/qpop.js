@@ -1,3 +1,20 @@
+import { Credits } from "./credits";
+import { ATTR, PLAYER_TYPE, SCENE, WORLD_MAP, download, draw_checkbox, draw_rect, handle_visibility_change, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
+import { i18n } from "./i18n";
+import { Init } from "./init";
+import { Intro } from "./intro";
+import { ResourceLoader } from "./loader";
+import { Mutations } from "./mutations";
+import { Options } from "./options";
+import { Outro } from "./outro";
+import { Player } from "./player";
+import { Ranking } from "./ranking";
+import { Survival } from "./survival";
+import { Transition } from "./transition";
+import { Turnselection } from "./turnselection";
+import { ClickArea, LANG_DE, LANG_EN, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
+import { version } from "./version";
+import { World } from "./world";
 
 const options = {
 	language: 'EN', // Language of the game. Currently one of ['DE', 'EN']
@@ -19,32 +36,26 @@ const options = {
 
 
 class Game {
+	last_time = 0;
+	time = 0;
+	paused = false;
+	clicked_element: ClickArea | null = null;
+	right_clicked_element: ClickArea | null = null;
+	stage: Stage;
+	backstage: Stage[] = [];
+	evo_points: SixNumbers = [0, 0, 0, 0, 0, 0];
+	seen_tutorials = new Set();
+	glob: TechGlobal;
+	world: WorldGlobal;
+
 	constructor() {
-		this.last_time = 0;
-		this.time = 0;
-		this.paused = false;
-		this.clicked_element = null;
-		this.right_clicked_element = null;
-		this.stage = null;
-		this.backstage = [];
-		this.players = [];
-		this.evo_points = [0, 0, 0, 0, 0, 0];
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.seen_tutorials = new Set();
-		this.max_turns = 5;
-		this.turn = 0;
-		this.humid = 50;
-		this.temp = 50;
-		this.water_level = 20;
-		this.mountain_level = 80;
-		this.humans_present = false;
-		this.infinite_game = false;
-		this.current_player = null;
-		this.height_map = null;
-		this.world_map = null;
-		this.map_positions = null;
+		this.glob = this.initialize();
+		this.world = this.reset();
+		this.init_clickareas();
+		this.stage = new ResourceLoader();
+		this.stage.initialize();
 	}
+
 	// The main game loop
 	main() {
 		const now = Date.now();
@@ -64,81 +75,36 @@ class Game {
 
 		requestAnimationFrame(() => this.main());
 	}
-	reset() {
-		this.players = [];
+
+	reset(): WorldGlobal {
+		const players = [];
 		for (let i = 0; i < 6; i++) {
-			this.players.push(new Player(i));
+			players.push(new Player(i));
 		}
-		this.max_turns = 5;
-		this.turn = 0;
-		this.humid = 50;
-		this.temp = 50;
-		this.water_level = 20;
-		this.mountain_level = 80;
-		this.humans_present = false;
-		this.infinite_game = false;
-		this.current_player = this.players[0];
-		this.height_map = null;
-		this.world_map = null;
-		this.map_positions = null;
+
+		return {
+			players,
+			max_turns: 5,
+			turn: 0,
+			humid: 50,
+			temp: 50,
+			water_level: 20,
+			mountain_level: 80,
+			humans_present: false,
+			infinite_game: false,
+			current_player: players[0],
+			height_map: null,
+			world_map: null,
+			map_positions: null,
+		};
 	}
+
 	start() {
-		ctx.font = 'bold 12px sans-serif';
-		this.stage = new Loader();
-		this.stage.initialize();
 		this.last_time = Date.now();
-
-		this.clickareas.push({
-			x1: 1, y1: 1,
-			x2: 21, y2: 20,
-			down: () => { draw_rect([0, 0], [22, 21], true, true); },
-			up: () => this.toggle_credits(),
-			blur: () => { draw_rect([0, 0], [22, 21]); }
-		});
-
-		this.clickareas.push({
-			x1: 546, y1: 1,
-			x2: 576, y2: 20,
-			down: () => { draw_rect([545, 0], [32, 21], true, true); },
-			up: () => this.next_language(1),
-			blur: () => { draw_rect([545, 0], [32, 21]); }
-		});
-
-		this.rightclickareas.push({
-			x1: 546, y1: 1,
-			x2: 576, y2: 20,
-			down: () => { draw_rect([545, 0], [32, 21], true, true); },
-			up: () => this.next_language(-1),
-			blur: () => { draw_rect([545, 0], [32, 21]); }
-		});
-
-		this.clickareas.push({
-			x1: 577, y1: 1,
-			x2: 597, y2: 20,
-			down: () => { draw_rect([576, 0], [22, 21], true, true); },
-			up: () => this.toggle_sound(),
-			blur: () => { draw_rect([576, 0], [22, 21]); }
-		});
-
-		this.clickareas.push({
-			x1: 598, y1: 1,
-			x2: 618, y2: 20,
-			down: () => { draw_rect([597, 0], [22, 21], true, true); },
-			up: () => this.toggle_music(),
-			blur: () => { draw_rect([597, 0], [22, 21]); }
-		});
-
-		this.clickareas.push({
-			x1: 619, y1: 1,
-			x2: 639, y2: 20,
-			down: () => { draw_rect([618, 0], [22, 21], true, true); },
-			up: () => this.toggle_options(),
-			blur: () => { draw_rect([618, 0], [22, 21]); }
-		});
-
 		this.main();
 	}
-	initialize() {
+
+	initialize(): TechGlobal {
 		// GET parameter handling
 		const search_params = new URL(document.location.href.toLowerCase()).searchParams;
 
@@ -149,35 +115,32 @@ class Game {
 		}
 
 		// Save version in case I need to account for different versions later
-		if (local_load('version') !== version) {
+		if (JSON.stringify(local_load('version')) !== JSON.stringify(version)) {
 			local_save('version', version);
 		}
 
 		// If "lang[uage]" is defined and set to a supported language, use that language.
 		//   Otherwise try to determine the browser language. Otherwise default to English.
-		options.language = search_params.get('lang') || search_params.get('language') || local_load('language') || navigator.language || navigator.userLanguage;
+		options.language = search_params.get('lang') || search_params.get('language') || local_load('language') as string | null || navigator.language;
 		options.language = options.language.substring(0, 2).toUpperCase();
+		if(!(options.language in Object.keys(i18n))) {
+			options.language = LANG_EN;
+		}
 
-		if (i18n.hasOwnProperty(options.language)) {
-			lang = i18n[options.language];
-		}
-		else {
-			lang = i18n.EN;
-			options.language = 'EN';
-		}
+		const lang = i18n[options.language as keyof typeof i18n];
 
 		for (let option of Object.keys(options)) {
 			if (local_load(option) === null) {
-				local_save(option, options[option]);
+				local_save(option, options[option as keyof typeof options]);
 			}
 
 			// language and seen_tutorials are handled above and below, respectively
 			else if (option !== 'language' && option !== 'seen_tutorials') {
-				options[option] = local_load(option);
+				options[option as keyof typeof options] = local_load(option) as any;
 			}
 		}
 
-		const seen_tutorials = local_load('seen_tutorials');
+		const seen_tutorials = local_load('seen_tutorials') as string[];
 		if (seen_tutorials !== null) {
 			this.seen_tutorials = new Set(seen_tutorials);
 		}
@@ -198,7 +161,105 @@ class Game {
 		else {
 			audio.set_sound_volume(0);
 		}
+
+		// Create the canvas
+		const canvas = document.createElement('canvas');
+		const ctx = canvas.getContext('2d');
+		if(ctx === null) {
+			const message = 'Could not get context from canvas.';
+			alert(message);
+			throw new Error(message);
+		}
+		canvas.width = 640;
+		canvas.height = 480;
+		ctx.font = 'bold 12px sans-serif';
+		const div = document.getElementById('qpop');
+		if(div === null) {
+			const message = 'Could not find a div with id qpop.';
+			alert(message);
+			throw new Error(message);
+		}
+		div.appendChild(canvas);
+		const canvas_pos = canvas.getBoundingClientRect();
+
+		// Disable the right-click context menu in the game
+		canvas.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+			return false;
+		});
+
+		document.addEventListener('visibilitychange', handle_visibility_change);
+		const [clickareas, rightclickareas] = this.init_clickareas();
+
+		const glob: TechGlobal = {
+			canvas,
+			ctx,
+			canvas_pos,
+			lang,
+			clickareas,
+			rightclickareas,
+			options,
+			next_stage: this.next_stage.bind(this),
+		};
+
+		return glob;
 	}
+
+	init_clickareas(): [ClickArea[], ClickArea[]] {
+		const clickareas = [];
+		const rightclickareas = [];
+
+		clickareas.push({
+			x1: 1, y1: 1,
+			x2: 21, y2: 20,
+			down: () => { draw_rect([0, 0], [22, 21], true, true); },
+			up: () => this.toggle_credits(),
+			blur: () => { draw_rect([0, 0], [22, 21]); }
+		});
+
+		clickareas.push({
+			x1: 546, y1: 1,
+			x2: 576, y2: 20,
+			down: () => { draw_rect([545, 0], [32, 21], true, true); },
+			up: () => this.next_language(1),
+			blur: () => { draw_rect([545, 0], [32, 21]); }
+		});
+
+		rightclickareas.push({
+			x1: 546, y1: 1,
+			x2: 576, y2: 20,
+			down: () => { draw_rect([545, 0], [32, 21], true, true); },
+			up: () => this.next_language(-1),
+			blur: () => { draw_rect([545, 0], [32, 21]); }
+		});
+
+		clickareas.push({
+			x1: 577, y1: 1,
+			x2: 597, y2: 20,
+			down: () => { draw_rect([576, 0], [22, 21], true, true); },
+			up: () => this.toggle_sound(),
+			blur: () => { draw_rect([576, 0], [22, 21]); }
+		});
+
+		clickareas.push({
+			x1: 598, y1: 1,
+			x2: 618, y2: 20,
+			down: () => { draw_rect([597, 0], [22, 21], true, true); },
+			up: () => this.toggle_music(),
+			blur: () => { draw_rect([597, 0], [22, 21]); }
+		});
+
+		clickareas.push({
+			x1: 619, y1: 1,
+			x2: 639, y2: 20,
+			down: () => { draw_rect([618, 0], [22, 21], true, true); },
+			up: () => this.toggle_options(),
+			blur: () => { draw_rect([618, 0], [22, 21]); }
+		});
+
+		return [clickareas, rightclickareas];
+	}
+
 	handle_input() {
 		if (window.input === undefined) {
 			// Input may be uninitialized because it might still be loading
@@ -208,7 +269,7 @@ class Game {
 		if (input.isDown('MOVE')) {
 			const pos = input.mousePos();
 			if (game.clicked_element || game.right_clicked_element) {
-				const area = game.clicked_element || game.right_clicked_element;
+				const area = game.clicked_element || game.right_clicked_element as ClickArea;
 				if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 					pos[1] >= area.y1 && pos[1] <= area.y2) {
 					if (area.move) {
@@ -228,7 +289,7 @@ class Game {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
 						if (!area.default_pointer) {
-							canvas.style.cursor = 'pointer';
+							this.glob.canvas.style.cursor = 'pointer';
 							found = true;
 						}
 						break;
@@ -236,7 +297,7 @@ class Game {
 				}
 
 				if (!found) {
-					canvas.style.cursor = 'default';
+					this.glob.canvas.style.cursor = 'default';
 				}
 			}
 		}
@@ -308,42 +369,46 @@ class Game {
 			}
 		}
 	}
+
 	is_last_player() {
-		for (let i = this.current_player.id + 1; i < 6; i++) {
-			if (!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
+		for (let i = this.world.current_player.id + 1; i < 6; i++) {
+			if (!this.world.players[i].is_dead && this.world.players[i].type !== PLAYER_TYPE.NOBODY) {
 				return false;
 			}
 		}
 
 		return true;
 	}
+
 	set_to_next_player() {
-		for (let i = this.current_player.id + 1; i < 6; i++) {
-			if (!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-				this.current_player = this.players[i];
+		for (let i = this.world.current_player.id + 1; i < 6; i++) {
+			if (!this.world.players[i].is_dead && this.world.players[i].type !== PLAYER_TYPE.NOBODY) {
+				this.world.current_player = this.world.players[i];
 				return true;
 			}
 		}
 
 		return false;
 	}
+
 	set_to_first_player() {
 		for (let i = 0; i < 6; i++) {
-			if (!this.players[i].is_dead && this.players[i].type !== PLAYER_TYPE.NOBODY) {
-				this.current_player = this.players[i];
+			if (!this.world.players[i].is_dead && this.world.players[i].type !== PLAYER_TYPE.NOBODY) {
+				this.world.current_player = this.world.players[i];
 				return;
 			}
 		}
 	}
+
 	// Returns false, if the game goes on, -1 if the game was lost, null if the player still has to be asked, and a number [0-5] if the player with the number won.
 	is_game_finished() {
 		const humans_alive = [];
 		const pcs_alive = [];
 		for (let i = 0; i < 6; i++) {
-			if (this.players[i].type === PLAYER_TYPE.HUMAN && !this.players[i].is_dead) {
+			if (this.world.players[i].type === PLAYER_TYPE.HUMAN && !this.world.players[i].is_dead) {
 				humans_alive.push(i);
 			}
-			else if (this.players[i].type === PLAYER_TYPE.COMPUTER && !this.players[i].is_dead) {
+			else if (this.world.players[i].type === PLAYER_TYPE.COMPUTER && !this.world.players[i].is_dead) {
 				pcs_alive.push(i);
 			}
 		}
@@ -358,38 +423,39 @@ class Game {
 				return pcs_alive[0];
 			}
 
-			return this.get_ranking(pcs_alive)[0][0];
+			return this.get_ranking(pcs_alive as SixNumbers)[0][0];
 		}
 
 		// only one player left and no infinite game
-		else if (this.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
+		else if (this.world.infinite_game !== true && humans_alive.length === 1 && pcs_alive.length === 0) {
 			// not asked, yet; indecisive
-			if (this.infinite_game === false) {
-				this.infinite_game = humans_alive[0];
-				open_popup(lang.popup_title, 'chuck_berry', lang.continue_alone,
-					(x) => game.game_finished_popup(x), lang.no, lang.yes);
+			if (this.world.infinite_game === false) {
+				this.world.infinite_game = !!humans_alive[0];
+				open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.continue_alone,
+					(x: number) => game.game_finished_popup(x), this.glob.lang.no, this.glob.lang.yes);
 				return null;
 			}
 
 			// asked and infinite game is a player number, so the player won
 			else {
-				return this.infinite_game;
+				return this.world.infinite_game;
 			}
 		}
 		// more than one player (human or PC) still alive or single player chose to start an infinite game -> game continues
 		return false;
 	}
-	game_finished_popup(answer) {
+
+	game_finished_popup(answer: number) {
 		if (answer === 1) {
-			this.infinite_game = true;
+			this.world.infinite_game = true;
 		}
 
 		this.next_stage();
 	}
-	get_ranking(selection = [0, 1, 2, 3, 4, 5]) {
 
+	get_ranking(selection: SixNumbers = [0, 1, 2, 3, 4, 5]): Tuple<[number, number],6> {
 		// Sort by total_score and individuals
-		function sortme(obj1, obj2) {
+		function sortme(obj1: number[], obj2: number[]): number {
 			if (obj1[1] === obj2[1]) {
 				return obj2[2] - obj1[2];
 			}
@@ -404,34 +470,21 @@ class Game {
 
 		scores.sort(sortme);
 
-		return scores;
+		return scores as Tuple<[number, number],6>;
 	}
-	count_plants() {
-		const wm_width = game.map_positions[0].length;
-		const wm_height = game.map_positions.length;
-		const counts = [0, 0, 0, 0, 0, 0];
 
-		for (let x = 1; x < wm_width - 1; x++) {
-			for (let y = 1; y < wm_height - 1; y++) {
-				if (game.map_positions[y][x] === this.current_player.id) {
-					counts[game.world_map[y][x] - WORLD_MAP.RANGONES]++;
-				}
-			}
-		}
-
-		return counts;
-	}
 	select_evo_points() {
-		if (this.max_turns <= 5) {
+		if (this.world.max_turns <= 5) {
 			this.evo_points = [60, 50, 40, 30, 20, 10];
 		}
-		else if (this.max_turns <= 10) {
+		else if (this.world.max_turns <= 10) {
 			this.evo_points = [42, 35, 28, 21, 14, 7];
 		}
 		else {
 			this.evo_points = [30, 25, 20, 15, 10, 5];
 		}
 	}
+
 	save_locally() {
 		const save = {
 			'players': game.players,
@@ -448,7 +501,7 @@ class Game {
 			'datetime': (new Date()).toISOString(),
 		};
 
-		let save_array = local_load('save');
+		let save_array = local_load('save') as any[] | null; // TODO
 		if (save_array === null) {
 			save_array = new Array(10).fill(null);
 		}
@@ -458,8 +511,9 @@ class Game {
 
 		return local_save('save', save_array);
 	}
-	load_locally(num) {
-		let save_array = local_load('save');
+
+	load_locally(num: number) {
+		let save_array = local_load('save') as any[] | null; // TODO
 		if (save_array === null) {
 			return;
 		}
@@ -487,6 +541,7 @@ class Game {
 		game.stage = new Ranking(); // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
 		game.stage.initialize(false);
 	}
+
 	save_game() {
 		console.log('01 Starting to save game');
 		const save_file = new ArrayBuffer(4172);
@@ -497,9 +552,9 @@ class Game {
 			content.setUint8(i, qpopstring.charCodeAt(i));
 		}
 
-		content.setUint8(0x10, options.music_on);
+		content.setUint8(0x10, options.music_on ? 1 : 0);
 		content.setUint8(0x11, options.music);
-		content.setUint8(0x12, options.sound_on);
+		content.setUint8(0x12, options.sound_on ? 1 : 0);
 		content.setUint8(0x13, options.sound);
 
 		for (let i = 0; i < game.players.length; i++) {
@@ -533,13 +588,13 @@ class Game {
 			content.setUint8(0x33 + offset, p.stats[ATTR.STINKBALLS]);
 			content.setUint8(0x34 + offset, p.stats[ATTR.SNAKEROOTS]);
 			content.setUint8(0x35 + offset, p.stats[ATTR.FIREGRASS]);
-			content.setUint8(0x36 + offset, p.is_dead);
-			content.setUint8(0x1042 + i, p.is_dead);
+			content.setUint8(0x36 + offset, p.is_dead ? 1 : 0);
+			content.setUint8(0x1042 + i, p.is_dead ? 1 : 0);
 		}
 
 		content.setUint16(0xaa, game.turn, true);
 		content.setUint8(0xac, game.max_turns);
-		content.setUint8(0xad, game.humans_present);
+		content.setUint8(0xad, game.humans_present ? 1 : 0);
 		content.setUint16(0xb1, game.water_level, true);
 		content.setUint16(0xb3, game.humid, true);
 		content.setUint16(0xb5, game.temp, true);
@@ -557,7 +612,7 @@ class Game {
 			}
 		}
 
-		content.setUint8(0x1049, game.infinite_game & 1);
+		content.setUint8(0x1049, game.infinite_game ? 1 : 0);
 
 		// Determination whether only a single human player without any others is playing
 		let single = 0;
@@ -586,6 +641,7 @@ class Game {
 
 		download(save_file, 'qpop_save.qpp', 'application/octet-stream');
 	}
+
 	load_game(save_file) {
 		// NB! Except for a simple test for the right file type, I do not do any sanity checks. The file will only be processed on the client side with data provided by the client, so at worst, the game will freeze when using a manipulated file.
 		const content = new DataView(save_file);
@@ -680,11 +736,12 @@ class Game {
 			mp = 4;
 		}
 
-		game.infinite_game = content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp);
+		game.infinite_game = !!(content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp));
 
 		game.stage = new Ranking(); // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
 		game.stage.initialize(false);
 	}
+
 	next_stage() {
 		if (this.stage.id > SCENE.TURN_SELECTION && this.stage.id !== SCENE.OUTRO) {
 			const finished = this.is_game_finished();
@@ -779,9 +836,10 @@ class Game {
 			default:
 				// This should never happen
 				console.warn(this.stage);
-				open_popup(lang.popup_title, 'dino_cries', 'Wrong scene code: ' + this.stage.id + '. This should never ever happen!', () => { }, 'Oh no!');
+				open_popup(this.glob.lang.popup_title, 'dino_cries', `Wrong scene code: ${this.stage.id}. This should never ever happen!`, () => { }, 'Oh no!');
 		}
 	}
+
 	tutorial() {
 		if (options.tutorial) {
 			for (let tut of this.stage.tutorials) {
@@ -794,6 +852,7 @@ class Game {
 			}
 		}
 	}
+
 	toggle_pause(force_pause = null) {
 		if (force_pause === null) {
 			game.paused = !game.paused;
@@ -806,6 +865,7 @@ class Game {
 			audio.unpause();
 		}
 	}
+
 	toggle_credits() {
 		draw_rect([0, 0], [22, 21]);
 		if (game.stage.id === SCENE.CREDITS) {
@@ -820,6 +880,7 @@ class Game {
 			game.stage.initialize();
 		}
 	}
+
 	toggle_options() {
 		draw_rect([618, 0], [22, 21]);
 		if (game.stage.id === SCENE.OPTIONS) {
@@ -834,6 +895,7 @@ class Game {
 			game.stage.initialize();
 		}
 	}
+
 	toggle_sound() {
 		if (options.audio_enabled) {
 			options.sound_on = !options.sound_on;
@@ -852,8 +914,8 @@ class Game {
 			game.stage.redraw();
 			open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => { }, lang.close);
 		}
-
 	}
+
 	toggle_music() {
 		if (options.audio_enabled) {
 			options.music_on = !options.music_on;
@@ -873,6 +935,7 @@ class Game {
 			open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => { }, lang.close);
 		}
 	}
+
 	disable_audio() {
 		// This does purposefully not change localStorage!
 		options.music_on = false;
@@ -887,17 +950,18 @@ class Game {
 			game.stage.redraw();
 		}
 	}
-	next_language(direction) {
-		// direction is either 1 or -1
+
+	next_language(direction: 1 | -1) {
 		draw_rect([545, 0], [32, 21]);
 		const lang_list = Object.keys(i18n);
 		const current_lang = lang_list.indexOf(options.language);
 
 		options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
 		local_save('language', options.language);
-		lang = i18n[options.language];
+		this.glob.lang = i18n[options.language];
 		game.stage.redraw();
 	}
+
 	toggle_tutorial(checkbox_pos = null) {
 		options.tutorial = !options.tutorial;
 		if (checkbox_pos !== null) {
@@ -914,46 +978,5 @@ class Game {
 	}
 }
 
-
-class Player {
-	constructor(num) {
-		this.id = num;
-		this.iq = 2;
-		this.type = (num === SPECIES.PURPLUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
-		this.individuals = 0;
-		this.toplace = 10;
-		this.tomove = 0;
-		this.is_dead = false;
-		this.loved = 0;
-		this.eaten = 0;
-		this.experience = 0;
-		this.deaths = 0;
-		this.evo_score = 100;
-		this.total_score = 230;
-		this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-	}
-}
-
-
-// Create the canvas
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = 640;
-canvas.height = 480;
-document.getElementById('qpop').appendChild(canvas);
-const canvas_pos = canvas.getBoundingClientRect();
-
-// Disable the right-click context menu in the game
-canvas.addEventListener('contextmenu', function(e) {
-	e.preventDefault();
-	return false;
-});
-
-document.addEventListener('visibilitychange', handle_visibility_change);
-
-let lang = null;
-
-const version = [1, 0, 5];
 const game = new Game();
-game.initialize();
 game.start();

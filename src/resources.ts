@@ -1,19 +1,20 @@
+import { ResourceElement } from "./types";
 
 (function() {
-	const resource_cache = {};
+	const resource_cache: {[key: string]: boolean | AudioBuffer | HTMLImageElement} = {};
 	let ready_callback = () => {};
 	let ready_param = null;
 	const loading = [];
-	const load_status = {};
+	const load_status: {[key: string]: number} = {};
 	let loaded = 0;
 	let audio_enabled = true;
 	let initial_play = true;
 
-	let best_audio_suffix = null;
+	let best_audio_suffix: string | null = null;
 	const context = new AudioContext();
 	const music_node = context.createGain();
 	const sound_node = context.createGain();
-	const musics = {};
+	const musics: {[key: string]: AudioBufferSourceNode} = {};
 	const sounds = {};
 	let currently_playing_music = '';
 	const currently_playing_sounds = new Set();
@@ -21,11 +22,11 @@
 
 	// Load an array of resources
 	// Format: [url, type, name]. Name is optional. Type must be "audio" or "image". The suffix for "audio" will be appended, so give the url without suffix for audio.
-	function load(Arr) {
-		for(let elem of Arr) {
-			let url = elem[0];
-			const type = elem[1];
-			const name = (elem.length === 3) ? elem[2] : url;
+	function load(resources: ResourceElement[]) {
+		for(let resource of resources) {
+			let url = resource.url;
+			const type = resource.type;
+			const name = resource.name ? resource.name : url;
 
 			// determine audio format. If no audio is possible, load nothing.
 			if(type === 'audio') {
@@ -40,7 +41,7 @@
 		}
 	}
 
-	function _load(url, name, type) {
+	function _load(url: string, name: string, type: string) {
 		if(!resource_cache[name]) {
 			loading.push(name);
 			resource_cache[name] = true;
@@ -62,7 +63,7 @@
 							if(_is_ready()) {
 								ready_callback(ready_param);
 							}
-						}, (e) => {console.warn('Error: ' + e.err);});
+						}, (e) => {console.warn(`Error: ${e.err}`);});
 					}
 				);
 			}
@@ -93,7 +94,7 @@
 		}
 	}
 
-	function _update_load_status(name, bytes) {
+	function _update_load_status(name: string, bytes: number) {
 		load_status[name] = bytes;
 	}
 
@@ -128,7 +129,7 @@
 		return best_audio_suffix;
 	}
 
-	function get(name) {
+	function get(name: string) {
 		return resource_cache[name];
 	}
 
@@ -143,13 +144,13 @@
 
 	function get_status() {
 		let bytes = 0;
-		for(let obj in load_status) {
-			bytes += load_status[obj];
+		for(const value of Object.values(load_status)) {
+			bytes += value;
 		}
 		return bytes;
 	}
 
-	function play_music(name) {
+	function play_music(name: string) {
 		if(initial_play) {
 			initial_play = false;
 

@@ -100,7 +100,7 @@ export class Mutations {
 			this.next_popup(1);
 		}
 		else {
-			audio.play_music('spec' + game.current_player.id);
+			audio.play_music(`spec${game.current_player.id}`);
 			this.plant_counts = game.count_plants();
 			const total_count = this.plant_counts.reduce((a, b) => a + b);
 			for (let i = 0; i < this.plant_counts.length; i++) {
@@ -258,7 +258,7 @@ export class Mutations {
 			this.percent_del_offset[0], this.percent_del_offset[1] + this.deltay * num,
 			this.percent_del_dim[0], this.percent_del_dim[1]);
 
-		write_text(this.stats[num] + '%', [this.percent_offset[0], this.percent_offset[1] + this.deltay * num], 'white', 'black', 'left');
+		write_text(`${this.stats[num]}%`, [this.percent_offset[0], this.percent_offset[1] + this.deltay * num], 'white', 'black', 'left');
 
 		// Bar
 		ctx.drawImage(this.pics,
@@ -455,5 +455,25 @@ export class Mutations {
 			game.current_player.stats = this.stats;
 			game.next_stage();
 		}
+	}
+	private count_plants(): SixNumbers {
+		const counts: SixNumbers = [0, 0, 0, 0, 0, 0];
+
+		if(game.map_positions === null || game.world_map === null) {
+			return counts;
+		}
+
+		const wm_width = game.map_positions[0].length;
+		const wm_height = game.map_positions.length;
+
+		for (let x = 1; x < wm_width - 1; x++) {
+			for (let y = 1; y < wm_height - 1; y++) {
+				if (game.map_positions[y][x] === this.current_player.id) {
+					counts[game.world_map[y][x] - WORLD_MAP.RANGONES]++;
+				}
+			}
+		}
+
+		return counts;
 	}
 }

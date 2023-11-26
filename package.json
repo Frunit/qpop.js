@@ -1,7 +1,15 @@
 {
   "name": "qpop",
+  "version": "1.1.0",
   "module": "src/game.ts",
+  "license": "ISC",
+  "main": "browser",
   "type": "module",
+  "homepage": "https://frunit.itch.io/q-pop",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/Frunit/qpop.js.git"
+  },
   "devDependencies": {
     "bun-types": "^1.0.14",
     "eslint": "^8.54.0",

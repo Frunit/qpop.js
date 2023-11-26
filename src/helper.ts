@@ -1,104 +1,109 @@
+import { Load } from "./load";
+import { Player } from "./player";
+import { Popup } from "./popup";
+import { Tutorial } from "./tutorial";
+import { Dimension, LocalSave, Point, Tuple } from "./types";
 
 // World
-const WORLD_MAP = Object.freeze({
-	WATER:      0,
-	RANGONES:   1,
-	BLUELEAF:   2,
-	HUSHROOMS:  3,
-	STINKBALLS: 4,
-	SNAKEROOTS: 5,
-	FIREGRASS:  6,
-	DESERT:     7,
-	MOUNTAIN:   8,
-	CRATER:     9,
-	HUMANS:    10,
-});
+export enum WORLD_MAP {
+	WATER =      0,
+	RANGONES =   1,
+	BLUELEAF =   2,
+	HUSHROOMS =  3,
+	STINKBALLS = 4,
+	SNAKEROOTS = 5,
+	FIREGRASS =  6,
+	DESERT =     7,
+	MOUNTAIN =   8,
+	CRATER =     9,
+	HUMANS =    10,
+};
 
 // Attribute
-const ATTR = Object.freeze({
-	RANGONES:      0,
-	BLUELEAF:      1,
-	HUSHROOMS:     2,
-	STINKBALLS:    3,
-	SNAKEROOTS:    4,
-	FIREGRASS:     5,
-	REPRODUCTION:  6,
-	ATTACK:        7,
-	DEFENSE:       8,
-	CAMOUFLAGE:    9,
-	SPEED:        10,
-	PERCEPTION:   11,
-	INTELLIGENCE: 12,
-});
+export enum ATTR {
+	RANGONES =      0,
+	BLUELEAF =      1,
+	HUSHROOMS =     2,
+	STINKBALLS =    3,
+	SNAKEROOTS =    4,
+	FIREGRASS =     5,
+	REPRODUCTION =  6,
+	ATTACK =        7,
+	DEFENSE =       8,
+	CAMOUFLAGE =    9,
+	SPEED =        10,
+	PERCEPTION =   11,
+	INTELLIGENCE = 12,
+};
 
 // Directions
-const DIR = Object.freeze({
-	X: 0,
-	N: 1,
-	E: 2,
-	S: 3,
-	W: 4,
-});
+export enum DIR {
+	X = 0,
+	N = 1,
+	E = 2,
+	S = 3,
+	W = 4,
+};
 
 // Player types
-const PLAYER_TYPE = Object.freeze({
-	HUMAN:    1,
-	COMPUTER: 2,
-	NOBODY:   3,
-});
+export enum PLAYER_TYPE {
+	HUMAN =    1,
+	COMPUTER = 2,
+	NOBODY =   3,
+};
 
 // Predators
-const PRED = Object.freeze({
-	DINO:     0,
-	MUSHROOM: 1,
-	HUMAN:    2,
-});
+export enum PRED {
+	DINO =     0,
+	MUSHROOM = 1,
+	HUMAN =    2,
+};
 
 // Predators
-const SPECIES = Object.freeze({
-	PURPLUS:      0,
-	KIWIOPTERYX:  1,
-	PESCIODYPHUS: 2,
-	ISNOBUG:      3,
-	AMORPH:       4,
-	CHUCKBERRY:   5,
-});
+export enum SPECIES {
+	PURPLUS =      0,
+	KIWIOPTERYX =  1,
+	PESCIODYPHUS = 2,
+	ISNOBUG =      3,
+	AMORPH =       4,
+	CHUCKBERRY =   5,
+};
 
 // Living objects on survival map
-const SURV_MAP = Object.freeze({
-	PLAYER:       1,
-	PREDATOR:     2,
-	ENEMY:        3,
-	FEMALE:       4,
-	UNRESPONSIVE: 5, // For defeated entities, offspring, etc.
-});
+export enum SURV_MAP {
+	PLAYER =       1,
+	PREDATOR =     2,
+	ENEMY =        3,
+	FEMALE =       4,
+	UNRESPONSIVE = 5, // For defeated entities, offspring, etc.
+};
 
 
-const SCENE = Object.freeze({
-	LOADING:         1,
-	INTRO:           2,
-	INIT:            3,
-	TURN_SELECTION:  4,
-	TRANS_WORLD:     5,
-	WORLD:           6,
-	RANKING:         7,
-	TRANS_MUTATION:  8,
-	MUTATION:        9,
-	TRANS_SURVIVAL: 10,
-	SURVIVAL:       11,
-	OUTRO:          12,
-	POPUP:          20,
-	CATASTROPHE:    21,
-	TUTORIAL:       22,
-	CREDITS:        30,
-	OPTIONS:        31,
-	LOAD_GAME:      32,
-});
+export enum SCENE {
+	LOADING =         1,
+	INTRO =           2,
+	INIT =            3,
+	TURN_SELECTION =  4,
+	TRANS_WORLD =     5,
+	WORLD =           6,
+	RANKING =         7,
+	TRANS_MUTATION =  8,
+	MUTATION =        9,
+	TRANS_SURVIVAL = 10,
+	SURVIVAL =       11,
+	OUTRO =          12,
+	POPUP =          20,
+	CATASTROPHE =    21,
+	TUTORIAL =       22,
+	CREDITS =        30,
+	OPTIONS =        31,
+	LOAD_GAME =      32,
+};
 
 const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46]);
 
 
-export function random_element(arr) {
+export function random_element<T>(arr: T[]): T | null {
 	// Random element of array or null if array is empty
 
 	if(arr.length) {
@@ -109,7 +114,7 @@ export function random_element(arr) {
 }
 
 
-export function pop_random_element(arr) {
+export function pop_random_element<T>(arr: T[]): T | null {
 	// Return and remove a random element from arr
 	if(arr.length === 0) {
 		return null;
@@ -123,13 +128,13 @@ export function pop_random_element(arr) {
 }
 
 
-export function random_int(min, max) {
+export function random_int(min: number, max: number): number {
 	// Random number between min and max (both inclusive)
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 
-export function shuffle(arr) {
+export function shuffle(arr: any[]): void {
 	// Shuffle array in place
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
@@ -138,13 +143,13 @@ export function shuffle(arr) {
 }
 
 
-export function range(start, end) {
+export function range(start: number, end: number): number[] {
 	// Array with numbers from start (inclusive) to end (exclusive)
 	return Array.from(new Array(end - start), (x,i) => i + start);
 }
 
 
-export function parse_bool(s) {
+export function parse_bool(s: string | null): boolean {
 	// Try to parse a string for boolean-like values.
 	// Following reasoning:
 	// Language | trueish | falseish
@@ -168,7 +173,7 @@ export function parse_bool(s) {
 }
 
 
-export function clamp(num, min, max) {
+export function clamp(num: number, min: number, max: number): number {
 	// Ensure num is between min and max (both inclusive)
 	return num <= min ? min : (num >= max ? max : num);
 }
@@ -202,7 +207,7 @@ export function download(data, filename, type) {
 }
 
 
-export function multiline(text, maxwidth) {
+export function multiline(text: string, maxwidth: number): string[] {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
 	const words = text.split(' ');
@@ -210,7 +215,7 @@ export function multiline(text, maxwidth) {
 	let line = words[0];
 
 	for(let n = 1; n < words.length; n++) {
-		const test_line = line + ' ' + words[n];
+		const test_line = `${line} ${words[n]}`;
 		const width = ctx.measureText(test_line).width;
 		if(width > maxwidth) {
 			lines.push(line);
@@ -230,7 +235,7 @@ export function multiline(text, maxwidth) {
 }
 
 
-export function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
+export function write_text(text: string, pos: Point, fg='#000000', bg='#ffffff', align='center') {
 	ctx.save();
 	ctx.textAlign = align;
 	if(bg) {
@@ -265,7 +270,7 @@ export function draw_base() {
 
 	// Middle
 	draw_rect([21, 0], [525, 21]);
-	write_text(lang.title + ' v' + version.join('.'), [320, 14], 'white', 'black');
+	write_text(`${lang.title} v${version.join('.')}`, [320, 14], 'white', 'black');
 
 	// Language
 	draw_rect([545, 0], [32, 21]);
@@ -296,7 +301,7 @@ export function draw_base() {
 }
 
 
-export function draw_black_rect(pos, dim, fill=false) {
+export function draw_black_rect(pos: Point, dim: Dimension, fill=false) {
 	ctx.save();
 	ctx.translate(0.5, 0.5);
 	ctx.lineWidth = 1;
@@ -312,7 +317,7 @@ export function draw_black_rect(pos, dim, fill=false) {
 }
 
 
-export function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
+export function draw_rect(pos: Point, dim: Dimension, black_line=true, clicked=false, light=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -349,7 +354,7 @@ export function draw_rect(pos, dim, black_line=true, clicked=false, light=false)
 }
 
 
-export function draw_upper_left_border(pos, dim) {
+export function draw_upper_left_border(pos: Point, dim: Dimension) {
 	ctx.save();
 	ctx.translate(-1, -1);
 	ctx.lineWidth = 2;
@@ -363,7 +368,7 @@ export function draw_upper_left_border(pos, dim) {
 }
 
 
-export function draw_inv_rect(pos, dim, black_line=true) {
+export function draw_inv_rect(pos: Point, dim: Dimension, black_line=true) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -399,7 +404,7 @@ export function draw_inv_rect(pos, dim, black_line=true) {
 }
 
 
-export function draw_checkbox(pos, checked) {
+export function draw_checkbox(pos: Point, checked: boolean) {
 	draw_inv_rect(pos, [14, 14], true);
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
@@ -415,12 +420,12 @@ export function draw_checkbox(pos, checked) {
 }
 
 
-export function subtitle(x, y, text) {
+export function subtitle(x: number, y: number, text: string) {
 	const radius = 5;
 	const height = 30;
 
 	ctx.save();
-	ctx.font = (height - 10) + 'px sans-serif';
+	ctx.font = `${height - 10}px sans-serif`;
 	ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
 	ctx.translate(0.5, 0.5);
 	ctx.beginPath();
@@ -517,7 +522,7 @@ export function init_upload(e) {
 }
 
 
-export function local_save(key, value) {
+export function local_save(key: string, value: unknown): boolean {
 	try {
 		localStorage.setItem(key, JSON.stringify(value));
 	}
@@ -529,13 +534,15 @@ export function local_save(key, value) {
 }
 
 
-export function local_load(key) {
+export function local_load(key: string): unknown {
 	try {
-		return JSON.parse(localStorage.getItem(key));
+		const item = localStorage.getItem(key);
+		if(item !== null) {
+			return JSON.parse(item);
+		}
 	}
-	catch (e) {
-		return null;
-	}
+	catch (e) {}
+	return null;
 }
 
 

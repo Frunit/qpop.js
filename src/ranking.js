@@ -255,7 +255,7 @@ export class Ranking {
 			ctx.font = 'bold 24px serif';
 			ctx.textAlign = 'center';
 			ctx.fillStyle = '#828282';
-			ctx.fillText(lang.turn + ' ' + game.turn, this.turn_offset[0], this.turn_offset[1]);
+			ctx.fillText(`${lang.turn} ${game.turn}`, this.turn_offset[0], this.turn_offset[1]);
 			ctx.restore();
 		}
 

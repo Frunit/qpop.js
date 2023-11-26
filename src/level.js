@@ -538,7 +538,7 @@ export class Character {
 		this.invincible = false;
 		this.hidden = false;
 
-		this.url = 'gfx/spec' + (species + 1) + '.png';
+		this.url = `gfx/spec${species + 1}.png`;
 		this.anims = anims_players[species];
 
 		this.victories = [];
@@ -558,7 +558,7 @@ export class Predator {
 		this.last_movement = 0; // last movement direction
 		this.hidden = false;
 
-		this.url = 'gfx/pred' + (species + 1) + '.png';
+		this.url = `gfx/pred${species + 1}.png`;
 		this.anims = anims_predators[species];
 		this.defeated = random_element(this.anims.defeated);
 
@@ -580,10 +580,10 @@ export class Female {
 		this.has_offspring = false;
 		this.hidden = false;
 		if (species !== SPECIES.ISNOBUG) {
-			this.env_sound = 'female_' + ['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][species];
+			this.env_sound = `female_${['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][species]}`;
 		}
 
-		this.url = 'gfx/spec' + (species + 1) + '.png';
+		this.url = `gfx/spec${species + 1}.png`;
 		this.anims = anims_players[species];
 
 		if (species === SPECIES.PURPLUS) {

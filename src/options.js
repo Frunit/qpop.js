@@ -1,7 +1,7 @@
 // MAYBE: Add a little gimmick that a predator walks along the right-hand side of the screen after some time :)
 // MAYBE: Use different bar colors depending on value, similar to mutation screen
 
-class Options {
+export class Options {
 	constructor() {
 		this.id = SCENE.OPTIONS;
 		this.bg = resources.get('gfx/dark_bg.png');
@@ -317,7 +317,7 @@ class Options {
 
 		// Transition delay
 		write_text(lang.options_transition, [this.text_x, this.ys.transition + this.text_y_offset], '#000000', '#ffffff', 'left');
-		write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(`${(options.update_freq * options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
 		this.clickareas.push({
 			x1: this.secondary_x_offset + 1,
@@ -441,7 +441,7 @@ class Options {
 			this.secondary_x_offset, this.text_y_offset + 2,
 			this.text_x - 1, this.ys.transition + this.line_height - 1,
 			this.secondary_x_offset, this.text_y_offset + 2);
-		write_text((options.update_freq * options.transition_delay).toFixed(2) + ' s', [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(`${(options.update_freq * options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], options.transition_delay * 10 / 9);
 
 		local_save('transition_delay', options.transition_delay);

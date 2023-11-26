@@ -1,36 +1,47 @@
 
-export class Catastrophe {
-	constructor(callback) {
-		this.id = SCENE.CATASTROPHE;
-		this.bg = resources.get('gfx/dark_bg.png');
+import { Animation } from "./animation";
+import { catastrophe_frames } from "./frames";
+import { SCENE, draw_black_rect, draw_inv_rect, draw_rect, random_int, write_text } from "./helper";
+import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
 
+export class Catastrophe implements Stage {
+	id = SCENE.CATASTROPHE;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	tutorials = [];
+	glob: TechGlobal;
+
+	private bg: any; // TODO
+	private callback: (type: number) => void;
+	private animation: Animation | null = null;
+	private type: number;
+
+	readonly dim: Point = [360, 300];
+	readonly title_dim: Point = [360, 21];
+	readonly anim_dim: Point = [320, 240];
+	readonly offset: Point = [140, 90];
+	readonly title_offset: Point = [140, 90];
+	readonly anim_offset: Point = [160, 130];
+
+	constructor(glob: TechGlobal, callback: (type: number) => void) {
+		this.glob = glob;
 		this.callback = callback;
 
-		// CONST_START
-		this.dim = [360, 300];
-		this.title_dim = [360, 21];
-		this.anim_dim = [320, 240];
-
-		this.offset = [140, 90];
-		this.title_offset = [140, 90];
-		this.anim_offset = [160, 130];
-		// CONST_END
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
-		this.animation = null;
+		this.bg = resources.get('gfx/dark_bg.png');
 
 		this.type = random_int(0, 8);
 	}
+
 	initialize() {
 		audio.play_music('catastrophe');
-		canvas.style.cursor = 'default';
+		this.glob.canvas.style.cursor = 'default';
 		this.animation = new Animation(catastrophe_frames[this.type], this.anim_offset);
 		this.redraw();
 	}
 	redraw() {
 		// Background
-		ctx.drawImage(this.bg,
+		this.glob.ctx.drawImage(this.bg,
 			0, 0,
 			this.dim[0], this.dim[1],
 			this.offset[0], this.offset[1],
@@ -41,7 +52,7 @@ export class Catastrophe {
 
 		// Title
 		draw_rect([this.title_offset[0], this.title_offset[1]], this.title_dim);
-		write_text(lang.catastrophe,
+		write_text(this.glob.lang.catastrophe,
 			[this.title_offset[0] + this.title_dim[0] / 2,
 			this.title_offset[1] + 15],
 			'white', 'black');
@@ -69,18 +80,25 @@ export class Catastrophe {
 			{ 'key': 'ESCAPE', 'action': () => this.end(), 'reset': true },
 		];
 	}
+
 	render() {
-		this.animation.render();
+		if(this.animation !== null) {
+			this.animation.render();
+		}
 	}
+
 	update() {
-		if (this.animation.has_stopped) {
-			this.end();
-		}
-		else {
-			this.animation.step();
+		if(this.animation !== null) {
+			if (this.animation.has_stopped) {
+				this.end();
+			}
+			else {
+				this.animation.step();
+			}
 		}
 	}
-	end() {
+
+	private end() {
 		this.callback(this.type); // also redraws
 	}
 }

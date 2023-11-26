@@ -85,8 +85,9 @@ export class World {
 		this.catastrophe_status = 0; // 0 = no cata yet; 1 = cata called back; 2 = cata executing; 3 = cata finished
 		this.catastrophe_type = -1;
 	}
+
 	initialize() {
-		audio.play_music('spec' + game.current_player.id);
+		audio.play_music(`spec${game.current_player.id}`);
 
 		if (game.height_map === null) {
 			game.height_map = this.create_height_map();
@@ -123,7 +124,7 @@ export class World {
 		this.catastrophe_status = 0;
 	}
 	next_player() {
-		audio.play_music('spec' + game.current_player.id);
+		audio.play_music(`spec${game.current_player.id}`);
 		this.draw_avatar();
 		this.draw_minispec();
 
@@ -505,19 +506,19 @@ export class World {
 
 		if (!game.seen_tutorials.has('catastrophe')) {
 			this.tutorials.push({
-				'name': 'catastrophe',
-				'pos': [140, 150],
-				'arrows': [],
-				'highlight': [0, 0, 640, 480],
+				name: 'catastrophe',
+				pos: [140, 150],
+				arrows: [],
+				highlight: [0, 0, 640, 480],
 			});
 		}
 
-		if (!game.seen_tutorials.has('catastrophe' + this.catastrophe_type)) {
+		if (!game.seen_tutorials.has(`catastrophe${this.catastrophe_type}`)) {
 			this.tutorials.push({
-				'name': 'catastrophe' + this.catastrophe_type,
-				'pos': [140, 110],
-				'arrows': [],
-				'highlight': [0, 0, 640, 480],
+				name: `catastrophe${this.catastrophe_type}`,
+				pos: [140, 110],
+				arrows: [],
+				highlight: [0, 0, 640, 480],
 			});
 		}
 
