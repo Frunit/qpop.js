@@ -1,5 +1,6 @@
+import { worldmap_size } from "./consts";
 import { Credits } from "./credits";
-import { ATTR, PLAYER_TYPE, SCENE, WORLD_MAP, download, draw_checkbox, draw_rect, handle_visibility_change, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
+import { ATTR, PLAYER_TYPE, SCENE, download, draw_checkbox, draw_rect, handle_visibility_change, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
 import { i18n } from "./i18n";
 import { Init } from "./init";
 import { InputManager } from "./input";
@@ -14,9 +15,9 @@ import { ResourceManager } from "./resources";
 import { Survival } from "./survival";
 import { Transition } from "./transition";
 import { Turnselection } from "./turnselection";
-import { ClickArea, LANG_DE, LANG_EN, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
+import { ClickArea, LANG_EN, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
 import { version } from "./version";
-import { World } from "./world";
+import { World, create_height_map, create_world_map } from "./world";
 
 const options = {
 	language: LANG_EN, // Language of the game
@@ -84,20 +85,26 @@ class Game {
 			players.push(new Player(i));
 		}
 
+		const height_map = create_height_map();
+		const humid = 50;
+		const temp = 50;
+		const water_level = 20;
+		const mountain_level = 80;
+
 		return {
 			players,
 			max_turns: 5,
 			turn: 0,
-			humid: 50,
-			temp: 50,
-			water_level: 20,
-			mountain_level: 80,
+			humid,
+			temp,
+			water_level,
+			mountain_level,
 			humans_present: false,
 			infinite_game: false,
 			current_player: players[0],
-			height_map: null,
-			world_map: null,
-			map_positions: null,
+			height_map,
+			world_map: create_world_map(null, height_map, water_level, mountain_level, temp, humid),
+			map_positions: Array.from(Array(worldmap_size[1]), () => Array(worldmap_size[0]).fill(-1)),
 		};
 	}
 
@@ -134,7 +141,7 @@ class Game {
 
 		const lang = i18n[options.language as keyof typeof i18n];
 
-		for (let option of Object.keys(options)) {
+		for (const option of Object.keys(options)) {
 			if (local_load(option) === null) {
 				local_save(option, options[option as keyof typeof options]);
 			}
@@ -287,7 +294,7 @@ class Game {
 			}
 			else {
 				let found = false;
-				for (let area of game.stage.clickareas) {
+				for (const area of game.stage.clickareas) {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
 						if (!area.default_pointer) {
@@ -309,7 +316,7 @@ class Game {
 			if (this.glob.input.getClickPos()) {
 				this.glob.input.resetClickPos();
 				const pos = this.glob.input.getMousePos();
-				for (let area of game.stage.clickareas) {
+				for (const area of game.stage.clickareas) {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
 						area.down(pos[0], pos[1]);
@@ -328,7 +335,7 @@ class Game {
 			else if (this.glob.input.getRightClickPos()) {
 				this.glob.input.resetRightClickPos();
 				const pos = this.glob.input.getMousePos();
-				for (let area of game.stage.rightclickareas) {
+				for (const area of game.stage.rightclickareas) {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
 						area.down(pos[0], pos[1]);
@@ -362,7 +369,7 @@ class Game {
 			this.toggle_pause();
 		}
 
-		for (let key of game.stage.keys) {
+		for (const key of game.stage.keys) {
 			if (this.glob.input.isDown(key.key)) {
 				if (key.reset) {
 					this.glob.input.reset(key.key);
@@ -466,7 +473,7 @@ class Game {
 		}
 
 		const scores = [];
-		for (let i of selection) {
+		for (const i of selection) {
 			scores.push([i, game.world.players[i].total_score, game.world.players[i].individuals]);
 		}
 
@@ -601,12 +608,10 @@ class Game {
 		content.setUint16(0xb3, game.world.humid, true);
 		content.setUint16(0xb5, game.world.temp, true);
 
-		const size = 28;
-
-		for (let y = 0; y < size; y++) {
-			for (let x = 0; x < size; x++) {
-				const i = x + y * size;
-				const j = y + x * size; // x and y are exchanged in the heightmap for some reason
+		for (let y = 0; y < worldmap_size[0]; y++) {
+			for (let x = 0; x < worldmap_size[1]; x++) {
+				const i = x + y * worldmap_size[0];
+				const j = y + x * worldmap_size[1]; // x and y are exchanged in the heightmap for some reason
 
 				content.setUint8(0xb7 + i, game.world.world_map[y][x]);
 				content.setUint8(0x3c7 + j, game.world.height_map[y][x]);
@@ -712,16 +717,14 @@ class Game {
 
 		this.select_evo_points();
 
-		const size = 28;
+		game.world.world_map = Array.from(Array(worldmap_size[0]), () => Array(worldmap_size[1]).fill(0));
+		game.world.height_map = Array.from(Array(worldmap_size[0]), () => Array(worldmap_size[1]).fill(0));
+		game.world.map_positions = Array.from(Array(worldmap_size[0]), () => Array(worldmap_size[1]).fill(-1));
 
-		game.world.world_map = Array.from(Array(size), () => Array(size).fill(0));
-		game.world.height_map = Array.from(Array(size), () => Array(size).fill(0));
-		game.world.map_positions = Array.from(Array(size), () => Array(size).fill(0));
-
-		for (let y = 0; y < size; y++) {
-			for (let x = 0; x < size; x++) {
-				const i = x + y * size;
-				const j = y + x * size; // x and y are exchanged in the heightmap for some reason
+		for (let y = 0; y < worldmap_size[0]; y++) {
+			for (let x = 0; x < worldmap_size[1]; x++) {
+				const i = x + y * worldmap_size[0];
+				const j = y + x * worldmap_size[1]; // x and y are exchanged in the heightmap for some reason
 
 				game.world.world_map[y][x] = content.getUint8(0xb7 + i + mp);
 				game.world.height_map[y][x] = content.getUint8(0x3c7 + j + mp);
@@ -844,7 +847,7 @@ class Game {
 
 	tutorial() {
 		if (options.tutorial && this.stage.tutorials) {
-			for (let tut of this.stage.tutorials) {
+			for (const tut of this.stage.tutorials) {
 				if (!this.seen_tutorials.has(tut.name)) {
 					this.seen_tutorials.add(tut.name);
 					local_save('seen_tutorials', [...this.seen_tutorials]);

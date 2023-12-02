@@ -3,7 +3,7 @@
 import { Animation } from "./animation";
 import { intro_frames } from "./frames";
 import { SCENE, draw_base, draw_inv_rect, draw_rect } from "./helper";
-import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 export class Intro implements Stage {
 	id: number = SCENE.INTRO;
@@ -15,7 +15,7 @@ export class Intro implements Stage {
 	private num: number = 0;
 	private animation: Animation | null = null;
 
-	readonly anim_dim: Point = [600, 420];
+	readonly anim_dim: Dimension = [600, 420];
 	readonly anim_offset: Point = [19, 39];
 
 	constructor(glob: TechGlobal) {

@@ -65,7 +65,7 @@ export class Love {
 
 		if (this.delay_counter % this.delay === 0) {
 			this.frame++;
-			for (let sprite of this.sprites) {
+			for (const sprite of this.sprites) {
 				sprite.update();
 			}
 		}
@@ -179,7 +179,7 @@ export class Fight {
 
 		if (this.delay_counter % this.delay === 0) {
 			this.frame++;
-			for (let sprite of this.sprites) {
+			for (const sprite of this.sprites) {
 				if (sprite !== null) {
 					sprite.update();
 				}
@@ -277,10 +277,6 @@ export class Fight {
 }
 
 
-
-
-
-
 export class Feeding {
 	constructor(character, level, food_type, callback) {
 		this.character = character;
@@ -374,10 +370,6 @@ export class Feeding {
 }
 
 
-
-
-
-
 export class Quicksand {
 	constructor(character, callback) {
 		this.character = character;
@@ -461,10 +453,6 @@ export class Quicksand {
 }
 
 
-
-
-
-
 export class Waiting {
 	constructor(character, callback) {
 		this.callback = callback;
@@ -499,10 +487,6 @@ export class Waiting {
 }
 
 
-
-
-
-
 export class Electro {
 	constructor(dir, character, callback) {
 		this.dir = dir;
@@ -529,7 +513,7 @@ export class Electro {
 		}
 	}
 	update() {
-		for (let sprite of this.sprites) {
+		for (const sprite of this.sprites) {
 			sprite.update();
 		}
 

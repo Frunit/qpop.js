@@ -1,58 +1,74 @@
+import { DIR, PLAYER_TYPE, SCENE, WORLD_MAP, draw_base, draw_rect, draw_upper_left_border, multiline, open_popup, random_element, random_int, write_text } from "./helper";
+import { ClickArea, Dimension, KeyType, Point, SixNumbers, Stage, TechGlobal, Tuple, TutorialType, WorldGlobal } from "./types";
+
 // MAYBE: Slowly fill up bar when mouse button is kept pressed
 
+export class Mutations implements Stage {
+	id = SCENE.MUTATION;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	tutorials: TutorialType[];
+	glob: TechGlobal;
+	world: WorldGlobal;
 
-export class Mutations {
-	constructor() {
-		this.id = SCENE.MUTATION;
-		this.bg_pic = resources.get('gfx/dark_bg.png');
-		this.pics = resources.get('gfx/mutations.png');
-		this.spec_pics = resources.get('gfx/species.png');
+	private bg_pic: HTMLImageElement;
+	private pics: HTMLImageElement;
+	private spec_pics: HTMLImageElement;
 
-		// CONST_START
-		this.symbol_dim = [24, 24];
-		this.plusminus_dim = [16, 16];
-		this.bar_dim = [300, 16];
-		this.spec_dim = [64, 64];
-		this.next_dim = [181, 22];
-		this.percent_del_dim = [60, 16];
-		this.evo_pts_numdel_dim = [60, 16];
-		this.pie_dim = [16, 16];
+	private stats: Tuple<number, 13> = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
+	private plant_counts: SixNumbers = [0, 0, 0, 0, 0, 0];
 
-		this.text_offset = [20, 123];
-		this.percent_offset = [571, 123];
-		this.percent_del_offset = [569, 111];
-		this.evo_pts_text_offset = [107, 70];
-		this.evo_pts_num_offset = [571, 70];
-		this.evo_pts_numdel_offset = [569, 58];
-		this.symbol_offset = [201, 106];
-		this.evobar_offset = [248, 59];
-		this.bar_offset = [248, 111];
-		this.minus_offset = [233, 111];
-		this.plus_offset = [547, 111];
-		this.spec_offset = [23, 23];
-		this.next_offset = [459, 458];
-		this.pie_offset = [615, 111];
-		this.help_text_offset = [80, 10];
-		this.inner_help_text_offset = [10, 10];
+	readonly symbol_dim: Dimension = [24, 24];
+	readonly plusminus_dim: Dimension = [16, 16];
+	readonly bar_dim: Dimension = [300, 16];
+	readonly spec_dim: Dimension = [64, 64];
+	readonly next_dim: Dimension = [181, 22];
+	readonly percent_del_dim: Dimension = [60, 16];
+	readonly evo_pts_numdel_dim: Dimension = [60, 16];
+	readonly pie_dim: Dimension = [16, 16];
 
-		this.symbol_soffset = [0, 96];
-		this.plus_soffset = [312, 96];
-		this.plusdown_soffset = [328, 96];
-		this.minus_soffset = [344, 96];
-		this.minusdown_soffset = [360, 96];
-		this.evobar_soffset = [0, 0];
-		this.emptybar_soffset = [300, 80];
-		this.pie_soffset = [376, 96];
+	readonly text_offset: Point = [20, 123];
+	readonly percent_offset: Point = [571, 123];
+	readonly percent_del_offset: Point = [569, 111];
+	readonly evo_pts_text_offset: Point = [107, 70];
+	readonly evo_pts_num_offset: Point = [571, 70];
+	readonly evo_pts_numdel_offset: Point = [569, 58];
+	readonly symbol_offset: Point = [201, 106];
+	readonly evobar_offset: Point = [248, 59];
+	readonly bar_offset: Point = [248, 111];
+	readonly minus_offset: Point = [233, 111];
+	readonly plus_offset: Point = [547, 111];
+	readonly spec_offset: Point = [23, 23];
+	readonly next_offset: Point = [459, 458];
+	readonly pie_offset: Point = [615, 111];
+	readonly help_text_offset: Point = [80, 10];
+	readonly inner_help_text_offset: Point = [10, 10];
 
-		this.deltay = 26;
-		this.last_bit_width = 3;
-		this.line_height = 18;
-		this.max_text_width = 400;
-		// CONST_END
-		this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
-		this.bar_soffsets = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
-		this.stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
-		this.plant_counts = [0, 0, 0, 0, 0, 0];
+	readonly symbol_soffset: Point = [0, 96];
+	readonly plus_soffset: Point = [312, 96];
+	readonly plusdown_soffset: Point = [328, 96];
+	readonly minus_soffset: Point = [344, 96];
+	readonly minusdown_soffset: Point = [360, 96];
+	readonly evobar_soffset: Point = [0, 0];
+	readonly emptybar_soffset: Point = [300, 80];
+	readonly pie_soffset: Point = [376, 96];
+
+	readonly deltay = 26;
+	readonly last_bit_width = 3;
+	readonly line_height = 18;
+	readonly max_text_width = 400;
+
+	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
+	readonly bar_soffsets: Point[] = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
+
+	constructor(glob: TechGlobal, world: WorldGlobal) {
+		this.glob = glob;
+		this.world = world;
+
+		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
+		this.pics = glob.resources.get_image('gfx/mutations.png');
+		this.spec_pics = glob.resources.get_image('gfx/species.png');
 
 		this.tutorials = [
 			{
@@ -68,11 +84,8 @@ export class Mutations {
 				'highlight': [0, 0, 640, 480],
 			},
 		];
-
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
 	}
+
 	initialize() {
 		this.next_player();
 
@@ -92,16 +105,17 @@ export class Mutations {
 		}
 		game.tutorial();
 	}
-	next_player() {
-		this.stats = game.current_player.stats.slice();
 
-		if (game.current_player.type === PLAYER_TYPE.COMPUTER) {
+	next_player() {
+		this.stats = [...this.world.current_player.stats];
+
+		if (this.world.current_player.type === PLAYER_TYPE.COMPUTER) {
 			this.ai();
 			this.next_popup(1);
 		}
 		else {
-			audio.play_music(`spec${game.current_player.id}`);
-			this.plant_counts = game.count_plants();
+			this.glob.resources.play_music(`spec${this.world.current_player.id}`);
+			this.plant_counts = this.count_plants();
 			const total_count = this.plant_counts.reduce((a, b) => a + b);
 			for (let i = 0; i < this.plant_counts.length; i++) {
 				this.plant_counts[i] = Math.round(this.plant_counts[i] / total_count * 12);
@@ -109,6 +123,7 @@ export class Mutations {
 			this.redraw();
 		}
 	}
+
 	redraw() {
 		draw_base();
 
@@ -116,10 +131,10 @@ export class Mutations {
 		draw_rect([0, 95], [640, 385]); // Lower rectangle
 		draw_rect(this.next_offset, this.next_dim); // Continue
 		draw_upper_left_border(this.next_offset, this.next_dim);
-		write_text(lang.next, [549, 473], 'white', 'black');
+		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
 
-		this.clickareas = game.clickareas.slice();
-		this.rightclickareas = game.rightclickareas.slice();
+		this.clickareas = this.glob.clickareas.slice();
+		this.rightclickareas = this.glob.rightclickareas.slice();
 
 		this.clickareas.push({
 			x1: this.next_offset[0],
@@ -132,10 +147,10 @@ export class Mutations {
 		});
 
 		for (let i = 0; i < 13; i++) {
-			write_text(lang.traits[i], [this.text_offset[0], this.text_offset[1] + this.deltay * i], 'white', 'black', 'left');
+			write_text(this.glob.lang.traits[i], [this.text_offset[0], this.text_offset[1] + this.deltay * i], 'white', 'black', 'left');
 
 			// Symbol
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				this.symbol_soffset[0] + this.symbol_dim[0] * i, this.symbol_soffset[1],
 				this.symbol_dim[0], this.symbol_dim[1],
 				this.symbol_offset[0], this.symbol_offset[1] + this.deltay * i,
@@ -195,7 +210,7 @@ export class Mutations {
 				blur: () => this.redraw()
 			});
 		}
-		write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
+		write_text(this.glob.lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
 
 		this.draw_avatar();
 		this.draw_evo_score();
@@ -207,52 +222,58 @@ export class Mutations {
 			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
 		];
 	}
-	draw_plus(pos) {
-		ctx.drawImage(this.pics,
+
+	draw_plus(pos: number) {
+		this.glob.ctx.drawImage(this.pics,
 			this.plus_soffset[0], this.plus_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
 			this.plus_offset[0], this.plus_offset[1] + this.deltay * pos,
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
-	draw_plusdown(pos) {
-		ctx.drawImage(this.pics,
+
+	draw_plusdown(pos: number) {
+		this.glob.ctx.drawImage(this.pics,
 			this.plusdown_soffset[0], this.plusdown_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
 			this.plus_offset[0], this.plus_offset[1] + this.deltay * pos,
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
-	draw_minus(pos) {
-		ctx.drawImage(this.pics,
+
+	draw_minus(pos: number) {
+		this.glob.ctx.drawImage(this.pics,
 			this.minus_soffset[0], this.minus_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
 			this.minus_offset[0], this.minus_offset[1] + this.deltay * pos,
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
-	draw_minusdown(pos) {
-		ctx.drawImage(this.pics,
+
+	draw_minusdown(pos: number) {
+		this.glob.ctx.drawImage(this.pics,
 			this.minusdown_soffset[0], this.minusdown_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
 			this.minus_offset[0], this.minus_offset[1] + this.deltay * pos,
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
-	draw_avatar() {
-		const soffset = this.spec_soffsets[game.current_player.id];
 
-		ctx.drawImage(this.bg_pic,
+	draw_avatar() {
+		const soffset = this.spec_soffsets[this.world.current_player.id];
+
+		this.glob.ctx.drawImage(this.bg_pic,
 			this.spec_offset[0], this.spec_offset[1],
 			this.spec_dim[0], this.spec_dim[1],
 			this.spec_offset[0], this.spec_offset[1],
 			this.spec_dim[0], this.spec_dim[1]);
 
-		ctx.drawImage(this.spec_pics,
+		this.glob.ctx.drawImage(this.spec_pics,
 			soffset[0], soffset[1],
 			this.spec_dim[0], this.spec_dim[1],
 			this.spec_offset[0], this.spec_offset[1],
 			this.spec_dim[0], this.spec_dim[1]);
 	}
-	draw_bar(num) {
+
+	draw_bar(num: number) {
 		// Percentage
-		ctx.drawImage(this.bg_pic,
+		this.glob.ctx.drawImage(this.bg_pic,
 			this.percent_del_offset[0], this.percent_del_offset[1] + this.deltay * num,
 			this.percent_del_dim[0], this.percent_del_dim[1],
 			this.percent_del_offset[0], this.percent_del_offset[1] + this.deltay * num,
@@ -261,7 +282,7 @@ export class Mutations {
 		write_text(`${this.stats[num]}%`, [this.percent_offset[0], this.percent_offset[1] + this.deltay * num], 'white', 'black', 'left');
 
 		// Bar
-		ctx.drawImage(this.pics,
+		this.glob.ctx.drawImage(this.pics,
 			this.emptybar_soffset[0], this.emptybar_soffset[1],
 			this.bar_dim[0], this.bar_dim[1],
 			this.bar_offset[0], this.bar_offset[1] + this.deltay * num,
@@ -273,13 +294,13 @@ export class Mutations {
 			const soffset = this.bar_soffsets[Math.min(9, Math.floor(this.stats[num] / 10))];
 
 			// Main bar
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				soffset[0], soffset[1],
 				length, this.bar_dim[1],
 				this.bar_offset[0], this.bar_offset[1] + this.deltay * num,
 				length, this.bar_dim[1]);
 			// Last bit
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				soffset[0] + this.bar_dim[0] - this.last_bit_width, soffset[1],
 				this.last_bit_width, this.bar_dim[1],
 				this.bar_offset[0] + length, this.bar_offset[1] + this.deltay * num,
@@ -287,35 +308,36 @@ export class Mutations {
 		}
 
 		// Pie chart
-		if (options.plant_distribtion && num <= 5) {
-			ctx.drawImage(this.pics,
+		if (this.glob.options.plant_distribtion && num <= 5) {
+			this.glob.ctx.drawImage(this.pics,
 				this.pie_soffset[0] + this.pie_dim[0] * this.plant_counts[num], this.pie_soffset[1],
 				this.pie_dim[0], this.pie_dim[1],
 				this.pie_offset[0], this.pie_offset[1] + this.deltay * num,
 				this.pie_dim[0], this.pie_dim[1]);
 		}
 	}
+
 	draw_evo_score() {
 		// Number
-		ctx.drawImage(this.bg_pic,
+		this.glob.ctx.drawImage(this.bg_pic,
 			this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
 			this.evo_pts_numdel_dim[0], this.evo_pts_numdel_dim[1],
 			this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
 			this.evo_pts_numdel_dim[0], this.evo_pts_numdel_dim[1]);
 
-		write_text(game.current_player.evo_score, this.evo_pts_num_offset, 'white', 'black', 'left');
+		write_text(this.world.current_player.evo_score.toString(), this.evo_pts_num_offset, 'white', 'black', 'left');
 
 		// Bar
-		ctx.drawImage(this.pics,
+		this.glob.ctx.drawImage(this.pics,
 			this.emptybar_soffset[0], this.emptybar_soffset[1],
 			this.bar_dim[0], this.bar_dim[1],
 			this.evobar_offset[0], this.evobar_offset[1],
 			this.bar_dim[0], this.bar_dim[1]);
 
-		const length = game.current_player.evo_score * 3 - this.last_bit_width;
+		const length = this.world.current_player.evo_score * 3 - this.last_bit_width;
 		// Main bar
 		if (length) {
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				this.evobar_soffset[0], this.evobar_soffset[1],
 				length, this.bar_dim[1],
 				this.evobar_offset[0], this.evobar_offset[1],
@@ -323,18 +345,21 @@ export class Mutations {
 		}
 		// Last bit
 		if (length >= 0) {
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				this.evobar_soffset[0] + this.bar_dim[0] - this.last_bit_width, this.evobar_soffset[1],
 				this.last_bit_width, this.bar_dim[1],
 				this.evobar_offset[0] + length, this.evobar_offset[1],
 				this.last_bit_width, this.bar_dim[1]);
 		}
 	}
+
 	render() {
 	}
+
 	update() {
 	}
-	add(attribute, value) {
+
+	add(attribute: number, value: number) {
 		if (value === 1) {
 			this.draw_plus(attribute);
 		}
@@ -343,56 +368,57 @@ export class Mutations {
 		}
 
 		if (value < 0) {
-			if (game.current_player.stats[attribute] > this.stats[attribute] + value) {
-				value = game.current_player.stats[attribute] - this.stats[attribute];
+			if (this.world.current_player.stats[attribute] > this.stats[attribute] + value) {
+				value = this.world.current_player.stats[attribute] - this.stats[attribute];
 			}
 
 			if (value !== 0) {
-				game.current_player.evo_score -= value;
+				this.world.current_player.evo_score -= value;
 				this.stats[attribute] += value;
 			}
 		}
-		else if (game.current_player.evo_score) {
-			if (value > game.current_player.evo_score) {
-				value = game.current_player.evo_score;
+		else if (this.world.current_player.evo_score) {
+			if (value > this.world.current_player.evo_score) {
+				value = this.world.current_player.evo_score;
 			}
 
 			if (this.stats[attribute] + value > 100) {
 				value = 100 - this.stats[attribute];
 			}
 
-			game.current_player.evo_score -= value;
+			this.world.current_player.evo_score -= value;
 			this.stats[attribute] += value;
 		}
 
 		this.draw_bar(attribute);
 		this.draw_evo_score();
 	}
+
 	ai() {
 		const choosable_plants = [];
 		const choosable_nonplants = [];
 		for (let i = 0; i < 6; i++) {
-			if (game.current_player.stats[i] < 100) {
+			if (this.world.current_player.stats[i] < 100) {
 				choosable_plants.push(i);
 			}
 		}
 		for (let i = 6; i < 13; i++) {
-			if (game.current_player.stats[i] < 100) {
+			if (this.world.current_player.stats[i] < 100) {
 				choosable_nonplants.push(i);
 			}
 		}
 
-		const own_plants = [];
-		for (let x = 1; x < game.map_positions[0].length - 1; x++) {
-			for (let y = 1; y < game.map_positions.length - 1; y++) {
-				if (game.map_positions[y][x] === game.current_player.id &&
-					choosable_plants.includes(game.world_map[y][x] - 1)) {
-					own_plants.push(game.world_map[y][x] - 1);
+		const own_plants: number[] = [];
+		for (let x = 1; x < this.world.map_positions[0].length - 1; x++) {
+			for (let y = 1; y < this.world.map_positions.length - 1; y++) {
+				if (this.world.map_positions[y][x] === this.world.current_player.id &&
+					choosable_plants.includes(this.world.world_map[y][x] - 1)) {
+					own_plants.push(this.world.world_map[y][x] - 1);
 				}
 			}
 		}
 
-		for (let i = 0; i < game.current_player.evo_score; i++) {
+		for (let i = 0; i < this.world.current_player.evo_score; i++) {
 			if (choosable_plants.length === 0 && choosable_nonplants.length === 0) {
 				return; // All values are at 100 already
 			}
@@ -401,25 +427,26 @@ export class Mutations {
 				choose_plants = random_int(1, 10) <= 6; // 60% chance to choose a plant adaptation
 			}
 
-			if (choose_plants) {
+			if (choose_plants && own_plants.length) {
 				// Increase the adaption to a random plant on which the player is standing
-				game.current_player.stats[random_element(own_plants)]++;
+				this.world.current_player.stats[random_element(own_plants)]++;
 			}
 			else if (choosable_nonplants.length === 0) {
 				// If only plants are left, increase one of them
-				game.current_player.stats[random_element(choosable_plants)]++;
+				this.world.current_player.stats[random_element(choosable_plants)]++;
 			}
 			else {
 				// Increase a random non-plant property
-				game.current_player.stats[random_element(choosable_nonplants)]++;
+				this.world.current_player.stats[random_element(choosable_nonplants)]++;
 			}
 		}
 
-		game.current_player.evo_score = 0;
-		this.stats = game.current_player.stats;
+		this.world.current_player.evo_score = 0;
+		this.stats = this.world.current_player.stats;
 	}
-	show_info(trait) {
-		const text = multiline(lang.trait_hints[trait], this.max_text_width);
+
+	show_info(trait: number) {
+		const text = multiline(this.glob.lang.trait_hints[trait], this.max_text_width);
 
 		const width = this.inner_help_text_offset[0] * 2 + this.max_text_width;
 		const height = this.inner_help_text_offset[1] + this.line_height * text.length;
@@ -432,7 +459,7 @@ export class Mutations {
 			y = this.symbol_offset[1] + this.deltay * trait - this.help_text_offset[1] - height;
 		}
 
-		ctx.drawImage(this.bg_pic, this.help_text_offset[0], y, width, height);
+		this.glob.ctx.drawImage(this.bg_pic, this.help_text_offset[0], y, width, height);
 
 		draw_rect([this.help_text_offset[0], y], [width, height], true);
 
@@ -440,36 +467,41 @@ export class Mutations {
 			write_text(text[i], [this.help_text_offset[0] + this.inner_help_text_offset[0], y + this.line_height * (i + 1)], 'white', 'black', 'left');
 		}
 	}
+
 	next() {
 		draw_rect(this.next_offset, this.next_dim);
 
-		if (game.current_player.evo_score > 0) {
-			open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
+		if (this.world.current_player.evo_score > 0) {
+			open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 		else {
 			this.next_popup(1);
 		}
 	}
-	next_popup(answer) {
+
+	next_popup(answer: number) {
 		if (answer === 1) {
-			game.current_player.stats = this.stats;
+			this.world.current_player.stats = this.stats;
 			game.next_stage();
 		}
 	}
+
 	private count_plants(): SixNumbers {
 		const counts: SixNumbers = [0, 0, 0, 0, 0, 0];
 
-		if(game.map_positions === null || game.world_map === null) {
+		// TODO: I should make sure that those are never null.
+		if(this.world.map_positions === null || this.world.world_map === null) {
 			return counts;
 		}
 
-		const wm_width = game.map_positions[0].length;
-		const wm_height = game.map_positions.length;
+		const wm_width = this.world.map_positions[0].length;
+		const wm_height = this.world.map_positions.length;
 
+		// MAYBE: I could store an array of positions for each player to make this more efficient.
 		for (let x = 1; x < wm_width - 1; x++) {
 			for (let y = 1; y < wm_height - 1; y++) {
-				if (game.map_positions[y][x] === this.current_player.id) {
-					counts[game.world_map[y][x] - WORLD_MAP.RANGONES]++;
+				if (this.world.map_positions[y][x] === this.world.current_player.id) {
+					counts[this.world.world_map[y][x] - WORLD_MAP.RANGONES]++;
 				}
 			}
 		}

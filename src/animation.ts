@@ -1,38 +1,53 @@
 // MAYBE: Subtitles for some animations? (Intro and Outro text)
 
+import { AnimationType, Point, TechGlobal } from "./types";
+
+type DrawImageExpected = [HTMLImageElement, number, number] |
+	[HTMLImageElement, number, number, number, number] |
+	[HTMLImageElement, number, number, number, number, number, number, number, number];
+
 export class Animation {
-	constructor(animation, offset) {
-		// Apparently the best way to copy an object...
-		this.animation = JSON.parse(JSON.stringify(animation));
+	has_stopped = false;
+
+	private animation: AnimationType;
+	private pics: HTMLImageElement[];
+	private bg: HTMLImageElement;
+	private offset: Point;
+	private to_render: DrawImageExpected[] = [];
+	private glob: TechGlobal;
+
+
+	constructor(glob: TechGlobal, animation: AnimationType, offset: Point) {
+		this.glob = glob;
+		this.animation = structuredClone(animation);
+		this.offset = offset;
 
 		this.pics = [];
 		for (let i = 0; i < this.animation.imgs.length; i++) {
-			this.pics.push(resources.get(this.animation.imgs[i][0]));
+			this.pics.push(glob.resources.get_image(this.animation.imgs[i][0]));
 		}
 
-		this.bg = resources.get(this.animation.bg[0]);
-		this.to_render = [];
-		this.offset = offset;
-
-		this.has_stopped = false;
+		this.bg = glob.resources.get_image(this.animation.bg[0]);
 	}
+
 	render() {
-		ctx.save();
+		this.glob.ctx.save();
 
 		// clip area (don't draw anything outside this area)
-		ctx.beginPath();
-		ctx.rect(this.offset[0], this.offset[1], this.animation.size[0], this.animation.size[1]);
-		ctx.clip();
+		this.glob.ctx.beginPath();
+		this.glob.ctx.rect(this.offset[0], this.offset[1], this.animation.size[0], this.animation.size[1]);
+		this.glob.ctx.clip();
 
 		// translate to center
-		ctx.translate(this.offset[0] + this.animation.size[0] / 2, this.offset[1] + this.animation.size[1] / 2);
+		this.glob.ctx.translate(this.offset[0] + this.animation.size[0] / 2, this.offset[1] + this.animation.size[1] / 2);
 
-		for (let img of this.to_render) {
-			ctx.drawImage(...img);
+		for (const img of this.to_render) {
+			this.glob.ctx.drawImage(...img);
 		}
 
-		ctx.restore();
+		this.glob.ctx.restore();
 	}
+
 	step() {
 		this.to_render = [];
 
@@ -41,7 +56,7 @@ export class Animation {
 
 		// draw fixed images
 		// This might be optimized (i.e. removed fixed images that are not seen, like the text in the very first intro animation), but it runs smoothly so far, so no urgent need for optimization.
-		for (let fix of this.animation.fixed) {
+		for (const fix of this.animation.fixed) {
 			this.to_render.push([this.pics[fix.seq_img],
 			this.animation.imgs[fix.seq_img][1] * fix.move_img, 0,
 			this.animation.imgs[fix.seq_img][1], this.animation.imgs[fix.seq_img][2],
@@ -50,7 +65,7 @@ export class Animation {
 		}
 
 		// Paused animations are still shown
-		for (let fix of this.animation.paused) {
+		for (const fix of this.animation.paused) {
 			if (fix !== null) {
 				this.to_render.push([this.pics[fix.seq_img],
 				this.animation.imgs[fix.seq_img][1] * fix.move_img, 0,
@@ -145,7 +160,7 @@ export class Animation {
 				// a move.counter < 0 means that the loop was not executed (so it has to start now)
 				// move.loop is an array in the form: [number_of_repetitions, target]
 				else {
-					if (move.loop) {
+					if (move.loop.length) {
 						if (move.counter !== 0) {
 							if (move.counter < 0) {
 								if (move.loop[0] === 0) {
@@ -171,8 +186,8 @@ export class Animation {
 					}
 					else {
 						// Moves may activate other sequence objects.
-						if (move.activate) {
-							for (let target of move.activate) {
+						if (move.activate.length) {
+							for (const target of move.activate) {
 								this.animation.seqs[target].moves[this.animation.seqs[target].pos].pause = false;
 								this.animation.seqs[target].active = true;
 								this.animation.paused[target] = null;

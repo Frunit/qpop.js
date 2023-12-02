@@ -100,24 +100,33 @@ export enum SCENE {
 	LOAD_GAME =      32,
 };
 
-const correct_world_tile = Object.freeze([0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46]);
+export const correct_world_tile = [0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46];
 
 
-export function random_element<T>(arr: T[]): T | null {
-	// Random element of array or null if array is empty
-
+/**
+ * Random element of `arr` or throws if array is empty
+ *
+ * @param arr - the array to choose from
+ * @returns a random element of the given array
+ */
+export function random_element<T>(arr: T[]): T {
 	if(arr.length) {
 		return arr[Math.floor(Math.random() * arr.length)];
 	}
 
-	return null;
+	throw new Error('Array must not be empty!');
 }
 
-
-export function pop_random_element<T>(arr: T[]): T | null {
+/**
+ * Return and remove a random element of `arr` or throws if array is empty
+ *
+ * @param arr - the array to pop from
+ * @returns a random element of the given array
+ */
+export function pop_random_element<T>(arr: T[]): T {
 	// Return and remove a random element from arr
 	if(arr.length === 0) {
-		return null;
+		throw new Error('Array must not be empty!');
 	}
 
 	const idx = Math.floor(Math.random() * arr.length);
@@ -127,24 +136,37 @@ export function pop_random_element<T>(arr: T[]): T | null {
 	return elem;
 }
 
-
+/**
+ * Random number (float) between `min` and `max` (both inclusive)
+ *
+ * @param min - the minimum number
+ * @param max - the maximum number
+ * @returns a random number (float)
+ */
 export function random_int(min: number, max: number): number {
-	// Random number between min and max (both inclusive)
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
+/**
+ * Shuffle array in place
+ *
+ * @param arr - the array to shuffle
+ */
 export function shuffle(arr: any[]): void {
-	// Shuffle array in place
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[arr[i], arr[j]] = [arr[j], arr[i]];
 	}
 }
 
-
+/**
+ * Creates an array with numbers from start (inclusive) to end (exclusive)
+ *
+ * @param start - the first number in the resulting array
+ * @param end - the number before this number will be the last in the array
+ * @returns an array with numbers from start (inclusive) to end (exclusive)
+ */
 export function range(start: number, end: number): number[] {
-	// Array with numbers from start (inclusive) to end (exclusive)
 	return Array.from(new Array(end - start), (x,i) => i + start);
 }
 
@@ -172,9 +194,15 @@ export function parse_bool(s: string | null): boolean {
 	return true;
 }
 
-
+/**
+ * Ensure num is between min and max (both inclusive)
+ *
+ * @param num - the number to clamp
+ * @param min - the smallest allowed value
+ * @param max - the highest allowed value
+ * @returns the clamped number
+ */
 export function clamp(num: number, min: number, max: number): number {
-	// Ensure num is between min and max (both inclusive)
 	return num <= min ? min : (num >= max ? max : num);
 }
 

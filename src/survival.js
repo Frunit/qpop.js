@@ -418,7 +418,7 @@ export class Survival {
 
 		this.update_environment_sound();
 
-		for (let predator of this.moving_predators) {
+		for (const predator of this.moving_predators) {
 			this.resolve_movement(predator, true);
 		}
 		this.moving_predators = [];
@@ -462,11 +462,11 @@ export class Survival {
 		const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x));
 		const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x));
 
-		for (let sound of to_stop) {
+		for (const sound of to_stop) {
 			audio.stop_sound(sound);
 		}
 
-		for (let sound of to_start) {
+		for (const sound of to_start) {
 			audio.play_sound(sound, true);
 		}
 
@@ -666,7 +666,7 @@ export class Survival {
 
 		this.moving_predators = [];
 
-		for (let predator of this.level.predators) {
+		for (const predator of this.level.predators) {
 			if (predator.type === SURV_MAP.UNRESPONSIVE) {
 				continue;
 			}
@@ -876,7 +876,7 @@ export class Survival {
 			if (this.delay_counter >= this.delay) {
 				this.delay_counter = 0;
 
-				for (let predator of this.moving_predators) {
+				for (const predator of this.moving_predators) {
 					this.resolve_movement(predator);
 				}
 

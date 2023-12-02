@@ -9,7 +9,7 @@ export class Transition implements Stage {
 	keys: KeyType[] = [];
 	glob: TechGlobal;
 
-	private pic: any; // TODO!!!
+	private pic: HTMLImageElement;
 	private lang_string: string;
 	private frame = 0;
 

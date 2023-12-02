@@ -30,7 +30,7 @@ export class ResourceManager {
 	// Load an array of resources
 	// Format: [url, type, name]. Name is optional. Type must be "audio" or "image". The suffix for "audio" will be appended, so give the url without suffix for audio.
 	load(resources: ResourceElement[]) {
-		for(let resource of resources) {
+		for (const resource of resources) {
 			let url = resource.url;
 			const type = resource.type;
 			const name = resource.name ? resource.name : url;
@@ -141,7 +141,7 @@ export class ResourceManager {
 			];
 
 			const audio_elem = document.createElement('audio');
-			for(let mime of mimes) {
+			for (const mime of mimes) {
 				if(audio_elem.canPlayType(mime[1]) === 'probably') {
 					this.best_audio_suffix = mime[0];
 					break;
@@ -251,7 +251,7 @@ export class ResourceManager {
 
 	stop_sound(name=null) {
 		if(name === null) {
-			for(let elem of this.currently_playing_sounds) {
+			for (const elem of this.currently_playing_sounds) {
 				this.sounds[elem].stop();
 			}
 			this.currently_playing_sounds.clear();

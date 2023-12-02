@@ -1,5 +1,5 @@
 import { SCENE, draw_base, draw_checkbox, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
-import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 export class ResourceLoader implements Stage {
 	id = SCENE.LOADING;
@@ -17,10 +17,10 @@ export class ResourceLoader implements Stage {
 	private percentage = 0;
 	private images_drawn = false;
 
-	readonly header_dim: Point = [236, 78];
-	readonly bar_dim: Point = [300, 16];
-	readonly start_dim: Point = [200, 50];
-	readonly x_dim: Point = [12, 12];
+	readonly header_dim: Dimension = [236, 78];
+	readonly bar_dim: Dimension = [300, 16];
+	readonly start_dim: Dimension = [200, 50];
+	readonly x_dim: Dimension = [12, 12];
 
 	readonly header_offset: Point = [202, 50];
 	readonly subtitle_offset: Point = [320, 190];

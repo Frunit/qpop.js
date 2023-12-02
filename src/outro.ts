@@ -4,7 +4,7 @@
 import { Animation } from "./animation";
 import { outro_frames } from "./frames";
 import { SCENE, draw_base, draw_inv_rect, draw_rect } from "./helper";
-import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 
 export class Outro implements Stage {
@@ -17,7 +17,7 @@ export class Outro implements Stage {
 	private winner: number;
 	private animation: Animation | null = null;
 
-	readonly anim_dim: Point = [600, 420];
+	readonly anim_dim: Dimension = [600, 420];
 	readonly anim_offset: Point = [19, 39];
 
 	constructor(glob: TechGlobal, winner: number) {
@@ -29,7 +29,7 @@ export class Outro implements Stage {
 		this.glob.resources.play_music('outro');
 		this.glob.canvas.style.cursor = 'default';
 		const num = (this.winner >= 0) ? this.winner : 6;
-		this.animation = new Animation(outro_frames[num], this.anim_offset);
+		this.animation = new Animation(this.glob, outro_frames[num], this.anim_offset);
 		this.redraw();
 	}
 	redraw() {

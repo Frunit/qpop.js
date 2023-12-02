@@ -1,5 +1,6 @@
+import { NamedAnimationFrames, Point } from "./types";
 
-export const anims_players = [
+export const anims_players: NamedAnimationFrames[] = [
 	{   // Purplus
 		still: {
 			soffset: [0, 0],
@@ -434,7 +435,7 @@ export const anims_players = [
 	},
 ];
 
-export const anims_predators = [
+export const anims_predators: NamedAnimationFrames[] = [
 	{   // Dino
 		still: {
 			soffset: [0, 0],
@@ -569,7 +570,7 @@ export const anims_predators = [
 	},
 ];
 
-export const anims_clouds = {
+export const anims_clouds: NamedAnimationFrames = {
 	fight_hor: {
 		size: [100, 64],
 		offset: [14, 0],
@@ -596,7 +597,7 @@ export const anims_clouds = {
 	},
 };
 
-export const anim_ranking = {
+export const anim_ranking: NamedAnimationFrames = {
 	walking: [
 		{
 			offset: [128, 0],
@@ -652,7 +653,7 @@ export const anim_ranking = {
 	],
 };
 
-export const anim_delays = {
+export const anim_delays: Record<string, number> = {
 	movement: 2,
 	electro: 3,
 	feeding: 3,
@@ -672,7 +673,7 @@ export const anim_delays = {
 	popups: 12,
 };
 
-export const survival_background = {
+export const survival_background: Record<string, Point[]> = {
 	36: [[384, 192], [448, 192], [512, 192], [576, 192], [0, 256], [64, 256], [128, 256], [192, 256]], // Swamp
 	44: [[256, 256], [320, 256], [384, 256], [448, 256], [512, 256], [576, 256], [320, 256], [256, 256]], // Volcano
 	66: [[384, 384], [448, 384], [512, 384], [576, 384], [576, 384], [512, 384], [448, 384], [384, 384]], // Snail

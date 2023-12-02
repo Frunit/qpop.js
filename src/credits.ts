@@ -1,5 +1,5 @@
 import { SCENE, draw_base, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
-import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 export class Credits implements Stage {
 	id = SCENE.CREDITS;
@@ -8,11 +8,11 @@ export class Credits implements Stage {
 	keys: KeyType[] = [];
 	glob: TechGlobal;
 
-	private bg: any; // TODO
-	private github: any; // TODO
+	private bg: HTMLImageElement;
+	private github: HTMLImageElement;
 	
-	readonly upper_panel_dim: Point = [620, 130];
-	readonly lower_panel_dim: Point = [305, 280];
+	readonly upper_panel_dim: Dimension = [620, 130];
+	readonly lower_panel_dim: Dimension = [305, 280];
 	readonly close_dim : Point = [181, 22];
 	readonly github_dim : Point = [64, 83];
 	readonly upper_panel_offset : Point = [9, 29];

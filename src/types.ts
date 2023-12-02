@@ -93,9 +93,9 @@ export type WorldGlobal = {
 	humans_present: boolean,
 	infinite_game: boolean,
 	current_player: Player,
-	height_map: number[][] | null,
-	world_map: number[][] | null,
-	map_positions: number[][] | null,
+	height_map: number[][],
+	world_map: number[][],
+	map_positions: number[][],
 };
 
 export type ResourceElement = {
@@ -115,4 +115,59 @@ export type TutorialType = {
     arrows: TutorialArrow[],
     low_anchor?: boolean,
     highlight?: Tuple<number, 4>,
+};
+
+export type AnimationFrames = {
+	size?: Dimension,
+	offset?: Point,
+	soffset?: Point,
+	frames: Point[] | Point[][],
+    transitions?: number[][],
+};
+
+export type NamedAnimationFrames = Record<string, AnimationFrames>;
+
+// Animations
+
+type PicAndPos = [string, number, number];
+
+type Moves = {
+  xabs: boolean,
+  yabs: boolean,
+  fixed: boolean,
+  pause: boolean,
+  end: boolean,
+  img: number,
+  delay: number,
+  counter: number,
+  x: number,
+  y: number,
+  loop: number[],
+  activate: number[],
+};
+
+type Seq = {
+  delay: number,
+  pos: number,
+  active: boolean,
+  x: number,
+  y: number,
+  img: number,
+  moves: Moves[],
+};
+
+type Fixed = {
+  seq_img: number,
+  move_img: number,
+  x: number,
+  y: number,
+};
+
+export type AnimationType = {
+  size: Point,
+  bg: PicAndPos,
+  imgs: PicAndPos[],
+  seqs: Seq[],
+  fixed: Fixed[],
+  paused: (Fixed | null)[],
 };

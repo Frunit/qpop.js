@@ -1,5 +1,5 @@
 import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, draw_upper_left_border, init_upload, local_load, multiline, open_load_dialog, open_popup, write_text } from "./helper";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
 
 export class Init implements Stage {
 	id = SCENE.INIT;
@@ -8,6 +8,7 @@ export class Init implements Stage {
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
 	glob: TechGlobal;
+	world: WorldGlobal;
 
 	private bg: HTMLImageElement;
 	private spec_pics: HTMLImageElement;
@@ -37,8 +38,9 @@ export class Init implements Stage {
 	readonly iq_soffsets: Point[] = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
 	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 
-	constructor(glob: TechGlobal) {
+	constructor(glob: TechGlobal, world: WorldGlobal) {
 		this.glob = glob;
+		this.world = world;
 		this.bg = glob.resources.get_image('gfx/init.png');
 		this.spec_pics = glob.resources.get_image('gfx/species.png');
 
@@ -125,15 +127,15 @@ export class Init implements Stage {
 				this.panel_dim[0], this.panel_dim[1]);
 
 
-			let soffset = this.iq_soffsets[game.players[playernum].iq];
+			let soffset = this.iq_soffsets[this.world.players[playernum].iq];
 			this.glob.ctx.drawImage(this.bg,
 				soffset[0], soffset[1],
 				this.iq_dim[0], this.iq_dim[1],
 				panel_offset[0] + this.iq_offset[0],
-				panel_offset[1] + this.iq_offset[1] - this.iq_dy * (game.players[playernum].iq - 1),
+				panel_offset[1] + this.iq_offset[1] - this.iq_dy * (this.world.players[playernum].iq - 1),
 				this.iq_dim[0], this.iq_dim[1]);
 
-			soffset = this.type_soffsets[game.players[playernum].type];
+			soffset = this.type_soffsets[this.world.players[playernum].type];
 			this.glob.ctx.drawImage(this.bg,
 				soffset[0], soffset[1],
 				this.type_dim[0], this.type_dim[1],
@@ -217,8 +219,8 @@ export class Init implements Stage {
 	}
 
 	change_type(player_num: number, value: number) {
-		game.players[player_num].type = (game.players[player_num].type + value) % 3 + 1;
-		const soffset = this.type_soffsets[game.players[player_num].type];
+		this.world.players[player_num].type = (this.world.players[player_num].type + value) % 3 + 1;
+		const soffset = this.type_soffsets[this.world.players[player_num].type];
 		const panel_offset = this.panel_offsets[player_num];
 		this.glob.ctx.drawImage(this.bg,
 			soffset[0], soffset[1],
@@ -228,7 +230,7 @@ export class Init implements Stage {
 	}
 
 	change_iq(player_num: number, iq: number) {
-		game.players[player_num].iq = iq;
+		this.world.players[player_num].iq = iq;
 		const panel_offset = this.panel_offsets[player_num];
 
 		for (let i = 1; i <= 4; i++) {
@@ -246,13 +248,13 @@ export class Init implements Stage {
 		let no_human = true;
 		let known_first_player = false;
 
-		for (let i = 0; i < game.players.length; i++) {
-			if (!known_first_player && game.players[i].type !== PLAYER_TYPE.NOBODY) {
+		for (let i = 0; i < this.world.players.length; i++) {
+			if (!known_first_player && this.world.players[i].type !== PLAYER_TYPE.NOBODY) {
 				known_first_player = true;
-				game.current_player = game.players[i];
+				this.world.current_player = this.world.players[i];
 			}
 
-			if (game.players[i].type === PLAYER_TYPE.HUMAN) {
+			if (this.world.players[i].type === PLAYER_TYPE.HUMAN) {
 				no_human = false;
 				break;
 			}

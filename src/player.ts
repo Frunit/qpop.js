@@ -1,4 +1,5 @@
 import { PLAYER_TYPE, SPECIES } from "./helper";
+import { Tuple } from "./types";
 
 export class Player {
 	id: number;
@@ -14,7 +15,7 @@ export class Player {
 	deaths = 0;
 	evo_score = 100;
 	total_score = 230;
-	stats = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
+	stats: Tuple<number, 13> = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
 
 	constructor(num: number) {
 		this.id = num;

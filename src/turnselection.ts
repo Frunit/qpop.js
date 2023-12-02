@@ -1,7 +1,7 @@
 import { PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, random_int, write_text } from "./helper";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
 
 export class Turnselection implements Stage {
 	id = SCENE.TURN_SELECTION;
@@ -10,10 +10,11 @@ export class Turnselection implements Stage {
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
 	glob: TechGlobal;
+	world: WorldGlobal;
 
 	private bg: HTMLImageElement;
 	private pics: HTMLImageElement;
-	private animations: any; // TODO
+	private animations: Sprite[] | null = null;
 	private turn_index = 0;
 
 	readonly turns = [5, 10, 20, 255];
@@ -42,9 +43,9 @@ export class Turnselection implements Stage {
 	readonly anim_soffsets: Point[] = [[0, 0], [0, 90], [0, 180]];
 	readonly button_soffsets: Point[] = [[0, 630], [43, 630]];
 
-	constructor(glob: TechGlobal) {
+	constructor(glob: TechGlobal, world: WorldGlobal) {
 		this.glob = glob;
-		this.id = SCENE.TURN_SELECTION;
+		this.world = world;
 		this.bg = this.glob.resources.get_image('gfx/light_bg.png');
 		this.pics = this.glob.resources.get_image('gfx/turns.png');
 
@@ -199,18 +200,19 @@ export class Turnselection implements Stage {
 			}
 		}
 	}
+
 	update() {
 		if (this.animations) {
 			if (this.animations.length === 1) {
 				this.animations[0].update();
-				if (this.animations[0].finished) {
+				if (this.animations[0].finished && this.animations[0].callback !== null) {
 					this.animations[0].callback();
 				}
 			}
 			else {
-				for (let anim of this.animations) {
+				for (const anim of this.animations) {
 					anim.update();
-					if (anim.finished) {
+					if (anim.finished && anim.callback !== null) {
 						anim.callback();
 					}
 				}

@@ -110,7 +110,7 @@ export class Tutorial implements Stage {
 		});
 
 		// Arrows
-		for (let arrow of this.arrows) {
+		for (const arrow of this.arrows) {
 			switch (arrow.dir) {
 				case DIR.N:
 					this.glob.ctx.drawImage(this.gfx,

@@ -1,7 +1,7 @@
 import { SCENE, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
-import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 export class Popup implements Stage {
 	id = SCENE.POPUP;
@@ -22,10 +22,10 @@ export class Popup implements Stage {
 	readonly max_text_width = 260;
 
 	readonly dim: Point = [360, 150];
-	readonly title_dim: Point = [360, 21];
-	readonly spec_dim: Point = [64, 64];
-	readonly left_answer_dim: Point = [180, 22];
-	readonly right_answer_dim: Point = [181, 22];
+	readonly title_dim: Dimension = [360, 21];
+	readonly spec_dim: Dimension = [64, 64];
+	readonly left_answer_dim: Dimension = [180, 22];
+	readonly right_answer_dim: Dimension = [181, 22];
 
 	readonly spec_positions: {[key: string]: Point[]} = {
 		0: [[0, 0]],
@@ -55,7 +55,7 @@ export class Popup implements Stage {
 		this.callback = callback;
 
 		this.bg = this.glob.resources.get_image('gfx/dark_bg.png');
-		this.sprite = new Sprite(glob, 'gfx/species.png', [0, 0], this.spec_positions[image], anim_delays.popups);
+		this.sprite = new Sprite(this.glob.resources.get_image('gfx/species.png'), [0, 0], this.spec_positions[image], anim_delays.popups);
 	}
 
 	initialize() {

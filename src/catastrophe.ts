@@ -17,8 +17,8 @@ export class Catastrophe implements Stage {
 	private type: number;
 
 	readonly dim: Point = [360, 300];
-	readonly title_dim: Point = [360, 21];
-	readonly anim_dim: Point = [320, 240];
+	readonly title_dim: Dimension = [360, 21];
+	readonly anim_dim: Dimension = [320, 240];
 	readonly offset: Point = [140, 90];
 	readonly title_offset: Point = [140, 90];
 	readonly anim_offset: Point = [160, 130];
@@ -35,7 +35,7 @@ export class Catastrophe implements Stage {
 	initialize() {
 		this.glob.resources.play_music('catastrophe');
 		this.glob.canvas.style.cursor = 'default';
-		this.animation = new Animation(catastrophe_frames[this.type], this.anim_offset);
+		this.animation = new Animation(this.glob, catastrophe_frames[this.type], this.anim_offset);
 		this.redraw();
 	}
 	redraw() {

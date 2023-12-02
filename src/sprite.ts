@@ -1,6 +1,15 @@
-import { Dimension, Point, TechGlobal } from "./types";
+import { Dimension, Point } from "./types";
 
-export class Sprite {
+export interface ISprite {
+	finished: boolean;
+	callback: Function | null;
+	update: Function;
+	reset: Function;
+	is_new_frame: Function;
+	render: Function;
+}
+
+export class Sprite implements ISprite {
 	finished: boolean
 	callback: Function | null;
 
@@ -75,7 +84,10 @@ export class Sprite {
 }
 
 
-export class RandomSprite {
+export class RandomSprite implements ISprite {
+	finished = false;
+	callback = null;
+
 	private transitions: number[][];
 	private sprites: Sprite[] = [];
 	private current_sprite: Sprite;
@@ -84,7 +96,7 @@ export class RandomSprite {
 
 	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[][] = [[[0, 0]]], transitions: number[][] = [[1]], delay = 0, size: Dimension = [64, 64]) {
 		this.transitions = transitions;
-		for (let sprite_frames of frames) {
+		for (const sprite_frames of frames) {
 			this.sprites.push(new Sprite(pic, offset, sprite_frames, delay, size, true));
 		}
 		this.current_sprite = this.sprites[this.current_idx];
