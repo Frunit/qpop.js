@@ -1,6 +1,6 @@
 import { Catastrophe } from "./catastrophe";
 import { worldmap_size } from "./consts";
-import { ATTR, DIR, PLAYER_TYPE, SCENE, WORLD_MAP, clamp, correct_world_tile, draw_base, draw_black_rect, draw_rect, open_popup, pop_random_element, random_element, random_int, shuffle, write_text } from "./helper";
+import { ATTR, DIR, PLAYER_TYPE, SCENE, WORLD_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, pop_random_element, random_element, random_int, shuffle, write_text } from "./helper";
 import { Player } from "./player";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
@@ -136,26 +136,26 @@ export class World implements Stage{
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob);
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
 
-		draw_rect(this.left_rect_offset, this.left_rect_dim); // World rectangle
-		draw_rect(this.right_rect_offset, this.right_rect_dim); // Right rectangle
-		draw_rect(this.next_offset, this.next_dim); // Continue rectangle
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, this.left_rect_offset, this.left_rect_dim); // World rectangle
+		draw_rect(this.glob.ctx, this.right_rect_offset, this.right_rect_dim); // Right rectangle
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue rectangle
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 		this.clickareas.push({
 			x1: this.next_offset[0],
 			y1: this.next_offset[1],
 			x2: this.next_offset[0] + this.next_dim[0],
 			y2: this.next_offset[1] + this.next_dim[1],
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		// Black border around world
-		draw_black_rect([this.map_offset[0] - 1, this.map_offset[1] - 1], [this.map_dim[0] + 1, this.map_dim[1] + 1]);
+		draw_black_rect(this.glob.ctx, [this.map_offset[0] - 1, this.map_offset[1] - 1], [this.map_dim[0] + 1, this.map_dim[1] + 1]);
 
 		// World
 		this.draw_worldmap();
@@ -294,7 +294,7 @@ export class World implements Stage{
 	}
 
 	next() {
-		draw_rect(this.next_offset, this.next_dim);
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim);
 
 		if (this.ai_active || this.animation !== null) {
 			return;
@@ -304,10 +304,10 @@ export class World implements Stage{
 			this.next_popup(1);
 		}
 		else if (this.world.current_player.individuals === 0) {
-			open_popup(this.glob.lang.popup_title, 'dino', this.glob.lang.where_to_live, () => { }, this.glob.lang.next);
+			open_popup(this.glob, this.glob.lang.popup_title, 'dino', this.glob.lang.where_to_live, () => { }, this.glob.lang.next);
 		}
 		else {
-			open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+			open_popup(this.glob, this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 	}
 
@@ -315,7 +315,7 @@ export class World implements Stage{
 		if (answer === 1) {
 			if (this.world.current_player.individuals === 0 && !this.world.current_player.is_dead) {
 				this.world.current_player.is_dead = true;
-				open_popup(this.glob.lang.popup_title, this.world.current_player.id, this.glob.lang.dead, () => this.next_popup(1), this.glob.lang.next);
+				open_popup(this.glob, this.glob.lang.popup_title, this.world.current_player.id.toString(), this.glob.lang.dead, () => this.next_popup(1), this.glob.lang.next);
 				return;
 			}
 
@@ -355,7 +355,7 @@ export class World implements Stage{
 		game.stage.initialize();
 	}
 
-	catastrophe_callback(type) {
+	catastrophe_callback(type: number) {
 		game.stage = game.backstage.pop();
 		game.stage.catastrophe_type = type;
 		game.stage.catastrophe_status = 1;
@@ -483,7 +483,7 @@ export class World implements Stage{
 			}
 			default:
 				console.warn(this.catastrophe_type);
-				open_popup(this.glob.lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
+				open_popup(this.glob, this.glob.lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
 					() => { }, 'Oh no!');
 		}
 	}
@@ -512,7 +512,7 @@ export class World implements Stage{
 		for (const player of this.world.players) {
 			if (player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
 				player.is_dead = true;
-				open_popup(this.glob.lang.popup_title, player.id, this.glob.lang.dead, () => this.catastrophe_finish(), this.glob.lang.next);
+				open_popup(this.glob, this.glob.lang.popup_title, player.id.toString(), this.glob.lang.dead, () => this.catastrophe_finish(), this.glob.lang.next);
 				return;
 			}
 		}
@@ -634,7 +634,7 @@ export class World implements Stage{
 
 		if (enemy.individuals === 0) {
 			enemy.is_dead = true;
-			open_popup(this.glob.lang.popup_title, enemy.id, this.glob.lang.dead, () => { }, this.glob.lang.next);
+			open_popup(this.glob, this.glob.lang.popup_title, enemy.id.toString(), this.glob.lang.dead, () => { }, this.glob.lang.next);
 		}
 	}
 
@@ -1079,9 +1079,11 @@ export class World implements Stage{
 			idx += 128;
 		}
 
-		return correct_world_tile[idx];
+		return correct_coast_tile[idx];
 	}
 }
+
+const correct_coast_tile = [0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46];
 
 export function create_height_map(): number[][] {
 	const map: number[][] = Array.from(Array(worldmap_size[1]), () => Array(worldmap_size[0]).fill(0));

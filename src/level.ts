@@ -1,5 +1,6 @@
 import { survivalmap_size } from "./consts";
 import { DIR, PRED, SPECIES, SURV_MAP, WORLD_MAP, random_element, random_int, shuffle } from "./helper";
+import { ResourceManager } from "./resources";
 import { ISprite, RandomSprite, Sprite } from "./sprite";
 import { anim_delays, anims_players, anims_predators, survival_background } from "./sprite_positions";
 import { AnimationFrames, NamedAnimationFrames, Point, SixNumbers, WorldGlobal } from "./types";
@@ -8,24 +9,25 @@ export class Level {
 	character: Character;
 	bg_sprites: (ISprite | null)[][] = Array.from(Array(survivalmap_size[0]), () => Array(survivalmap_size[0]).fill(null));
 	mobmap: (ISurvivalCharacter | null)[][];
+	map: number[][];
+	edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
+	predators: Predator[] = [];
 
 	private world: WorldGlobal;
-	private map: number[][];
 	private individuals;
-
-	private neighbourfields = 0;
-	private predators: Predator[] = [];
 	private enemies: number[] = [];
-
 	private density = 0;
 	private blocking = '000000000000000000000000000000000000111111111111111111111110011110111100000000001111111100000000000111111111111111111100001111111111111';
-	private edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
+	private resources: ResourceManager;
+	private bg_pic: HTMLImageElement;
 
-	constructor(world: WorldGlobal) {
+	constructor(resources: ResourceManager, world: WorldGlobal) {
 		this.world = world;
+		this.resources = resources;
+		this.bg_pic = resources.get_image('gfx/background.png');
 
 		this.individuals = world.current_player.individuals;
-		this.character = new Character(world.current_player.id, [49, 49]);
+		this.character = new Character(resources, world.current_player.id, [49, 49]);
 
 		this.map = this.generate_map();
 		this.mobmap = this.populate();
@@ -342,7 +344,7 @@ export class Level {
 				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
 			const species = random_int(0, this.world.humans_present ? 2 : 1);
-			const pred = new Predator(species, pos);
+			const pred = new Predator(this.resources, species, pos);
 			mobmap[pos[1]][pos[0]] = pred
 			this.predators.push(pred);
 		}
@@ -353,7 +355,7 @@ export class Level {
 				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
-			mobmap[pos[1]][pos[0]] = new Female(this.world.current_player.id, pos);
+			mobmap[pos[1]][pos[0]] = new Female(this.resources, this.world.current_player.id, pos);
 		}
 
 		for (let i = 0; i < num_enemies; i++) {
@@ -362,7 +364,7 @@ export class Level {
 				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 			const species = random_element(this.enemies);
-			mobmap[pos[1]][pos[0]] = new Enemy(species, pos);
+			mobmap[pos[1]][pos[0]] = new Enemy(this.resources, species, pos);
 		}
 
 		return mobmap;
@@ -466,12 +468,12 @@ export class Level {
 		const type = this.map[y][x];
 
 		if (survival_background.hasOwnProperty(type)) {
-			this.bg_sprites[y][x] = new Sprite('gfx/background.png', [0, 0], survival_background[type], anim_delays.background);
+			this.bg_sprites[y][x] = new Sprite(this.bg_pic, [0, 0], survival_background[type], anim_delays.background);
 		}
 		else {
 			const xx = Math.floor(type % 10);
 			const yy = Math.floor(type / 10);
-			this.bg_sprites[y][x] = new Sprite('gfx/background.png', [xx * 64, yy * 64]);
+			this.bg_sprites[y][x] = new Sprite(this.bg_pic, [xx * 64, yy * 64]);
 		}
 	}
 
@@ -563,6 +565,7 @@ export interface ISurvivalCharacter {
 	hidden: boolean;
 	anims: NamedAnimationFrames;
 	sprite: ISprite;
+	pic: HTMLImageElement;
 	env_sound?: string;
 	movement?: DIR;
 	last_movement?: DIR;
@@ -581,12 +584,44 @@ export class Character implements ISurvivalCharacter {
 	anims: NamedAnimationFrames;
 	sprite: ISprite;
 	victories: (SPECIES | PRED)[] = [];
+	pic: HTMLImageElement;
 
-	constructor(species: SPECIES, tile: Point) {
+	constructor(resources: ResourceManager, species: SPECIES, tile: Point) {
 		this.tile = tile;
 		this.species = species;
 		this.anims = anims_players[species];
-		this.sprite = new Sprite(`gfx/spec${species + 1}.png`, this.anims.still.soffset, this.anims.still.frames);
+		this.pic = resources.get_image(`gfx/spec${species + 1}.png`);
+		this.sprite = new Sprite(this.pic, this.anims.still.soffset, this.anims.still.frames);
+	}
+}
+
+
+export class Female implements ISurvivalCharacter {
+	type = SURV_MAP.FEMALE;
+	tile: Point;
+	species: SPECIES;
+	rel_pos: Point = [0, 0];
+	hidden = false;
+	anims: NamedAnimationFrames;
+	sprite: ISprite;
+	has_offspring = false;
+	env_sound: string;
+	pic: HTMLImageElement;
+
+	constructor(resources: ResourceManager, species: SPECIES, tile: Point) {
+		this.tile = tile;
+		this.species = species;
+		// Isnobug has no environment sound
+		this.env_sound = `female_${['purplus', 'kiwi', 'pesci', '', 'amorph', 'chuck'][species]}`;
+		this.anims = anims_players[species];
+		this.pic = resources.get_image(`gfx/spec${species + 1}.png`);
+
+		if (species === SPECIES.PURPLUS) {
+			this.sprite = new RandomSprite(this.pic, this.anims.female.soffset, this.anims.female.frames, this.anims.female.transitions, anim_delays.female);
+		}
+		else {
+			this.sprite = new Sprite(this.pic, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
+		}
 	}
 }
 
@@ -604,46 +639,20 @@ export class Predator implements ISurvivalCharacter {
 	defeated: AnimationFrames;
 	attack: number;
 	scent: number;
+	pic: HTMLImageElement;
 
-	constructor(species: PRED, tile: Point) {
+	constructor(resources: ResourceManager, species: PRED, tile: Point) {
 		this.tile = tile;
 		this.species = species;
 		this.anims = anims_predators[species];
 		this.defeated = random_element(this.anims.defeated);
+		this.pic = resources.get_image(`gfx/spec${species + 1}.png`);
 
-		this.sprite = new Sprite(`gfx/pred${species + 1}.png`, this.anims.still.soffset, this.anims.still.frames);
+		this.sprite = new Sprite(this.pic, this.anims.still.soffset, this.anims.still.frames);
 
 		//             dino, mushroom, human
 		this.attack = [250, 350, 150][species];
 		this.scent = [100, 70, 150][species];
-	}
-}
-
-
-export class Female implements ISurvivalCharacter {
-	type = SURV_MAP.FEMALE;
-	tile: Point;
-	species: SPECIES;
-	rel_pos: Point = [0, 0];
-	hidden = false;
-	anims: NamedAnimationFrames;
-	sprite: ISprite;
-	has_offspring = false;
-	env_sound: string;
-
-	constructor(species: SPECIES, tile: Point) {
-		this.tile = tile;
-		this.species = species;
-		// Isnobug has no environment sound
-		this.env_sound = `female_${['purplus', 'kiwi', 'pesci', '', 'amorph', 'chuck'][species]}`;
-		this.anims = anims_players[species];
-
-		if (species === SPECIES.PURPLUS) {
-			this.sprite = new RandomSprite(`gfx/spec${species + 1}.png`, this.anims.female.soffset, this.anims.female.frames, this.anims.female.transitions, anim_delays.female);
-		}
-		else {
-			this.sprite = new Sprite(`gfx/spec${species + 1}.png`, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
-		}
 	}
 }
 
@@ -657,13 +666,15 @@ export class Enemy implements ISurvivalCharacter {
 	anims: NamedAnimationFrames;
 	sprite: ISprite;
 	defeated: any; // TODO
+	pic: HTMLImageElement;
 
-	constructor(species: SPECIES, tile: Point) {
+	constructor(resources: ResourceManager, species: SPECIES, tile: Point) {
 		this.tile = tile;
 		this.species = species;
 		this.anims = anims_players[species];
 		this.defeated = this.anims.defeated;
+		this.pic = resources.get_image('gfx/enemies.png');
 
-		this.sprite = new RandomSprite('gfx/enemies.png', this.anims.enem_boasting.soffset, this.anims.enem_boasting.frames, this.anims.enem_boasting.transitions, anim_delays.female);
+		this.sprite = new RandomSprite(this.pic, this.anims.enem_boasting.soffset, this.anims.enem_boasting.frames, this.anims.enem_boasting.transitions, anim_delays.female);
 	}
 }

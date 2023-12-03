@@ -663,7 +663,7 @@ class Game {
 			mp = 10;
 		}
 		else {
-			open_popup(lang.popup_title, 'dino_cries', lang.not_a_savegame, () => { }, lang.next);
+			open_popup(this.glob, lang.popup_title, 'dino_cries', lang.not_a_savegame, () => { }, lang.next);
 			return;
 		}
 

@@ -1,22 +1,44 @@
-export class Love {
-	constructor(dir, character, partner, callback) {
+import { DIR, PRED, SPECIES, SURV_MAP } from "./helper";
+import { Character, Enemy, Female, Level, Predator } from "./level";
+import { ISprite, RandomSprite, Sprite } from "./sprite";
+import { anim_delays, anims_clouds, anims_players } from "./sprite_positions";
+import { Dimension, Point } from "./types";
+
+export interface IAction {
+	finished: boolean;
+	callback: Function; // TODO
+	update: () => void;
+	render: (ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) => void;
+}
+
+export class Love implements IAction {
+	private dir: DIR;
+	private character: Character;
+	private partner: Female;
+	callback: Function; // TODO
+	finished = false;
+	private delay = anim_delays.offspring;
+	private delay_counter = 0;
+	private frame = 0;
+	private draw_cloud = false;
+	private cloud_offset: Point = [0, 0];
+	private sprites: ISprite[];
+	private pre_offspring: ISprite | null = null;
+	offspring_sprite: ISprite;
+	private tiles;
+	private cloud_sprite;
+
+	constructor(dir: DIR, character: Character, partner: Female, callback: Function) {
 		this.dir = dir;
 		this.character = character;
 		this.partner = partner;
 		this.callback = callback;
-		this.finished = false;
-		this.delay = anim_delays.offspring;
-		this.delay_counter = 0;
-		this.frame = 0;
-		this.draw_cloud = false;
-		this.cloud_offset = [0, 0];
-		this.sprites = [];
-		this.pre_offspring = null;
+
 		if (character.species === SPECIES.PURPLUS) {
-			this.offspring_sprite = new RandomSprite(partner.url, partner.anims.offspring.soffset, partner.anims.offspring.frames, partner.anims.offspring.transitions, anim_delays.offspring);
+			this.offspring_sprite = new RandomSprite(partner.pic, partner.anims.offspring.soffset, partner.anims.offspring.frames, partner.anims.offspring.transitions, anim_delays.offspring);
 		}
 		else {
-			this.offspring_sprite = new Sprite(partner.url, partner.anims.offspring.soffset, partner.anims.offspring.frames, anim_delays.offspring);
+			this.offspring_sprite = new Sprite(partner.pic, partner.anims.offspring.soffset, partner.anims.offspring.frames, anim_delays.offspring);
 		}
 
 		this.sprites = [
@@ -44,7 +66,7 @@ export class Love {
 				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
 				this.cloud_offset = [14, 0];
 				break;
-			case DIR.E:
+			default: // DIR.E
 				this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
 				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
 				this.cloud_offset = [14, 0];
@@ -53,6 +75,7 @@ export class Love {
 
 		audio.play_sound('love');
 	}
+
 	update() {
 		this.delay_counter++;
 
@@ -101,7 +124,8 @@ export class Love {
 			this.finished = true;
 		}
 	}
-	render(ctx, dim, cpos) {
+
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		for (let i = 0; i < this.sprites.length; i++) {
 			this.sprites[i].render(ctx,
 				[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),
@@ -117,22 +141,31 @@ export class Love {
 }
 
 
-export class Fight {
-	constructor(dir, character, opponent, player_wins, callback) {
+export class Fight implements IAction {
+	private dir: DIR;
+	private character: Character;
+	private opponent: Enemy | Predator;
+	callback: Function; // TODO
+	finished = false;
+	private delay = anim_delays.winner;
+	private delay_counter = 0;
+	// Predators show the attack frame before attacking
+	private frame: number;
+	private player_wins: boolean;
+	private draw_cloud = false;
+	private cloud_offset: Point = [0, 0];
+	private sprites: (Sprite | null)[] = [];
+	private final_opponent_sprite: Sprite | null = null;
+	private tiles: [Point, Point];
+	private cloud_sprite: Sprite;
+
+	constructor(dir: DIR, character: Character, opponent: Enemy | Predator, player_wins: boolean, callback: Function) {
 		this.dir = dir;
 		this.character = character;
 		this.opponent = opponent;
 		this.callback = callback;
-		this.finished = false;
-		this.delay = anim_delays.winner;
-		this.delay_counter = 0;
-		// Predators show the attack frame before attacking
-		this.frame = opponent.type === SURV_MAP.PREDATOR ? -2 : 0;
 		this.player_wins = player_wins;
-		this.draw_cloud = false;
-		this.cloud_offset = [0, 0];
-		this.sprites = [];
-		this.final_opponent_sprite = null;
+		this.frame = opponent.type === SURV_MAP.PREDATOR ? -2 : 0
 
 		if (this.opponent.type === SURV_MAP.PREDATOR) {
 			this.sprites = [new Sprite(opponent.url, opponent.anims.attack.soffset, opponent.anims.attack.frames[this.dir - 1])];
@@ -163,13 +196,14 @@ export class Fight {
 				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
 				this.cloud_offset = [14, 0];
 				break;
-			case DIR.E:
+			default: // DIR.E
 				this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
 				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
 				this.cloud_offset = [14, 0];
 				break;
 		}
 	}
+
 	update() {
 		this.delay_counter++;
 
@@ -259,10 +293,12 @@ export class Fight {
 				break;
 		}
 	}
-	render(ctx, dim, cpos) {
+	
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		for (let i = 0; i < this.sprites.length; i++) {
-			if (this.sprites[i] !== null) {
-				this.sprites[i].render(ctx,
+			const sprite = this.sprites[i];
+			if (sprite !== null) {
+				sprite.render(ctx,
 					[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),
 					Math.round(this.tiles[i][1] * dim[1] - cpos[1])]);
 			}
@@ -277,19 +313,26 @@ export class Fight {
 }
 
 
-export class Feeding {
-	constructor(character, level, food_type, callback) {
+export class Feeding implements IAction {
+	private character: Character;
+	private level: Level;
+	callback: Function; // TODO
+	finished = false;
+	private food_type: number;
+	private delay = anim_delays.feeding;
+	private delay_counter = 0;
+	// Predators show the attack frame before attacking
+	private frame = -1;
+	private step = 0;
+	private awaiting_power_food_sound = false;
+	private tiles: Point[];
+	private sprite: Sprite;
+
+	constructor(character: Character, level: Level, food_type: number, callback: Function) {
 		this.character = character;
 		this.level = level;
 		this.food_type = food_type;
 		this.callback = callback;
-		this.delay = anim_delays.feeding;
-		this.delay_counter = 0;
-		this.frame = -1;
-		this.step = 0;
-		this.finished = false;
-		this.awaiting_power_food_sound = false;
-
 		this.tiles = [this.character.tile];
 
 		this.sprite = new Sprite(character.url, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, 0, [64, 64], true);
@@ -306,6 +349,7 @@ export class Feeding {
 				break;
 		}
 	}
+
 	update() {
 		this.delay_counter++;
 		if (this.delay_counter >= this.delay) {
@@ -362,7 +406,8 @@ export class Feeding {
 			}
 		}
 	}
-	render(ctx, dim, cpos) {
+
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		this.sprite.render(ctx,
 			[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
 			Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
@@ -370,20 +415,23 @@ export class Feeding {
 }
 
 
-export class Quicksand {
-	constructor(character, callback) {
+export class Quicksand implements IAction {
+	private character: Character;
+	callback: Function;
+	finished = false;
+	private delay: number;
+	private delay_counter = 0;
+	private frame = -1;
+	private mov: Point = [0, 0];
+	private tiles: Point[];
+	private sprite: Sprite;
+
+	constructor(character: Character, callback: Function) {
 		this.character = character;
 		this.callback = callback;
-		if (this.character.species === SPECIES.PESCIODYPHUS) {
-			this.delay = anim_delays.feeding;
-		}
-		else {
+		this.delay = this.character.species === SPECIES.PESCIODYPHUS ?
+			anim_delays.feeding :
 			this.delay = anim_delays.quicksand;
-		}
-		this.delay_counter = 0;
-		this.frame = -1;
-		this.mov = [0, 0];
-		this.finished = false;
 
 		this.tiles = [this.character.tile];
 
@@ -392,6 +440,7 @@ export class Quicksand {
 
 		audio.play_sound('quicksand');
 	}
+
 	update() {
 		this.delay_counter++;
 		if (this.delay_counter >= this.delay) {
@@ -445,7 +494,8 @@ export class Quicksand {
 
 		this.finished = this.sprite.finished;
 	}
-	render(ctx, dim, cpos) {
+
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		this.sprite.render(ctx,
 			[Math.round(this.tiles[0][0] * dim[0] - cpos[0] + this.mov[0]),
 			Math.round(this.tiles[0][1] * dim[1] - cpos[1] + this.mov[1])]);
@@ -453,18 +503,22 @@ export class Quicksand {
 }
 
 
-export class Waiting {
-	constructor(character, callback) {
-		this.callback = callback;
-		this.delay = anim_delays.movement;
-		this.delay_counter = 0;
-		this.frame = 0;
-		this.finished = false;
+export class Waiting implements IAction {
+	callback: Function;
+	finished = false;
+	private delay = anim_delays.movement;
+	private delay_counter = 0;
+	private frame = 0;
+	private tiles: Point[];
+	private sprite: Sprite;
 
+	constructor(character: Character, callback: Function) {
+		this.callback = callback;
 		this.tiles = [character.tile];
 
 		this.sprite = new Sprite(character.url, anims_players[character.species].still.soffset, anims_players[character.species].still.frames);
 	}
+
 	update() {
 		this.delay_counter++;
 		if (this.delay_counter >= this.delay) {
@@ -479,7 +533,8 @@ export class Waiting {
 			this.finished = true;
 		}
 	}
-	render(ctx, dim, cpos) {
+
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		this.sprite.render(ctx,
 			[Math.round(this.tiles[0][0] * dim[0] - cpos[0]),
 			Math.round(this.tiles[0][1] * dim[1] - cpos[1])]);
@@ -487,15 +542,21 @@ export class Waiting {
 }
 
 
-export class Electro {
-	constructor(dir, character, callback) {
+export class Electro implements IAction {
+	private dir: DIR;
+	private character: Character;
+	callback: Function;
+	finished = false;
+	private delay = anim_delays.electro;
+	private delay_counter = 0;
+	private frame = 0;
+	private tiles: Point[];
+	private sprites: Sprite[];
+
+	constructor(dir: DIR, character: Character, callback: Function) {
 		this.dir = dir;
 		this.character = character;
 		this.callback = callback;
-		this.finished = false;
-		this.delay = anim_delays.electro;
-		this.delay_counter = 0;
-		this.frame = 0;
 
 		if (dir === DIR.E) {
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
@@ -512,6 +573,7 @@ export class Electro {
 			];
 		}
 	}
+
 	update() {
 		for (const sprite of this.sprites) {
 			sprite.update();
@@ -526,16 +588,17 @@ export class Electro {
 			return;
 		}
 
-		const sprite_pos = 1 * (this.dir === DIR.E);
+		const sprite_pos = 1 * (this.dir === DIR.E ? 1 : 0);
 
 		if (this.frame === 15) {
 			this.sprites[sprite_pos] = new Sprite(this.character.url, this.character.anims.zapped.soffset, this.character.anims.zapped.frames, anim_delays.electro, [64, 64], true);
 			audio.play_sound('electro');
 		}
 
-		this.finished = this.sprites[1 * !sprite_pos].finished;
+		this.finished = this.sprites[1 * (!sprite_pos ? 1 : 0)].finished;
 	}
-	render(ctx, dim, cpos) {
+
+	render(ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) {
 		for (let i = 0; i < this.sprites.length; i++) {
 			this.sprites[i].render(ctx,
 				[Math.round(this.tiles[i][0] * dim[0] - cpos[0]),

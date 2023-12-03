@@ -1,69 +1,93 @@
+import { Electro, Feeding, Fight, IAction, Love, Quicksand, Waiting } from "./actions";
+import { Camera } from "./camera";
+import { survivalmap_size } from "./consts";
+import { ATTR, DIR, PLAYER_TYPE, SCENE, SURV_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, random_element, random_int, write_text } from "./helper";
+import { Enemy, Female, ISurvivalCharacter, Level, Predator } from "./level";
+import { Sprite } from "./sprite";
+import { anim_delays } from "./sprite_positions";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
 
-export class Survival {
-	constructor() {
-		this.id = SCENE.SURVIVAL;
-		this.bg_pic = resources.get('gfx/dark_bg.png');
-		this.gui_pics = resources.get('gfx/survival_gui.png');
+export class Survival implements Stage {
+	id = SCENE.SURVIVAL;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	tutorials: TutorialType[];
+	glob: TechGlobal;
+	world: WorldGlobal;
 
-		// CONST_START
-		this.camera_dim = [448, 448];
-		this.tile_dim = [64, 64];
-		this.left_rect_dim = [460, 460];
-		this.right_rect_dim = [181, 439];
-		this.next_dim = [181, 22];
-		this.time_dim = [122, 25];
-		this.steps_dim = [122, 25];
-		this.icon_dim = [20, 20];
-		this.sym_dim = [16, 16];
-		this.minimap_dim = [168, 168];
-		this.minimap_sym_dim = [8, 8];
+	private bg_pic: HTMLImageElement;
+	private gui_pics: HTMLImageElement;
 
-		this.camera_offset = [6, 26];
-		this.left_rect_offset = [0, 20];
-		this.right_rect_offset = [459, 20];
-		this.next_offset = [459, 458];
-		this.steps_offset = [508, 205];
-		this.time_offset = [508, 240];
-		this.icon_steps_offset = [470, 243];
-		this.icon_time_offset = [470, 208];
-		this.sym_food_offset = [465, 286];
-		this.sym_love_offset = [465, 347];
-		this.sym_dead_offset = [465, 381];
-		this.sym_won_offset = [465, 416];
-		this.minimap_offset = [465, 26];
-		this.minimap_sym_soffset = [0, 16];
+	private level: Level;
+	private camera: Camera;
+	private action: IAction | null = null;
+	private movement_active = false;
+	private movement_just_finished = false;
+	private player_started = false;
+	private moving_predators: Predator[] = [];
 
-		this.sym_food_soffset = [0, 0];
-		this.sym_love_soffset = [16, 0];
-		this.sym_dead_soffset = [32, 0];
-		this.sym_won_soffset = [0, 24];
-		this.icon_steps_soffset = [48, 0];
-		this.icon_time_soffset = [68, 0];
+	private delay = anim_delays.movement;
+	private delay_counter = 0;
+	private time: number;
+	private steps = 10;
+	private max_steps = 10;
 
-		this.sym_food_delta = [8, 25];
-		this.sym_dx = 17;
+	private active_sounds: Set<string> = new Set();
 
-		this.minimap_center = 10;
+	private clickdir = -1;
 
-		this.eating_div = 37;
-		this.max_time = 54;
-		this.speed = 8;
-		// CONST_END
-		this.level = null;
-		this.camera = null;
-		this.action = null;
-		this.movement_active = false;
-		this.movement_just_finished = false;
-		this.player_started = false;
-		this.moving_predators = [];
+	readonly camera_dim: Dimension = [448, 448];
+	readonly tile_dim: Dimension = [64, 64];
+	readonly left_rect_dim: Dimension = [460, 460];
+	readonly right_rect_dim: Dimension = [181, 439];
+	readonly next_dim: Dimension = [181, 22];
+	readonly time_dim: Dimension = [122, 25];
+	readonly steps_dim: Dimension = [122, 25];
+	readonly icon_dim: Dimension = [20, 20];
+	readonly sym_dim: Dimension = [16, 16];
+	readonly minimap_dim: Dimension = [168, 168];
+	readonly minimap_sym_dim: Dimension = [8, 8];
 
-		this.delay = anim_delays.movement;
-		this.delay_counter = 0;
+	readonly camera_offset: Point = [6, 26];
+	readonly left_rect_offset: Point = [0, 20];
+	readonly right_rect_offset: Point = [459, 20];
+	readonly next_offset: Point = [459, 458];
+	readonly steps_offset: Point = [508, 205];
+	readonly time_offset: Point = [508, 240];
+	readonly icon_steps_offset: Point = [470, 243];
+	readonly icon_time_offset: Point = [470, 208];
+	readonly sym_food_offset: Point = [465, 286];
+	readonly sym_love_offset: Point = [465, 347];
+	readonly sym_dead_offset: Point = [465, 381];
+	readonly sym_won_offset: Point = [465, 416];
+	readonly minimap_offset: Point = [465, 26];
+	readonly minimap_sym_soffset: Point = [0, 16];
+
+	readonly sym_food_soffset: Point = [0, 0];
+	readonly sym_love_soffset: Point = [16, 0];
+	readonly sym_dead_soffset: Point = [32, 0];
+	readonly sym_won_soffset: Point = [0, 24];
+	readonly icon_steps_soffset: Point = [48, 0];
+	readonly icon_time_soffset: Point = [68, 0];
+
+	readonly sym_food_delta: Point = [8, 25];
+	readonly sym_dx = 17;
+
+	readonly minimap_center = 10;
+	readonly eating_div = 37;
+	readonly max_time = 54;
+	readonly speed = 8;
+
+	constructor(glob: TechGlobal, world: WorldGlobal) {
+		this.glob = glob;
+		this.world = world;
+		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
+		this.gui_pics = glob.resources.get_image('gfx/survival_gui.png');
 		this.time = this.max_time;
-		this.steps = 10;
-		this.max_steps = 10;
 
-		this.active_sounds = new Set();
+		this.level = new Level(world);
+		this.camera = new Camera(glob.ctx, this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
 
 		this.tutorials = [
 			{
@@ -91,51 +115,46 @@ export class Survival {
 				'highlight': [this.minimap_offset[0], this.minimap_offset[1], this.minimap_offset[0] + this.minimap_dim[0], this.minimap_offset[1] + this.minimap_dim[1]],
 			},
 		];
-
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
-
-		this.clickdir = -1;
 	}
-	initialize() {
-		game.current_player.loved = 0;
-		game.current_player.eaten = 0;
-		game.current_player.experience = 0;
-		game.current_player.deaths = 0;
 
-		if (game.current_player.type === PLAYER_TYPE.COMPUTER) {
+	initialize() {
+		this.world.current_player.loved = 0;
+		this.world.current_player.eaten = 0;
+		this.world.current_player.experience = 0;
+		this.world.current_player.deaths = 0;
+
+		if (this.world.current_player.type === PLAYER_TYPE.COMPUTER) {
 			this.ai();
 			return;
 		}
 
-		audio.play_music(`spec${game.current_player.id}`);
+		this.glob.resources.play_music(`spec${this.world.current_player.id}`);
 
-		this.level = new Level();
-		this.camera = new Camera(this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
+
 		this.player_started = false;
 		this.time = this.max_time;
 
 		// Higher difficulty (iq) means less steps
-		this.steps = 40 + (5 - game.current_player.iq) * 10;
+		this.steps = 40 + (5 - this.world.current_player.iq) * 10;
 		this.max_steps = this.steps;
 
 		this.redraw();
 		game.tutorial();
 		this.update_environment_sound();
 	}
+
 	redraw() {
-		if (game.current_player.type === PLAYER_TYPE.COMPUTER) {
+		if (this.world.current_player.type === PLAYER_TYPE.COMPUTER) {
 			return;
 		}
 		draw_base();
-		this.clickareas = game.clickareas.slice();
-		this.rightclickareas = game.rightclickareas.slice();
+		this.clickareas = this.glob.clickareas.slice();
+		this.rightclickareas = this.glob.rightclickareas.slice();
 
 		draw_rect(this.left_rect_offset, this.left_rect_dim); // Main rectangle
 		draw_rect(this.right_rect_offset, this.right_rect_dim); // Right rectangle
 		draw_rect(this.next_offset, this.next_dim); // Continue rectangle
-		write_text(lang.next, [549, 473], 'white', 'black');
+		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
 		this.clickareas.push({
 			x1: this.next_offset[0],
 			y1: this.next_offset[1],
@@ -160,10 +179,10 @@ export class Survival {
 			y1: this.camera_offset[1],
 			x2: this.camera_offset[0] + this.camera_dim[0],
 			y2: this.camera_offset[1] + this.camera_dim[1],
-			down: (x, y) => this.cam_click(x, y),
+			down: (x: number, y: number) => this.cam_click(x, y),
 			up: () => this.cam_click(-1, -1),
 			blur: () => this.cam_click(-1, -1),
-			move: (x, y) => this.cam_click(x, y),
+			move: (x: number, y: number) => this.cam_click(x, y),
 			default_pointer: true
 		});
 
@@ -172,8 +191,8 @@ export class Survival {
 			y1: this.camera_offset[1],
 			x2: this.camera_offset[0] + this.camera_dim[0],
 			y2: this.camera_offset[1] + this.camera_dim[1],
-			down: (x, y) => this.cam_rightclickup(x, y),
-			up: (x, y) => this.cam_rightclickup(x, y),
+			down: (x: number, y: number) => this.cam_rightclickup(x, y),
+			up: (x: number, y: number) => this.cam_rightclickup(x, y),
 			blur: () => { },
 			move: () => { }
 		});
@@ -182,7 +201,7 @@ export class Survival {
 		this.draw_minimap();
 
 		// Steps
-		ctx.drawImage(this.gui_pics,
+		this.glob.ctx.drawImage(this.gui_pics,
 			this.icon_steps_soffset[0], this.icon_steps_soffset[1],
 			this.icon_dim[0], this.icon_dim[1],
 			this.icon_steps_offset[0], this.icon_steps_offset[1],
@@ -190,7 +209,7 @@ export class Survival {
 		this.draw_steps();
 
 		// Time
-		ctx.drawImage(this.gui_pics,
+		this.glob.ctx.drawImage(this.gui_pics,
 			this.icon_time_soffset[0], this.icon_time_soffset[1],
 			this.icon_dim[0], this.icon_dim[1],
 			this.icon_time_offset[0], this.icon_time_offset[1],
@@ -208,6 +227,7 @@ export class Survival {
 			{ 'key': 'ESCAPE', 'action': () => this.suicide(), 'reset': true },
 		];
 	}
+
 	draw_minimap() {
 		draw_black_rect(this.minimap_offset, this.minimap_dim, '#000000');
 
@@ -217,10 +237,10 @@ export class Survival {
 		const MM_PREDATOR = 3;
 		const MM_ENEMY = 4;
 
-		const radar_range = (game.current_player.stats[ATTR.PERCEPTION] * 7 + game.current_player.stats[ATTR.INTELLIGENCE]) / 10;
+		const radar_range = (this.world.current_player.stats[ATTR.PERCEPTION] * 7 + this.world.current_player.stats[ATTR.INTELLIGENCE]) / 10;
 
 		for (let y = -10; y < 10; y++) {
-			const real_y = clamp(this.level.character.tile[1] + y, 0, this.level.height - 1);
+			const real_y = clamp(this.level.character.tile[1] + y, 0, survivalmap_size[1] - 1);
 			for (let x = -10; x < 10; x++) {
 
 				// If the range is too low, don't show anything here
@@ -228,26 +248,21 @@ export class Survival {
 					continue;
 				}
 
-				const real_x = clamp(this.level.character.tile[0] + x, 0, this.level.width - 1);
-				let sym;
-				let draw = false;
+				const real_x = clamp(this.level.character.tile[0] + x, 0, survivalmap_size[0] - 1);
+				let sym = -1;
 
 				if (x === 0 && y === 0) {
-					draw = true;
 					sym = MM_PLAYER;
 				}
 				else if (this.level.mobmap[real_y][real_x] !== null) {
-					switch (this.level.mobmap[real_y][real_x].type) {
+					switch ((this.level.mobmap[real_y][real_x] as ISurvivalCharacter).type) {
 						case SURV_MAP.PREDATOR:
-							draw = true;
 							sym = MM_PREDATOR;
 							break;
 						case SURV_MAP.ENEMY:
-							draw = true;
 							sym = MM_ENEMY;
 							break;
 						case SURV_MAP.FEMALE:
-							draw = true;
 							sym = MM_LOVE;
 							break;
 					}
@@ -270,14 +285,13 @@ export class Survival {
 
 					// Mapping from survival food to stats food.
 					const food_type = [0, 2, 5, 1, 3, 4][Math.floor(this.level.map[real_y][real_x] / 6)];
-					if (game.current_player.stats[food_type] > threshold) {
-						draw = true;
+					if (this.world.current_player.stats[food_type] > threshold) {
 						sym = MM_FOOD;
 					}
 				}
 
-				if (draw) {
-					ctx.drawImage(this.gui_pics,
+				if (sym >= 0) {
+					this.glob.ctx.drawImage(this.gui_pics,
 						this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
 						this.minimap_sym_soffset[1],
 						this.minimap_sym_dim[0], this.minimap_sym_dim[1],
@@ -288,43 +302,46 @@ export class Survival {
 			}
 		}
 	}
+
 	draw_steps() {
 		const width = Math.ceil((this.steps_dim[0] - 1) * this.steps / this.max_steps);
 
-		ctx.save();
-		ctx.fillStyle = '#c3c3c3';
-		ctx.fillRect(this.steps_offset[0], this.steps_offset[1], this.steps_dim[0], this.steps_dim[1]);
-		ctx.fillStyle = '#0000ff';
-		ctx.fillRect(this.steps_offset[0] + 1, this.steps_offset[1] + 1, width, this.steps_dim[1] - 1);
-		ctx.restore();
+		this.glob.ctx.save();
+		this.glob.ctx.fillStyle = '#c3c3c3';
+		this.glob.ctx.fillRect(this.steps_offset[0], this.steps_offset[1], this.steps_dim[0], this.steps_dim[1]);
+		this.glob.ctx.fillStyle = '#0000ff';
+		this.glob.ctx.fillRect(this.steps_offset[0] + 1, this.steps_offset[1] + 1, width, this.steps_dim[1] - 1);
+		this.glob.ctx.restore();
 
 		draw_black_rect(this.steps_offset, this.steps_dim);
 	}
+
 	draw_time() {
 		const width = Math.ceil((this.time_dim[0] - 1) * this.time / this.max_time);
 
-		ctx.save();
-		ctx.fillStyle = '#c3c3c3';
-		ctx.fillRect(this.time_offset[0], this.time_offset[1], this.time_dim[0], this.time_dim[1]);
-		ctx.fillStyle = '#ff0000';
-		ctx.fillRect(this.time_offset[0] + 1, this.time_offset[1] + 1, width, this.time_dim[1] - 1);
-		ctx.restore();
+		this.glob.ctx.save();
+		this.glob.ctx.fillStyle = '#c3c3c3';
+		this.glob.ctx.fillRect(this.time_offset[0], this.time_offset[1], this.time_dim[0], this.time_dim[1]);
+		this.glob.ctx.fillStyle = '#ff0000';
+		this.glob.ctx.fillRect(this.time_offset[0] + 1, this.time_offset[1] + 1, width, this.time_dim[1] - 1);
+		this.glob.ctx.restore();
 
 		draw_black_rect(this.time_offset, this.time_dim);
 	}
+
 	draw_symbols() {
 		// Delete earlier drawings
 		const w = this.sym_dx * 10;
 		const h = this.sym_won_offset[1] - this.sym_food_offset[1] + this.sym_dim[1];
-		ctx.drawImage(this.bg_pic,
+		this.glob.ctx.drawImage(this.bg_pic,
 			this.sym_food_offset[0], this.sym_food_offset[1],
 			w, h,
 			this.sym_food_offset[0], this.sym_food_offset[1],
 			w, h);
 
 		// Food
-		for (let i = 0; i < Math.floor(game.current_player.eaten / this.eating_div); i++) {
-			ctx.drawImage(this.gui_pics,
+		for (let i = 0; i < Math.floor(this.world.current_player.eaten / this.eating_div); i++) {
+			this.glob.ctx.drawImage(this.gui_pics,
 				this.sym_food_soffset[0], this.sym_food_soffset[1],
 				this.sym_dim[0], this.sym_dim[1],
 				this.sym_food_offset[0] + this.sym_food_delta[0] * (i % 20), this.sym_food_offset[1] + this.sym_food_delta[1] * Math.floor(i / 20),
@@ -332,8 +349,8 @@ export class Survival {
 		}
 
 		// Love
-		for (let i = 0; i < game.current_player.loved; i++) {
-			ctx.drawImage(this.gui_pics,
+		for (let i = 0; i < this.world.current_player.loved; i++) {
+			this.glob.ctx.drawImage(this.gui_pics,
 				this.sym_love_soffset[0], this.sym_love_soffset[1],
 				this.sym_dim[0], this.sym_dim[1],
 				this.sym_love_offset[0] + this.sym_dx * i, this.sym_love_offset[1],
@@ -341,8 +358,8 @@ export class Survival {
 		}
 
 		// Deaths
-		for (let i = 0; i < game.current_player.deaths; i++) {
-			ctx.drawImage(this.gui_pics,
+		for (let i = 0; i < this.world.current_player.deaths; i++) {
+			this.glob.ctx.drawImage(this.gui_pics,
 				this.sym_dead_soffset[0], this.sym_dead_soffset[1],
 				this.sym_dim[0], this.sym_dim[1],
 				this.sym_dead_offset[0] + this.sym_dx * i, this.sym_dead_offset[1],
@@ -351,13 +368,14 @@ export class Survival {
 
 		// Wins
 		for (let i = 0; i < this.level.character.victories.length; i++) {
-			ctx.drawImage(this.gui_pics,
+			this.glob.ctx.drawImage(this.gui_pics,
 				this.sym_won_soffset[0] + this.sym_dim[0] * this.level.character.victories[i], this.sym_won_soffset[1],
 				this.sym_dim[0], this.sym_dim[1],
 				this.sym_won_offset[0] + this.sym_dx * i, this.sym_won_offset[1],
 				this.sym_dim[0], this.sym_dim[1]);
 		}
 	}
+
 	render() {
 		this.camera.render(true || this.movement_just_finished); // DEBUG
 		this.draw_time();
@@ -367,46 +385,48 @@ export class Survival {
 			this.draw_minimap();
 		}
 	}
+
 	ai() {
-		const iq = game.current_player.iq;
-		game.current_player.experience = random_int(0, iq);
+		const iq = this.world.current_player.iq;
+		this.world.current_player.experience = random_int(0, iq);
 
 		// MAYBE correct: This does not include the density that affects human players. For human players: Higher density -> less food
 		let food = 0;
 
 		for (let x = 1; x <= 26; x++) {
 			for (let y = 1; y <= 26; y++) {
-				if (game.map_positions[y][x] === game.current_player.id) {
-					food += (20 + iq * 20 + game.current_player.stats[ATTR.PERCEPTION] / 5 + game.current_player.stats[ATTR.INTELLIGENCE] / 10) * game.current_player.stats[game.world_map[y][x] - 1] / 3;
+				if (this.world.map_positions[y][x] === this.world.current_player.id) {
+					food += (20 + iq * 20 + this.world.current_player.stats[ATTR.PERCEPTION] / 5 + this.world.current_player.stats[ATTR.INTELLIGENCE] / 10) * this.world.current_player.stats[this.world.world_map[y][x] - 1] / 3;
 				}
 			}
 		}
 
-		food = Math.floor(food / game.current_player.individuals);
+		food = Math.floor(food / this.world.current_player.individuals);
 
 		if (food > 1480) {
 			food = 1480;
 		}
-		game.current_player.eaten = food;
+		this.world.current_player.eaten = food;
 
-		let deaths = Math.floor(random_int(0, game.current_player.individuals - 1) / 10) + 5;
+		let deaths = Math.floor(random_int(0, this.world.current_player.individuals - 1) / 10) + 5;
 		let saved = 0;
 		for (let i = 0; i < deaths; i++) {
-			if (random_int(0, 600) < game.current_player.stats[ATTR.SPEED] ||
-				random_int(0, 300) < game.current_player.stats[ATTR.CAMOUFLAGE] ||
-				random_int(0, 1000) < game.current_player.stats[ATTR.INTELLIGENCE] ||
-				random_int(0, 600) < game.current_player.stats[ATTR.DEFENSE] ||
+			if (random_int(0, 600) < this.world.current_player.stats[ATTR.SPEED] ||
+				random_int(0, 300) < this.world.current_player.stats[ATTR.CAMOUFLAGE] ||
+				random_int(0, 1000) < this.world.current_player.stats[ATTR.INTELLIGENCE] ||
+				random_int(0, 600) < this.world.current_player.stats[ATTR.DEFENSE] ||
 				random_int(0, 6) < iq) {
 				saved++;
 			}
 		}
-		game.current_player.deaths = deaths - saved;
+		this.world.current_player.deaths = deaths - saved;
 
 		// MAYBE correct: This does not take into account density. For a human player: Higher density > more females
-		game.current_player.loved = random_int(0, iq * 2 + 2);
+		this.world.current_player.loved = random_int(0, iq * 2 + 2);
 
 		this.next_popup(1);
 	}
+
 	finish_movement() {
 		this.movement_just_finished = true;
 		const char = this.level.character;
@@ -433,8 +453,8 @@ export class Survival {
 		// Enemy or Female found
 		const [dir, adjacent] = this.get_adjacent();
 		if (dir) {
-			if (adjacent.type === SURV_MAP.FEMALE) {
-				this.action = new Love(dir, char, adjacent, () => this.finish_love(adjacent));
+			if (adjacent !== null && adjacent.type === SURV_MAP.FEMALE) {
+				this.action = new Love(dir, char, (adjacent as Female), () => this.finish_love(adjacent as Female));
 			}
 			else {
 				const player_wins = this.does_player_win(adjacent);
@@ -457,28 +477,31 @@ export class Survival {
 		// Nothing happened, end movement
 		char.sprite = new Sprite(char.url, char.anims.still.soffset, char.anims.still.frames);
 	}
+
 	update_environment_sound() {
 		const current_sounds = this.level.get_sounds();
 		const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x));
 		const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x));
 
 		for (const sound of to_stop) {
-			audio.stop_sound(sound);
+			this.glob.resources.stop_sound(sound);
 		}
 
 		for (const sound of to_start) {
-			audio.play_sound(sound, true);
+			this.glob.resources.play_sound(sound, true);
 		}
 
 		this.active_sounds = current_sounds;
 	}
-	does_player_win(opponent) {
+
+	does_player_win(opponent: Enemy | Predator) {
 		// The player wins if the character is invincible, fights against an enemy, or has a high defense.
 		return this.level.character.invincible ||
 			opponent.type === SURV_MAP.ENEMY ||
-			random_int(0, opponent.attack) <= game.current_player.stats[ATTR.DEFENSE];
+			random_int(0, (opponent as Predator).attack) <= this.world.current_player.stats[ATTR.DEFENSE];
 	}
-	finish_feeding(food) {
+
+	finish_feeding(food: number) {
 		// Power food
 		if (food >= 118) {
 			this.level.character.invincible = true;
@@ -488,9 +511,9 @@ export class Survival {
 		else if (food < 36) {
 			// Mapping from survival food to stats food.
 			const food_type = [0, 2, 5, 1, 3, 4][Math.floor(food / 6)];
-			game.current_player.eaten += game.current_player.stats[food_type];
-			if (game.current_player.eaten > 1480) {
-				game.current_player.eaten = 1480;
+			this.world.current_player.eaten += this.world.current_player.stats[food_type];
+			if (this.world.current_player.eaten > 1480) {
+				this.world.current_player.eaten = 1480;
 			}
 			this.draw_symbols();
 		}
@@ -498,7 +521,8 @@ export class Survival {
 		// Nothing happens with poison (it just steals your time by the lengthy animation)
 		this.finish_movement();
 	}
-	finish_love(partner) {
+
+	finish_love(partner: Female) {
 		partner.hidden = false;
 		this.level.character.hidden = false;
 		partner.type = SURV_MAP.UNRESPONSIVE;
@@ -506,26 +530,27 @@ export class Survival {
 		if (partner.hasOwnProperty('env_sound')) {
 			partner.env_sound = `offspring_${['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][partner.species]}`;
 		}
-		game.current_player.loved++;
-		if (game.current_player.loved > 10) {
-			game.current_player.loved = 10;
+		this.world.current_player.loved++;
+		if (this.world.current_player.loved > 10) {
+			this.world.current_player.loved = 10;
 		}
 		this.steps--;
 		this.draw_symbols();
 		this.finish_movement();
 	}
-	finish_fight(player_wins, opponent) {
+
+	finish_fight(player_wins: boolean, opponent: Enemy | Predator) {
 		opponent.hidden = false;
 		if (player_wins) {
 			if (this.level.character.victories.length < 10) {
 				if (opponent.type === SURV_MAP.ENEMY) {
 					this.level.character.victories.push(opponent.species);
 				}
-				else if (options.show_predators) { // Predator
+				else if (this.glob.options.show_predators) { // Predator
 					this.level.character.victories.push(opponent.species + 6);
 				}
 			}
-			game.current_player.experience++;
+			this.world.current_player.experience++;
 
 			this.level.character.hidden = false;
 			opponent.type = SURV_MAP.UNRESPONSIVE;
@@ -542,29 +567,31 @@ export class Survival {
 			this.player_death();
 		}
 	}
-	get_adjacent() {
+
+	get_adjacent(): [DIR, ISurvivalCharacter | null] {
 		const x = this.level.character.tile[0];
 		const y = this.level.character.tile[1];
 
-		if (this.level.mobmap[y - 1][x] !== null && this.level.mobmap[y - 1][x].type !== SURV_MAP.UNRESPONSIVE) {
+		if (this.level.mobmap[y - 1][x] !== null && (this.level.mobmap[y - 1][x] as ISurvivalCharacter).type !== SURV_MAP.UNRESPONSIVE) {
 			return [DIR.N, this.level.mobmap[y - 1][x]];
 		}
 
-		if (this.level.mobmap[y][x + 1] !== null && this.level.mobmap[y][x + 1].type !== SURV_MAP.UNRESPONSIVE) {
+		if (this.level.mobmap[y][x + 1] !== null && (this.level.mobmap[y][x + 1] as ISurvivalCharacter).type !== SURV_MAP.UNRESPONSIVE) {
 			return [DIR.E, this.level.mobmap[y][x + 1]];
 		}
 
-		if (this.level.mobmap[y + 1][x] !== null && this.level.mobmap[y + 1][x].type !== SURV_MAP.UNRESPONSIVE) {
+		if (this.level.mobmap[y + 1][x] !== null && (this.level.mobmap[y + 1][x] as ISurvivalCharacter).type !== SURV_MAP.UNRESPONSIVE) {
 			return [DIR.S, this.level.mobmap[y + 1][x]];
 		}
 
-		if (this.level.mobmap[y][x - 1] !== null && this.level.mobmap[y][x - 1].type !== SURV_MAP.UNRESPONSIVE) {
+		if (this.level.mobmap[y][x - 1] !== null && (this.level.mobmap[y][x - 1] as ISurvivalCharacter).type !== SURV_MAP.UNRESPONSIVE) {
 			return [DIR.W, this.level.mobmap[y][x - 1]];
 		}
 
-		return [0, null];
+		return [DIR.X, null];
 	}
-	start_movement(dir) {
+
+	start_movement(dir: DIR) {
 		const char = this.level.character;
 		char.movement = dir;
 		this.delay = anim_delays.movement;
@@ -618,7 +645,8 @@ export class Survival {
 		this.movement_active = true;
 		this.draw_minimap();
 	}
-	resolve_movement(obj, force = false) {
+
+	resolve_movement(obj: ISurvivalCharacter, force = false) {
 		if (!obj.movement) {
 			return;
 		}
@@ -659,10 +687,11 @@ export class Survival {
 			}
 		}
 	}
+
 	start_predator_movement() {
 		const player_pos = this.level.character.tile;
 		const anim_delay = 0;
-		const evasion = game.current_player.stats[ATTR.CAMOUFLAGE] * 4 + game.current_player.stats[ATTR.SPEED] * 2 + game.current_player.stats[ATTR.INTELLIGENCE];
+		const evasion = this.world.current_player.stats[ATTR.CAMOUFLAGE] * 4 + this.world.current_player.stats[ATTR.SPEED] * 2 + this.world.current_player.stats[ATTR.INTELLIGENCE];
 
 		this.moving_predators = [];
 
@@ -695,10 +724,6 @@ export class Survival {
 				predator.movement = DIR.X;
 				predator.last_movement = DIR.X;
 			}
-
-
-
-
 
 			// If the predator scents the player, try to get closer or don't move at all:
 			// If possible, move closer on the axis where the predator is further away.
@@ -794,17 +819,19 @@ export class Survival {
 			}
 		}
 	}
+
 	suicide() {
 		if (this.movement_active || this.action !== null) {
 			return;
 		}
 
-		open_popup(lang.popup_title, 'chuck_berry', lang.suicide, (x) => { if (x === 1) { this.player_death(true); } }, lang.no, lang.yes);
+		open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.suicide, (x: number) => { if (x === 1) { this.player_death(true); } }, this.glob.lang.no, this.glob.lang.yes);
 	}
+
 	player_death(delete_sprite = false) {
-		game.current_player.deaths++;
-		if (game.current_player.deaths > 10) {
-			game.current_player.deaths = 10;
+		this.world.current_player.deaths++;
+		if (this.world.current_player.deaths > 10) {
+			this.world.current_player.deaths = 10;
 		}
 		this.draw_symbols();
 
@@ -825,6 +852,7 @@ export class Survival {
 		this.update_environment_sound();
 		this.camera.move_to(char);
 	}
+
 	update() {
 		this.test_movement_input();
 
@@ -838,8 +866,6 @@ export class Survival {
 				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 				this.action = new Quicksand(char, () => this.player_death(true));
 			}
-
-
 
 			// Test for Electro flower
 			// The field left or right must be empty (tile 65) and no unit may be on it
@@ -896,7 +922,8 @@ export class Survival {
 
 		this.camera.update_visible_level();
 	}
-	cam_click(x, y) {
+
+	cam_click(x: number, y: number) {
 		x -= this.camera_offset[0];
 		y -= this.camera_offset[1];
 
@@ -929,7 +956,8 @@ export class Survival {
 		}
 
 	}
-	cam_rightclickup(x, y) {
+
+	cam_rightclickup(x: number, y: number) {
 		x -= this.camera_offset[0];
 		y -= this.camera_offset[1];
 
@@ -938,6 +966,7 @@ export class Survival {
 			this.suicide();
 		}
 	}
+
 	test_movement_input() {
 		if (this.movement_active || this.action !== null) {
 			return false;
@@ -973,10 +1002,11 @@ export class Survival {
 
 		return true;
 	}
+
 	calc_outcome() {
-		let death_prob = game.current_player.deaths * 0.05;
-		if (game.current_player.eaten < 20 * this.eating_div) {
-			death_prob += (20 * this.eating_div - game.current_player.eaten) * 0.05 / this.eating_div;
+		let death_prob = this.world.current_player.deaths * 0.05;
+		if (this.world.current_player.eaten < 20 * this.eating_div) {
+			death_prob += (20 * this.eating_div - this.world.current_player.eaten) * 0.05 / this.eating_div;
 		}
 		if (death_prob > 0.9) {
 			death_prob = 0.9;
@@ -984,24 +1014,25 @@ export class Survival {
 
 		for (let x = 1; x <= 26; x++) {
 			for (let y = 1; y <= 26; y++) {
-				if (game.map_positions[y][x] === game.current_player.id && Math.random() < death_prob) {
-					game.map_positions[y][x] = -1;
-					game.current_player.individuals--;
+				if (this.world.map_positions[y][x] === this.world.current_player.id && Math.random() < death_prob) {
+					this.world.map_positions[y][x] = -1;
+					this.world.current_player.individuals--;
 				}
 			}
 		}
 
-		let loved = game.current_player.loved;
+		let loved = this.world.current_player.loved;
 		// A little bonus if you have eaten alot. It's a bit more than in the original game, so you actually get a bonus when you fill the second row.
-		if (game.current_player.eaten >= 20 * this.eating_div) {
-			loved += Math.floor((game.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
+		if (this.world.current_player.eaten >= 20 * this.eating_div) {
+			loved += Math.floor((this.world.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
 		}
 
-		game.current_player.toplace = Math.floor(loved * game.current_player.stats[ATTR.REPRODUCTION] / 20);
-		game.current_player.toplace = clamp(game.current_player.toplace, loved, 20);
+		this.world.current_player.toplace = Math.floor(loved * this.world.current_player.stats[ATTR.REPRODUCTION] / 20);
+		this.world.current_player.toplace = clamp(this.world.current_player.toplace, loved, 20);
 
-		game.current_player.tomove = Math.floor(game.current_player.stats[ATTR.SPEED] / 5);
+		this.world.current_player.tomove = Math.floor(this.world.current_player.stats[ATTR.SPEED] / 5);
 	}
+
 	next() {
 		draw_rect(this.next_offset, this.next_dim);
 
@@ -1010,21 +1041,22 @@ export class Survival {
 		}
 
 		if (this.steps > 0) {
-			open_popup(lang.popup_title, 'chuck_berry', lang.turn_finished, (x) => this.next_popup(x), lang.no, lang.yes);
+			open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 		else {
 			this.next_popup(1);
 		}
 	}
-	next_popup(answer) {
+
+	next_popup(answer: number) {
 		if (answer === 1) {
 			this.calc_outcome();
-			if (game.current_player.individuals === 0 && !game.current_player.is_dead) {
-				game.current_player.is_dead = true;
-				open_popup(lang.popup_title, game.current_player.id, lang.dead, () => game.next_stage(), lang.next);
+			if (this.world.current_player.individuals === 0 && !this.world.current_player.is_dead) {
+				this.world.current_player.is_dead = true;
+				open_popup(this.glob.lang.popup_title, this.world.current_player.id, this.glob.lang.dead, () => game.next_stage(), this.glob.lang.next);
 			}
 			else {
-				audio.stop_sound();
+				this.glob.resources.stop_sound();
 				game.next_stage();
 			}
 		}

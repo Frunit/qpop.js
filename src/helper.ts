@@ -1,11 +1,11 @@
 import { Load } from "./load";
-import { Player } from "./player";
 import { Popup } from "./popup";
 import { Tutorial } from "./tutorial";
-import { Dimension, LocalSave, Point, Tuple } from "./types";
+import { Dimension, Point, TechGlobal, TutorialType } from "./types";
+import { version } from "./version";
 
 // World
-export enum WORLD_MAP {
+export const enum WORLD_MAP {
 	WATER =      0,
 	RANGONES =   1,
 	BLUELEAF =   2,
@@ -20,7 +20,7 @@ export enum WORLD_MAP {
 };
 
 // Attribute
-export enum ATTR {
+export const enum ATTR {
 	RANGONES =      0,
 	BLUELEAF =      1,
 	HUSHROOMS =     2,
@@ -37,7 +37,7 @@ export enum ATTR {
 };
 
 // Directions
-export enum DIR {
+export const enum DIR {
 	X = 0,
 	N = 1,
 	E = 2,
@@ -46,21 +46,21 @@ export enum DIR {
 };
 
 // Player types
-export enum PLAYER_TYPE {
+export const enum PLAYER_TYPE {
 	HUMAN =    1,
 	COMPUTER = 2,
 	NOBODY =   3,
 };
 
 // Predators
-export enum PRED {
+export const enum PRED {
 	DINO =     0,
 	MUSHROOM = 1,
 	HUMAN =    2,
 };
 
 // Predators
-export enum SPECIES {
+export const enum SPECIES {
 	PURPLUS =      0,
 	KIWIOPTERYX =  1,
 	PESCIODYPHUS = 2,
@@ -70,7 +70,7 @@ export enum SPECIES {
 };
 
 // Living objects on survival map
-export enum SURV_MAP {
+export const enum SURV_MAP {
 	PLAYER =       1,
 	PREDATOR =     2,
 	ENEMY =        3,
@@ -79,7 +79,7 @@ export enum SURV_MAP {
 };
 
 
-export enum SCENE {
+export const enum SCENE {
 	LOADING =         1,
 	INTRO =           2,
 	INIT =            3,
@@ -99,8 +99,6 @@ export enum SCENE {
 	OPTIONS =        31,
 	LOAD_GAME =      32,
 };
-
-export const correct_world_tile = [0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46];
 
 
 /**
@@ -229,7 +227,7 @@ export function download(data: ArrayBuffer, filename: string, type: string = 'ap
 }
 
 
-export function multiline(text: string, maxwidth: number): string[] {
+export function multiline(ctx: CanvasRenderingContext2D, text: string, maxwidth: number): string[] {
 	// Split a given text at spaces to limit it to maxwidth pixels
 	// Returns a list where each element is one line
 	const words = text.split(' ');
@@ -257,7 +255,7 @@ export function multiline(text: string, maxwidth: number): string[] {
 }
 
 
-export function write_text(text: string, pos: Point, fg='#000000', bg='#ffffff', align='center') {
+export function write_text(ctx: CanvasRenderingContext2D, text: string, pos: Point, fg = '#000000', bg = '#ffffff', align: CanvasTextAlign = 'center') {
 	ctx.save();
 	ctx.textAlign = align;
 	if(bg) {
@@ -270,60 +268,60 @@ export function write_text(text: string, pos: Point, fg='#000000', bg='#ffffff',
 }
 
 
-export function draw_base() {
-	const bg = resources.get('gfx/dark_bg.png');
-	const gui = resources.get('gfx/gui.png');
-	ctx.drawImage(bg, 0, 0);
-	ctx.save();
-	ctx.beginPath();
-	ctx.rect(0.5, 0.5, canvas.width-1, canvas.height-1);
-	ctx.strokeStyle = '#000000';
-	ctx.stroke();
-	ctx.restore();
+export function draw_base(glob: TechGlobal) {
+	const bg = glob.resources.get_image('gfx/dark_bg.png');
+	const gui = glob.resources.get_image('gfx/gui.png');
+	glob.ctx.drawImage(bg, 0, 0);
+	glob.ctx.save();
+	glob.ctx.beginPath();
+	glob.ctx.rect(0.5, 0.5, glob.canvas.width-1, glob.canvas.height-1);
+	glob.ctx.strokeStyle = '#000000';
+	glob.ctx.stroke();
+	glob.ctx.restore();
 
 	// Info
-	draw_rect([0, 0], [22, 21]);
+	draw_rect(glob.ctx, [0, 0], [22, 21]);
 	if(game.stage.id === SCENE.CREDITS) {
-		ctx.drawImage(gui, 12, 0, 12, 12, 5, 4, 12, 12);
+		glob.ctx.drawImage(gui, 12, 0, 12, 12, 5, 4, 12, 12);
 	}
 	else {
-		ctx.drawImage(gui, 0, 0, 12, 12, 5, 4, 12, 12);
+		glob.ctx.drawImage(gui, 0, 0, 12, 12, 5, 4, 12, 12);
 	}
 
 	// Middle
-	draw_rect([21, 0], [525, 21]);
-	write_text(`${lang.title} v${version.join('.')}`, [320, 14], 'white', 'black');
+	draw_rect(glob.ctx, [21, 0], [525, 21]);
+	write_text(glob.ctx, `${glob.lang.title} v${version.join('.')}`, [320, 14], 'white', 'black');
 
 	// Language
-	draw_rect([545, 0], [32, 21]);
-	write_text(options.language, [561, 14], 'white', 'black');
+	draw_rect(glob.ctx, [545, 0], [32, 21]);
+	write_text(glob.ctx, glob.options.language, [561, 14], 'white', 'black');
 
 	// Sound
-	draw_rect([576, 0], [22, 21]);
-	ctx.drawImage(gui, 24, 0, 12, 12, 581, 4, 12, 12);
-	if(!options.sound_on) {
-		ctx.drawImage(gui, 72, 0, 12, 12, 581, 4, 12, 12);
+	draw_rect(glob.ctx, [576, 0], [22, 21]);
+	glob.ctx.drawImage(gui, 24, 0, 12, 12, 581, 4, 12, 12);
+	if(!glob.options.sound_on) {
+		glob.ctx.drawImage(gui, 72, 0, 12, 12, 581, 4, 12, 12);
 	}
 
 	// Music
-	draw_rect([597, 0], [22, 21]);
-	ctx.drawImage(gui, 36, 0, 12, 12, 602, 4, 12, 12);
-	if(!options.music_on) {
-		ctx.drawImage(gui, 72, 0, 12, 12, 602, 4, 12, 12);
+	draw_rect(glob.ctx, [597, 0], [22, 21]);
+	glob.ctx.drawImage(gui, 36, 0, 12, 12, 602, 4, 12, 12);
+	if(!glob.options.music_on) {
+		glob.ctx.drawImage(gui, 72, 0, 12, 12, 602, 4, 12, 12);
 	}
 
 	// Settings
-	draw_rect([618, 0], [22, 21]);
+	draw_rect(glob.ctx, [618, 0], [22, 21]);
 	if(game.stage.id === SCENE.OPTIONS) {
-		ctx.drawImage(gui, 60, 0, 12, 12, 623, 4, 12, 12);
+		glob.ctx.drawImage(gui, 60, 0, 12, 12, 623, 4, 12, 12);
 	}
 	else {
-		ctx.drawImage(gui, 48, 0, 12, 12, 623, 4, 12, 12);
+		glob.ctx.drawImage(gui, 48, 0, 12, 12, 623, 4, 12, 12);
 	}
 }
 
 
-export function draw_black_rect(pos: Point, dim: Dimension, fill=false) {
+export function draw_black_rect(ctx: CanvasRenderingContext2D, pos: Point, dim: Dimension, fill='') {
 	ctx.save();
 	ctx.translate(0.5, 0.5);
 	ctx.lineWidth = 1;
@@ -339,7 +337,7 @@ export function draw_black_rect(pos: Point, dim: Dimension, fill=false) {
 }
 
 
-export function draw_rect(pos: Point, dim: Dimension, black_line=true, clicked=false, light=false) {
+export function draw_rect(ctx: CanvasRenderingContext2D, pos: Point, dim: Dimension, black_line=true, clicked=false, light=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -376,7 +374,7 @@ export function draw_rect(pos: Point, dim: Dimension, black_line=true, clicked=f
 }
 
 
-export function draw_upper_left_border(pos: Point, dim: Dimension) {
+export function draw_upper_left_border(ctx: CanvasRenderingContext2D, pos: Point, dim: Dimension) {
 	ctx.save();
 	ctx.translate(-1, -1);
 	ctx.lineWidth = 2;
@@ -390,7 +388,7 @@ export function draw_upper_left_border(pos: Point, dim: Dimension) {
 }
 
 
-export function draw_inv_rect(pos: Point, dim: Dimension, black_line=true) {
+export function draw_inv_rect(ctx: CanvasRenderingContext2D, pos: Point, dim: Dimension, black_line=true) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
 	ctx.translate(0.5, 0.5);
@@ -426,8 +424,8 @@ export function draw_inv_rect(pos: Point, dim: Dimension, black_line=true) {
 }
 
 
-export function draw_checkbox(pos: Point, checked: boolean) {
-	draw_inv_rect(pos, [14, 14], true);
+export function draw_checkbox(ctx: CanvasRenderingContext2D, pos: Point, checked: boolean) {
+	draw_inv_rect(ctx, pos, [14, 14], true);
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
 	ctx.fillRect(pos[0] + 1, pos[1] + 1, 12, 12);
@@ -442,7 +440,7 @@ export function draw_checkbox(pos: Point, checked: boolean) {
 }
 
 
-export function subtitle(x: number, y: number, text: string) {
+export function subtitle(ctx: CanvasRenderingContext2D, x: number, y: number, text: string) {
 	const radius = 5;
 	const height = 30;
 
@@ -474,47 +472,47 @@ export function subtitle(x: number, y: number, text: string) {
 }
 
 
-export function open_popup(title, image, text, callback, right_answer, left_answer=null) {
+export function open_popup(glob: TechGlobal, title: string, image: string, text: string, callback: (x: number) => void | (() => void), right_answer: string, left_answer = '') {
 	// The callback export function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
 	game.backstage.push(game.stage);
-	game.stage = new Popup(title, image, callback, text, right_answer, left_answer);
+	game.stage = new Popup(glob, title, image, callback, text, right_answer, left_answer);
 	game.stage.initialize();
 }
 
 
-export function open_tutorial(tutorial) {
+export function open_tutorial(glob: TechGlobal, tutorial: TutorialType) {
 	// Highlight
-	ctx.save();
-	ctx.translate(0.5, 0,5);
-	ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-	if(tutorial.highlight[0] !== 0) {
-		ctx.fillRect(0, tutorial.highlight[1], tutorial.highlight[0], tutorial.highlight[3] - tutorial.highlight[1]);
+	glob.ctx.save();
+	glob.ctx.translate(0.5, 0.5);
+	glob.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+	if(tutorial.highlight && tutorial.highlight[0] !== 0) {
+		glob.ctx.fillRect(0, tutorial.highlight[1], tutorial.highlight[0], tutorial.highlight[3] - tutorial.highlight[1]);
 	}
-	if(tutorial.highlight[1] !== 0) {
-		ctx.fillRect(0, 0, 640, tutorial.highlight[1]);
+	if(tutorial.highlight && tutorial.highlight[1] !== 0) {
+		glob.ctx.fillRect(0, 0, 640, tutorial.highlight[1]);
 	}
-	if(tutorial.highlight[2] !== 640) {
-		ctx.fillRect(tutorial.highlight[2], tutorial.highlight[1], 640 - tutorial.highlight[2], tutorial.highlight[3] - tutorial.highlight[1]);
+	if(tutorial.highlight && tutorial.highlight[2] !== 640) {
+		glob.ctx.fillRect(tutorial.highlight[2], tutorial.highlight[1], 640 - tutorial.highlight[2], tutorial.highlight[3] - tutorial.highlight[1]);
 	}
-	if(tutorial.highlight[3] !== 480) {
-		ctx.fillRect(0, tutorial.highlight[3], 640, 480 - tutorial.highlight[3]);
+	if(tutorial.highlight && tutorial.highlight[3] !== 480) {
+		glob.ctx.fillRect(0, tutorial.highlight[3], 640, 480 - tutorial.highlight[3]);
 	}
-	ctx.restore();
+	glob.ctx.restore();
 
 	game.backstage.push(game.stage);
-	game.stage = new Tutorial(tutorial);
+	game.stage = new Tutorial(glob, tutorial);
 	game.stage.initialize();
 }
 
 
-export function open_load_dialog() {
+export function open_load_dialog(glob: TechGlobal) {
 	game.backstage.push(game.stage);
-	game.stage = new Load();
+	game.stage = new Load(glob);
 	game.stage.initialize();
 }
 
 
-export function init_upload(e) {
+export function init_upload(e: MouseEvent) {
 	const pos_x = e.x - canvas_pos.left;
 	const pos_y = e.y - canvas_pos.top;
 
@@ -530,12 +528,16 @@ export function init_upload(e) {
 
 		input.addEventListener('change', (event) => {
 			canvas.removeEventListener('mouseup', init_upload);
-			const file = event.target.files[0];
+			const files = (event.target as HTMLInputElement).files;
+			if(files === null) {
+				return;
+			}
+			const file = files[0];
 			const reader = new FileReader();
 			reader.readAsArrayBuffer(file);
 
-			reader.addEventListener('load', readerEvent => {
-				game.load_game(readerEvent.target.result);
+			reader.addEventListener('load', (readerEvent) => {
+				game.load_game(readerEvent.target!.result);
 			});
 		});
 

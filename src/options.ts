@@ -377,7 +377,7 @@ export class Options implements Stage {
 			x2: this.text_x + this.lang_dim[0],
 			y2: this.ys.restart + this.lang_dim[1],
 			down: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim, true, true),
-			up: () => open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.really_restart, (x) => this.restart_game(x), this.glob.lang.no, this.glob.lang.yes),
+			up: () => open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.really_restart, (x: number) => this.restart_game(x), this.glob.lang.no, this.glob.lang.yes),
 			blur: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim)
 		});
 
@@ -528,7 +528,7 @@ export class Options implements Stage {
 		local_save('show_predators', this.glob.options.show_predators);
 	}
 
-	restart_game(x) {
+	restart_game(x: number) {
 		if (x === 1) {
 			game.stage = new Init();
 			game.stage.initialize();

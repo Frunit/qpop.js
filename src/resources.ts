@@ -249,8 +249,8 @@ export class ResourceManager {
 		}
 	}
 
-	stop_sound(name=null) {
-		if(name === null) {
+	stop_sound(name = '') {
+		if(name === '') {
 			for (const elem of this.currently_playing_sounds) {
 				this.sounds[elem].stop();
 			}

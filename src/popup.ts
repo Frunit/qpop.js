@@ -49,7 +49,7 @@ export class Popup implements Stage {
 	constructor(glob: TechGlobal, title:string, image: string, callback: Function, text: string, right_answer: string, left_answer: string) {
 		this.glob = glob;
 		this.title = title;
-		this.text = multiline(text, this.max_text_width);
+		this.text = multiline(this.glob.ctx, text, this.max_text_width);
 		this.right_answer = right_answer;
 		this.left_answer = left_answer;
 		this.callback = callback;

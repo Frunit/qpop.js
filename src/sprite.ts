@@ -12,11 +12,11 @@ export interface ISprite {
 export class Sprite implements ISprite {
 	finished: boolean
 	callback: Function | null;
+	delay: number;
 
 	private pic: HTMLImageElement;
 	private offset: Point;
 	private size: Dimension;
-	private delay: number;
 	private frames: Point[];
 	private once: boolean;
 
