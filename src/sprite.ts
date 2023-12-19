@@ -2,6 +2,7 @@ import { Dimension, Point } from "./types";
 
 export interface ISprite {
 	finished: boolean;
+	offset?: Point;
 	callback: Function | null;
 	update: Function;
 	reset: Function;
@@ -13,9 +14,9 @@ export class Sprite implements ISprite {
 	finished: boolean
 	callback: Function | null;
 	delay: number;
+	offset: Point;
 
 	private pic: HTMLImageElement;
-	private offset: Point;
 	private size: Dimension;
 	private frames: Point[];
 	private once: boolean;

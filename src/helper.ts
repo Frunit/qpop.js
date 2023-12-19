@@ -1,5 +1,7 @@
+import { Game } from "./game";
 import { Load } from "./load";
 import { Popup } from "./popup";
+import type { ResourceManager } from "./resources";
 import { Tutorial } from "./tutorial";
 import { Dimension, Point, TechGlobal, TutorialType } from "./types";
 import { version } from "./version";
@@ -268,7 +270,7 @@ export function write_text(ctx: CanvasRenderingContext2D, text: string, pos: Poi
 }
 
 
-export function draw_base(glob: TechGlobal) {
+export function draw_base(glob: TechGlobal, stage_id: SCENE) {
 	const bg = glob.resources.get_image('gfx/dark_bg.png');
 	const gui = glob.resources.get_image('gfx/gui.png');
 	glob.ctx.drawImage(bg, 0, 0);
@@ -281,7 +283,7 @@ export function draw_base(glob: TechGlobal) {
 
 	// Info
 	draw_rect(glob.ctx, [0, 0], [22, 21]);
-	if(game.stage.id === SCENE.CREDITS) {
+	if(stage_id === SCENE.CREDITS) {
 		glob.ctx.drawImage(gui, 12, 0, 12, 12, 5, 4, 12, 12);
 	}
 	else {
@@ -312,7 +314,7 @@ export function draw_base(glob: TechGlobal) {
 
 	// Settings
 	draw_rect(glob.ctx, [618, 0], [22, 21]);
-	if(game.stage.id === SCENE.OPTIONS) {
+	if(stage_id === SCENE.OPTIONS) {
 		glob.ctx.drawImage(gui, 60, 0, 12, 12, 623, 4, 12, 12);
 	}
 	else {
@@ -424,14 +426,14 @@ export function draw_inv_rect(ctx: CanvasRenderingContext2D, pos: Point, dim: Di
 }
 
 
-export function draw_checkbox(ctx: CanvasRenderingContext2D, pos: Point, checked: boolean) {
+export function draw_checkbox(ctx: CanvasRenderingContext2D, resources: ResourceManager, pos: Point, checked: boolean) {
 	draw_inv_rect(ctx, pos, [14, 14], true);
 	ctx.save();
 	ctx.fillStyle = '#c3c3c3';
 	ctx.fillRect(pos[0] + 1, pos[1] + 1, 12, 12);
 	ctx.restore();
 	if(checked) {
-		ctx.drawImage(resources.get('gfx/gui.png'),
+		ctx.drawImage(resources.get_image('gfx/gui.png'),
 			72, 0,
 			12, 12,
 			pos[0] + 1, pos[1] + 1,
@@ -472,77 +474,43 @@ export function subtitle(ctx: CanvasRenderingContext2D, x: number, y: number, te
 }
 
 
-export function open_popup(glob: TechGlobal, title: string, image: string, text: string, callback: (x: number) => void | (() => void), right_answer: string, left_answer = '') {
+export function open_popup(game: Game, image: string, text: string, callback: (x: number) => void | (() => void), right_answer: string, left_answer = '') {
 	// The callback export function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
 	game.backstage.push(game.stage);
-	game.stage = new Popup(glob, title, image, callback, text, right_answer, left_answer);
+	game.stage = new Popup(game, image, callback, text, right_answer, left_answer);
 	game.stage.initialize();
 }
 
 
-export function open_tutorial(glob: TechGlobal, tutorial: TutorialType) {
+export function open_tutorial(game: Game, ctx: CanvasRenderingContext2D, tutorial: TutorialType) {
 	// Highlight
-	glob.ctx.save();
-	glob.ctx.translate(0.5, 0.5);
-	glob.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+	ctx.save();
+	ctx.translate(0.5, 0.5);
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 	if(tutorial.highlight && tutorial.highlight[0] !== 0) {
-		glob.ctx.fillRect(0, tutorial.highlight[1], tutorial.highlight[0], tutorial.highlight[3] - tutorial.highlight[1]);
+		ctx.fillRect(0, tutorial.highlight[1], tutorial.highlight[0], tutorial.highlight[3] - tutorial.highlight[1]);
 	}
 	if(tutorial.highlight && tutorial.highlight[1] !== 0) {
-		glob.ctx.fillRect(0, 0, 640, tutorial.highlight[1]);
+		ctx.fillRect(0, 0, 640, tutorial.highlight[1]);
 	}
 	if(tutorial.highlight && tutorial.highlight[2] !== 640) {
-		glob.ctx.fillRect(tutorial.highlight[2], tutorial.highlight[1], 640 - tutorial.highlight[2], tutorial.highlight[3] - tutorial.highlight[1]);
+		ctx.fillRect(tutorial.highlight[2], tutorial.highlight[1], 640 - tutorial.highlight[2], tutorial.highlight[3] - tutorial.highlight[1]);
 	}
 	if(tutorial.highlight && tutorial.highlight[3] !== 480) {
-		glob.ctx.fillRect(0, tutorial.highlight[3], 640, 480 - tutorial.highlight[3]);
+		ctx.fillRect(0, tutorial.highlight[3], 640, 480 - tutorial.highlight[3]);
 	}
-	glob.ctx.restore();
+	ctx.restore();
 
 	game.backstage.push(game.stage);
-	game.stage = new Tutorial(glob, tutorial);
+	game.stage = new Tutorial(game, game.glob, tutorial);
 	game.stage.initialize();
 }
 
 
-export function open_load_dialog(glob: TechGlobal) {
+export function open_load_dialog(game: Game) {
 	game.backstage.push(game.stage);
-	game.stage = new Load(glob);
+	game.stage = new Load(game, game.glob);
 	game.stage.initialize();
-}
-
-
-export function init_upload(e: MouseEvent) {
-	const pos_x = e.x - canvas_pos.left;
-	const pos_y = e.y - canvas_pos.top;
-
-	// Remember to update the values here when they change in Load
-	if(pos_x >= 120 + 8 &&
-		pos_x <= 120 + 8 + 90 &&
-		pos_y >= 65 + 28 &&
-		pos_y <= 65 + 28 + 66)
-	{
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = '.qpp';
-
-		input.addEventListener('change', (event) => {
-			canvas.removeEventListener('mouseup', init_upload);
-			const files = (event.target as HTMLInputElement).files;
-			if(files === null) {
-				return;
-			}
-			const file = files[0];
-			const reader = new FileReader();
-			reader.readAsArrayBuffer(file);
-
-			reader.addEventListener('load', (readerEvent) => {
-				game.load_game(readerEvent.target!.result);
-			});
-		});
-
-		input.click();
-	}
 }
 
 
@@ -567,14 +535,4 @@ export function local_load(key: string): unknown {
 	}
 	catch (e) {}
 	return null;
-}
-
-
-export function handle_visibility_change() {
-	if(game === undefined) {
-		return;
-	}
-
-	game.toggle_pause(document.hidden);
-
 }

@@ -1,3 +1,4 @@
+import type { Game } from "./game";
 import { SCENE, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
@@ -8,10 +9,11 @@ export class Popup implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	glob: TechGlobal;
+
+	private glob: TechGlobal;
+	private game: Game;
 
 	private bg: HTMLImageElement;
-	private title: string;
 	private text: string[];
 	private callback: Function; // TODO
 	private right_answer: string;
@@ -46,9 +48,9 @@ export class Popup implements Stage {
 	readonly left_answer_offset: Point = [0, 128];
 	readonly right_answer_offset: Point = [179, 128];
 
-	constructor(glob: TechGlobal, title:string, image: string, callback: Function, text: string, right_answer: string, left_answer: string) {
-		this.glob = glob;
-		this.title = title;
+	constructor(game: Game, image: string, callback: Function, text: string, right_answer: string, left_answer: string) {
+		this.game = game;
+		this.glob = game.glob;
 		this.text = multiline(this.glob.ctx, text, this.max_text_width);
 		this.right_answer = right_answer;
 		this.left_answer = left_answer;
@@ -69,13 +71,13 @@ export class Popup implements Stage {
 			this.offset[0], this.offset[1],
 			this.dim[0], this.dim[1]);
 
-		draw_rect([this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] + 1], true);
+		draw_rect(this.glob.ctx, [this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] + 1], true);
 
 		this.clickareas = [];
 
 		// Title
-		draw_rect([this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
-		write_text(this.title, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
+		draw_rect(this.glob.ctx, [this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
+		write_text(this.glob.ctx, this.glob.lang.popup_title, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
 
 		// Species image
 		this.sprite.render(this.glob.ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
@@ -83,42 +85,42 @@ export class Popup implements Stage {
 		// Text
 		const line_correction = this.line_height * this.text.length / 2;
 		for (let i = 0; i < this.text.length; i++) {
-			write_text(this.text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] - line_correction + this.line_height * i], 'white', 'black');
+			write_text(this.glob.ctx, this.text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] - line_correction + this.line_height * i], 'white', 'black');
 		}
 
 		// Left answer (button) if present
 		if (this.left_answer !== null) {
-			draw_rect([this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim);
-			write_text(this.left_answer, [this.offset[0] + this.left_answer_offset[0] + this.left_answer_dim[0] / 2, this.offset[1] + this.left_answer_offset[1] + 15], 'white', 'black');
+			draw_rect(this.glob.ctx, [this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim);
+			write_text(this.glob.ctx, this.left_answer, [this.offset[0] + this.left_answer_offset[0] + this.left_answer_dim[0] / 2, this.offset[1] + this.left_answer_offset[1] + 15], 'white', 'black');
 
 			this.clickareas.push({
 				x1: this.offset[0] + this.left_answer_offset[0],
 				y1: this.offset[1] + this.left_answer_offset[1],
 				x2: this.offset[0] + this.left_answer_offset[0] + this.left_answer_dim[0],
 				y2: this.offset[1] + this.left_answer_offset[1] + this.left_answer_dim[1],
-				down: () => draw_rect([this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim, true, true),
+				down: () => draw_rect(this.glob.ctx, [this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim, true, true),
 				up: () => this.clicked(1),
-				blur: () => draw_rect([this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim)
+				blur: () => draw_rect(this.glob.ctx, [this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim)
 			});
 		}
 
 		// Right answer (button)
-		draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
-		write_text(this.right_answer, [this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0] / 2, this.offset[1] + this.right_answer_offset[1] + 15], 'white', 'black');
+		draw_rect(this.glob.ctx, [this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
+		write_text(this.glob.ctx, this.right_answer, [this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0] / 2, this.offset[1] + this.right_answer_offset[1] + 15], 'white', 'black');
 
 		this.clickareas.push({
 			x1: this.offset[0] + this.right_answer_offset[0],
 			y1: this.offset[1] + this.right_answer_offset[1],
 			x2: this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0],
 			y2: this.offset[1] + this.right_answer_offset[1] + this.right_answer_dim[1],
-			down: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, [this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim, true, true),
 			up: () => this.clicked(0),
-			blur: () => draw_rect([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim)
+			blur: () => draw_rect(this.glob.ctx, [this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim)
 		});
 
 		// Grey border
 		if (this.left_answer === null) {
-			draw_upper_left_border([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
+			draw_upper_left_border(this.glob.ctx, [this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
 		}
 		else {
 			this.glob.ctx.save();
@@ -154,8 +156,7 @@ export class Popup implements Stage {
 	}
 
 	clicked(answer: unknown) {
-		game.stage = game.backstage.pop();
-		game.stage.redraw();
+		this.game.get_last_stage();
 		this.callback(answer);
 	}
 }

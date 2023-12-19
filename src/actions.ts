@@ -1,79 +1,76 @@
 import { DIR, PRED, SPECIES, SURV_MAP } from "./helper";
 import { Character, Enemy, Female, Level, Predator } from "./level";
+import { ResourceManager } from "./resources";
 import { ISprite, RandomSprite, Sprite } from "./sprite";
-import { anim_delays, anims_clouds, anims_players } from "./sprite_positions";
+import { anim_delays, anims_clouds, anims_players, attack_frames, purplus_special_animations } from "./sprite_positions";
 import { Dimension, Point } from "./types";
 
 export interface IAction {
 	finished: boolean;
+	tiles: Point[];
 	callback: Function; // TODO
+	offspring_sprite?: ISprite;
+	final_opponent_sprite?: ISprite;
 	update: () => void;
 	render: (ctx: CanvasRenderingContext2D, dim: Dimension, cpos: Point) => void;
 }
 
 export class Love implements IAction {
-	private dir: DIR;
-	private character: Character;
-	private partner: Female;
-	callback: Function; // TODO
 	finished = false;
 	private delay = anim_delays.offspring;
 	private delay_counter = 0;
 	private frame = 0;
 	private draw_cloud = false;
 	private cloud_offset: Point = [0, 0];
+	private cloud_sprite: Sprite;
 	private sprites: ISprite[];
 	private pre_offspring: ISprite | null = null;
 	offspring_sprite: ISprite;
-	private tiles;
-	private cloud_sprite;
+	tiles: Point[];
 
-	constructor(dir: DIR, character: Character, partner: Female, callback: Function) {
-		this.dir = dir;
-		this.character = character;
-		this.partner = partner;
-		this.callback = callback;
-
+	constructor(private dir: DIR, private character: Character, private partner: Female, public callback: Function, private resources: ResourceManager) {
 		if (character.species === SPECIES.PURPLUS) {
-			this.offspring_sprite = new RandomSprite(partner.pic, partner.anims.offspring.soffset, partner.anims.offspring.frames, partner.anims.offspring.transitions, anim_delays.offspring);
+			this.offspring_sprite = new RandomSprite(partner.pic, partner.anims.offspring.soffset, purplus_special_animations.offspring.frames, purplus_special_animations.offspring.transitions, anim_delays.offspring);
 		}
 		else {
 			this.offspring_sprite = new Sprite(partner.pic, partner.anims.offspring.soffset, partner.anims.offspring.frames, anim_delays.offspring);
 		}
 
 		this.sprites = [
-			new Sprite(partner.url, partner.anims.female_pre_love.soffset, partner.anims.female_pre_love.frames),
-			new Sprite(character.url, character.anims.still.soffset, character.anims.still.frames),
+			new Sprite(partner.pic, partner.anims.female_pre_love.soffset, partner.anims.female_pre_love.frames),
+			new Sprite(character.pic, character.anims.still.soffset, character.anims.still.frames),
 		];
 
 		if (dir === DIR.S || dir === DIR.E) {
 			this.sprites.reverse();
 		}
 
+		const cloud_pic = resources.get_image('gfx/clouds.png');
+
 		switch (dir) {
 			case DIR.N:
 				this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, 0, anims_clouds.love_vert.size, true);
+				this.cloud_sprite = new Sprite(cloud_pic, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, 0, anims_clouds.love_vert.size, true);
 				this.cloud_offset = [0, 14];
 				break;
 			case DIR.S:
 				this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, 0, anims_clouds.love_vert.size, true);
+				this.cloud_sprite = new Sprite(cloud_pic, anims_clouds.love_vert.soffset, anims_clouds.love_vert.frames, 0, anims_clouds.love_vert.size, true);
 				this.cloud_offset = [0, 14];
 				break;
 			case DIR.W:
 				this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
+				this.cloud_sprite = new Sprite(cloud_pic, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
 				this.cloud_offset = [14, 0];
 				break;
 			default: // DIR.E
 				this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
+				this.cloud_sprite = new Sprite(cloud_pic, anims_clouds.love_hor.soffset, anims_clouds.love_hor.frames, 0, anims_clouds.love_hor.size, true);
 				this.cloud_offset = [14, 0];
 				break;
 		}
 
-		audio.play_sound('love');
+		this.resources.play_sound('love');
 	}
 
 	update() {
@@ -104,17 +101,17 @@ export class Love implements IAction {
 			this.sprites = [];
 
 			if (this.character.species === SPECIES.PURPLUS) {
-				this.sprites.push(new RandomSprite(this.partner.url, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames, this.partner.anims.offspring.transitions));
+				this.sprites.push(new RandomSprite(this.partner.pic, this.partner.anims.offspring.soffset, purplus_special_animations.offspring.frames, purplus_special_animations.offspring.transitions));
 			}
 			else if (this.partner.anims.hasOwnProperty('pre_offspring')) {
-				this.pre_offspring = new Sprite(this.partner.url, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames, 0, [64, 64], true);
+				this.pre_offspring = new Sprite(this.partner.pic, this.partner.anims.pre_offspring.soffset, this.partner.anims.pre_offspring.frames, 0, [64, 64], true);
 				this.sprites.push(this.pre_offspring);
 			}
 			else {
-				this.sprites.push(new Sprite(this.partner.url, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames));
+				this.sprites.push(new Sprite(this.partner.pic, this.partner.anims.offspring.soffset, this.partner.anims.offspring.frames));
 			}
 
-			this.sprites.push(new Sprite(this.character.url, this.character.anims.still.soffset, this.character.anims.still.frames));
+			this.sprites.push(new Sprite(this.character.pic, this.character.anims.still.soffset, this.character.anims.still.frames));
 
 			if (this.dir === DIR.S || this.dir === DIR.E) {
 				this.sprites.reverse();
@@ -155,11 +152,11 @@ export class Fight implements IAction {
 	private draw_cloud = false;
 	private cloud_offset: Point = [0, 0];
 	private sprites: (Sprite | null)[] = [];
-	private final_opponent_sprite: Sprite | null = null;
-	private tiles: [Point, Point];
+	final_opponent_sprite?: Sprite;
+	tiles: Point[];
 	private cloud_sprite: Sprite;
 
-	constructor(dir: DIR, character: Character, opponent: Enemy | Predator, player_wins: boolean, callback: Function) {
+	constructor(dir: DIR, character: Character, opponent: Enemy | Predator, player_wins: boolean, callback: Function, private resources: ResourceManager) {
 		this.dir = dir;
 		this.character = character;
 		this.opponent = opponent;
@@ -168,37 +165,39 @@ export class Fight implements IAction {
 		this.frame = opponent.type === SURV_MAP.PREDATOR ? -2 : 0
 
 		if (this.opponent.type === SURV_MAP.PREDATOR) {
-			this.sprites = [new Sprite(opponent.url, opponent.anims.attack.soffset, opponent.anims.attack.frames[this.dir - 1])];
+			this.sprites = [new Sprite(opponent.pic, opponent.anims.attack.soffset, attack_frames[opponent.species][this.dir - 1])];
 		}
 		else {
-			this.sprites = [new Sprite(opponent.url, opponent.anims.enem_still.soffset, opponent.anims.enem_still.frame)];
+			this.sprites = [new Sprite(opponent.pic, opponent.anims.enem_still.soffset, opponent.anims.enem_still.frames)];
 		}
 
-		this.sprites.push(new Sprite(character.url, character.anims.still.soffset, character.anims.still.frames));
+		this.sprites.push(new Sprite(character.pic, character.anims.still.soffset, character.anims.still.frames));
 
 		if (dir === DIR.S || dir === DIR.E) {
 			this.sprites.reverse();
 		}
 
+		const cloud_pics = resources.get_image('gfx/clouds.png');
+
 		switch (dir) {
 			case DIR.N:
 				this.tiles = [[character.tile[0], character.tile[1] - 1], character.tile];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, 0, anims_clouds.fight_vert.size);
+				this.cloud_sprite = new Sprite(cloud_pics, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, 0, anims_clouds.fight_vert.size);
 				this.cloud_offset = [0, 14];
 				break;
 			case DIR.S:
 				this.tiles = [character.tile, [character.tile[0], character.tile[1] + 1]];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, 0, anims_clouds.fight_vert.size);
+				this.cloud_sprite = new Sprite(cloud_pics, anims_clouds.fight_vert.soffset, anims_clouds.fight_vert.frames, 0, anims_clouds.fight_vert.size);
 				this.cloud_offset = [0, 14];
 				break;
 			case DIR.W:
 				this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
+				this.cloud_sprite = new Sprite(cloud_pics, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
 				this.cloud_offset = [14, 0];
 				break;
 			default: // DIR.E
 				this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
-				this.cloud_sprite = new Sprite('gfx/clouds.png', anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
+				this.cloud_sprite = new Sprite(cloud_pics, anims_clouds.fight_hor.soffset, anims_clouds.fight_hor.frames, 0, anims_clouds.fight_hor.size);
 				this.cloud_offset = [14, 0];
 				break;
 		}
@@ -225,7 +224,7 @@ export class Fight implements IAction {
 
 		switch (this.frame) {
 			case 2:
-				audio.play_sound('survival_fight');
+				this.resources.play_sound('survival_fight');
 				this.sprites = [];
 				this.draw_cloud = true;
 				break;
@@ -235,17 +234,17 @@ export class Fight implements IAction {
 				if (this.player_wins) {
 					const an = this.opponent.defeated;
 
-					this.final_opponent_sprite = new Sprite(this.opponent.url, an.soffset, an.frames);
+					this.final_opponent_sprite = new Sprite(this.opponent.pic, an.soffset, an.frames);
 
 					this.sprites = [
 						this.final_opponent_sprite,
-						new Sprite(this.character.url, this.character.anims.winner.soffset, this.character.anims.winner.frames),
+						new Sprite(this.character.pic, this.character.anims.winner.soffset, this.character.anims.winner.frames),
 					];
 				}
 				else {
 					this.sprites = [
 						null,
-						new Sprite(this.opponent.url, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
+						new Sprite(this.opponent.pic, this.opponent.anims.winner.soffset, this.opponent.anims.winner.frames),
 					];
 				}
 
@@ -261,26 +260,26 @@ export class Fight implements IAction {
 				if (this.player_wins) {
 					switch (this.character.species) {
 						case SPECIES.KIWIOPTERYX:
-							audio.play_sound('win_kiwi');
+							this.resources.play_sound('win_kiwi');
 							break;
 						case SPECIES.PESCIODYPHUS:
-							audio.play_sound('win_pesci');
+							this.resources.play_sound('win_pesci');
 							break;
 						default:
-							audio.play_sound('win');
+							this.resources.play_sound('win');
 							break;
 					}
 				}
 				else {
 					switch (this.opponent.species) {
 						case PRED.DINO:
-							audio.play_sound('dino_win');
+							this.resources.play_sound('dino_win');
 							break;
 						case PRED.MUSHROOM:
-							audio.play_sound('mushroom_win');
+							this.resources.play_sound('mushroom_win');
 							break;
 						case PRED.HUMAN:
-							audio.play_sound('human_win');
+							this.resources.play_sound('human_win');
 							break;
 					}
 				}
@@ -325,27 +324,27 @@ export class Feeding implements IAction {
 	private frame = -1;
 	private step = 0;
 	private awaiting_power_food_sound = false;
-	private tiles: Point[];
+	tiles: Point[];
 	private sprite: Sprite;
 
-	constructor(character: Character, level: Level, food_type: number, callback: Function) {
+	constructor(character: Character, level: Level, food_type: number, callback: Function, private resources: ResourceManager) {
 		this.character = character;
 		this.level = level;
 		this.food_type = food_type;
 		this.callback = callback;
 		this.tiles = [this.character.tile];
 
-		this.sprite = new Sprite(character.url, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, 0, [64, 64], true);
+		this.sprite = new Sprite(character.pic, anims_players[character.species].feeding.soffset, anims_players[character.species].feeding.frames, 0, [64, 64], true);
 
 		switch (character.species) {
 			case SPECIES.KIWIOPTERYX:
-				audio.play_sound('feeding_kiwi');
+				this.resources.play_sound('feeding_kiwi');
 				break;
 			case SPECIES.CHUCKBERRY:
-				audio.play_sound('feeding_chuck');
+				this.resources.play_sound('feeding_chuck');
 				break;
 			default:
-				audio.play_sound('feeding');
+				this.resources.play_sound('feeding');
 				break;
 		}
 	}
@@ -375,7 +374,7 @@ export class Feeding implements IAction {
 		// Power food as a delayed sound effect
 		else if (this.awaiting_power_food_sound && this.frame === 17) {
 			this.awaiting_power_food_sound = false;
-			audio.play_sound('power_food');
+			this.resources.play_sound('power_food');
 		}
 
 
@@ -388,19 +387,19 @@ export class Feeding implements IAction {
 
 			// Poison
 			else if (this.food_type < 118) {
-				this.sprite = new Sprite(this.character.url, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, 0, [64, 64], true);
+				this.sprite = new Sprite(this.character.pic, anims_players[this.character.species].poisoned.soffset, anims_players[this.character.species].poisoned.frames, 0, [64, 64], true);
 				this.step++;
 				if (this.character.species === SPECIES.CHUCKBERRY) {
-					audio.play_sound('poison_chuck');
+					this.resources.play_sound('poison_chuck');
 				}
 				else {
-					audio.play_sound('poison');
+					this.resources.play_sound('poison');
 				}
 			}
 
 			// Power food
 			else {
-				this.sprite = new Sprite(this.character.url, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, 0, [64, 64], true);
+				this.sprite = new Sprite(this.character.pic, anims_players[this.character.species].power_food.soffset, anims_players[this.character.species].power_food.frames, 0, [64, 64], true);
 				this.step++;
 				this.awaiting_power_food_sound = true;
 			}
@@ -423,10 +422,10 @@ export class Quicksand implements IAction {
 	private delay_counter = 0;
 	private frame = -1;
 	private mov: Point = [0, 0];
-	private tiles: Point[];
+	tiles: Point[];
 	private sprite: Sprite;
 
-	constructor(character: Character, callback: Function) {
+	constructor(character: Character, callback: Function, resources: ResourceManager) {
 		this.character = character;
 		this.callback = callback;
 		this.delay = this.character.species === SPECIES.PESCIODYPHUS ?
@@ -436,9 +435,9 @@ export class Quicksand implements IAction {
 		this.tiles = [this.character.tile];
 
 		const qs = anims_players[this.character.species].quicksand;
-		this.sprite = new Sprite(this.character.url, qs.soffset, qs.frames, 0, [64, 64], true);
+		this.sprite = new Sprite(this.character.pic, qs.soffset, qs.frames, 0, [64, 64], true);
 
-		audio.play_sound('quicksand');
+		resources.play_sound('quicksand');
 	}
 
 	update() {
@@ -509,14 +508,14 @@ export class Waiting implements IAction {
 	private delay = anim_delays.movement;
 	private delay_counter = 0;
 	private frame = 0;
-	private tiles: Point[];
+	tiles: Point[];
 	private sprite: Sprite;
 
 	constructor(character: Character, callback: Function) {
 		this.callback = callback;
 		this.tiles = [character.tile];
 
-		this.sprite = new Sprite(character.url, anims_players[character.species].still.soffset, anims_players[character.species].still.frames);
+		this.sprite = new Sprite(character.pic, anims_players[character.species].still.soffset, anims_players[character.species].still.frames);
 	}
 
 	update() {
@@ -550,26 +549,28 @@ export class Electro implements IAction {
 	private delay = anim_delays.electro;
 	private delay_counter = 0;
 	private frame = 0;
-	private tiles: Point[];
+	tiles: Point[];
 	private sprites: Sprite[];
 
-	constructor(dir: DIR, character: Character, callback: Function) {
+	constructor(dir: DIR, character: Character, callback: Function, private resources: ResourceManager) {
 		this.dir = dir;
 		this.character = character;
 		this.callback = callback;
 
+		const electro_pic = resources.get_image('gfx/electro.png');
+
 		if (dir === DIR.E) {
 			this.tiles = [[character.tile[0] - 1, character.tile[1]], character.tile];
 			this.sprites = [
-				new Sprite('gfx/electro.png', [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [0, 128], [0, 128], [256, 64], [256, 64], [0, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], anim_delays.electro, [64, 64], true),
-				new Sprite(character.url, character.anims.still.soffset, character.anims.still.frames),
+				new Sprite(electro_pic, [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [0, 128], [0, 128], [256, 64], [256, 64], [0, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [128, 128], [0, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], anim_delays.electro, [64, 64], true),
+				new Sprite(character.pic, character.anims.still.soffset, character.anims.still.frames),
 			];
 		}
 		else {
 			this.tiles = [character.tile, [character.tile[0] + 1, character.tile[1]]];
 			this.sprites = [
-				new Sprite(character.url, character.anims.still.soffset, character.anims.still.frames),
-				new Sprite('gfx/electro.png', [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [256, 64], [256, 64], [0, 128], [0, 128], [256, 64], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], anim_delays.electro, [64, 64], true),
+				new Sprite(character.pic, character.anims.still.soffset, character.anims.still.frames),
+				new Sprite(electro_pic, [0, 0], [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 64], [64, 64], [128, 64], [192, 64], [256, 64], [256, 64], [0, 128], [0, 128], [256, 64], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [64, 128], [256, 64], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 128], [192, 128], [256, 128], [256, 128], [192, 64], [128, 64], [64, 64], [0, 64], [256, 0], [192, 0], [128, 0], [64, 0], [0, 0]], anim_delays.electro, [64, 64], true),
 			];
 		}
 	}
@@ -591,8 +592,8 @@ export class Electro implements IAction {
 		const sprite_pos = 1 * (this.dir === DIR.E ? 1 : 0);
 
 		if (this.frame === 15) {
-			this.sprites[sprite_pos] = new Sprite(this.character.url, this.character.anims.zapped.soffset, this.character.anims.zapped.frames, anim_delays.electro, [64, 64], true);
-			audio.play_sound('electro');
+			this.sprites[sprite_pos] = new Sprite(this.character.pic, this.character.anims.zapped.soffset, this.character.anims.zapped.frames, anim_delays.electro, [64, 64], true);
+			this.resources.play_sound('electro');
 		}
 
 		this.finished = this.sprites[1 * (!sprite_pos ? 1 : 0)].finished;

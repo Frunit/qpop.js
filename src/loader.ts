@@ -1,4 +1,5 @@
-import { SCENE, draw_base, draw_checkbox, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
+import type { Game } from "./game";
+import { SCENE, draw_base, draw_checkbox, draw_rect, write_text } from "./helper";
 import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 export class ResourceLoader implements Stage {
@@ -6,7 +7,9 @@ export class ResourceLoader implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	glob: TechGlobal;
+
+	private glob: TechGlobal;
+	private game: Game;
 
 	private bg_pic: HTMLImageElement | null = null;
 	private header_pic: HTMLImageElement | null = null;
@@ -41,7 +44,8 @@ export class ResourceLoader implements Stage {
 	readonly ogg_size = 12314468;
 	readonly m4a_size = 8839096;
 
-	constructor(glob: TechGlobal) {
+	constructor(game: Game, glob: TechGlobal) {
+		this.game = game;
 		this.glob = glob;
 	}
 
@@ -63,7 +67,7 @@ export class ResourceLoader implements Stage {
 			this.max_size += this.mp3_size;
 		}
 		else {
-			game.disable_audio();
+			this.game.disable_audio();
 		}
 
 		this.glob.resources.on_ready(this.finished_preloading, this);
@@ -108,10 +112,10 @@ export class ResourceLoader implements Stage {
 			this.glob.ctx.stroke();
 			this.glob.ctx.restore();
 
-			draw_base();
-			draw_rect([0, 20], [640, 460]); // Main rectangle
+			draw_base(this.glob, this.id);
+			draw_rect(this.glob.ctx, [0, 20], [640, 460]); // Main rectangle
 
-			this.glob.ctx.drawImage(this.header_pic, this.header_offset[0], this.header_offset[1]);
+			this.glob.ctx.drawImage(this.header_pic!, this.header_offset[0], this.header_offset[1]);
 		}
 
 		// Subtitle
@@ -133,7 +137,7 @@ export class ResourceLoader implements Stage {
 		this.rightclickareas = this.glob.rightclickareas.slice();
 
 		// Loading/Starting button
-		draw_rect(this.start_offset, this.start_dim);
+		draw_rect(this.glob.ctx, this.start_offset, this.start_dim);
 		const text_x = this.start_offset[0] + Math.floor(this.start_dim[0] / 2);
 		const text_y = this.start_offset[1] + this.start_dim[1] - 18;
 
@@ -163,23 +167,23 @@ export class ResourceLoader implements Stage {
 				y1: this.start_offset[1],
 				x2: this.start_offset[0] + this.start_dim[0],
 				y2: this.start_offset[1] + this.start_dim[1],
-				down: () => draw_rect(this.start_offset, this.start_dim, true, true),
-				up: () => this.glob.next_stage(),
-				blur: () => draw_rect(this.start_offset, this.start_dim)
+				down: () => draw_rect(this.glob.ctx, this.start_offset, this.start_dim, true, true),
+				up: () => this.game.next_stage(),
+				blur: () => draw_rect(this.glob.ctx, this.start_offset, this.start_dim)
 			});
 		}
 
 		if (this.phase > 0) {
 			// Show tutorial
-			draw_checkbox([this.checkbox_x, this.tutorial_offset], this.glob.options.tutorial);
-			write_text(this.glob.lang.options_tutorial, [this.text_x, this.tutorial_offset + this.text_y_offset], '#000000', '#ffffff', 'left');
+			draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.tutorial_offset], this.glob.options.tutorial);
+			write_text(this.glob.ctx, this.glob.lang.options_tutorial, [this.text_x, this.tutorial_offset + this.text_y_offset], '#000000', '#ffffff', 'left');
 			this.clickareas.push({
 				x1: this.checkbox_x,
 				y1: this.tutorial_offset,
 				x2: this.checkbox_x + this.x_dim[0] + 2,
 				y2: this.tutorial_offset + this.x_dim[1] + 2,
 				down: () => { },
-				up: () => game.toggle_tutorial([this.checkbox_x, this.tutorial_offset]),
+				up: () => this.game.toggle_tutorial([this.checkbox_x, this.tutorial_offset]),
 				blur: () => { }
 			});
 		}
@@ -208,7 +212,7 @@ export class ResourceLoader implements Stage {
 		else {
 			const length = Math.floor(this.percentage * 3 - 3);
 
-			this.glob.ctx.drawImage(this.bar_pic,
+			this.glob.ctx.drawImage(this.bar_pic!,
 				this.emptybar_soffset[0], this.emptybar_soffset[1],
 				this.bar_dim[0], this.bar_dim[1],
 				this.bar_offset[0], this.bar_offset[1],
@@ -218,13 +222,13 @@ export class ResourceLoader implements Stage {
 				const soffset = this.bar_soffsets[Math.min(9, Math.floor(this.percentage / 10))];
 
 				// Main bar
-				this.glob.ctx.drawImage(this.bar_pic,
+				this.glob.ctx.drawImage(this.bar_pic!,
 					soffset[0], soffset[1],
 					length, this.bar_dim[1],
 					this.bar_offset[0], this.bar_offset[1],
 					length, this.bar_dim[1]);
 				// Last bit
-				this.glob.ctx.drawImage(this.bar_pic,
+				this.glob.ctx.drawImage(this.bar_pic!,
 					soffset[0] + this.bar_dim[0] - 3, soffset[1],
 					3, this.bar_dim[1],
 					this.bar_offset[0] + length, this.bar_offset[1],
@@ -232,7 +236,7 @@ export class ResourceLoader implements Stage {
 			}
 		}
 
-		write_text(`${this.percentage.toFixed(2)}%`, [this.percent_offset[0], this.percent_offset[1]]);
+		write_text(this.glob.ctx, `${this.percentage.toFixed(2)}%`, [this.percent_offset[0], this.percent_offset[1]]);
 	}
 
 	finished_preloading(self: ResourceLoader) {
@@ -428,7 +432,7 @@ export class ResourceLoader implements Stage {
 		]);
 
 		// Activate loading of save games by drag and drop
-		this.glob.canvas.addEventListener('dragover', function (event) {
+		this.glob.canvas.addEventListener('dragover', event => {
 			event.stopPropagation();
 			event.preventDefault();
 			if(event.dataTransfer !== null) {
@@ -436,7 +440,7 @@ export class ResourceLoader implements Stage {
 			}
 		});
 
-		this.glob.canvas.addEventListener('drop', function (event) {
+		this.glob.canvas.addEventListener('drop', event => {
 			event.stopPropagation();
 			event.preventDefault();
 			if(event.dataTransfer === null) {
@@ -447,13 +451,16 @@ export class ResourceLoader implements Stage {
 			reader.readAsArrayBuffer(file);
 
 			reader.addEventListener('load', readerEvent => {
-				game.load_game(readerEvent.target.result);
+				if(readerEvent.target?.result) {
+					// ArrayBuffer given by function `readAsArrayBuffer` above
+					this.game.load_game(readerEvent.target.result as ArrayBuffer);
+				}
 			});
 		});
 	}
 
 	finished_postloading(self: ResourceLoader) {
-		if (game.stage.id === SCENE.LOADING) {
+		if (this.game.stage.id === SCENE.LOADING) {
 			self.phase = 3;
 			self.percentage = 100;
 			if (this.glob.resources.get_status() - self.max_size !== 0) {
@@ -486,7 +493,7 @@ export class ResourceLoader implements Stage {
 
 	next() {
 		if (this.phase >= 2) {
-			this.glob.next_stage();
+			this.game.next_stage();
 		}
 	}
 }

@@ -1,7 +1,8 @@
 import { Electro, Feeding, Fight, IAction, Love, Quicksand, Waiting } from "./actions";
 import { Camera } from "./camera";
 import { survivalmap_size } from "./consts";
-import { ATTR, DIR, PLAYER_TYPE, SCENE, SURV_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, random_element, random_int, write_text } from "./helper";
+import { Game } from "./game";
+import { ATTR, DIR, PLAYER_TYPE, PRED, SCENE, SURV_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, random_element, random_int, write_text } from "./helper";
 import { Enemy, Female, ISurvivalCharacter, Level, Predator } from "./level";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
@@ -13,15 +14,13 @@ export class Survival implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
-	world: WorldGlobal;
 
 	private bg_pic: HTMLImageElement;
 	private gui_pics: HTMLImageElement;
 
 	private level: Level;
 	private camera: Camera;
-	private action: IAction | null = null;
+	action: IAction | null = null;
 	private movement_active = false;
 	private movement_just_finished = false;
 	private player_started = false;
@@ -79,14 +78,12 @@ export class Survival implements Stage {
 	readonly max_time = 54;
 	readonly speed = 8;
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.gui_pics = glob.resources.get_image('gfx/survival_gui.png');
 		this.time = this.max_time;
 
-		this.level = new Level(world);
+		this.level = new Level(glob.resources, world);
 		this.camera = new Camera(glob.ctx, this.level, this, this.tile_dim, this.camera_dim, this.camera_offset);
 
 		this.tutorials = [
@@ -139,7 +136,7 @@ export class Survival implements Stage {
 		this.max_steps = this.steps;
 
 		this.redraw();
-		game.tutorial();
+		this.game.tutorial();
 		this.update_environment_sound();
 	}
 
@@ -147,26 +144,26 @@ export class Survival implements Stage {
 		if (this.world.current_player.type === PLAYER_TYPE.COMPUTER) {
 			return;
 		}
-		draw_base();
+		draw_base(this.glob, this.id);
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
 
-		draw_rect(this.left_rect_offset, this.left_rect_dim); // Main rectangle
-		draw_rect(this.right_rect_offset, this.right_rect_dim); // Right rectangle
-		draw_rect(this.next_offset, this.next_dim); // Continue rectangle
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, this.left_rect_offset, this.left_rect_dim); // Main rectangle
+		draw_rect(this.glob.ctx, this.right_rect_offset, this.right_rect_dim); // Right rectangle
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue rectangle
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 		this.clickareas.push({
 			x1: this.next_offset[0],
 			y1: this.next_offset[1],
 			x2: this.next_offset[0] + this.next_dim[0],
 			y2: this.next_offset[1] + this.next_dim[1],
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		// Black border around camera
-		draw_black_rect([this.camera_offset[0] - 1, this.camera_offset[1] - 1], [this.camera_dim[0] + 1, this.camera_dim[1] + 1]);
+		draw_black_rect(this.glob.ctx, [this.camera_offset[0] - 1, this.camera_offset[1] - 1], [this.camera_dim[0] + 1, this.camera_dim[1] + 1]);
 
 		// Click on camera:
 		// Arrows override click
@@ -229,7 +226,7 @@ export class Survival implements Stage {
 	}
 
 	draw_minimap() {
-		draw_black_rect(this.minimap_offset, this.minimap_dim, '#000000');
+		draw_black_rect(this.glob.ctx, this.minimap_offset, this.minimap_dim, '#000000');
 
 		const MM_PLAYER = 0;
 		const MM_FOOD = 1;
@@ -313,7 +310,7 @@ export class Survival implements Stage {
 		this.glob.ctx.fillRect(this.steps_offset[0] + 1, this.steps_offset[1] + 1, width, this.steps_dim[1] - 1);
 		this.glob.ctx.restore();
 
-		draw_black_rect(this.steps_offset, this.steps_dim);
+		draw_black_rect(this.glob.ctx, this.steps_offset, this.steps_dim);
 	}
 
 	draw_time() {
@@ -326,7 +323,7 @@ export class Survival implements Stage {
 		this.glob.ctx.fillRect(this.time_offset[0] + 1, this.time_offset[1] + 1, width, this.time_dim[1] - 1);
 		this.glob.ctx.restore();
 
-		draw_black_rect(this.time_offset, this.time_dim);
+		draw_black_rect(this.glob.ctx, this.time_offset, this.time_dim);
 	}
 
 	draw_symbols() {
@@ -453,18 +450,27 @@ export class Survival implements Stage {
 		// Enemy or Female found
 		const [dir, adjacent] = this.get_adjacent();
 		if (dir) {
-			if (adjacent !== null && adjacent.type === SURV_MAP.FEMALE) {
-				this.action = new Love(dir, char, (adjacent as Female), () => this.finish_love(adjacent as Female));
-			}
-			else {
-				const player_wins = this.does_player_win(adjacent);
-				this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent));
+			if (adjacent !== null) {
+				if (isFemale(adjacent)) {
+					this.action = new Love(dir, char, adjacent, () => this.finish_love(adjacent), this.glob.resources);
+				}
+				else {
+					assertIsPredatorOrEnemy(adjacent);
+					const player_wins = this.does_player_win(adjacent);
+					this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent), this.glob.resources);
+				}
+				adjacent.env_sound = undefined;
+
+				const mobmap_at_char = this.level.mobmap[char.tile[1]][char.tile[0]];
+				if (mobmap_at_char) {
+					mobmap_at_char.hidden = true;
+				}
+				const mobmap_at_adjacent = this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]];
+				if (mobmap_at_adjacent) {
+					mobmap_at_adjacent.hidden = true;
+				}
 			}
 
-			this.level.mobmap[char.tile[1]][char.tile[0]].hidden = true;
-			this.level.mobmap[adjacent.tile[1]][adjacent.tile[0]].hidden = true;
-
-			adjacent.env_sound = null;
 			this.update_environment_sound();
 
 			return;
@@ -475,7 +481,7 @@ export class Survival implements Stage {
 		}
 
 		// Nothing happened, end movement
-		char.sprite = new Sprite(char.url, char.anims.still.soffset, char.anims.still.frames);
+		char.sprite = new Sprite(char.pic, char.anims.still.soffset, char.anims.still.frames);
 	}
 
 	update_environment_sound() {
@@ -526,7 +532,9 @@ export class Survival implements Stage {
 		partner.hidden = false;
 		this.level.character.hidden = false;
 		partner.type = SURV_MAP.UNRESPONSIVE;
-		partner.sprite = this.action.offspring_sprite;
+		if (this.action?.offspring_sprite) {
+			partner.sprite = this.action.offspring_sprite;
+		}
 		if (partner.hasOwnProperty('env_sound')) {
 			partner.env_sound = `offspring_${['purplus', 'kiwi', 'pesci', '_', 'amorph', 'chuck'][partner.species]}`;
 		}
@@ -554,16 +562,18 @@ export class Survival implements Stage {
 
 			this.level.character.hidden = false;
 			opponent.type = SURV_MAP.UNRESPONSIVE;
-			opponent.sprite = this.action.final_opponent_sprite;
+			if (this.action?.final_opponent_sprite) {
+				opponent.sprite = this.action.final_opponent_sprite;
+			}
 			// Mega dirty hack to enable crying sound *only* for crying dino
-			if (opponent.species === PRED.DINO && opponent.sprite.offset[0] === 320) {
+			if (opponent.species === PRED.DINO && opponent.sprite.offset && opponent.sprite.offset[0] === 320) {
 				opponent.env_sound = 'dino_cry';
 			}
 			this.draw_symbols();
 			this.finish_movement();
 		}
 		else {
-			opponent.sprite = new Sprite(opponent.url, opponent.anims.still.soffset, opponent.anims.still.frames);
+			opponent.sprite = new Sprite(opponent.pic, opponent.anims.still.soffset, opponent.anims.still.frames);
 			this.player_death();
 		}
 	}
@@ -604,29 +614,29 @@ export class Survival implements Stage {
 
 		switch (dir) {
 			case DIR.S:
-				char.sprite = new Sprite(char.url, char.anims.south.soffset, char.anims.south.frames);
+				char.sprite = new Sprite(char.pic, char.anims.south.soffset, char.anims.south.frames);
 				char.tile[1]++;
 				char.rel_pos = [0, -this.tile_dim[1]];
 				break;
 			case DIR.N:
-				char.sprite = new Sprite(char.url, char.anims.north.soffset, char.anims.north.frames);
+				char.sprite = new Sprite(char.pic, char.anims.north.soffset, char.anims.north.frames);
 				char.tile[1]--;
 				char.rel_pos = [0, this.tile_dim[1]];
 				break;
 			case DIR.E:
-				char.sprite = new Sprite(char.url, char.anims.east.soffset, char.anims.east.frames);
+				char.sprite = new Sprite(char.pic, char.anims.east.soffset, char.anims.east.frames);
 				char.tile[0]++;
 				char.rel_pos = [-this.tile_dim[0], 0];
 				break;
 			case DIR.W:
-				char.sprite = new Sprite(char.url, char.anims.west.soffset, char.anims.west.frames);
+				char.sprite = new Sprite(char.pic, char.anims.west.soffset, char.anims.west.frames);
 				char.tile[0]--;
 				char.rel_pos = [this.tile_dim[0], 0];
 				break;
 			case DIR.X: { // Feeding/waiting
 				const ground_type = this.level.map[char.tile[1]][char.tile[0]];
 				if (this.level.edible[ground_type] === '1') {
-					this.action = new Feeding(char, this.level, ground_type, () => this.finish_feeding(ground_type));
+					this.action = new Feeding(char, this.level, ground_type, () => this.finish_feeding(ground_type), this.glob.resources);
 					this.delay = anim_delays.feeding;
 				}
 				else {
@@ -683,7 +693,7 @@ export class Survival implements Stage {
 				this.finish_movement();
 			}
 			else {
-				obj.sprite = new Sprite(obj.url, obj.anims.still.soffset, obj.anims.still.frames);
+				obj.sprite = new Sprite(obj.pic, obj.anims.still.soffset, obj.anims.still.frames);
 			}
 		}
 	}
@@ -779,28 +789,28 @@ export class Survival implements Stage {
 				case DIR.N:
 					pos[1]--;
 					if (dist <= 5) {
-						predator.sprite = new Sprite(predator.url, predator.anims.north.soffset, predator.anims.north.frames, anim_delay);
+						predator.sprite = new Sprite(predator.pic, predator.anims.north.soffset, predator.anims.north.frames, anim_delay);
 						predator.rel_pos = [0, this.tile_dim[1]];
 					}
 					break;
 				case DIR.S:
 					pos[1]++;
 					if (dist <= 5) {
-						predator.sprite = new Sprite(predator.url, predator.anims.south.soffset, predator.anims.south.frames, anim_delay);
+						predator.sprite = new Sprite(predator.pic, predator.anims.south.soffset, predator.anims.south.frames, anim_delay);
 						predator.rel_pos = [0, -this.tile_dim[1]];
 					}
 					break;
 				case DIR.W:
 					pos[0]--;
 					if (dist <= 5) {
-						predator.sprite = new Sprite(predator.url, predator.anims.west.soffset, predator.anims.west.frames, anim_delay);
+						predator.sprite = new Sprite(predator.pic, predator.anims.west.soffset, predator.anims.west.frames, anim_delay);
 						predator.rel_pos = [this.tile_dim[0], 0];
 					}
 					break;
 				case DIR.E:
 					pos[0]++;
 					if (dist <= 5) {
-						predator.sprite = new Sprite(predator.url, predator.anims.east.soffset, predator.anims.east.frames, anim_delay);
+						predator.sprite = new Sprite(predator.pic, predator.anims.east.soffset, predator.anims.east.frames, anim_delay);
 						predator.rel_pos = [-this.tile_dim[0], 0];
 					}
 					break;
@@ -825,7 +835,7 @@ export class Survival implements Stage {
 			return;
 		}
 
-		open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.suicide, (x: number) => { if (x === 1) { this.player_death(true); } }, this.glob.lang.no, this.glob.lang.yes);
+		open_popup(this.game, 'chuck_berry', this.glob.lang.suicide, (x: number) => { if (x === 1) { this.player_death(true); } }, this.glob.lang.no, this.glob.lang.yes);
 	}
 
 	player_death(delete_sprite = false) {
@@ -841,7 +851,7 @@ export class Survival implements Stage {
 			this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 		}
 		this.level.place_player([random_int(20, 80), random_int(20, 80)]);
-		char.sprite = new Sprite(char.url, char.anims.still.soffset, char.anims.still.frames);
+		char.sprite = new Sprite(char.pic, char.anims.still.soffset, char.anims.still.frames);
 		this.level.mobmap[char.tile[1]][char.tile[0]] = char;
 		char.hidden = false;
 		this.action = null;
@@ -864,7 +874,7 @@ export class Survival implements Stage {
 			if (Math.random() <= 0.000055 &&
 				[0, 12, 18, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 119, 121].includes(this.level.map[char.tile[1]][char.tile[0]])) {
 				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
-				this.action = new Quicksand(char, () => this.player_death(true));
+				this.action = new Quicksand(char, () => this.player_death(true), this.glob.resources);
 			}
 
 			// Test for Electro flower
@@ -879,10 +889,10 @@ export class Survival implements Stage {
 				// If the left (western) field is empty, use that. Otherwise use the right field.
 				if (this.level.map[char.tile[1]][char.tile[0] - 1] === 65 &&
 					this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) {
-					this.action = new Electro(DIR.E, char, () => this.player_death(true));
+					this.action = new Electro(DIR.E, char, () => this.player_death(true), this.glob.resources);
 				}
 				else {
-					this.action = new Electro(DIR.W, char, () => this.player_death(true));
+					this.action = new Electro(DIR.W, char, () => this.player_death(true), this.glob.resources);
 				}
 			}
 
@@ -972,23 +982,23 @@ export class Survival implements Stage {
 			return false;
 		}
 
-		if (input.isDown('DOWN') && this.level.is_unblocked(this.level.character.tile, DIR.S)) {
+		if (this.glob.input.isDown('DOWN') && this.level.is_unblocked(this.level.character.tile, DIR.S)) {
 			this.start_movement(DIR.S);
 		}
 
-		else if (input.isDown('UP') && this.level.is_unblocked(this.level.character.tile, DIR.N)) {
+		else if (this.glob.input.isDown('UP') && this.level.is_unblocked(this.level.character.tile, DIR.N)) {
 			this.start_movement(DIR.N);
 		}
 
-		else if (input.isDown('LEFT') && this.level.is_unblocked(this.level.character.tile, DIR.W)) {
+		else if (this.glob.input.isDown('LEFT') && this.level.is_unblocked(this.level.character.tile, DIR.W)) {
 			this.start_movement(DIR.W);
 		}
 
-		else if (input.isDown('RIGHT') && this.level.is_unblocked(this.level.character.tile, DIR.E)) {
+		else if (this.glob.input.isDown('RIGHT') && this.level.is_unblocked(this.level.character.tile, DIR.E)) {
 			this.start_movement(DIR.E);
 		}
 
-		else if (input.isDown('SPACE')) {
+		else if (this.glob.input.isDown('SPACE')) {
 			this.start_movement(DIR.X);
 		}
 
@@ -1034,14 +1044,14 @@ export class Survival implements Stage {
 	}
 
 	next() {
-		draw_rect(this.next_offset, this.next_dim);
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim);
 
 		if (this.movement_active || this.action !== null) {
 			return;
 		}
 
 		if (this.steps > 0) {
-			open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 		else {
 			this.next_popup(1);
@@ -1053,12 +1063,22 @@ export class Survival implements Stage {
 			this.calc_outcome();
 			if (this.world.current_player.individuals === 0 && !this.world.current_player.is_dead) {
 				this.world.current_player.is_dead = true;
-				open_popup(this.glob.lang.popup_title, this.world.current_player.id, this.glob.lang.dead, () => game.next_stage(), this.glob.lang.next);
+				open_popup(this.game, this.world.current_player.id.toString(), this.glob.lang.dead, () => this.game.next_stage(), this.glob.lang.next);
 			}
 			else {
 				this.glob.resources.stop_sound();
-				game.next_stage();
+				this.game.next_stage();
 			}
 		}
+	}
+}
+
+function isFemale(subject: ISurvivalCharacter): subject is Female {
+	return subject.type === SURV_MAP.FEMALE;
+}
+
+function assertIsPredatorOrEnemy(subject: ISurvivalCharacter): asserts subject is Predator | Enemy {
+	if (subject.type !== SURV_MAP.PREDATOR && subject.type !== SURV_MAP.ENEMY) {
+		throw new Error('Used a non-predator or non-enemy where one is expected.');
 	}
 }

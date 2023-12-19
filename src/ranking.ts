@@ -1,3 +1,4 @@
+import { Game } from "./game";
 import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, write_text } from "./helper";
 import { Sprite } from "./sprite";
 import { anim_delays, anim_ranking } from "./sprite_positions";
@@ -9,9 +10,7 @@ export class Ranking implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
 
-	private world: WorldGlobal;
 	private bg_pic: HTMLImageElement;
 	private pics: HTMLImageElement;
 	private wreath_pic: HTMLImageElement;
@@ -74,9 +73,7 @@ export class Ranking implements Stage {
 	readonly rel_dx = [0, 106, 206, 306, 406, 504];
 	readonly max_heights = [167, 128, 104, 80, 56, 32];
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.pics = glob.resources.get_image('gfx/ranking.png');
 		this.wreath_pic = glob.resources.get_image('gfx/wreath.png');
@@ -101,7 +98,7 @@ export class Ranking implements Stage {
 
 	initialize(autosave = true) {
 		if (autosave) {
-			const saving_ok = game.save_locally();
+			const saving_ok = this.game.save_locally();
 			if (!saving_ok) {
 				this.tutorials[1].name = 'ranking_no_save';
 			}
@@ -120,18 +117,18 @@ export class Ranking implements Stage {
 		this.determine_best();
 		this.redraw();
 		this.render();
-		game.tutorial();
+		this.game.tutorial();
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob, this.id);
 
-		draw_rect(this.load_offset, this.load_dim); // Load
-		write_text(this.glob.lang.load_game, [115, 473], 'white', 'black');
-		draw_rect(this.save_offset, this.save_dim); // Save
-		write_text(this.glob.lang.save_game, [344, 473], 'white', 'black');
-		draw_rect(this.next_offset, this.next_dim); // Continue
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim); // Load
+		write_text(this.glob.ctx, this.glob.lang.load_game, [115, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, this.save_offset, this.save_dim); // Save
+		write_text(this.glob.ctx, this.glob.lang.save_game, [344, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
@@ -141,9 +138,9 @@ export class Ranking implements Stage {
 			y1: this.load_offset[1],
 			x2: this.load_offset[0] + this.load_dim[0] - 2,
 			y2: this.load_offset[1] + this.load_dim[1] - 2,
-			down: () => draw_rect(this.load_offset, this.load_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim, true, true),
 			up: () => this.load_game(),
-			blur: () => draw_rect(this.load_offset, this.load_dim)
+			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim)
 		});
 
 		this.clickareas.push({
@@ -151,9 +148,9 @@ export class Ranking implements Stage {
 			y1: this.save_offset[1] + 1,
 			x2: this.save_offset[0] + this.save_dim[0] - 2,
 			y2: this.save_offset[1] + this.save_dim[1] - 2,
-			down: () => draw_rect(this.save_offset, this.save_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.save_offset, this.save_dim, true, true),
 			up: () => this.save_game(),
-			blur: () => draw_rect(this.save_offset, this.save_dim)
+			blur: () => draw_rect(this.glob.ctx, this.save_offset, this.save_dim)
 		});
 
 		this.clickareas.push({
@@ -161,9 +158,9 @@ export class Ranking implements Stage {
 			y1: this.next_offset[1] + 1,
 			x2: this.next_offset[0] + this.next_dim[0] - 1,
 			y2: this.next_offset[1] + this.next_dim[1] - 1,
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		// Draw lower pillar parts
@@ -224,7 +221,7 @@ export class Ranking implements Stage {
 		}
 
 		// Main rectangle (draw last to overwrite any spare pixels from pillar parts)
-		draw_rect([0, 20], [640, 439]);
+		draw_rect(this.glob.ctx, [0, 20], [640, 439]);
 
 		this.keys = [
 			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
@@ -352,7 +349,7 @@ export class Ranking implements Stage {
 	}
 
 	private determine_best() {
-		const scores = game.get_ranking();
+		const scores = this.game.get_ranking();
 
 		this.winners = [scores[0][0]];
 		for (let i = 1; i < 6; i++) {
@@ -385,7 +382,7 @@ export class Ranking implements Stage {
 			this.sprites = [];
 			for (let i = 0; i < 6; i++) {
 				this.sprites.push(
-					new Sprite(this.pics, anim_ranking.standing[i])
+					new Sprite(this.pics, anim_ranking.standing[i].offset)
 				);
 			}
 
@@ -403,17 +400,17 @@ export class Ranking implements Stage {
 	}
 
 	next() {
-		game.next_stage();
+		this.game.next_stage();
 	}
 
 	load_game() {
-		draw_rect(this.load_offset, this.load_dim);
-		open_load_dialog();
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim);
+		open_load_dialog(this.game);
 	}
 
 	save_game() {
-		draw_rect(this.save_offset, this.save_dim);
-		if (!game.seen_tutorials.has('save')) {
+		draw_rect(this.glob.ctx, this.save_offset, this.save_dim);
+		if (!this.game.seen_tutorials.has('save')) {
 			this.tutorials.push({
 				'name': 'save',
 				'pos': [220, 435],
@@ -422,9 +419,9 @@ export class Ranking implements Stage {
 				'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0], this.save_offset[1] + this.save_dim[1]],
 			});
 
-			game.tutorial();
+			this.game.tutorial();
 		}
 
-		game.save_game();
+		this.game.save_game();
 	}
 }

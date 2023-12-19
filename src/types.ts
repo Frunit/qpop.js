@@ -43,10 +43,10 @@ export interface Stage {
     redraw: () => void;
     render: () => void;
     update: () => void;
+    next_player?: () => void;
     clickareas: ClickArea[];
     rightclickareas: ClickArea[];
     keys: KeyType[];
-    glob: TechGlobal;
 }
 
 export type Point = [number, number];
@@ -77,7 +77,6 @@ export type TechGlobal = {
     clickareas: ClickArea[];
 	rightclickareas: ClickArea[];
     options: any, // TODO
-    next_stage: Function, // TODO
     resources: ResourceManager,
     input: InputManager,
 };
@@ -121,11 +120,17 @@ export type AnimationFrames = {
 	size?: Dimension,
 	offset?: Point,
 	soffset?: Point,
-	frames: Point[] | Point[][],
-    transitions?: number[][],
+	frames: Point[],
+};
+
+export type RandomAnimationFrames = {
+	soffset: Point,
+	frames: Point[][],
+    transitions: number[][],
 };
 
 export type NamedAnimationFrames = Record<string, AnimationFrames>;
+export type NamedListOfAnimationsFrames = Record<string, AnimationFrames[]>;
 
 // Animations
 

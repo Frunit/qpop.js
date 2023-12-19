@@ -1,3 +1,4 @@
+import { Game } from "./game";
 import { PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, random_int, write_text } from "./helper";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
@@ -9,8 +10,6 @@ export class Turnselection implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
-	world: WorldGlobal;
 
 	private bg: HTMLImageElement;
 	private pics: HTMLImageElement;
@@ -43,9 +42,7 @@ export class Turnselection implements Stage {
 	readonly anim_soffsets: Point[] = [[0, 0], [0, 90], [0, 180]];
 	readonly button_soffsets: Point[] = [[0, 630], [43, 630]];
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 		this.bg = this.glob.resources.get_image('gfx/light_bg.png');
 		this.pics = this.glob.resources.get_image('gfx/turns.png');
 
@@ -63,7 +60,7 @@ export class Turnselection implements Stage {
 	initialize() {
 		this.glob.resources.play_music('intro');
 		this.redraw();
-		game.tutorial();
+		this.game.tutorial();
 	}
 
 	draw_turn_changed() {
@@ -79,7 +76,7 @@ export class Turnselection implements Stage {
 			this.bar_offset[0], this.bar_offset[1],
 			this.bar_dim[0], this.bar_dim[1]);
 
-		write_text(this.glob.lang.turns[this.turn_index], this.bar_text_offset, 'black', '');
+		write_text(this.glob.ctx, this.glob.lang.turns[this.turn_index], this.bar_text_offset, 'black', '');
 
 		if (this.turn_index === 3) {
 			if (this.animations === null) {
@@ -107,14 +104,14 @@ export class Turnselection implements Stage {
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob, this.id);
 
-		draw_rect([0, 20], [640, 439]); // Main rectangle
-		draw_rect(this.load_offset, this.load_dim); // Load
-		write_text(this.glob.lang.load_game, [115, 473], 'white', 'black');
-		draw_rect([229, 458], [231, 22]); // Bottom middle
-		draw_rect(this.next_offset, this.next_dim); // Continue
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [0, 20], [640, 439]); // Main rectangle
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim); // Load
+		write_text(this.glob.ctx, this.glob.lang.load_game, [115, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [229, 458], [231, 22]); // Bottom middle
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
@@ -124,9 +121,9 @@ export class Turnselection implements Stage {
 			y1: this.load_offset[1],
 			x2: this.load_offset[0] + this.load_dim[0],
 			y2: this.load_offset[1] + this.load_dim[1],
-			down: () => draw_rect(this.load_offset, this.load_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim, true, true),
 			up: () => this.load_game(),
-			blur: () => draw_rect(this.load_offset, this.load_dim)
+			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim)
 		});
 
 		this.clickareas.push({
@@ -134,14 +131,14 @@ export class Turnselection implements Stage {
 			y1: this.next_offset[1],
 			x2: this.next_offset[0] + this.next_dim[0],
 			y2: this.next_offset[1] + this.next_dim[1],
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		for (let i = 0; i < 2; i++) {
 			// Background panels
-			draw_rect(this.panel_offsets[i], this.panel_dim, true, false, true);
+			draw_rect(this.glob.ctx, this.panel_offsets[i], this.panel_dim, true, false, true);
 			this.glob.ctx.drawImage(this.bg, this.panel_offsets[i][0] + 3, this.panel_offsets[i][1] + 3);
 		}
 
@@ -158,9 +155,9 @@ export class Turnselection implements Stage {
 				y1: this.button_offsets[i][1],
 				x2: this.button_offsets[i][0] + this.button_dim[0],
 				y2: this.button_offsets[i][1] + this.button_dim[1],
-				down: () => draw_rect(this.button_offsets[i], this.button_dim, true, true),
+				down: () => draw_rect(this.glob.ctx, this.button_offsets[i], this.button_dim, true, true),
 				up: () => this.change_turn(i >= 1),
-				blur: () => draw_rect(this.button_offsets[i], this.button_dim)
+				blur: () => draw_rect(this.glob.ctx, this.button_offsets[i], this.button_dim)
 			});
 		}
 
@@ -245,7 +242,7 @@ export class Turnselection implements Stage {
 	}
 
 	change_turn(up: boolean) {
-		draw_rect(this.button_offsets[up ? 1 : 0], this.button_dim);
+		draw_rect(this.glob.ctx, this.button_offsets[up ? 1 : 0], this.button_dim);
 		if (up && this.turn_index < 3) {
 			this.turn_index++;
 		}
@@ -259,7 +256,7 @@ export class Turnselection implements Stage {
 	}
 
 	next() {
-		draw_rect(this.next_offset, this.next_dim);
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim);
 
 		let players_active = 0;
 		for (let i = 0; i < 6; i++) {
@@ -272,12 +269,12 @@ export class Turnselection implements Stage {
 			this.world.infinite_game = true;
 		}
 
-		game.select_evo_points();
-		game.next_stage();
+		this.game.select_evo_points();
+		this.game.next_stage();
 	}
 
 	load_game() {
-		draw_rect(this.load_offset, this.load_dim);
-		open_load_dialog();
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim);
+		open_load_dialog(this.game);
 	}
 }

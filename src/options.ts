@@ -1,4 +1,6 @@
+import { Game } from "./game";
 import { SCENE, clamp, draw_base, draw_checkbox, draw_rect, draw_upper_left_border, local_save, open_popup, write_text } from "./helper";
+import { Init } from "./init";
 import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
 // MAYBE: Add a little gimmick that a predator walks along the right-hand side of the screen after some time :)
@@ -9,7 +11,6 @@ export class Options implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	glob: TechGlobal;
 
 	private bg: HTMLImageElement;
 	private symbols: HTMLImageElement;
@@ -53,8 +54,7 @@ export class Options implements Stage {
 	
 	readonly wm_ai_delays = [36, 18, 9, 4, 0];
 
-	constructor(glob: TechGlobal) {
-		this.glob = glob;
+	constructor(private game: Game, private glob: TechGlobal) {
 		this.bg = glob.resources.get_image('gfx/dark_bg.png');
 		this.symbols = glob.resources.get_image('gfx/gui.png');
 		this.bar = glob.resources.get_image('gfx/mutations.png');
@@ -65,12 +65,12 @@ export class Options implements Stage {
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob, this.id);
 
-		draw_rect([0, 20], [640, 460]); // Main rectangle
-		draw_rect(this.close_offset, this.close_dim); // Close
-		draw_upper_left_border(this.close_offset, this.close_dim);
-		write_text(this.glob.lang.close, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [0, 20], [640, 460]); // Main rectangle
+		draw_rect(this.glob.ctx, this.close_offset, this.close_dim); // Close
+		draw_upper_left_border(this.glob.ctx, this.close_offset, this.close_dim);
+		write_text(this.glob.ctx, this.glob.lang.close, [549, 473], 'white', 'black');
 
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
@@ -81,37 +81,37 @@ export class Options implements Stage {
 			y1: this.close_offset[1],
 			x2: this.close_offset[0] + this.close_dim[0],
 			y2: this.close_offset[1] + this.close_dim[1],
-			down: () => draw_rect(this.close_offset, this.close_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.close_offset, this.close_dim, true, true),
 			up: () => this.close(),
-			blur: () => draw_rect(this.close_offset, this.close_dim)
+			blur: () => draw_rect(this.glob.ctx, this.close_offset, this.close_dim)
 		});
 
 		// Language
-		write_text(this.glob.lang.options_lang, [this.text_x, this.ys.lang + this.text_y_offset + 3], '#000000', '#ffffff', 'left');
-		draw_rect([this.secondary_x_offset, this.ys.lang], this.lang_dim);
-		write_text(this.glob.lang.options_this_lang, [this.secondary_x_offset + this.lang_dim[0] / 2, this.ys.lang + this.text_y_offset + 3], 'white', 'black');
+		write_text(this.glob.ctx, this.glob.lang.options_lang, [this.text_x, this.ys.lang + this.text_y_offset + 3], '#000000', '#ffffff', 'left');
+		draw_rect(this.glob.ctx, [this.secondary_x_offset, this.ys.lang], this.lang_dim);
+		write_text(this.glob.ctx, this.glob.lang.options_this_lang, [this.secondary_x_offset + this.lang_dim[0] / 2, this.ys.lang + this.text_y_offset + 3], 'white', 'black');
 		this.clickareas.push({
 			x1: this.secondary_x_offset,
 			y1: this.ys.lang,
 			x2: this.secondary_x_offset + this.lang_dim[0],
 			y2: this.ys.lang + this.lang_dim[1],
-			down: () => draw_rect([this.secondary_x_offset, this.ys.lang], this.lang_dim, true, true),
-			up: () => game.next_language(1),
-			blur: () => draw_rect([this.secondary_x_offset, this.ys.lang], this.lang_dim)
+			down: () => draw_rect(this.glob.ctx, [this.secondary_x_offset, this.ys.lang], this.lang_dim, true, true),
+			up: () => this.game.next_language(1),
+			blur: () => draw_rect(this.glob.ctx, [this.secondary_x_offset, this.ys.lang], this.lang_dim)
 		});
 		this.rightclickareas.push({
 			x1: this.secondary_x_offset,
 			y1: this.ys.lang,
 			x2: this.secondary_x_offset + this.lang_dim[0],
 			y2: this.ys.lang + this.lang_dim[1],
-			down: () => draw_rect([this.secondary_x_offset, this.ys.lang], this.lang_dim, true, true),
-			up: () => game.next_language(-1),
-			blur: () => draw_rect([this.secondary_x_offset, this.ys.lang], this.lang_dim)
+			down: () => draw_rect(this.glob.ctx, [this.secondary_x_offset, this.ys.lang], this.lang_dim, true, true),
+			up: () => this.game.next_language(-1),
+			blur: () => draw_rect(this.glob.ctx, [this.secondary_x_offset, this.ys.lang], this.lang_dim)
 		});
 
 		// Music
-		draw_checkbox([this.checkbox_x, this.ys.music], this.glob.options.music_on);
-		write_text(this.glob.lang.options_music, [this.text_x, this.ys.music + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.music], this.glob.options.music_on);
+		write_text(this.glob.ctx, this.glob.lang.options_music, [this.text_x, this.ys.music + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.music], this.glob.options.music);
 		this.clickareas.push({
 			x1: this.checkbox_x,
@@ -119,7 +119,7 @@ export class Options implements Stage {
 			x2: this.checkbox_x + this.x_dim[0] + 2,
 			y2: this.ys.music + this.x_dim[1] + 2,
 			down: () => { },
-			up: () => game.toggle_music(),
+			up: () => this.game.toggle_music(),
 			blur: () => { }
 		});
 		this.clickareas.push({
@@ -163,8 +163,8 @@ export class Options implements Stage {
 		});
 
 		// Sound
-		draw_checkbox([this.checkbox_x, this.ys.sound], this.glob.options.sound_on);
-		write_text(this.glob.lang.options_sound, [this.text_x, this.ys.sound + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.sound], this.glob.options.sound_on);
+		write_text(this.glob.ctx, this.glob.lang.options_sound, [this.text_x, this.ys.sound + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.sound], this.glob.options.sound);
 		this.clickareas.push({
 			x1: this.checkbox_x,
@@ -172,7 +172,7 @@ export class Options implements Stage {
 			x2: this.checkbox_x + this.x_dim[0] + 2,
 			y2: this.ys.sound + this.x_dim[1] + 2,
 			down: () => { },
-			up: () => game.toggle_sound(),
+			up: () => this.game.toggle_sound(),
 			blur: () => { }
 		});
 		this.clickareas.push({
@@ -216,9 +216,9 @@ export class Options implements Stage {
 		});
 
 		// AI speed
-		write_text(this.glob.lang.options_ai_speed, [this.text_x, this.ys.ai_speed + this.text_y_offset], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, this.glob.lang.options_ai_speed, [this.text_x, this.ys.ai_speed + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * this.glob.options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
-		write_text(this.glob.lang.options_ai_speeds[this.glob.options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, this.glob.lang.options_ai_speeds[this.glob.options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.secondary_x_offset + 1,
 			y1: this.ys.ai_speed + this.line_height + 1,
@@ -260,8 +260,8 @@ export class Options implements Stage {
 		});
 
 		// Auto continue
-		draw_checkbox([this.checkbox_x, this.ys.auto_continue], this.glob.options.wm_ai_auto_continue);
-		write_text(this.glob.lang.options_auto_continue, [this.text_x, this.ys.auto_continue + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.auto_continue], this.glob.options.wm_ai_auto_continue);
+		write_text(this.glob.ctx, this.glob.lang.options_auto_continue, [this.text_x, this.ys.auto_continue + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.checkbox_x,
 			y1: this.ys.auto_continue,
@@ -273,8 +273,8 @@ export class Options implements Stage {
 		});
 
 		// Click and hold
-		draw_checkbox([this.checkbox_x, this.ys.click_hold], this.glob.options.wm_click_and_hold);
-		write_text(this.glob.lang.options_click_hold, [this.text_x, this.ys.click_hold + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.click_hold], this.glob.options.wm_click_and_hold);
+		write_text(this.glob.ctx, this.glob.lang.options_click_hold, [this.text_x, this.ys.click_hold + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.checkbox_x,
 			y1: this.ys.click_hold,
@@ -286,8 +286,8 @@ export class Options implements Stage {
 		});
 
 		// Plant distribution
-		draw_checkbox([this.checkbox_x, this.ys.plants], this.glob.options.plant_distribtion);
-		write_text(this.glob.lang.options_plants, [this.text_x, this.ys.plants + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.plants], this.glob.options.plant_distribtion);
+		write_text(this.glob.ctx, this.glob.lang.options_plants, [this.text_x, this.ys.plants + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.checkbox_x,
 			y1: this.ys.plants,
@@ -299,8 +299,8 @@ export class Options implements Stage {
 		});
 
 		// Show vanquished predators
-		draw_checkbox([this.checkbox_x, this.ys.predators], this.glob.options.show_predators);
-		write_text(this.glob.lang.options_predators, [this.text_x, this.ys.predators + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.predators], this.glob.options.show_predators);
+		write_text(this.glob.ctx, this.glob.lang.options_predators, [this.text_x, this.ys.predators + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.checkbox_x,
 			y1: this.ys.predators,
@@ -312,21 +312,21 @@ export class Options implements Stage {
 		});
 
 		// Show tutorial
-		draw_checkbox([this.checkbox_x, this.ys.tutorial], this.glob.options.tutorial);
-		write_text(this.glob.lang.options_tutorial, [this.text_x, this.ys.tutorial + this.text_y_offset], '#000000', '#ffffff', 'left');
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.tutorial], this.glob.options.tutorial);
+		write_text(this.glob.ctx, this.glob.lang.options_tutorial, [this.text_x, this.ys.tutorial + this.text_y_offset], '#000000', '#ffffff', 'left');
 		this.clickareas.push({
 			x1: this.checkbox_x,
 			y1: this.ys.tutorial,
 			x2: this.checkbox_x + this.x_dim[0] + 2,
 			y2: this.ys.tutorial + this.x_dim[1] + 2,
 			down: () => { },
-			up: () => game.toggle_tutorial([this.checkbox_x, this.ys.tutorial]),
+			up: () => this.game.toggle_tutorial([this.checkbox_x, this.ys.tutorial]),
 			blur: () => { }
 		});
 
 		// Transition delay
-		write_text(this.glob.lang.options_transition, [this.text_x, this.ys.transition + this.text_y_offset], '#000000', '#ffffff', 'left');
-		write_text(`${(this.glob.options.update_freq * this.glob.options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, this.glob.lang.options_transition, [this.text_x, this.ys.transition + this.text_y_offset], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, `${(this.glob.options.update_freq * this.glob.options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], this.glob.options.transition_delay * 10 / 9);
 		this.clickareas.push({
 			x1: this.secondary_x_offset + 1,
@@ -369,16 +369,16 @@ export class Options implements Stage {
 		});
 
 		// Restart game
-		write_text(this.glob.lang.options_restart, [this.text_x + this.lang_dim[0] / 2, this.ys.restart + this.text_y_offset + 3], '#ffffff', '#000000', 'center');
-		draw_rect([this.text_x, this.ys.restart], this.lang_dim);
+		write_text(this.glob.ctx, this.glob.lang.options_restart, [this.text_x + this.lang_dim[0] / 2, this.ys.restart + this.text_y_offset + 3], '#ffffff', '#000000', 'center');
+		draw_rect(this.glob.ctx, [this.text_x, this.ys.restart], this.lang_dim);
 		this.clickareas.push({
 			x1: this.text_x,
 			y1: this.ys.restart,
 			x2: this.text_x + this.lang_dim[0],
 			y2: this.ys.restart + this.lang_dim[1],
-			down: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim, true, true),
-			up: () => open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.really_restart, (x: number) => this.restart_game(x), this.glob.lang.no, this.glob.lang.yes),
-			blur: () => draw_rect([this.text_x, this.ys.restart], this.lang_dim)
+			down: () => draw_rect(this.glob.ctx, [this.text_x, this.ys.restart], this.lang_dim, true, true),
+			up: () => open_popup(this.game, 'chuck_berry', this.glob.lang.really_restart, (x: number) => this.restart_game(x), this.glob.lang.no, this.glob.lang.yes),
+			blur: () => draw_rect(this.glob.ctx, [this.text_x, this.ys.restart], this.lang_dim)
 		});
 
 		this.keys = [
@@ -456,7 +456,7 @@ export class Options implements Stage {
 			this.secondary_x_offset, this.text_y_offset + 2,
 			this.text_x - 1, this.ys.transition + this.line_height - 1,
 			this.secondary_x_offset, this.text_y_offset + 2);
-		write_text(`${(this.glob.options.update_freq * this.glob.options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, `${(this.glob.options.update_freq * this.glob.options.transition_delay).toFixed(2)} s`, [this.text_x, this.ys.transition + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.transition + this.line_height], this.glob.options.transition_delay * 10 / 9);
 
 		local_save('transition_delay', this.glob.options.transition_delay);
@@ -493,7 +493,7 @@ export class Options implements Stage {
 			this.secondary_x_offset, this.text_y_offset + 6,
 			this.text_x - 1, this.ys.ai_speed + this.line_height - 1,
 			this.secondary_x_offset, this.text_y_offset + 6);
-		write_text(this.glob.lang.options_ai_speeds[this.glob.options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
+		write_text(this.glob.ctx, this.glob.lang.options_ai_speeds[this.glob.options.wm_ai_delay_idx], [this.text_x, this.ys.ai_speed + this.text_y_offset + this.line_height], '#000000', '#ffffff', 'left');
 		this.draw_bar([this.secondary_x_offset, this.ys.ai_speed + this.line_height], Math.ceil(100 * this.glob.options.wm_ai_delay_idx / (this.wm_ai_delays.length - 1)));
 
 		local_save('wm_ai_delay_idx', this.glob.options.wm_ai_delay_idx);
@@ -502,36 +502,36 @@ export class Options implements Stage {
 
 	toggle_auto_continue() {
 		this.glob.options.wm_ai_auto_continue = !this.glob.options.wm_ai_auto_continue;
-		draw_checkbox([this.checkbox_x, this.ys.auto_continue], this.glob.options.wm_ai_auto_continue);
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.auto_continue], this.glob.options.wm_ai_auto_continue);
 
 		local_save('wm_ai_auto_continue', this.glob.options.wm_ai_auto_continue);
 	}
 
 	toggle_click_and_hold() {
 		this.glob.options.wm_click_and_hold = !this.glob.options.wm_click_and_hold;
-		draw_checkbox([this.checkbox_x, this.ys.click_hold], this.glob.options.wm_click_and_hold);
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.click_hold], this.glob.options.wm_click_and_hold);
 
 		local_save('wm_click_and_hold', this.glob.options.wm_click_and_hold);
 	}
 
 	toggle_plant_distribtion() {
 		this.glob.options.plant_distribtion = !this.glob.options.plant_distribtion;
-		draw_checkbox([this.checkbox_x, this.ys.plants], this.glob.options.plant_distribtion);
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.plants], this.glob.options.plant_distribtion);
 
 		local_save('plant_distribtion', this.glob.options.plant_distribtion);
 	}
 
 	toggle_show_predators() {
 		this.glob.options.show_predators = !this.glob.options.show_predators;
-		draw_checkbox([this.checkbox_x, this.ys.predators], this.glob.options.show_predators);
+		draw_checkbox(this.glob.ctx, this.glob.resources, [this.checkbox_x, this.ys.predators], this.glob.options.show_predators);
 
 		local_save('show_predators', this.glob.options.show_predators);
 	}
 
 	restart_game(x: number) {
 		if (x === 1) {
-			game.stage = new Init();
-			game.stage.initialize();
+			this.game.stage = new Init(this.game, this.glob, this.game.world);
+			this.game.stage.initialize();
 		}
 	}
 
@@ -542,8 +542,7 @@ export class Options implements Stage {
 	}
 
 	close() {
-		draw_rect(this.close_offset, this.close_dim);
-		game.stage = game.backstage.pop();
-		game.stage.redraw();
+		draw_rect(this.glob.ctx, this.close_offset, this.close_dim);
+		this.game.get_last_stage();
 	}
 }

@@ -1,5 +1,6 @@
 import { Catastrophe } from "./catastrophe";
 import { worldmap_size } from "./consts";
+import { Game } from "./game";
 import { ATTR, DIR, PLAYER_TYPE, SCENE, WORLD_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, pop_random_element, random_element, random_int, shuffle, write_text } from "./helper";
 import { Player } from "./player";
 import { Sprite } from "./sprite";
@@ -14,8 +15,6 @@ export class World implements Stage{
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
-	world: WorldGlobal;
 
 	private bg_pic: HTMLImageElement;
 	private map_pics: HTMLImageElement;
@@ -34,7 +33,7 @@ export class World implements Stage{
 	private wm_rightclickpos: Point | null = null;
 	private wm_set_mode = 0; // 0 = no mode; 1 = set; 2 = remove TODO
 
-	private catastrophe_status = 0; // 0 = no cata yet; 1 = cata called back; 2 = cata executing; 3 = cata finished TODO
+	catastrophe_status = 0; // 0 = no cata yet; 1 = cata called back; 2 = cata executing; 3 = cata finished TODO
 	private catastrophe_type = -1;
 
 	readonly map_dim: Dimension = [448, 448];
@@ -77,10 +76,7 @@ export class World implements Stage{
 	readonly temp_soffsets: Point[] = [[80, 0], [120, 0]];
 	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
-
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.map_pics = glob.resources.get_image('gfx/world.png');
 		this.spec_pics = glob.resources.get_image('gfx/species.png');
@@ -116,7 +112,7 @@ export class World implements Stage{
 			});
 		}
 
-		game.tutorial();
+		this.game.tutorial();
 
 		if (this.world.current_player.type === PLAYER_TYPE.COMPUTER) {
 			this.ai();
@@ -136,7 +132,7 @@ export class World implements Stage{
 	}
 
 	redraw() {
-		draw_base(this.glob);
+		draw_base(this.glob, this.id);
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
 
@@ -304,10 +300,10 @@ export class World implements Stage{
 			this.next_popup(1);
 		}
 		else if (this.world.current_player.individuals === 0) {
-			open_popup(this.glob, this.glob.lang.popup_title, 'dino', this.glob.lang.where_to_live, () => { }, this.glob.lang.next);
+			open_popup(this.game, 'dino', this.glob.lang.where_to_live, () => { }, this.glob.lang.next);
 		}
 		else {
-			open_popup(this.glob, this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 	}
 
@@ -315,7 +311,7 @@ export class World implements Stage{
 		if (answer === 1) {
 			if (this.world.current_player.individuals === 0 && !this.world.current_player.is_dead) {
 				this.world.current_player.is_dead = true;
-				open_popup(this.glob, this.glob.lang.popup_title, this.world.current_player.id.toString(), this.glob.lang.dead, () => this.next_popup(1), this.glob.lang.next);
+				open_popup(this.game, this.world.current_player.id.toString(), this.glob.lang.dead, () => this.next_popup(1), this.glob.lang.next);
 				return;
 			}
 
@@ -329,7 +325,7 @@ export class World implements Stage{
 
 				scores.sort((a, b) => b[1] - a[1]);
 
-				this.world.players[scores[0][0]].evo_score = game.evo_points[0];
+				this.world.players[scores[0][0]].evo_score = this.game.evo_points[0];
 				for (let i = 1; i < 6; i++) {
 					const p = this.world.players[scores[i][0]];
 					if (p.is_dead || p.type === PLAYER_TYPE.NOBODY) {
@@ -339,26 +335,26 @@ export class World implements Stage{
 						p.evo_score = this.world.players[scores[i - 1][0]].evo_score;
 					}
 					else {
-						p.evo_score = game.evo_points[i];
+						p.evo_score = this.game.evo_points[i];
 					}
 				}
 			}
 
-			game.next_stage();
+			this.game.next_stage();
 		}
 	}
 
 	catastrophe_start() {
-		const self = this; // TODO: Muss das wirklich sein mit self??
-		game.backstage.push(game.stage);
-		game.stage = new Catastrophe(this.glob, self.catastrophe_callback);
-		game.stage.initialize();
+		// TODO: Sollte das nicht `this` statt `this.game.stage` sein??
+		this.game.backstage.push(this);
+		this.game.stage = new Catastrophe(this.glob, this.catastrophe_callback);
+		this.game.stage.initialize();
 	}
 
 	catastrophe_callback(type: number) {
-		game.stage = game.backstage.pop();
-		game.stage.catastrophe_type = type;
-		game.stage.catastrophe_status = 1;
+		this.game.get_last_stage();
+		this.catastrophe_type = type;
+		this.catastrophe_status = 1;
 	}
 
 	catastrophe_exec() {
@@ -483,7 +479,7 @@ export class World implements Stage{
 			}
 			default:
 				console.warn(this.catastrophe_type);
-				open_popup(this.glob, this.glob.lang.popup_title, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
+				open_popup(this.game, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
 					() => { }, 'Oh no!');
 		}
 	}
@@ -512,12 +508,12 @@ export class World implements Stage{
 		for (const player of this.world.players) {
 			if (player.type !== PLAYER_TYPE.NOBODY && !player.is_dead && player.individuals === 0) {
 				player.is_dead = true;
-				open_popup(this.glob, this.glob.lang.popup_title, player.id.toString(), this.glob.lang.dead, () => this.catastrophe_finish(), this.glob.lang.next);
+				open_popup(this.game, player.id.toString(), this.glob.lang.dead, () => this.catastrophe_finish(), this.glob.lang.next);
 				return;
 			}
 		}
 
-		if (!game.seen_tutorials.has('catastrophe')) {
+		if (!this.game.seen_tutorials.has('catastrophe')) {
 			this.tutorials.push({
 				name: 'catastrophe',
 				pos: [140, 150],
@@ -526,7 +522,7 @@ export class World implements Stage{
 			});
 		}
 
-		if (!game.seen_tutorials.has(`catastrophe${this.catastrophe_type}`)) {
+		if (!this.game.seen_tutorials.has(`catastrophe${this.catastrophe_type}`)) {
 			this.tutorials.push({
 				name: `catastrophe${this.catastrophe_type}`,
 				pos: [140, 110],
@@ -535,7 +531,7 @@ export class World implements Stage{
 			});
 		}
 
-		game.tutorial();
+		this.game.tutorial();
 	}
 
 	comet_finish() {
@@ -634,7 +630,7 @@ export class World implements Stage{
 
 		if (enemy.individuals === 0) {
 			enemy.is_dead = true;
-			open_popup(this.glob, this.glob.lang.popup_title, enemy.id.toString(), this.glob.lang.dead, () => { }, this.glob.lang.next);
+			open_popup(this.game, enemy.id.toString(), this.glob.lang.dead, () => { }, this.glob.lang.next);
 		}
 	}
 
@@ -859,7 +855,7 @@ export class World implements Stage{
 		this.ai_active = false;
 		this.draw_minispec();
 		this.glob.canvas.style.cursor = 'default';
-		if (this.glob.options.wm_ai_auto_continue && !game.is_last_player()) {
+		if (this.glob.options.wm_ai_auto_continue && !this.game.is_last_player()) {
 			this.next();
 		}
 	}

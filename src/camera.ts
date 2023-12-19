@@ -1,5 +1,6 @@
 // MAYBE: Camera optimization has some issues with predators when the player is not moving. left/right moving predators glitch and predators on the edge of the screen disappear suddenly (e.g. left edge going left). This is fixed by force rendering for now, but it would be nice to put optimizations in place again.
 
+import { survivalmap_size } from "./consts";
 import { DIR, SURV_MAP, range } from "./helper";
 import { ISurvivalCharacter, Level } from "./level";
 import { Survival } from "./survival";
@@ -51,14 +52,14 @@ export class Camera {
 			this.camera_pos[0] = new_x;
 			this.pos_changed = true;
 			this.x_tiles = range(Math.max(Math.floor(this.camera_pos[0] / this.tile_dim[0]) - 1, 0),
-				Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, this.level.width));
+				Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, survivalmap_size[0]));
 		}
 
 		if (new_y !== this.camera_pos[1]) {
 			this.camera_pos[1] = new_y;
 			this.pos_changed = true;
 			this.y_tiles = range(Math.max(Math.floor(this.camera_pos[1] / this.tile_dim[1]) - 1, 0),
-				Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, this.level.height));
+				Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, survivalmap_size[1]));
 		}
 	}
 

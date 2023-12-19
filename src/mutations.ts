@@ -1,3 +1,4 @@
+import type { Game } from "./game";
 import { DIR, PLAYER_TYPE, SCENE, WORLD_MAP, draw_base, draw_rect, draw_upper_left_border, multiline, open_popup, random_element, random_int, write_text } from "./helper";
 import { ClickArea, Dimension, KeyType, Point, SixNumbers, Stage, TechGlobal, Tuple, TutorialType, WorldGlobal } from "./types";
 
@@ -9,8 +10,6 @@ export class Mutations implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
-	world: WorldGlobal;
 
 	private bg_pic: HTMLImageElement;
 	private pics: HTMLImageElement;
@@ -62,9 +61,7 @@ export class Mutations implements Stage {
 	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 	readonly bar_soffsets: Point[] = [[300, 64], [0, 64], [300, 48], [0, 48], [300, 32], [0, 32], [300, 16], [300, 16], [0, 16], [300, 0]];
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.pics = glob.resources.get_image('gfx/mutations.png');
@@ -90,7 +87,7 @@ export class Mutations implements Stage {
 		this.next_player();
 
 		// Make sure tutorial points to the best plant
-		if (!game.seen_tutorials.has('mutation_plant')) {
+		if (!this.game.seen_tutorials.has('mutation_plant')) {
 			let best = 0;
 			let best_idx = 0;
 			for (let i = 0; i < this.plant_counts.length; i++) {
@@ -103,7 +100,7 @@ export class Mutations implements Stage {
 			this.tutorials[1].pos = [170, this.bar_offset[1] + this.deltay * best_idx + 33];
 			this.tutorials[1].highlight = [0, this.symbol_offset[1] + this.deltay * best_idx, 640, this.symbol_offset[1] + this.deltay * (best_idx + 1)];
 		}
-		game.tutorial();
+		this.game.tutorial();
 	}
 
 	next_player() {
@@ -125,13 +122,13 @@ export class Mutations implements Stage {
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob, this.id);
 
-		draw_rect([0, 20], [640, 76]); // Upper rectangle
-		draw_rect([0, 95], [640, 385]); // Lower rectangle
-		draw_rect(this.next_offset, this.next_dim); // Continue
-		draw_upper_left_border(this.next_offset, this.next_dim);
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [0, 20], [640, 76]); // Upper rectangle
+		draw_rect(this.glob.ctx, [0, 95], [640, 385]); // Lower rectangle
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue
+		draw_upper_left_border(this.glob.ctx, this.next_offset, this.next_dim);
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
@@ -141,13 +138,13 @@ export class Mutations implements Stage {
 			y1: this.next_offset[1],
 			x2: this.next_offset[0] + this.next_dim[0],
 			y2: this.next_offset[1] + this.next_dim[1],
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		for (let i = 0; i < 13; i++) {
-			write_text(this.glob.lang.traits[i], [this.text_offset[0], this.text_offset[1] + this.deltay * i], 'white', 'black', 'left');
+			write_text(this.glob.ctx, this.glob.lang.traits[i], [this.text_offset[0], this.text_offset[1] + this.deltay * i], 'white', 'black', 'left');
 
 			// Symbol
 			this.glob.ctx.drawImage(this.pics,
@@ -210,7 +207,7 @@ export class Mutations implements Stage {
 				blur: () => this.redraw()
 			});
 		}
-		write_text(this.glob.lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
+		write_text(this.glob.ctx, this.glob.lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
 
 		this.draw_avatar();
 		this.draw_evo_score();
@@ -223,7 +220,7 @@ export class Mutations implements Stage {
 		];
 	}
 
-	draw_plus(pos: number) {
+	private draw_plus(pos: number) {
 		this.glob.ctx.drawImage(this.pics,
 			this.plus_soffset[0], this.plus_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
@@ -231,7 +228,7 @@ export class Mutations implements Stage {
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
 
-	draw_plusdown(pos: number) {
+	private draw_plusdown(pos: number) {
 		this.glob.ctx.drawImage(this.pics,
 			this.plusdown_soffset[0], this.plusdown_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
@@ -239,7 +236,7 @@ export class Mutations implements Stage {
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
 
-	draw_minus(pos: number) {
+	private draw_minus(pos: number) {
 		this.glob.ctx.drawImage(this.pics,
 			this.minus_soffset[0], this.minus_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
@@ -247,7 +244,7 @@ export class Mutations implements Stage {
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
 
-	draw_minusdown(pos: number) {
+	private draw_minusdown(pos: number) {
 		this.glob.ctx.drawImage(this.pics,
 			this.minusdown_soffset[0], this.minusdown_soffset[1],
 			this.plusminus_dim[0], this.plusminus_dim[1],
@@ -255,7 +252,7 @@ export class Mutations implements Stage {
 			this.plusminus_dim[0], this.plusminus_dim[1]);
 	}
 
-	draw_avatar() {
+	private draw_avatar() {
 		const soffset = this.spec_soffsets[this.world.current_player.id];
 
 		this.glob.ctx.drawImage(this.bg_pic,
@@ -271,7 +268,7 @@ export class Mutations implements Stage {
 			this.spec_dim[0], this.spec_dim[1]);
 	}
 
-	draw_bar(num: number) {
+	private draw_bar(num: number) {
 		// Percentage
 		this.glob.ctx.drawImage(this.bg_pic,
 			this.percent_del_offset[0], this.percent_del_offset[1] + this.deltay * num,
@@ -279,7 +276,7 @@ export class Mutations implements Stage {
 			this.percent_del_offset[0], this.percent_del_offset[1] + this.deltay * num,
 			this.percent_del_dim[0], this.percent_del_dim[1]);
 
-		write_text(`${this.stats[num]}%`, [this.percent_offset[0], this.percent_offset[1] + this.deltay * num], 'white', 'black', 'left');
+		write_text(this.glob.ctx, `${this.stats[num]}%`, [this.percent_offset[0], this.percent_offset[1] + this.deltay * num], 'white', 'black', 'left');
 
 		// Bar
 		this.glob.ctx.drawImage(this.pics,
@@ -317,7 +314,7 @@ export class Mutations implements Stage {
 		}
 	}
 
-	draw_evo_score() {
+	private draw_evo_score() {
 		// Number
 		this.glob.ctx.drawImage(this.bg_pic,
 			this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
@@ -325,7 +322,7 @@ export class Mutations implements Stage {
 			this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
 			this.evo_pts_numdel_dim[0], this.evo_pts_numdel_dim[1]);
 
-		write_text(this.world.current_player.evo_score.toString(), this.evo_pts_num_offset, 'white', 'black', 'left');
+		write_text(this.glob.ctx, this.world.current_player.evo_score.toString(), this.evo_pts_num_offset, 'white', 'black', 'left');
 
 		// Bar
 		this.glob.ctx.drawImage(this.pics,
@@ -359,7 +356,7 @@ export class Mutations implements Stage {
 	update() {
 	}
 
-	add(attribute: number, value: number) {
+	private add(attribute: number, value: number) {
 		if (value === 1) {
 			this.draw_plus(attribute);
 		}
@@ -394,7 +391,7 @@ export class Mutations implements Stage {
 		this.draw_evo_score();
 	}
 
-	ai() {
+	private ai() {
 		const choosable_plants = [];
 		const choosable_nonplants = [];
 		for (let i = 0; i < 6; i++) {
@@ -445,8 +442,8 @@ export class Mutations implements Stage {
 		this.stats = this.world.current_player.stats;
 	}
 
-	show_info(trait: number) {
-		const text = multiline(this.glob.lang.trait_hints[trait], this.max_text_width);
+	private show_info(trait: number) {
+		const text = multiline(this.glob.ctx, this.glob.lang.trait_hints[trait], this.max_text_width);
 
 		const width = this.inner_help_text_offset[0] * 2 + this.max_text_width;
 		const height = this.inner_help_text_offset[1] + this.line_height * text.length;
@@ -461,18 +458,18 @@ export class Mutations implements Stage {
 
 		this.glob.ctx.drawImage(this.bg_pic, this.help_text_offset[0], y, width, height);
 
-		draw_rect([this.help_text_offset[0], y], [width, height], true);
+		draw_rect(this.glob.ctx, [this.help_text_offset[0], y], [width, height], true);
 
 		for (let i = 0; i < text.length; i++) {
-			write_text(text[i], [this.help_text_offset[0] + this.inner_help_text_offset[0], y + this.line_height * (i + 1)], 'white', 'black', 'left');
+			write_text(this.glob.ctx, text[i], [this.help_text_offset[0] + this.inner_help_text_offset[0], y + this.line_height * (i + 1)], 'white', 'black', 'left');
 		}
 	}
 
 	next() {
-		draw_rect(this.next_offset, this.next_dim);
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim);
 
 		if (this.world.current_player.evo_score > 0) {
-			open_popup(this.glob.lang.popup_title, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 		else {
 			this.next_popup(1);
@@ -482,7 +479,7 @@ export class Mutations implements Stage {
 	next_popup(answer: number) {
 		if (answer === 1) {
 			this.world.current_player.stats = this.stats;
-			game.next_stage();
+			this.game.next_stage();
 		}
 	}
 

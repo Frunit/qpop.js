@@ -1,4 +1,4 @@
-import { NamedAnimationFrames, Point } from "./types";
+import { AnimationFrames, NamedAnimationFrames, NamedListOfAnimationsFrames, Point, RandomAnimationFrames } from "./types";
 
 export const anims_players: NamedAnimationFrames[] = [
 	{   // Purplus
@@ -34,19 +34,9 @@ export const anims_players: NamedAnimationFrames[] = [
 			soffset: [0, 0],
 			frames: [[0, 0], [0, 0], [448, 256], [448, 256], [512, 256], [512, 256], [576, 256], [576, 256], [512, 256], [512, 256], [576, 256], [576, 256], [512, 256], [512, 256], [576, 256], [576, 256], [512, 256], [512, 256], [576, 256], [576, 256], [512, 256], [512, 256], [576, 256], [576, 256], [512, 256], [512, 256]],
 					},
-		female: {
-			soffset: [0, 256],
-			frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]], [[192, 0], [192, 0]]],
-			transitions: [[0.8, 0.9, 0.95, 1], [0.5, 0.85, 0.93, 1], [0.5, 0.57, 0.93, 1], [0.5, 0.57, 0.64, 1]],
-					},
 		female_pre_love: {
 			soffset: [0, 256],
 			frames: [[0, 0]],
-					},
-		offspring: {
-			soffset: [256, 256],
-			frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]]],
-			transitions: [[0.7, 0.85, 1], [0.4, 0.8, 1], [0.4, 0.6, 1]],
 					},
 		quicksand: {
 			soffset: [0, 0],
@@ -63,11 +53,6 @@ export const anims_players: NamedAnimationFrames[] = [
 		enem_still: {
 			soffset: [0, 0],
 			frames: [[0, 0]],
-					},
-		enem_boasting: {
-			soffset: [0, 0],
-			frames: [[[0, 0], [0, 0]], [[320, 0], [320, 0]], [[384, 0], [384, 0]]],
-			transitions: [[0.8, 0.9, 1], [0.1, 0.95, 1], [0.1, 0.15, 1]],
 					},
 		defeated: {
 			soffset: [64, 0],
@@ -139,11 +124,6 @@ export const anims_players: NamedAnimationFrames[] = [
 			soffset: [0, 64],
 			frames: [[0, 0]],
 					},
-		enem_boasting: {
-			soffset: [0, 64],
-			frames: [[[0, 0]], [[384, 0], [320, 0]]],
-			transitions: [[0.95, 1], [0.3, 1]],
-					},
 		defeated: {
 			soffset: [64, 64],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
@@ -209,11 +189,6 @@ export const anims_players: NamedAnimationFrames[] = [
 		enem_still: {
 			soffset: [0, 128],
 			frames: [[0, 0]],
-					},
-		enem_boasting: {
-			soffset: [0, 128],
-			frames: [[[0, 0]], [[320, 0], [384, 0]]],
-			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 128],
@@ -281,11 +256,6 @@ export const anims_players: NamedAnimationFrames[] = [
 			soffset: [0, 192],
 			frames: [[0, 0]],
 					},
-		enem_boasting: {
-			soffset: [0, 192],
-			frames: [[[0, 0]], [[320, 0], [384, 0]]],
-			transitions: [[0.95, 1], [0.5, 1]],
-					},
 		defeated: {
 			soffset: [64, 192],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
@@ -351,11 +321,6 @@ export const anims_players: NamedAnimationFrames[] = [
 		enem_still: {
 			soffset: [0, 256],
 			frames: [[0, 0]],
-					},
-		enem_boasting: {
-			soffset: [0, 256],
-			frames: [[[0, 0]], [[320, 0], [384, 0]]],
-			transitions: [[0.95, 1], [0.3, 1]],
 					},
 		defeated: {
 			soffset: [64, 256],
@@ -423,17 +388,58 @@ export const anims_players: NamedAnimationFrames[] = [
 			soffset: [0, 320],
 			frames: [[0, 0]],
 					},
-		enem_boasting: {
-			soffset: [0, 320],
-			frames: [[[0, 0]], [[320, 0], [384, 0]]],
-			transitions: [[0.95, 1], [0.3, 1]],
-					},
 		defeated: {
 			soffset: [64, 320],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
 	},
 ];
+
+export const enem_boasting: RandomAnimationFrames[] = [
+	{
+		soffset: [0, 0],
+		frames: [[[0, 0], [0, 0]], [[320, 0], [320, 0]], [[384, 0], [384, 0]]],
+		transitions: [[0.8, 0.9, 1], [0.1, 0.95, 1], [0.1, 0.15, 1]],
+	},
+	{
+		soffset: [0, 64],
+		frames: [[[0, 0]], [[384, 0], [320, 0]]],
+		transitions: [[0.95, 1], [0.3, 1]],
+	},
+	{
+		soffset: [0, 128],
+		frames: [[[0, 0]], [[320, 0], [384, 0]]],
+		transitions: [[0.95, 1], [0.3, 1]],
+	},
+	{
+		soffset: [0, 192],
+		frames: [[[0, 0]], [[320, 0], [384, 0]]],
+		transitions: [[0.95, 1], [0.5, 1]],
+	},
+	{
+		soffset: [0, 256],
+		frames: [[[0, 0]], [[320, 0], [384, 0]]],
+		transitions: [[0.95, 1], [0.3, 1]],
+	},
+	{
+		soffset: [0, 320],
+		frames: [[[0, 0]], [[320, 0], [384, 0]]],
+		transitions: [[0.95, 1], [0.3, 1]],
+	},
+];
+
+export const purplus_special_animations: Record<string, RandomAnimationFrames> = {
+	female: {
+		soffset: [0, 256],
+		frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]], [[192, 0], [192, 0]]],
+		transitions: [[0.8, 0.9, 0.95, 1], [0.5, 0.85, 0.93, 1], [0.5, 0.57, 0.93, 1], [0.5, 0.57, 0.64, 1]],
+				},
+	offspring: {
+		soffset: [256, 256],
+		frames: [[[0, 0], [0, 0]], [[64, 0], [64, 0]], [[128, 0], [128, 0]]],
+		transitions: [[0.7, 0.85, 1], [0.4, 0.8, 1], [0.4, 0.6, 1]],
+				},
+};
 
 export const anims_predators: NamedAnimationFrames[] = [
 	{   // Dino
@@ -457,28 +463,10 @@ export const anims_predators: NamedAnimationFrames[] = [
 			soffset: [320, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
-		attack: {
-			soffset: [0, 0],
-			frames: [[[128, 192]], [[64, 192]], [[0, 64]], [[0, 192]]],  // Attacks from N E S W
-					},
 		winner: {
 			soffset: [0, 64],
 			frames: [[448, 0], [512, 0], [576, 0], [0, 64], [576, 0]],
 					},
-		defeated: [
-			{  // Stars
-				soffset: [64, 128],
-				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-			},
-			{  // Crying
-				soffset: [320, 128],
-				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-			},
-			{  // Skeleton
-				soffset: [576, 128],
-				frames: [[0, 0]],
-			},
-		],
 	},
 	{   // Mushroom
 		still: {
@@ -501,28 +489,10 @@ export const anims_predators: NamedAnimationFrames[] = [
 			soffset: [0, 0],
 			frames: [[192, 0], [64, 64], [64, 64], [256, 0]],
 					},
-		attack: {
-			soffset: [0, 0],
-			frames: [[[128, 64]], [[64, 64]], [[576, 0]], [[0, 64]]],  // Attacks from N E S W
-					},
 		winner: {
 			soffset: [0, 0],
 			frames: [[0, 0], [320, 64], [384, 64], [448, 64], [512, 64]],
 					},
-		defeated: [
-			{ // Soup
-				soffset: [576, 64],
-				frames: [[0, 0]],
-			},
-			{ // Plaster
-				soffset: [0, 128],
-				frames: [[0, 0]],
-			},
-			{
-				soffset: [64, 128],
-				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-			},
-		],
 	},
 	{   // Human
 		still: {
@@ -540,34 +510,67 @@ export const anims_predators: NamedAnimationFrames[] = [
 		east: {
 			soffset: [64, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-					},
+		},
 		west: {
 			soffset: [320, 0],
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-					},
-		attack: {
-			soffset: [0, 0],
-			frames: [[[64, 64]], [[448, 0]], [[320, 64]], [[64, 0]]],  // Attacks from N E S W
-					},
+		},
 		winner: {
 			soffset: [448, 64],
 			frames: [[0, 0]],
-					},
-		defeated: [
-			{ // Stars
-				soffset: [0, 64],
-				frames: [[512, 0], [576, 0], [0, 64], [64, 64]],
-			},
-			{ // Naked
-				soffset: [128, 128],
-				frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
-			},
-			{ // RIP
-				soffset: [384, 128],
-				frames: [[0, 0]],
-			},
-		],
+		},
 	},
+];
+
+export const attack_frames: Point[][][] = [
+	[[[128, 192]], [[64, 192]], [[0, 64]], [[0, 192]]],  // Dino attacks from N E S W
+	[[[128, 64]], [[64, 64]], [[576, 0]], [[0, 64]]],  // Mushroom attacks from N E S W
+	[[[64, 64]], [[448, 0]], [[320, 64]], [[64, 0]]],  // Human attacks from N E S W
+];
+
+export const anims_defeated_predators: AnimationFrames[][] = [
+	[ // Dino
+		{  // Stars
+			soffset: [64, 128],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
+		},
+		{  // Crying
+			soffset: [320, 128],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
+		},
+		{  // Skeleton
+			soffset: [576, 128],
+			frames: [[0, 0]],
+		},
+	],
+	[ // Mushroom
+		{ // Soup
+			soffset: [576, 64],
+			frames: [[0, 0]],
+		},
+		{ // Plaster
+			soffset: [0, 128],
+			frames: [[0, 0]],
+		},
+		{
+			soffset: [64, 128],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
+		},
+	],
+	[ // Human
+		{ // Stars
+			soffset: [0, 64],
+			frames: [[512, 0], [576, 0], [0, 64], [64, 64]],
+		},
+		{ // Naked
+			soffset: [128, 128],
+			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
+		},
+		{ // RIP
+			soffset: [384, 128],
+			frames: [[0, 0]],
+		},
+	]
 ];
 
 export const anims_clouds: NamedAnimationFrames = {
@@ -597,7 +600,7 @@ export const anims_clouds: NamedAnimationFrames = {
 	},
 };
 
-export const anim_ranking: NamedAnimationFrames = {
+export const anim_ranking: NamedListOfAnimationsFrames = {
 	walking: [
 		{
 			offset: [128, 0],
@@ -624,7 +627,32 @@ export const anim_ranking: NamedAnimationFrames = {
 			frames: [[0, 0], [64, 0]],
 		},
 	],
-	standing: [[128, 0], [320, 64], [0, 192], [64, 256], [256, 320], [320, 384]],
+	standing: [
+		{
+			offset: [128, 0],
+			frames: [[0, 0]],
+		},
+		{
+			offset: [320, 64],
+			frames: [[0, 0]],
+		},
+		{
+			offset: [0, 192],
+			frames: [[0, 0]],
+		},
+		{
+			offset: [64, 256],
+			frames: [[0, 0]],
+		},
+		{
+			offset: [256, 320],
+			frames: [[0, 0]],
+		},
+		{
+			offset: [320, 384],
+			frames: [[0, 0]],
+		},
+	],
 	boasting: [
 		{
 			offset: [192, 64],

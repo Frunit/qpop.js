@@ -1,4 +1,5 @@
-import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, draw_upper_left_border, init_upload, local_load, multiline, open_load_dialog, open_popup, write_text } from "./helper";
+import { Game } from "./game";
+import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, open_popup, write_text } from "./helper";
 import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
 
 export class Init implements Stage {
@@ -7,8 +8,6 @@ export class Init implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 	tutorials: TutorialType[];
-	glob: TechGlobal;
-	world: WorldGlobal;
 
 	private bg: HTMLImageElement;
 	private spec_pics: HTMLImageElement;
@@ -38,9 +37,7 @@ export class Init implements Stage {
 	readonly iq_soffsets: Point[] = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
 	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
 
-	constructor(glob: TechGlobal, world: WorldGlobal) {
-		this.glob = glob;
-		this.world = world;
+	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
 		this.bg = glob.resources.get_image('gfx/init.png');
 		this.spec_pics = glob.resources.get_image('gfx/species.png');
 
@@ -75,20 +72,20 @@ export class Init implements Stage {
 
 	initialize() {
 		this.glob.resources.play_music('intro');
-		game.reset();
+		this.game.reset();
 		this.redraw();
-		game.tutorial();
+		this.game.tutorial();
 	}
 
 	redraw() {
-		draw_base();
+		draw_base(this.glob, this.id);
 
-		draw_rect([0, 20], [640, 439]); // Main rectangle
-		draw_rect(this.load_offset, this.load_dim); // Load
-		write_text(this.glob.lang.load_game, [115, 473], 'white', 'black');
-		draw_rect([229, 458], [231, 22]); // Bottom middle
-		draw_rect(this.next_offset, this.next_dim); // Continue
-		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [0, 20], [640, 439]); // Main rectangle
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim); // Load
+		write_text(this.glob.ctx, this.glob.lang.load_game, [115, 473], 'white', 'black');
+		draw_rect(this.glob.ctx, [229, 458], [231, 22]); // Bottom middle
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim); // Continue
+		write_text(this.glob.ctx, this.glob.lang.next, [549, 473], 'white', 'black');
 
 		this.clickareas = this.glob.clickareas.slice();
 		this.rightclickareas = this.glob.rightclickareas.slice();
@@ -98,9 +95,9 @@ export class Init implements Stage {
 			y1: this.load_offset[1],
 			x2: this.load_offset[0] + this.load_dim[0],
 			y2: this.load_offset[1] + this.load_dim[1],
-			down: () => draw_rect(this.load_offset, this.load_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim, true, true),
 			up: () => this.load_game(),
-			blur: () => draw_rect(this.load_offset, this.load_dim)
+			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim)
 		});
 
 		this.clickareas.push({
@@ -108,9 +105,9 @@ export class Init implements Stage {
 			y1: this.next_offset[1],
 			x2: this.next_offset[0] + this.next_dim[0],
 			y2: this.next_offset[1] + this.next_dim[1],
-			down: () => draw_rect(this.next_offset, this.next_dim, true, true),
+			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
 		});
 
 		// Lengths of lines around iq title
@@ -149,13 +146,13 @@ export class Init implements Stage {
 				panel_offset[0] + this.spec_offset[0], panel_offset[1] + this.spec_offset[1],
 				this.type_dim[0], this.type_dim[1]);
 
-			write_text(this.glob.lang.player.replace('{num}', (playernum + 1)), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
+			write_text(this.glob.ctx, this.glob.lang.player.replace('{num}', (playernum + 1)), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
 
-			write_text(this.glob.lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
+			write_text(this.glob.ctx, this.glob.lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
 
-			write_text(this.glob.lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', undefined, 'center');
+			write_text(this.glob.ctx, this.glob.lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', undefined, 'center');
 			for (let iq = 0; iq < 4; iq++) {
-				write_text(this.glob.lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq], '#000000', undefined, 'left');
+				write_text(this.glob.ctx, this.glob.lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq], '#000000', undefined, 'left');
 			}
 
 			// Draw Line around IQ title   (------ IQ ------)
@@ -244,7 +241,7 @@ export class Init implements Stage {
 	}
 
 	next() {
-		draw_rect(this.next_offset, this.next_dim);
+		draw_rect(this.glob.ctx, this.next_offset, this.next_dim);
 		let no_human = true;
 		let known_first_player = false;
 
@@ -261,15 +258,15 @@ export class Init implements Stage {
 		}
 
 		if (no_human) {
-			open_popup(this.glob.lang.popup_title, 'dino', this.glob.lang.who_plays, () => { }, this.glob.lang.next);
+			open_popup(this.game, 'dino', this.glob.lang.who_plays, () => { }, this.glob.lang.next);
 			return;
 		}
 
-		game.next_stage();
+		this.game.next_stage();
 	}
 
 	load_game() {
-		draw_rect(this.load_offset, this.load_dim);
-		open_load_dialog();
+		draw_rect(this.glob.ctx, this.load_offset, this.load_dim);
+		open_load_dialog(this.game);
 	}
 }

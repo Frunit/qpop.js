@@ -1,3 +1,4 @@
+import type { Game } from "./game";
 import { DIR, SCENE, draw_rect, local_save, multiline, write_text } from "./helper";
 import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType } from "./types";
 
@@ -6,7 +7,9 @@ export class Tutorial implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	glob: TechGlobal;
+	
+	private game: Game;
+	private glob: TechGlobal;
 
 	private bg: HTMLImageElement;
 	private gfx: HTMLImageElement;
@@ -31,7 +34,8 @@ export class Tutorial implements Stage {
 	readonly arrow_soffsets: Point[] = [[34, 0], [34, 30], [34, 47], [34, 77]];
 	readonly arrow_dims: Dimension[] = [[17, 30], [30, 17], [17, 30], [30, 17]];
 
-	constructor(glob: TechGlobal, tut: TutorialType) {
+	constructor(game: Game, glob: TechGlobal, tut: TutorialType) {
+		this.game = game;
 		this.glob = glob;
 		this.bg = this.glob.resources.get_image('gfx/dark_bg.png');
 		this.gfx = this.glob.resources.get_image('gfx/tutorial.png');
