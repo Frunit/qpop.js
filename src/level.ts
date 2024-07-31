@@ -1,23 +1,33 @@
-import { survivalmap_size } from "./consts";
-import { DIR, PRED, SPECIES, SURV_MAP, WORLD_MAP, random_element, random_int, shuffle } from "./helper";
-import { ResourceManager } from "./resources";
-import { ISprite, RandomSprite, Sprite } from "./sprite";
-import { anims_defeated_predators, anim_delays, anims_players, anims_predators, survival_background, purplus_special_animations, enem_boasting } from "./sprite_positions";
-import { AnimationFrames, NamedAnimationFrames, Point, SixNumbers, WorldGlobal } from "./types";
+import { survivalmap_size } from './consts';
+import { DIR, PRED, SPECIES, SURV_MAP, WORLD_MAP, random_element, random_int, shuffle } from './helper';
+import { ResourceManager } from './resources';
+import { ISprite, RandomSprite, Sprite } from './sprite';
+import {
+	anims_defeated_predators,
+	anim_delays,
+	anims_players,
+	anims_predators,
+	survival_background,
+	purplus_special_animations,
+	enem_boasting,
+} from './sprite_positions';
+import { AnimationFrames, NamedAnimationFrames, Point, SixNumbers, WorldGlobal } from './types';
 
 export class Level {
 	character: Character;
 	bg_sprites: (ISprite | null)[][] = Array.from(Array(survivalmap_size[0]), () => Array(survivalmap_size[0]).fill(null));
 	mobmap: (ISurvivalCharacter | null)[][] = Array.from(Array(survivalmap_size[1]), () => Array(survivalmap_size[0]).fill(null));
 	map: number[][];
-	edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
+	edible =
+		'011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
 	predators: Predator[] = [];
 
 	private world: WorldGlobal;
 	private individuals;
 	private enemies: number[] = [];
 	private density = 0;
-	private blocking = '000000000000000000000000000000000000111111111111111111111110011110111100000000001111111100000000000111111111111111111100001111111111111';
+	private blocking =
+		'000000000000000000000000000000000000111111111111111111111110011110111100000000001111111100000000000111111111111111111100001111111111111';
 	private resources: ResourceManager;
 	private bg_pic: HTMLImageElement;
 
@@ -66,8 +76,7 @@ export class Level {
 			for (let ypos = Math.max(0, y - 2); ypos <= Math.min(27, y + 2); ypos++) {
 				if (this.world.world_map[ypos][xpos] === WORLD_MAP.HUMANS) {
 					bases += [0, 2, 1][Math.max(Math.abs(x - xpos), Math.abs(y - ypos))];
-				}
-				else if (this.world.world_map[ypos][xpos] === WORLD_MAP.CRATER) {
+				} else if (this.world.world_map[ypos][xpos] === WORLD_MAP.CRATER) {
 					craters += [0, 2, 1][Math.max(Math.abs(x - xpos), Math.abs(y - ypos))];
 				}
 			}
@@ -79,12 +88,10 @@ export class Level {
 
 		if (40 <= height && height <= 50) {
 			mountains = 50;
-		}
-		else if (51 <= height && height <= 60) {
+		} else if (51 <= height && height <= 60) {
 			mountains = 100;
 			crystals = 15;
-		}
-		else if (61 <= height) {
+		} else if (61 <= height) {
 			mountains = 150;
 			crystals = 30;
 		}
@@ -99,7 +106,6 @@ export class Level {
 		numbers[84] += 3 * crystals; // crystals 2
 		numbers[88] += 4 * crystals; // small crystals
 
-
 		// Cacti, whips, trees, eyes, lakes, mossy rocks, and drippy flowers
 		let whips = 0;
 		let trees = 0;
@@ -108,23 +114,18 @@ export class Level {
 
 		if (local_humid < -50) {
 			lakes = 20;
-		}
-		else if (local_humid <= -30) {
+		} else if (local_humid <= -30) {
 			whips = 200;
-		}
-		else if (local_humid <= -10) {
+		} else if (local_humid <= -10) {
 			whips = 100;
 			trees = 180;
-		}
-		else if (local_humid <= 10) {
+		} else if (local_humid <= 10) {
 			trees = 340;
 			eye = 320;
-		}
-		else if (local_humid <= 30) {
+		} else if (local_humid <= 30) {
 			trees = 180;
 			lakes = 10;
-		}
-		else {
+		} else {
 			lakes = 20;
 		}
 
@@ -143,7 +144,6 @@ export class Level {
 		numbers[63] += 14 * lakes; // mossy rocks
 		numbers[110] += 26 * lakes; // drippy flowers
 
-
 		// Humans
 		numbers[104] += bases * 25; // base structure 1
 		numbers[105] += bases * 25; // base structure 1
@@ -152,7 +152,6 @@ export class Level {
 		numbers[108] += bases * 25; // base structure 1
 		numbers[109] += bases * 25; // base structure 1
 		numbers[122] += bases * 150; // nuclear waste
-
 
 		// Craters; please note! Craters do not appear in the original game, although the graphic is there. I included them in a similar way that human structures are included to use the graphic.
 		numbers[55] += craters * 25;
@@ -182,14 +181,16 @@ export class Level {
 		for (let x = 1; x < wm_width - 1; x++) {
 			for (let y = 1; y < wm_height - 1; y++) {
 				if (this.world.map_positions[y][x] !== player) {
-					if (this.world.map_positions[y][x - 1] === player ||
+					if (
+						this.world.map_positions[y][x - 1] === player ||
 						this.world.map_positions[y][x + 1] === player ||
 						this.world.map_positions[y - 1][x] === player ||
-						this.world.map_positions[y + 1][x] === player) {
+						this.world.map_positions[y + 1][x] === player
+					) {
 						num_neighbours++;
 					}
-				}
-				else { // this.world.map_positions[y][x] === player
+				} else {
+					// this.world.map_positions[y][x] === player
 					this.update_tile_numbers(x, y, numbers);
 					if (this.world.world_map[y][x] >= WORLD_MAP.RANGONES && this.world.world_map[y][x] <= WORLD_MAP.FIREGRASS) {
 						const plant_type = [0, 3, 1, 4, 5, 2][this.world.world_map[y][x] - WORLD_MAP.RANGONES];
@@ -219,7 +220,7 @@ export class Level {
 		numbers[50] = random_int(10, 70);
 
 		// Food
-		this.density = 10 * this.individuals / num_neighbours;
+		this.density = (10 * this.individuals) / num_neighbours;
 		const mod_density = 50 + 10 * this.density;
 		const wfactor = Math.floor(2500 / this.individuals);
 
@@ -267,7 +268,16 @@ export class Level {
 
 	generate_map(): number[][] {
 		// Border is based on RAM analysis. The (0-based) tiles 44, 51, 52, 53, 54, 61 make 14.3% each and 80, 84, 99 make 4.8% each
-		const border: number[] = Array(1164).fill(44, 0, 166).fill(51, 166, 332).fill(52, 332, 498).fill(53, 498, 664).fill(54, 664, 830).fill(61, 830, 996).fill(80, 996, 1052).fill(84, 1052, 1108).fill(99, 1108);
+		const border: number[] = Array(1164)
+			.fill(44, 0, 166)
+			.fill(51, 166, 332)
+			.fill(52, 332, 498)
+			.fill(53, 498, 664)
+			.fill(54, 664, 830)
+			.fill(61, 830, 996)
+			.fill(80, 996, 1052)
+			.fill(84, 1052, 1108)
+			.fill(99, 1108);
 
 		// The mainpart is also based on RAM analysis. However, it is depending on various factors on the world map
 		const mainpart: number[] = Array(8836);
@@ -297,8 +307,7 @@ export class Level {
 					if (r <= 0.2) {
 						// Radar station (on average 5)
 						map[y][x] = 100;
-					}
-					else if (r <= 0.7) {
+					} else if (r <= 0.7) {
 						// Other human base structures (on average 2 per tile or 12 in total)
 						map[y][x] = random_element(tiles_human_base);
 					}
@@ -340,19 +349,18 @@ export class Level {
 		for (let i = 0; i < num_predators; i++) {
 			// Predators may not be placed within 2 fields of the player
 			do {
-				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+				pos = free_tiles.splice((free_tiles.length * Math.random()) | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
 			const species = random_int(0, this.world.humans_present ? 2 : 1);
 			const pred = new Predator(this.resources, species, pos);
-			this.mobmap[pos[1]][pos[0]] = pred
+			this.mobmap[pos[1]][pos[0]] = pred;
 			this.predators.push(pred);
 		}
 
 		for (let i = 0; i < num_females; i++) {
 			// Females may not be placed within 3 fields of the player
 			do {
-				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
-
+				pos = free_tiles.splice((free_tiles.length * Math.random()) | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 			this.mobmap[pos[1]][pos[0]] = new Female(this.resources, this.world.current_player.id, pos);
 		}
@@ -360,7 +368,7 @@ export class Level {
 		for (let i = 0; i < num_enemies; i++) {
 			// Enemies may not be placed within 3 fields of the player
 			do {
-				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
+				pos = free_tiles.splice((free_tiles.length * Math.random()) | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 			const species = random_element(this.enemies);
 			this.mobmap[pos[1]][pos[0]] = new Enemy(this.resources, species, pos);
@@ -371,8 +379,7 @@ export class Level {
 		// Place the player somewhere around the ideal position. If there is no empty space, it will be made empty.
 		try {
 			ideal_pos = random_element(this.find_free_player_tiles([ideal_pos[0] - 5, ideal_pos[1] - 5], 3, 11));
-		}
-		catch {
+		} catch {
 			// 65 exists more often to make it more likely to choose it
 			const empty_tiles = [65, 65, 65, 65, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79];
 
@@ -387,10 +394,12 @@ export class Level {
 			const to_delete = [];
 			for (let i = 0; i < this.predators.length; i++) {
 				const predator = this.predators[i];
-				if (predator.tile[0] >= ideal_pos[0] - 1 &&
+				if (
+					predator.tile[0] >= ideal_pos[0] - 1 &&
 					predator.tile[0] <= ideal_pos[0] + 1 &&
 					predator.tile[1] >= ideal_pos[1] - 1 &&
-					predator.tile[1] <= ideal_pos[1] + 1) {
+					predator.tile[1] <= ideal_pos[1] + 1
+				) {
 					to_delete.push(i);
 				}
 			}
@@ -439,12 +448,10 @@ export class Level {
 				if (this.blocking[this.map[y_pos][x_pos]] === '0' && this.mobmap[y_pos][x_pos] === null) {
 					if (x > 0) {
 						left_counts[y][x] = left_counts[y][x - 1] + 1;
-					}
-					else {
+					} else {
 						left_counts[y][x] = 1;
 					}
-				}
-				else {
+				} else {
 					left_counts[y][x] = 0;
 				}
 			}
@@ -466,8 +473,7 @@ export class Level {
 
 		if (survival_background.hasOwnProperty(type)) {
 			this.bg_sprites[y][x] = new Sprite(this.bg_pic, [0, 0], survival_background[type], anim_delays.background);
-		}
-		else {
+		} else {
 			const xx = Math.floor(type % 10);
 			const yy = Math.floor(type / 10);
 			this.bg_sprites[y][x] = new Sprite(this.bg_pic, [xx * 64, yy * 64]);
@@ -481,7 +487,6 @@ export class Level {
 		if (food_type < 36) {
 			this.map[tile[1]][tile[0]]--;
 		}
-
 
 		// Power food has its corresponding empty space at +1
 		else if (food_type >= 118) {
@@ -518,11 +523,16 @@ export class Level {
 		const y = pos[1];
 
 		switch (dir) {
-			case DIR.S: return this.blocking[this.map[y + 1][x]] === '0' && this.mobmap[y + 1][x] === null;
-			case DIR.N: return this.blocking[this.map[y - 1][x]] === '0' && this.mobmap[y - 1][x] === null;
-			case DIR.E: return this.blocking[this.map[y][x + 1]] === '0' && this.mobmap[y][x + 1] === null;
-			case DIR.W: return this.blocking[this.map[y][x - 1]] === '0' && this.mobmap[y][x - 1] === null;
-			default: return this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null;
+			case DIR.S:
+				return this.blocking[this.map[y + 1][x]] === '0' && this.mobmap[y + 1][x] === null;
+			case DIR.N:
+				return this.blocking[this.map[y - 1][x]] === '0' && this.mobmap[y - 1][x] === null;
+			case DIR.E:
+				return this.blocking[this.map[y][x + 1]] === '0' && this.mobmap[y][x + 1] === null;
+			case DIR.W:
+				return this.blocking[this.map[y][x - 1]] === '0' && this.mobmap[y][x - 1] === null;
+			default:
+				return this.blocking[this.map[y][x]] === '0' && this.mobmap[y][x] === null;
 		}
 	}
 
@@ -535,11 +545,9 @@ export class Level {
 				const tile = this.map[y][x];
 				if (tile >= 36 && tile <= 43) {
 					sounds.add('swamp');
-				}
-				else if (tile >= 44 && tile <= 49) {
+				} else if (tile >= 44 && tile <= 49) {
 					sounds.add('volcano');
-				}
-				else if (tile >= 100 && tile <= 103) {
+				} else if (tile >= 100 && tile <= 103) {
 					sounds.add('human_base');
 				}
 
@@ -554,7 +562,6 @@ export class Level {
 	}
 }
 
-
 export interface ISurvivalCharacter {
 	type: SURV_MAP;
 	tile: Point;
@@ -568,7 +575,6 @@ export interface ISurvivalCharacter {
 	movement?: DIR;
 	last_movement?: DIR;
 }
-
 
 export class Character implements ISurvivalCharacter {
 	type = SURV_MAP.PLAYER;
@@ -593,7 +599,6 @@ export class Character implements ISurvivalCharacter {
 	}
 }
 
-
 export class Female implements ISurvivalCharacter {
 	type = SURV_MAP.FEMALE;
 	tile: Point;
@@ -615,14 +620,18 @@ export class Female implements ISurvivalCharacter {
 		this.pic = resources.get_image(`gfx/spec${species + 1}.png`);
 
 		if (species === SPECIES.PURPLUS) {
-			this.sprite = new RandomSprite(this.pic, this.anims.female.soffset, purplus_special_animations.female.frames, purplus_special_animations.female.transitions, anim_delays.female);
-		}
-		else {
+			this.sprite = new RandomSprite(
+				this.pic,
+				this.anims.female.soffset,
+				purplus_special_animations.female.frames,
+				purplus_special_animations.female.transitions,
+				anim_delays.female,
+			);
+		} else {
 			this.sprite = new Sprite(this.pic, this.anims.female.soffset, this.anims.female.frames, anim_delays.female);
 		}
 	}
 }
-
 
 export class Predator implements ISurvivalCharacter {
 	type = SURV_MAP.PREDATOR;
@@ -657,7 +666,6 @@ export class Predator implements ISurvivalCharacter {
 	}
 }
 
-
 export class Enemy implements ISurvivalCharacter {
 	type = SURV_MAP.ENEMY;
 	tile: Point;
@@ -677,6 +685,12 @@ export class Enemy implements ISurvivalCharacter {
 		this.defeated = this.anims.defeated;
 		this.pic = resources.get_image('gfx/enemies.png');
 
-		this.sprite = new RandomSprite(this.pic, this.anims.enem_boasting.soffset, enem_boasting[this.species].frames, enem_boasting[this.species].transitions, anim_delays.female);
+		this.sprite = new RandomSprite(
+			this.pic,
+			this.anims.enem_boasting.soffset,
+			enem_boasting[this.species].frames,
+			enem_boasting[this.species].transitions,
+			anim_delays.female,
+		);
 	}
 }

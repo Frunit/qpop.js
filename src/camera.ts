@@ -1,11 +1,10 @@
 // MAYBE: Camera optimization has some issues with predators when the player is not moving. left/right moving predators glitch and predators on the edge of the screen disappear suddenly (e.g. left edge going left). This is fixed by force rendering for now, but it would be nice to put optimizations in place again.
 
-import { survivalmap_size } from "./consts";
-import { DIR, SURV_MAP, range } from "./helper";
-import { ISurvivalCharacter, Level } from "./level";
-import { Survival } from "./survival";
-import { Dimension, Point } from "./types";
-
+import { survivalmap_size } from './consts';
+import { DIR, SURV_MAP, range } from './helper';
+import { ISurvivalCharacter, Level } from './level';
+import { Survival } from './survival';
+import { Dimension, Point } from './types';
 
 export class Camera {
 	private ctx: CanvasRenderingContext2D;
@@ -51,15 +50,19 @@ export class Camera {
 		if (new_x !== this.camera_pos[0]) {
 			this.camera_pos[0] = new_x;
 			this.pos_changed = true;
-			this.x_tiles = range(Math.max(Math.floor(this.camera_pos[0] / this.tile_dim[0]) - 1, 0),
-				Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, survivalmap_size[0]));
+			this.x_tiles = range(
+				Math.max(Math.floor(this.camera_pos[0] / this.tile_dim[0]) - 1, 0),
+				Math.min(Math.ceil((this.camera_pos[0] + this.cwidth) / this.tile_dim[0]) + 2, survivalmap_size[0]),
+			);
 		}
 
 		if (new_y !== this.camera_pos[1]) {
 			this.camera_pos[1] = new_y;
 			this.pos_changed = true;
-			this.y_tiles = range(Math.max(Math.floor(this.camera_pos[1] / this.tile_dim[1]) - 1, 0),
-				Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, survivalmap_size[1]));
+			this.y_tiles = range(
+				Math.max(Math.floor(this.camera_pos[1] / this.tile_dim[1]) - 1, 0),
+				Math.min(Math.ceil((this.camera_pos[1] + this.cheight) / this.tile_dim[1]) + 2, survivalmap_size[1]),
+			);
 		}
 	}
 
@@ -74,8 +77,7 @@ export class Camera {
 			for (const x of this.x_tiles) {
 				if (this.level.bg_sprites[y][x] === null) {
 					this.tiles_to_render.add(x * 100 + y);
-				}
-				else {
+				} else {
 					this.level.bg_sprites[y][x]?.update();
 					if (this.pos_changed || this.level.bg_sprites[y][x]?.is_new_frame()) {
 						this.tiles_to_render.add(x * 100 + y);
@@ -115,8 +117,7 @@ export class Camera {
 							this.tiles_to_render.add(old_x * 100 + old_y);
 						}
 					}
-				}
-				else {
+				} else {
 					mob.sprite.update();
 				}
 
@@ -156,18 +157,17 @@ export class Camera {
 				this.level.request_sprite(x, y);
 			}
 
-			this.level.bg_sprites[y][x]?.render(this.ctx,
-				[x * this.tile_dim[0] - this.camera_pos[0],
-				y * this.tile_dim[1] - this.camera_pos[1]]);
+			this.level.bg_sprites[y][x]?.render(this.ctx, [x * this.tile_dim[0] - this.camera_pos[0], y * this.tile_dim[1] - this.camera_pos[1]]);
 		}
 
 		for (const coord of this.movs_to_render) {
 			const x = Math.floor(coord / 100);
 			const y = coord % 100;
 			const mov = this.level.mobmap[y][x];
-			mov?.sprite.render(this.ctx,
-				[Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.camera_pos[0]),
-				Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.camera_pos[1])]);
+			mov?.sprite.render(this.ctx, [
+				Math.round(mov.tile[0] * this.tile_dim[0] + mov.rel_pos[0] - this.camera_pos[0]),
+				Math.round(mov.tile[1] * this.tile_dim[1] + mov.rel_pos[1] - this.camera_pos[1]),
+			]);
 		}
 
 		if (this.survival.action !== null) {

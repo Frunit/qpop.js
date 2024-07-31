@@ -1,10 +1,11 @@
 // MAYBE: Subtitles for some animations? (Intro and Outro text)
 
-import { AnimationType, Point, TechGlobal } from "./types";
+import { AnimationType, Point, TechGlobal } from './types';
 
-type DrawImageExpected = [HTMLImageElement, number, number] |
-	[HTMLImageElement, number, number, number, number] |
-	[HTMLImageElement, number, number, number, number, number, number, number, number];
+type DrawImageExpected =
+	| [HTMLImageElement, number, number]
+	| [HTMLImageElement, number, number, number, number]
+	| [HTMLImageElement, number, number, number, number, number, number, number, number];
 
 export class Animation {
 	has_stopped = false;
@@ -15,7 +16,6 @@ export class Animation {
 	private offset: Point;
 	private to_render: DrawImageExpected[] = [];
 	private glob: TechGlobal;
-
 
 	constructor(glob: TechGlobal, animation: AnimationType, offset: Point) {
 		this.glob = glob;
@@ -42,7 +42,7 @@ export class Animation {
 		this.glob.ctx.translate(this.offset[0] + this.animation.size[0] / 2, this.offset[1] + this.animation.size[1] / 2);
 
 		for (const img of this.to_render) {
-			this.glob.ctx.drawImage(...img as [HTMLImageElement, number, number]); // Type might not be correct, but the union type doesn't work.
+			this.glob.ctx.drawImage(...(img as [HTMLImageElement, number, number])); // Type might not be correct, but the union type doesn't work.
 		}
 
 		this.glob.ctx.restore();
@@ -57,21 +57,33 @@ export class Animation {
 		// draw fixed images
 		// This might be optimized (i.e. removed fixed images that are not seen, like the text in the very first intro animation), but it runs smoothly so far, so no urgent need for optimization.
 		for (const fix of this.animation.fixed) {
-			this.to_render.push([this.pics[fix.seq_img],
-			this.animation.imgs[fix.seq_img][1] * fix.move_img, 0,
-			this.animation.imgs[fix.seq_img][1], this.animation.imgs[fix.seq_img][2],
-			fix.x - Math.floor(this.animation.imgs[fix.seq_img][1] / 2), fix.y - Math.floor(this.animation.imgs[fix.seq_img][2] / 2),
-			this.animation.imgs[fix.seq_img][1], this.animation.imgs[fix.seq_img][2]]);
+			this.to_render.push([
+				this.pics[fix.seq_img],
+				this.animation.imgs[fix.seq_img][1] * fix.move_img,
+				0,
+				this.animation.imgs[fix.seq_img][1],
+				this.animation.imgs[fix.seq_img][2],
+				fix.x - Math.floor(this.animation.imgs[fix.seq_img][1] / 2),
+				fix.y - Math.floor(this.animation.imgs[fix.seq_img][2] / 2),
+				this.animation.imgs[fix.seq_img][1],
+				this.animation.imgs[fix.seq_img][2],
+			]);
 		}
 
 		// Paused animations are still shown
 		for (const fix of this.animation.paused) {
 			if (fix !== null) {
-				this.to_render.push([this.pics[fix.seq_img],
-				this.animation.imgs[fix.seq_img][1] * fix.move_img, 0,
-				this.animation.imgs[fix.seq_img][1], this.animation.imgs[fix.seq_img][2],
-				fix.x - Math.floor(this.animation.imgs[fix.seq_img][1] / 2), fix.y - Math.floor(this.animation.imgs[fix.seq_img][2] / 2),
-				this.animation.imgs[fix.seq_img][1], this.animation.imgs[fix.seq_img][2]]);
+				this.to_render.push([
+					this.pics[fix.seq_img],
+					this.animation.imgs[fix.seq_img][1] * fix.move_img,
+					0,
+					this.animation.imgs[fix.seq_img][1],
+					this.animation.imgs[fix.seq_img][2],
+					fix.x - Math.floor(this.animation.imgs[fix.seq_img][1] / 2),
+					fix.y - Math.floor(this.animation.imgs[fix.seq_img][2] / 2),
+					this.animation.imgs[fix.seq_img][1],
+					this.animation.imgs[fix.seq_img][2],
+				]);
 			}
 		}
 
@@ -104,8 +116,7 @@ export class Animation {
 						// If movement was relative, objects that are out of screen on one side come in again on the other side.
 						if (x - this.animation.imgs[seq.img][1] / 2 > this.animation.size[0] / 2) {
 							x = -Math.floor((this.animation.size[0] + this.animation.imgs[seq.img][1]) / 2);
-						}
-						else if (x + this.animation.imgs[seq.img][1] / 2 < -(this.animation.size[0] / 2)) {
+						} else if (x + this.animation.imgs[seq.img][1] / 2 < -(this.animation.size[0] / 2)) {
 							x = Math.floor((this.animation.size[0] + this.animation.imgs[seq.img][1]) / 2);
 						}
 					}
@@ -115,8 +126,7 @@ export class Animation {
 						// If movement was relative, objects that are out of screen on one side come in again on the other side.
 						if (y - this.animation.imgs[seq.img][2] / 2 > this.animation.size[1] / 2) {
 							y = -Math.floor((this.animation.size[1] + this.animation.imgs[seq.img][2]) / 2);
-						}
-						else if (y + this.animation.imgs[seq.img][2] / 2 < -(this.animation.size[1] / 2)) {
+						} else if (y + this.animation.imgs[seq.img][2] / 2 < -(this.animation.size[1] / 2)) {
 							y = Math.floor((this.animation.size[1] + this.animation.imgs[seq.img][2]) / 2);
 						}
 					}
@@ -139,18 +149,23 @@ export class Animation {
 
 				// This draws the actual image
 				// See https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-				this.to_render.push([this.pics[seq.img],
-				this.animation.imgs[seq.img][1] * move.img, 0,
-				this.animation.imgs[seq.img][1], this.animation.imgs[seq.img][2],
-				x - Math.floor(this.animation.imgs[seq.img][1] / 2), y - Math.floor(this.animation.imgs[seq.img][2] / 2),
-				this.animation.imgs[seq.img][1], this.animation.imgs[seq.img][2]]);
+				this.to_render.push([
+					this.pics[seq.img],
+					this.animation.imgs[seq.img][1] * move.img,
+					0,
+					this.animation.imgs[seq.img][1],
+					this.animation.imgs[seq.img][2],
+					x - Math.floor(this.animation.imgs[seq.img][1] / 2),
+					y - Math.floor(this.animation.imgs[seq.img][2] / 2),
+					this.animation.imgs[seq.img][1],
+					this.animation.imgs[seq.img][2],
+				]);
 
 				// Define a delay if the move requires it or decrement the current delay if one is active.
 				if (move.delay && seq.delay !== 0) {
 					if (seq.delay < 0) {
 						seq.delay = move.delay - 1;
-					}
-					else {
+					} else {
 						seq.delay--;
 					}
 				}
@@ -165,12 +180,10 @@ export class Animation {
 							if (move.counter < 0) {
 								if (move.loop[0] === 0) {
 									move.counter = Infinity;
-								}
-								else {
+								} else {
 									move.counter = move.loop[0] - 1;
 								}
-							}
-							else {
+							} else {
 								move.counter--;
 							}
 							seq.pos = move.loop[1];
@@ -183,8 +196,7 @@ export class Animation {
 						}
 
 						seq.delay = -1;
-					}
-					else {
+					} else {
 						// Moves may activate other sequence objects.
 						if (move.activate.length) {
 							for (const target of move.activate) {

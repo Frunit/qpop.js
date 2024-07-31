@@ -4,6 +4,9 @@ old_stuff/
 min/
 itch.io/
 node_modules/
+out.js
+out.js.map
+tsconfig.tsbuildinfo
 *_old*
 *_debug*
 *.txt

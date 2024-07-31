@@ -1,8 +1,8 @@
-import { Game } from "./game";
-import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, write_text } from "./helper";
-import { Sprite } from "./sprite";
-import { anim_delays, anim_ranking } from "./sprite_positions";
-import { ClickArea, Dimension, KeyType, Point, SixNumbers, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
+import { Game } from './game';
+import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, write_text } from './helper';
+import { Sprite } from './sprite';
+import { anim_delays, anim_ranking } from './sprite_positions';
+import { ClickArea, Dimension, KeyType, Point, SixNumbers, Stage, TechGlobal, TutorialType, WorldGlobal } from './types';
 
 export class Ranking implements Stage {
 	id = SCENE.RANKING;
@@ -28,15 +28,15 @@ export class Ranking implements Stage {
 	private final_heights: SixNumbers = [0, 0, 0, 0, 0, 0];
 	private winners: number[] = [];
 
-	readonly load_dim: Dimension  = [230, 22];
-	readonly save_dim: Dimension  = [231, 22];
-	readonly next_dim: Dimension  = [181, 22];
-	readonly pillarbottom_dim: Dimension  = [100, 100];
-	readonly pillarcenter_dim: Dimension  = [50, 8];
-	readonly pillartop_dim: Dimension  = [50, 10];
-	readonly species_dim: Dimension  = [64, 64];
-	readonly icon_dim: Dimension  = [16, 16];
-	readonly draw_area_dim: Dimension  = [634, 333];
+	readonly load_dim: Dimension = [230, 22];
+	readonly save_dim: Dimension = [231, 22];
+	readonly next_dim: Dimension = [181, 22];
+	readonly pillarbottom_dim: Dimension = [100, 100];
+	readonly pillarcenter_dim: Dimension = [50, 8];
+	readonly pillartop_dim: Dimension = [50, 10];
+	readonly species_dim: Dimension = [64, 64];
+	readonly icon_dim: Dimension = [16, 16];
+	readonly draw_area_dim: Dimension = [634, 333];
 
 	readonly load_offset: Point = [0, 458];
 	readonly save_offset: Point = [229, 458];
@@ -68,30 +68,58 @@ export class Ranking implements Stage {
 	readonly walk_y = 252;
 	readonly delta = 8;
 
-	readonly dead_soffsets: Point[] = [[384, 0], [384, 64], [384, 128], [384, 192], [384, 256], [384, 320]];
-	readonly sym_spec_soffsets: Point[] = [[384, 448], [400, 448], [416, 448], [432, 448], [384, 464], [400, 464]];
+	readonly dead_soffsets: Point[] = [
+		[384, 0],
+		[384, 64],
+		[384, 128],
+		[384, 192],
+		[384, 256],
+		[384, 320],
+	];
+	readonly sym_spec_soffsets: Point[] = [
+		[384, 448],
+		[400, 448],
+		[416, 448],
+		[432, 448],
+		[384, 464],
+		[400, 464],
+	];
 	readonly rel_dx = [0, 106, 206, 306, 406, 504];
 	readonly max_heights = [167, 128, 104, 80, 56, 32];
 
-	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+		private world: WorldGlobal,
+	) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.pics = glob.resources.get_image('gfx/ranking.png');
 		this.wreath_pic = glob.resources.get_image('gfx/wreath.png');
 
 		this.tutorials = [
 			{
-				'name': 'ranking',
-				'pos': [140, 335],
-				'low_anchor': true,
-				'arrows': [],
-				'highlight': [this.pillarbottom_offset[0], this.pillarbottom_offset[1], this.pillarbottom_offset[0] + this.pillarbottom_dim[0] * 6, this.pillarbottom_offset[1] + this.pillarbottom_dim[1]],
+				name: 'ranking',
+				pos: [140, 335],
+				low_anchor: true,
+				arrows: [],
+				highlight: [
+					this.pillarbottom_offset[0],
+					this.pillarbottom_offset[1],
+					this.pillarbottom_offset[0] + this.pillarbottom_dim[0] * 6,
+					this.pillarbottom_offset[1] + this.pillarbottom_dim[1],
+				],
 			},
 			{
-				'name': 'ranking_save',
-				'pos': [220, 435],
-				'low_anchor': true,
-				'arrows': [{ dir: DIR.S, offset: 55 }],
-				'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0] - 1, this.save_offset[1] + this.save_dim[1]],
+				name: 'ranking_save',
+				pos: [220, 435],
+				low_anchor: true,
+				arrows: [{ dir: DIR.S, offset: 55 }],
+				highlight: [
+					this.save_offset[0],
+					this.save_offset[1],
+					this.save_offset[0] + this.save_dim[0] - 1,
+					this.save_offset[1] + this.save_dim[1],
+				],
 			},
 		];
 	}
@@ -107,9 +135,7 @@ export class Ranking implements Stage {
 		this.glob.resources.play_music('ranking');
 		this.sprites = [];
 		for (let i = 0; i < 6; i++) {
-			this.sprites.push(
-				new Sprite(this.pics, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames, anim_delays.ranking)
-			);
+			this.sprites.push(new Sprite(this.pics, anim_ranking.walking[i].offset, anim_ranking.walking[i].frames, anim_delays.ranking));
 
 			this.world.players[i].total_score = this.world.players[i].evo_score + this.world.players[i].stats.reduce((a, b) => a + b);
 		}
@@ -140,7 +166,7 @@ export class Ranking implements Stage {
 			y2: this.load_offset[1] + this.load_dim[1] - 2,
 			down: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim, true, true),
 			up: () => this.load_game(),
-			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim)
+			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim),
 		});
 
 		this.clickareas.push({
@@ -150,7 +176,7 @@ export class Ranking implements Stage {
 			y2: this.save_offset[1] + this.save_dim[1] - 2,
 			down: () => draw_rect(this.glob.ctx, this.save_offset, this.save_dim, true, true),
 			up: () => this.save_game(),
-			blur: () => draw_rect(this.glob.ctx, this.save_offset, this.save_dim)
+			blur: () => draw_rect(this.glob.ctx, this.save_offset, this.save_dim),
 		});
 
 		this.clickareas.push({
@@ -160,62 +186,123 @@ export class Ranking implements Stage {
 			y2: this.next_offset[1] + this.next_dim[1] - 1,
 			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim),
 		});
 
 		// Draw lower pillar parts
 		for (let i = -1; i < 7; i++) {
-			this.glob.ctx.drawImage(this.pics,
-				this.pillarbottom_soffset[0], this.pillarbottom_soffset[1],
-				this.pillarbottom_dim[0], this.pillarbottom_dim[1],
-				this.pillarbottom_offset[0] + i * this.pillarbottom_dim[0], this.pillarbottom_offset[1],
-				this.pillarbottom_dim[0], this.pillarbottom_dim[1]);
+			this.glob.ctx.drawImage(
+				this.pics,
+				this.pillarbottom_soffset[0],
+				this.pillarbottom_soffset[1],
+				this.pillarbottom_dim[0],
+				this.pillarbottom_dim[1],
+				this.pillarbottom_offset[0] + i * this.pillarbottom_dim[0],
+				this.pillarbottom_offset[1],
+				this.pillarbottom_dim[0],
+				this.pillarbottom_dim[1],
+			);
 		}
 
 		// Draw symbols in pillar signs
 		for (let i = 0; i < 6; i++) {
-			if (this.world.players[i].type === PLAYER_TYPE.NOBODY) { // Out of order
-				this.glob.ctx.drawImage(this.pics,
-					this.outoforder_soffset[0], this.outoforder_soffset[1],
-					this.species_dim[0], this.species_dim[1],
-					this.sign_offset[0] + i * this.sign_dx, this.sign_offset[1],
-					this.species_dim[0], this.species_dim[1]);
-			}
-			else if (this.world.players[i].is_dead) { // Death symbol
-				this.glob.ctx.drawImage(this.pics,
-					this.dead_soffsets[i][0], this.dead_soffsets[i][1],
-					this.species_dim[0], this.species_dim[1],
-					this.sign_offset[0] + i * this.sign_dx, this.sign_offset[1],
-					this.species_dim[0], this.species_dim[1]);
-			}
-			else { // Stats (Three symbols and 3x text)
-				this.glob.ctx.drawImage(this.pics,
-					this.sym_spec_soffsets[i][0], this.sym_spec_soffsets[i][1],
-					this.icon_dim[0], this.icon_dim[1],
-					this.sym_spec_offset[0] + i * this.sign_dx, this.sym_spec_offset[1],
-					this.icon_dim[0], this.icon_dim[1]);
-				this.glob.ctx.drawImage(this.pics,
-					this.sym_dna_soffset[0], this.sym_dna_soffset[1],
-					this.icon_dim[0], this.icon_dim[1],
-					this.sym_dna_offset[0] + i * this.sign_dx, this.sym_dna_offset[1],
-					this.icon_dim[0], this.icon_dim[1]);
-				this.glob.ctx.drawImage(this.pics,
-					this.sym_total_soffset[0], this.sym_total_soffset[1],
-					this.icon_dim[0], this.icon_dim[1],
-					this.sym_total_offset[0] + i * this.sign_dx, this.sym_total_offset[1],
-					this.icon_dim[0], this.icon_dim[1]);
+			if (this.world.players[i].type === PLAYER_TYPE.NOBODY) {
+				// Out of order
+				this.glob.ctx.drawImage(
+					this.pics,
+					this.outoforder_soffset[0],
+					this.outoforder_soffset[1],
+					this.species_dim[0],
+					this.species_dim[1],
+					this.sign_offset[0] + i * this.sign_dx,
+					this.sign_offset[1],
+					this.species_dim[0],
+					this.species_dim[1],
+				);
+			} else if (this.world.players[i].is_dead) {
+				// Death symbol
+				this.glob.ctx.drawImage(
+					this.pics,
+					this.dead_soffsets[i][0],
+					this.dead_soffsets[i][1],
+					this.species_dim[0],
+					this.species_dim[1],
+					this.sign_offset[0] + i * this.sign_dx,
+					this.sign_offset[1],
+					this.species_dim[0],
+					this.species_dim[1],
+				);
+			} else {
+				// Stats (Three symbols and 3x text)
+				this.glob.ctx.drawImage(
+					this.pics,
+					this.sym_spec_soffsets[i][0],
+					this.sym_spec_soffsets[i][1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+					this.sym_spec_offset[0] + i * this.sign_dx,
+					this.sym_spec_offset[1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+				);
+				this.glob.ctx.drawImage(
+					this.pics,
+					this.sym_dna_soffset[0],
+					this.sym_dna_soffset[1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+					this.sym_dna_offset[0] + i * this.sign_dx,
+					this.sym_dna_offset[1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+				);
+				this.glob.ctx.drawImage(
+					this.pics,
+					this.sym_total_soffset[0],
+					this.sym_total_soffset[1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+					this.sym_total_offset[0] + i * this.sign_dx,
+					this.sym_total_offset[1],
+					this.icon_dim[0],
+					this.icon_dim[1],
+				);
 
 				this.glob.ctx.save();
 				this.glob.ctx.textAlign = 'center';
 				this.glob.ctx.fillStyle = '#ffffff';
-				this.glob.ctx.fillText(this.world.players[i].individuals.toString(), this.text_spec_offset[0] + i * this.sign_dx, this.text_spec_offset[1] - 1);
-				this.glob.ctx.fillText(this.world.players[i].evo_score.toString(), this.text_dna_offset[0] + i * this.sign_dx, this.text_dna_offset[1] - 1);
-				this.glob.ctx.fillText(this.world.players[i].total_score.toString(), this.text_total_offset[0] + i * this.sign_dx, this.text_total_offset[1] - 1);
+				this.glob.ctx.fillText(
+					this.world.players[i].individuals.toString(),
+					this.text_spec_offset[0] + i * this.sign_dx,
+					this.text_spec_offset[1] - 1,
+				);
+				this.glob.ctx.fillText(
+					this.world.players[i].evo_score.toString(),
+					this.text_dna_offset[0] + i * this.sign_dx,
+					this.text_dna_offset[1] - 1,
+				);
+				this.glob.ctx.fillText(
+					this.world.players[i].total_score.toString(),
+					this.text_total_offset[0] + i * this.sign_dx,
+					this.text_total_offset[1] - 1,
+				);
 
 				this.glob.ctx.fillStyle = '#000000';
-				this.glob.ctx.fillText(this.world.players[i].individuals.toString(), this.text_spec_offset[0] + i * this.sign_dx, this.text_spec_offset[1]);
-				this.glob.ctx.fillText(this.world.players[i].evo_score.toString(), this.text_dna_offset[0] + i * this.sign_dx, this.text_dna_offset[1]);
-				this.glob.ctx.fillText(this.world.players[i].total_score.toString(), this.text_total_offset[0] + i * this.sign_dx, this.text_total_offset[1]);
+				this.glob.ctx.fillText(
+					this.world.players[i].individuals.toString(),
+					this.text_spec_offset[0] + i * this.sign_dx,
+					this.text_spec_offset[1],
+				);
+				this.glob.ctx.fillText(
+					this.world.players[i].evo_score.toString(),
+					this.text_dna_offset[0] + i * this.sign_dx,
+					this.text_dna_offset[1],
+				);
+				this.glob.ctx.fillText(
+					this.world.players[i].total_score.toString(),
+					this.text_total_offset[0] + i * this.sign_dx,
+					this.text_total_offset[1],
+				);
 				this.glob.ctx.restore();
 			}
 		}
@@ -223,19 +310,23 @@ export class Ranking implements Stage {
 		// Main rectangle (draw last to overwrite any spare pixels from pillar parts)
 		draw_rect(this.glob.ctx, [0, 20], [640, 439]);
 
-		this.keys = [
-			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
-		];
+		this.keys = [{ key: 'ENTER', action: () => this.next(), reset: true }];
 	}
 
 	// MAYBE: This could be made more efficient, drawing only the necessary parts depeding on the phase
 	render() {
 		// Draw background in draw area
-		this.glob.ctx.drawImage(this.bg_pic,
-			this.draw_area_offset[0], this.draw_area_offset[1],
-			this.draw_area_dim[0], this.draw_area_dim[1],
-			this.draw_area_offset[0], this.draw_area_offset[1],
-			this.draw_area_dim[0], this.draw_area_dim[1]);
+		this.glob.ctx.drawImage(
+			this.bg_pic,
+			this.draw_area_offset[0],
+			this.draw_area_offset[1],
+			this.draw_area_dim[0],
+			this.draw_area_dim[1],
+			this.draw_area_offset[0],
+			this.draw_area_offset[1],
+			this.draw_area_dim[0],
+			this.draw_area_dim[1],
+		);
 
 		this.glob.ctx.save();
 		this.glob.ctx.translate(this.draw_area_offset[0], this.draw_area_offset[1]);
@@ -256,8 +347,7 @@ export class Ranking implements Stage {
 			this.glob.ctx.fillStyle = '#000000';
 			this.glob.ctx.fillText(this.world.turn.toString(), this.final_turn_offset[0], this.final_turn_offset[1]);
 			this.glob.ctx.restore();
-		}
-		else {
+		} else {
 			// Draw turn number
 			this.glob.ctx.save();
 			this.glob.ctx.font = 'bold 24px serif';
@@ -269,41 +359,61 @@ export class Ranking implements Stage {
 
 		// Draw fixed upper pillar parts
 		for (let i = -1; i < 12; i += 2) {
-			this.glob.ctx.drawImage(this.pics,
-				this.pillartop_soffset[0], this.pillartop_soffset[1],
-				this.pillartop_dim[0], this.pillartop_dim[1],
-				this.pillartop_offset[0] + i * this.pillartop_dim[0], this.pillartop_offset[1],
-				this.pillartop_dim[0], this.pillartop_dim[1]);
+			this.glob.ctx.drawImage(
+				this.pics,
+				this.pillartop_soffset[0],
+				this.pillartop_soffset[1],
+				this.pillartop_dim[0],
+				this.pillartop_dim[1],
+				this.pillartop_offset[0] + i * this.pillartop_dim[0],
+				this.pillartop_offset[1],
+				this.pillartop_dim[0],
+				this.pillartop_dim[1],
+			);
 
-			this.glob.ctx.drawImage(this.pics,
-				this.pillarcenter_soffset[0], this.pillarcenter_soffset[1],
-				this.pillarcenter_dim[0], this.pillarcenter_dim[1],
-				this.pillarcenter_offset[0] + i * this.pillarcenter_dim[0], this.pillarcenter_offset[1],
-				this.pillarcenter_dim[0], this.pillarcenter_dim[1]);
+			this.glob.ctx.drawImage(
+				this.pics,
+				this.pillarcenter_soffset[0],
+				this.pillarcenter_soffset[1],
+				this.pillarcenter_dim[0],
+				this.pillarcenter_dim[1],
+				this.pillarcenter_offset[0] + i * this.pillarcenter_dim[0],
+				this.pillarcenter_offset[1],
+				this.pillarcenter_dim[0],
+				this.pillarcenter_dim[1],
+			);
 		}
-
 
 		// Draw variable upper pillar parts
 		for (let i = 0; i < 6; i++) {
-			this.glob.ctx.drawImage(this.pics,
-				this.pillartop_soffset[0], this.pillartop_soffset[1],
-				this.pillartop_dim[0], this.pillartop_dim[1],
-				this.pillartop_offset[0] + i * 2 * this.pillartop_dim[0], this.pillartop_offset[1] - this.heights[i],
-				this.pillartop_dim[0], this.pillartop_dim[1]);
+			this.glob.ctx.drawImage(
+				this.pics,
+				this.pillartop_soffset[0],
+				this.pillartop_soffset[1],
+				this.pillartop_dim[0],
+				this.pillartop_dim[1],
+				this.pillartop_offset[0] + i * 2 * this.pillartop_dim[0],
+				this.pillartop_offset[1] - this.heights[i],
+				this.pillartop_dim[0],
+				this.pillartop_dim[1],
+			);
 
-			this.glob.ctx.drawImage(this.pics,
-				this.pillarcenter_soffset[0], this.pillarcenter_soffset[1],
-				this.pillarcenter_dim[0], this.pillarcenter_dim[1],
-				this.pillarcenter_offset[0] + i * 2 * this.pillarcenter_dim[0], this.pillarcenter_offset[1] - this.heights[i],
-				this.pillarcenter_dim[0], this.heights[i] + this.pillarcenter_dim[1]);
+			this.glob.ctx.drawImage(
+				this.pics,
+				this.pillarcenter_soffset[0],
+				this.pillarcenter_soffset[1],
+				this.pillarcenter_dim[0],
+				this.pillarcenter_dim[1],
+				this.pillarcenter_offset[0] + i * 2 * this.pillarcenter_dim[0],
+				this.pillarcenter_offset[1] - this.heights[i],
+				this.pillarcenter_dim[0],
+				this.heights[i] + this.pillarcenter_dim[1],
+			);
 		}
 
 		// Draw species
 		for (let i = 0; i < 6; i++) {
-			this.sprites[i].render(this.glob.ctx,
-				[this.lead_x + this.rel_dx[i],
-				this.walk_y - this.heights[i]]
-			);
+			this.sprites[i].render(this.glob.ctx, [this.lead_x + this.rel_dx[i], this.walk_y - this.heights[i]]);
 		}
 
 		this.glob.ctx.restore();
@@ -332,8 +442,7 @@ export class Ranking implements Stage {
 				this.lead_x = 33;
 				this.next_phase();
 			}
-		}
-		else if (this.phase === 1) {
+		} else if (this.phase === 1) {
 			for (let i = 0; i < 6; i++) {
 				this.heights[i] += this.delta;
 				if (this.heights[i] > this.final_heights[i]) {
@@ -362,16 +471,14 @@ export class Ranking implements Stage {
 
 		if (this.world.players[scores[5][0]].is_dead || this.world.players[scores[5][0]].type === PLAYER_TYPE.NOBODY) {
 			this.final_heights[scores[5][0]] = 0;
-		}
-		else {
+		} else {
 			this.final_heights[scores[5][0]] = this.max_heights[5];
 		}
 
 		for (let i = 4; i >= 0; i--) {
 			if (scores[i][1] === scores[i + 1][1] && scores[i][2] === scores[i + 1][2]) {
 				this.final_heights[scores[i][0]] = this.final_heights[scores[i + 1][0]];
-			}
-			else {
+			} else {
 				this.final_heights[scores[i][0]] = this.max_heights[i];
 			}
 		}
@@ -381,16 +488,18 @@ export class Ranking implements Stage {
 		if (this.phase === 0) {
 			this.sprites = [];
 			for (let i = 0; i < 6; i++) {
-				this.sprites.push(
-					new Sprite(this.pics, anim_ranking.standing[i].offset)
-				);
+				this.sprites.push(new Sprite(this.pics, anim_ranking.standing[i].offset));
 			}
 
 			this.phase++;
-		}
-		else {
+		} else {
 			for (const winner of this.winners) {
-				this.sprites[winner] = new Sprite(this.pics, anim_ranking.boasting[winner].offset, anim_ranking.boasting[winner].frames, anim_delays.ranking_winner);
+				this.sprites[winner] = new Sprite(
+					this.pics,
+					anim_ranking.boasting[winner].offset,
+					anim_ranking.boasting[winner].frames,
+					anim_delays.ranking_winner,
+				);
 			}
 
 			this.delay = anim_delays.ranking_winner;
@@ -412,11 +521,16 @@ export class Ranking implements Stage {
 		draw_rect(this.glob.ctx, this.save_offset, this.save_dim);
 		if (!this.game.seen_tutorials.has('save')) {
 			this.tutorials.push({
-				'name': 'save',
-				'pos': [220, 435],
-				'low_anchor': true,
-				'arrows': [{ dir: DIR.S, offset: 55 }],
-				'highlight': [this.save_offset[0], this.save_offset[1], this.save_offset[0] + this.save_dim[0], this.save_offset[1] + this.save_dim[1]],
+				name: 'save',
+				pos: [220, 435],
+				low_anchor: true,
+				arrows: [{ dir: DIR.S, offset: 55 }],
+				highlight: [
+					this.save_offset[0],
+					this.save_offset[1],
+					this.save_offset[0] + this.save_dim[0],
+					this.save_offset[1] + this.save_dim[1],
+				],
 			});
 
 			this.game.tutorial();

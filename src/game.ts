@@ -1,23 +1,35 @@
-import { worldmap_size } from "./consts";
-import { Credits } from "./credits";
-import { ATTR, PLAYER_TYPE, SCENE, download, draw_checkbox, draw_rect, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
-import { i18n } from "./i18n";
-import { Init } from "./init";
-import { InputManager } from "./input";
-import { Intro } from "./intro";
-import { ResourceLoader } from "./loader";
-import { Mutations } from "./mutations";
-import { Options } from "./options";
-import { Outro } from "./outro";
-import { Player } from "./player";
-import { Ranking } from "./ranking";
-import { ResourceManager } from "./resources";
-import { Survival } from "./survival";
-import { Transition } from "./transition";
-import { Turnselection } from "./turnselection";
-import { ClickArea, GameOptions, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
-import { version } from "./version";
-import { World, create_height_map, create_world_map } from "./world";
+import { worldmap_size } from './consts';
+import { Credits } from './credits';
+import {
+	ATTR,
+	PLAYER_TYPE,
+	SCENE,
+	download,
+	draw_checkbox,
+	draw_rect,
+	local_load,
+	local_save,
+	open_popup,
+	open_tutorial,
+	parse_bool,
+} from './helper';
+import { i18n } from './i18n';
+import { Init } from './init';
+import { InputManager } from './input';
+import { Intro } from './intro';
+import { ResourceLoader } from './loader';
+import { Mutations } from './mutations';
+import { Options } from './options';
+import { Outro } from './outro';
+import { Player } from './player';
+import { Ranking } from './ranking';
+import { ResourceManager } from './resources';
+import { Survival } from './survival';
+import { Transition } from './transition';
+import { Turnselection } from './turnselection';
+import { ClickArea, GameOptions, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from './types';
+import { version } from './version';
+import { World, create_height_map, create_world_map } from './world';
 
 const options: GameOptions = {
 	language: 'EN',
@@ -34,9 +46,8 @@ const options: GameOptions = {
 	sound_on: true,
 	sound: 100,
 	audio_enabled: true,
-	update_freq: 1/18,
+	update_freq: 1 / 18,
 };
-
 
 export class Game {
 	private last_time = 0;
@@ -132,9 +143,10 @@ export class Game {
 
 		// If "lang[uage]" is defined and set to a supported language, use that language.
 		//   Otherwise try to determine the browser language. Otherwise default to English.
-		options.language = search_params.get('lang') || search_params.get('language') || local_load('language') as string | null || navigator.language;
+		options.language =
+			search_params.get('lang') || search_params.get('language') || (local_load('language') as string | null) || navigator.language;
 		options.language = options.language.substring(0, 2).toUpperCase();
-		if(!(options.language in Object.keys(i18n))) {
+		if (!(options.language in Object.keys(i18n))) {
 			options.language = 'EN';
 		}
 
@@ -155,29 +167,26 @@ export class Game {
 		const seen_tutorials = local_load('seen_tutorials') as string[];
 		if (seen_tutorials !== null) {
 			this.seen_tutorials = new Set(seen_tutorials);
-		}
-		else {
+		} else {
 			this.seen_tutorials = new Set();
 		}
 
 		if (options.music_on) {
 			resources.set_music_volume(options.music / 100);
-		}
-		else {
+		} else {
 			resources.set_music_volume(0);
 		}
 
 		if (options.sound_on) {
 			resources.set_sound_volume(options.sound / 100);
-		}
-		else {
+		} else {
 			resources.set_sound_volume(0);
 		}
 
 		// Create the canvas
 		const canvas = document.createElement('canvas');
 		const ctx = canvas.getContext('2d');
-		if(ctx === null) {
+		if (ctx === null) {
 			const message = 'Could not get context from canvas.';
 			alert(message);
 			throw new Error(message);
@@ -186,7 +195,7 @@ export class Game {
 		canvas.height = 480;
 		ctx.font = 'bold 12px sans-serif';
 		const div = document.getElementById('qpop');
-		if(div === null) {
+		if (div === null) {
 			const message = 'Could not find a div with id qpop.';
 			alert(message);
 			throw new Error(message);
@@ -195,12 +204,14 @@ export class Game {
 		const canvas_pos = canvas.getBoundingClientRect();
 
 		// Disable the right-click context menu in the game
-		canvas.addEventListener('contextmenu', event => {
+		canvas.addEventListener('contextmenu', (event) => {
 			event.preventDefault();
 			return false;
 		});
 
-		document.addEventListener('visibilitychange', () => { this.toggle_pause(document.hidden); });
+		document.addEventListener('visibilitychange', () => {
+			this.toggle_pause(document.hidden);
+		});
 		const [clickareas, rightclickareas] = this.init_clickareas();
 
 		const input = new InputManager(canvas, canvas_pos);
@@ -225,51 +236,87 @@ export class Game {
 		const rightclickareas = [];
 
 		clickareas.push({
-			x1: 1, y1: 1,
-			x2: 21, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [0, 0], [22, 21], true, true); },
+			x1: 1,
+			y1: 1,
+			x2: 21,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [0, 0], [22, 21], true, true);
+			},
 			up: () => this.toggle_credits(),
-			blur: () => { draw_rect(this.glob.ctx, [0, 0], [22, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [0, 0], [22, 21]);
+			},
 		});
 
 		clickareas.push({
-			x1: 546, y1: 1,
-			x2: 576, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [545, 0], [32, 21], true, true); },
+			x1: 546,
+			y1: 1,
+			x2: 576,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [545, 0], [32, 21], true, true);
+			},
 			up: () => this.next_language(1),
-			blur: () => { draw_rect(this.glob.ctx, [545, 0], [32, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [545, 0], [32, 21]);
+			},
 		});
 
 		rightclickareas.push({
-			x1: 546, y1: 1,
-			x2: 576, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [545, 0], [32, 21], true, true); },
+			x1: 546,
+			y1: 1,
+			x2: 576,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [545, 0], [32, 21], true, true);
+			},
 			up: () => this.next_language(-1),
-			blur: () => { draw_rect(this.glob.ctx, [545, 0], [32, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [545, 0], [32, 21]);
+			},
 		});
 
 		clickareas.push({
-			x1: 577, y1: 1,
-			x2: 597, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [576, 0], [22, 21], true, true); },
+			x1: 577,
+			y1: 1,
+			x2: 597,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [576, 0], [22, 21], true, true);
+			},
 			up: () => this.toggle_sound(),
-			blur: () => { draw_rect(this.glob.ctx, [576, 0], [22, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [576, 0], [22, 21]);
+			},
 		});
 
 		clickareas.push({
-			x1: 598, y1: 1,
-			x2: 618, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [597, 0], [22, 21], true, true); },
+			x1: 598,
+			y1: 1,
+			x2: 618,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [597, 0], [22, 21], true, true);
+			},
 			up: () => this.toggle_music(),
-			blur: () => { draw_rect(this.glob.ctx, [597, 0], [22, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [597, 0], [22, 21]);
+			},
 		});
 
 		clickareas.push({
-			x1: 619, y1: 1,
-			x2: 639, y2: 20,
-			down: () => { draw_rect(this.glob.ctx, [618, 0], [22, 21], true, true); },
+			x1: 619,
+			y1: 1,
+			x2: 639,
+			y2: 20,
+			down: () => {
+				draw_rect(this.glob.ctx, [618, 0], [22, 21], true, true);
+			},
 			up: () => this.toggle_options(),
-			blur: () => { draw_rect(this.glob.ctx, [618, 0], [22, 21]); }
+			blur: () => {
+				draw_rect(this.glob.ctx, [618, 0], [22, 21]);
+			},
 		});
 
 		return [clickareas, rightclickareas];
@@ -279,25 +326,20 @@ export class Game {
 		if (this.glob.input.isDown('MOVE')) {
 			const pos = this.glob.input.getMousePos();
 			if (this.clicked_element || this.right_clicked_element) {
-				const area = this.clicked_element || this.right_clicked_element as ClickArea;
-				if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
-					pos[1] >= area.y1 && pos[1] <= area.y2) {
+				const area = this.clicked_element || (this.right_clicked_element as ClickArea);
+				if (pos[0] >= area.x1 && pos[0] <= area.x2 && pos[1] >= area.y1 && pos[1] <= area.y2) {
 					if (area.move) {
 						area.move(pos[0], pos[1]);
 					}
-				}
-
-				else {
+				} else {
 					area.blur();
 					this.clicked_element = null;
 					this.right_clicked_element = null;
 				}
-			}
-			else {
+			} else {
 				let found = false;
 				for (const area of this.stage.clickareas) {
-					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2) {
+					if (pos[0] >= area.x1 && pos[0] <= area.x2 && pos[1] >= area.y1 && pos[1] <= area.y2) {
 						if (!area.default_pointer) {
 							this.glob.canvas.style.cursor = 'pointer';
 							found = true;
@@ -318,41 +360,35 @@ export class Game {
 				this.glob.input.resetClickPos();
 				const pos = this.glob.input.getMousePos();
 				for (const area of this.stage.clickareas) {
-					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2) {
+					if (pos[0] >= area.x1 && pos[0] <= area.x2 && pos[1] >= area.y1 && pos[1] <= area.y2) {
 						area.down(pos[0], pos[1]);
 						this.clicked_element = area;
 						break;
 					}
 				}
-			}
-			else if (this.glob.input.isDown('CLICKUP')) {
+			} else if (this.glob.input.isDown('CLICKUP')) {
 				this.glob.input.reset('CLICKUP');
 				if (this.clicked_element) {
 					this.clicked_element.up(NaN, NaN);
 					this.clicked_element = null;
 				}
-			}
-			else if (this.glob.input.getRightClickPos()) {
+			} else if (this.glob.input.getRightClickPos()) {
 				this.glob.input.resetRightClickPos();
 				const pos = this.glob.input.getMousePos();
 				for (const area of this.stage.rightclickareas) {
-					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
-						pos[1] >= area.y1 && pos[1] <= area.y2) {
+					if (pos[0] >= area.x1 && pos[0] <= area.x2 && pos[1] >= area.y1 && pos[1] <= area.y2) {
 						area.down(pos[0], pos[1]);
 						this.right_clicked_element = area;
 						break;
 					}
 				}
-			}
-			else if (this.glob.input.isDown('RCLICKUP')) {
+			} else if (this.glob.input.isDown('RCLICKUP')) {
 				this.glob.input.reset('RCLICKUP');
 				if (this.right_clicked_element) {
 					this.right_clicked_element.up(NaN, NaN);
 					this.right_clicked_element = null;
 				}
-			}
-			else if (this.glob.input.isDown('BLUR')) {
+			} else if (this.glob.input.isDown('BLUR')) {
 				this.glob.input.reset('BLUR');
 				if (this.clicked_element) {
 					this.clicked_element.blur();
@@ -417,8 +453,7 @@ export class Game {
 		for (let i = 0; i < 6; i++) {
 			if (this.world.players[i].type === PLAYER_TYPE.HUMAN && !this.world.players[i].is_dead) {
 				humans_alive.push(i);
-			}
-			else if (this.world.players[i].type === PLAYER_TYPE.COMPUTER && !this.world.players[i].is_dead) {
+			} else if (this.world.players[i].type === PLAYER_TYPE.COMPUTER && !this.world.players[i].is_dead) {
 				pcs_alive.push(i);
 			}
 		}
@@ -441,8 +476,14 @@ export class Game {
 			// not asked, yet; indecisive
 			if (this.world.infinite_game === false) {
 				this.world.infinite_game = !!humans_alive[0];
-				open_popup(this, 'chuck_berry', this.glob.lang.continue_alone,
-					(x: number) => this.game_finished_popup(x), this.glob.lang.no, this.glob.lang.yes);
+				open_popup(
+					this,
+					'chuck_berry',
+					this.glob.lang.continue_alone,
+					(x: number) => this.game_finished_popup(x),
+					this.glob.lang.no,
+					this.glob.lang.yes,
+				);
 				return null;
 			}
 
@@ -463,7 +504,7 @@ export class Game {
 		this.next_stage();
 	}
 
-	get_ranking(selection: SixNumbers = [0, 1, 2, 3, 4, 5]): Tuple<[number, number, number],6> {
+	get_ranking(selection: SixNumbers = [0, 1, 2, 3, 4, 5]): Tuple<[number, number, number], 6> {
 		// Sort by total_score and individuals
 		function sortme(obj1: number[], obj2: number[]): number {
 			if (obj1[1] === obj2[1]) {
@@ -480,35 +521,33 @@ export class Game {
 
 		scores.sort(sortme);
 
-		return scores as Tuple<[number, number, number],6>;
+		return scores as Tuple<[number, number, number], 6>;
 	}
 
 	select_evo_points() {
 		if (this.world.max_turns <= 5) {
 			this.evo_points = [60, 50, 40, 30, 20, 10];
-		}
-		else if (this.world.max_turns <= 10) {
+		} else if (this.world.max_turns <= 10) {
 			this.evo_points = [42, 35, 28, 21, 14, 7];
-		}
-		else {
+		} else {
 			this.evo_points = [30, 25, 20, 15, 10, 5];
 		}
 	}
 
 	save_locally() {
 		const save = {
-			'players': this.world.players,
-			'world_map': this.world.world_map,
-			'height_map': this.world.height_map,
-			'map_positions': this.world.map_positions,
-			'turn': this.world.turn,
-			'max_turns': this.world.max_turns,
-			'humans_present': this.world.humans_present,
-			'water_level': this.world.water_level,
-			'humid': this.world.humid,
-			'temp': this.world.temp,
-			'infinite_game': this.world.infinite_game,
-			'datetime': (new Date()).toISOString(),
+			players: this.world.players,
+			world_map: this.world.world_map,
+			height_map: this.world.height_map,
+			map_positions: this.world.map_positions,
+			turn: this.world.turn,
+			max_turns: this.world.max_turns,
+			humans_present: this.world.humans_present,
+			water_level: this.world.water_level,
+			humid: this.world.humid,
+			temp: this.world.temp,
+			infinite_game: this.world.infinite_game,
+			datetime: new Date().toISOString(),
 		};
 
 		let save_array = local_load('save') as any[] | null; // TODO
@@ -626,13 +665,11 @@ export class Game {
 		let single = 0;
 		if (this.world.infinite_game) {
 			single = 1;
-		}
-		else {
+		} else {
 			for (let i = 0; i < 6; i++) {
 				if (this.world.players[i].type === PLAYER_TYPE.HUMAN) {
 					single += 1;
-				}
-				else if (this.world.players[i].type === PLAYER_TYPE.COMPUTER) {
+				} else if (this.world.players[i].type === PLAYER_TYPE.COMPUTER) {
 					single = 0;
 					break;
 				}
@@ -655,15 +692,11 @@ export class Game {
 		const content = new DataView(save_file);
 		let mp = 0;
 
-		if (save_file.byteLength === 4172 &&
-			new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) === 'Q-POP Savegame') {
+		if (save_file.byteLength === 4172 && new TextDecoder().decode(new Uint8Array(save_file, 0, 14)) === 'Q-POP Savegame') {
 			mp = 0;
-		}
-		else if (save_file.byteLength === 4174 &&
-			new TextDecoder().decode(new Uint8Array(save_file, 0, 24)) === 'Magnetic Planet Savegame') {
+		} else if (save_file.byteLength === 4174 && new TextDecoder().decode(new Uint8Array(save_file, 0, 24)) === 'Magnetic Planet Savegame') {
 			mp = 10;
-		}
-		else {
+		} else {
 			open_popup(this, 'dino_cries', this.glob.lang.not_a_savegame, null, this.glob.lang.next);
 			return;
 		}
@@ -707,8 +740,7 @@ export class Game {
 			this.world.max_turns = 255;
 			this.world.humans_present = false;
 			mp = 8;
-		}
-		else {
+		} else {
 			this.world.max_turns = content.getUint8(0xac);
 			this.world.humans_present = !!content.getUint8(0xad);
 		}
@@ -790,16 +822,13 @@ export class Game {
 				if (this.stage.catastrophe_status === 3) {
 					this.stage = new Ranking(this, this.glob, this.world);
 					this.stage.initialize();
-				}
-				else if (this.set_to_next_player()) {
+				} else if (this.set_to_next_player()) {
 					this.stage.next_player();
-				}
-				else {
+				} else {
 					if (this.world.turn === 0) {
 						this.stage = new Transition(this, this.glob, 'gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 						this.stage.initialize();
-					}
-					else {
+					} else {
 						this.stage.catastrophe_start();
 					}
 				}
@@ -807,8 +836,7 @@ export class Game {
 			case SCENE.RANKING: // Ranking
 				if (this.world.turn === this.world.max_turns) {
 					this.stage = new Outro(this, this.glob, this.get_ranking()[0][0]);
-				}
-				else {
+				} else {
 					this.stage = new Transition(this, this.glob, 'gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				}
 				this.stage.initialize();
@@ -849,7 +877,7 @@ export class Game {
 
 	get_last_stage() {
 		const old_stage = this.backstage.pop();
-		if(old_stage !== undefined) {
+		if (old_stage !== undefined) {
 			this.stage = old_stage;
 			this.stage.redraw();
 		}
@@ -875,8 +903,7 @@ export class Game {
 
 		if (this.paused || force_pause === true) {
 			this.glob.resources.pause();
-		}
-		else if (!this.paused) {
+		} else if (!this.paused) {
 			this.glob.resources.unpause();
 		}
 	}
@@ -885,8 +912,7 @@ export class Game {
 		draw_rect(this.glob.ctx, [0, 0], [22, 21]);
 		if (this.stage.id === SCENE.CREDITS) {
 			this.get_last_stage();
-		}
-		else {
+		} else {
 			if (this.stage.id !== SCENE.OPTIONS) {
 				this.backstage.push(this.stage);
 			}
@@ -899,8 +925,7 @@ export class Game {
 		draw_rect(this.glob.ctx, [618, 0], [22, 21]);
 		if (this.stage.id === SCENE.OPTIONS) {
 			this.get_last_stage();
-		}
-		else {
+		} else {
 			if (this.stage.id !== SCENE.CREDITS) {
 				this.backstage.push(this.stage);
 			}
@@ -914,16 +939,14 @@ export class Game {
 			options.sound_on = !options.sound_on;
 			if (options.sound_on) {
 				this.glob.resources.set_sound_volume(options.sound / 100);
-			}
-			else {
+			} else {
 				this.glob.resources.set_sound_volume(0);
 			}
 
 			local_save('sound_on', options.sound_on);
 
 			this.stage.redraw();
-		}
-		else {
+		} else {
 			this.stage.redraw();
 			open_popup(this, 'dino', this.glob.lang.sound_disabled, null, this.glob.lang.close);
 		}
@@ -934,16 +957,14 @@ export class Game {
 			options.music_on = !options.music_on;
 			if (options.music_on) {
 				this.glob.resources.set_music_volume(options.music / 100);
-			}
-			else {
+			} else {
 				this.glob.resources.set_music_volume(0);
 			}
 
 			local_save('music_on', options.music_on);
 
 			this.stage.redraw();
-		}
-		else {
+		} else {
 			this.stage.redraw();
 			open_popup(this, 'dino', this.glob.lang.sound_disabled, null, this.glob.lang.close);
 		}

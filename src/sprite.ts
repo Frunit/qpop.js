@@ -1,4 +1,4 @@
-import { Dimension, Point } from "./types";
+import { Dimension, Point } from './types';
 
 export interface ISprite {
 	finished: boolean;
@@ -11,7 +11,7 @@ export interface ISprite {
 }
 
 export class Sprite implements ISprite {
-	finished: boolean
+	finished: boolean;
 	callback?: () => void;
 	delay: number;
 	offset: Point;
@@ -25,8 +25,15 @@ export class Sprite implements ISprite {
 	private fresh = true;
 	private delay_counter = 0;
 
-
-	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[] = [[0, 0]], delay = 0, size: Dimension = [64, 64], once = false, callback?: () => void) {
+	constructor(
+		pic: HTMLImageElement,
+		offset: Point = [0, 0],
+		frames: Point[] = [[0, 0]],
+		delay = 0,
+		size: Dimension = [64, 64],
+		once = false,
+		callback?: () => void,
+	) {
 		this.pic = pic;
 		this.offset = offset;
 		this.size = size;
@@ -76,14 +83,19 @@ export class Sprite implements ISprite {
 		const real_idx = this.idx % this.frames.length;
 		const frame = this.frames[real_idx];
 
-		ctx.drawImage(this.pic,
-			this.offset[0] + frame[0], this.offset[1] + frame[1],
-			this.size[0], this.size[1],
-			pos[0], pos[1],
-			this.size[0], this.size[1]);
+		ctx.drawImage(
+			this.pic,
+			this.offset[0] + frame[0],
+			this.offset[1] + frame[1],
+			this.size[0],
+			this.size[1],
+			pos[0],
+			pos[1],
+			this.size[0],
+			this.size[1],
+		);
 	}
 }
-
 
 export class RandomSprite implements ISprite {
 	finished = false;
@@ -95,7 +107,14 @@ export class RandomSprite implements ISprite {
 
 	private current_idx = 0;
 
-	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[][] = [[[0, 0]]], transitions: number[][] = [[1]], delay = 0, size: Dimension = [64, 64]) {
+	constructor(
+		pic: HTMLImageElement,
+		offset: Point = [0, 0],
+		frames: Point[][] = [[[0, 0]]],
+		transitions: number[][] = [[1]],
+		delay = 0,
+		size: Dimension = [64, 64],
+	) {
 		this.transitions = transitions;
 		for (const sprite_frames of frames) {
 			this.sprites.push(new Sprite(pic, offset, sprite_frames, delay, size, true));

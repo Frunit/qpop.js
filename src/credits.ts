@@ -1,6 +1,6 @@
-import { Game } from "./game";
-import { SCENE, draw_base, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
+import { Game } from './game';
+import { SCENE, draw_base, draw_rect, draw_upper_left_border, multiline, write_text } from './helper';
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from './types';
 
 export class Credits implements Stage {
 	id = SCENE.CREDITS;
@@ -10,21 +10,24 @@ export class Credits implements Stage {
 
 	private bg: HTMLImageElement;
 	private github: HTMLImageElement;
-	
+
 	readonly upper_panel_dim: Dimension = [620, 130];
 	readonly lower_panel_dim: Dimension = [305, 280];
-	readonly close_dim : Point = [181, 22];
-	readonly github_dim : Point = [64, 83];
-	readonly upper_panel_offset : Point = [9, 29];
-	readonly left_panel_offset : Point = [9, 168];
-	readonly right_panel_offset : Point = [324, 168];
-	readonly close_offset : Point = [459, 458];
-	readonly text_rel_offset : Point = [10, 22];
-	readonly github_offset : Point = [538, 50];
+	readonly close_dim: Point = [181, 22];
+	readonly github_dim: Point = [64, 83];
+	readonly upper_panel_offset: Point = [9, 29];
+	readonly left_panel_offset: Point = [9, 168];
+	readonly right_panel_offset: Point = [324, 168];
+	readonly close_offset: Point = [459, 458];
+	readonly text_rel_offset: Point = [10, 22];
+	readonly github_offset: Point = [538, 50];
 	readonly max_text_width = 500;
 	readonly line_height = 20;
 
-	constructor(private game: Game, private glob: TechGlobal) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+	) {
 		this.bg = this.glob.resources.get_image('gfx/light_bg.png');
 		this.github = this.glob.resources.get_image('gfx/github.png');
 	}
@@ -51,31 +54,53 @@ export class Credits implements Stage {
 			y2: this.close_offset[1] + this.close_dim[1],
 			down: () => draw_rect(this.glob.ctx, this.close_offset, this.close_dim, true, true),
 			up: () => this.close(),
-			blur: () => draw_rect(this.glob.ctx, this.close_offset, this.close_dim)
+			blur: () => draw_rect(this.glob.ctx, this.close_offset, this.close_dim),
 		});
 
 		// Background panels
 		this.glob.ctx.save();
 		const rep = this.glob.ctx.createPattern(this.bg, 'repeat');
-		if(rep !== null) {
+		if (rep !== null) {
 			this.glob.ctx.fillStyle = rep;
 		}
 
 		draw_rect(this.glob.ctx, this.upper_panel_offset, this.upper_panel_dim, true, false, true);
-		this.glob.ctx.fillRect(this.upper_panel_offset[0] + 3, this.upper_panel_offset[1] + 3, this.upper_panel_dim[0] - 6, this.upper_panel_dim[1] - 6);
+		this.glob.ctx.fillRect(
+			this.upper_panel_offset[0] + 3,
+			this.upper_panel_offset[1] + 3,
+			this.upper_panel_dim[0] - 6,
+			this.upper_panel_dim[1] - 6,
+		);
 
 		draw_rect(this.glob.ctx, this.left_panel_offset, this.lower_panel_dim, true, false, true);
-		this.glob.ctx.fillRect(this.left_panel_offset[0] + 3, this.left_panel_offset[1] + 3, this.lower_panel_dim[0] - 6, this.lower_panel_dim[1] - 6);
+		this.glob.ctx.fillRect(
+			this.left_panel_offset[0] + 3,
+			this.left_panel_offset[1] + 3,
+			this.lower_panel_dim[0] - 6,
+			this.lower_panel_dim[1] - 6,
+		);
 
 		draw_rect(this.glob.ctx, this.right_panel_offset, this.lower_panel_dim, true, false, true);
-		this.glob.ctx.fillRect(this.right_panel_offset[0] + 3, this.right_panel_offset[1] + 3, this.lower_panel_dim[0] - 6, this.lower_panel_dim[1] - 6);
+		this.glob.ctx.fillRect(
+			this.right_panel_offset[0] + 3,
+			this.right_panel_offset[1] + 3,
+			this.lower_panel_dim[0] - 6,
+			this.lower_panel_dim[1] - 6,
+		);
 
 		this.glob.ctx.restore();
 
 		// Info text
 		const text = multiline(this.glob.ctx, this.glob.lang.information, this.max_text_width);
 		for (let i = 0; i < text.length; i++) {
-			write_text(this.glob.ctx, text[i], [this.text_rel_offset[0] + this.upper_panel_offset[0], this.text_rel_offset[1] + this.upper_panel_offset[1] + this.line_height * i], '#000000', '#ffffff', 'left');
+			write_text(
+				this.glob.ctx,
+				text[i],
+				[this.text_rel_offset[0] + this.upper_panel_offset[0], this.text_rel_offset[1] + this.upper_panel_offset[1] + this.line_height * i],
+				'#000000',
+				'#ffffff',
+				'left',
+			);
 		}
 
 		// Github logo
@@ -85,31 +110,85 @@ export class Credits implements Stage {
 			y1: this.github_offset[1],
 			x2: this.github_offset[0] + this.github_dim[0],
 			y2: this.github_offset[1] + this.github_dim[1],
-			down: () => { },
+			down: () => {},
 			up: () => window.open('https://www.github.com/Frunit/qpop.js', '_blank'),
-			blur: () => { }
+			blur: () => {},
 		});
 
 		// Credits for original game
 		let line = 1;
-		write_text(this.glob.ctx, '1995', [this.left_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.left_panel_offset[1]], '#000000', '#ffffff', 'right');
+		write_text(
+			this.glob.ctx,
+			'1995',
+			[this.left_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.left_panel_offset[1]],
+			'#000000',
+			'#ffffff',
+			'right',
+		);
 		for (let i = 0; i < this.glob.lang.credits_original.length; i++) {
-			write_text(this.glob.ctx, this.glob.lang.credits_original[i][0], [this.text_rel_offset[0] + this.left_panel_offset[0], this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			write_text(
+				this.glob.ctx,
+				this.glob.lang.credits_original[i][0],
+				[
+					this.text_rel_offset[0] + this.left_panel_offset[0],
+					this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line,
+				],
+				'#000000',
+				'#ffffff',
+				'left',
+			);
 			line++;
 			for (let j = 0; j < this.glob.lang.credits_original[i][1].length; j++) {
-				write_text(this.glob.ctx, this.glob.lang.credits_original[i][1][j], [this.text_rel_offset[0] + this.left_panel_offset[0] + 30, this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+				write_text(
+					this.glob.ctx,
+					this.glob.lang.credits_original[i][1][j],
+					[
+						this.text_rel_offset[0] + this.left_panel_offset[0] + 30,
+						this.text_rel_offset[1] + this.left_panel_offset[1] + this.line_height * line,
+					],
+					'#000000',
+					'#ffffff',
+					'left',
+				);
 				line++;
 			}
 		}
 
 		// Credits for remake
 		line = 1;
-		write_text(this.glob.ctx, '2020-2024', [this.right_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.right_panel_offset[1]], '#000000', '#ffffff', 'right');
+		write_text(
+			this.glob.ctx,
+			'2020-2024',
+			[this.right_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.right_panel_offset[1]],
+			'#000000',
+			'#ffffff',
+			'right',
+		);
 		for (let i = 0; i < this.glob.lang.credits_remake.length; i++) {
-			write_text(this.glob.ctx, this.glob.lang.credits_remake[i][0], [this.text_rel_offset[0] + this.right_panel_offset[0], this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+			write_text(
+				this.glob.ctx,
+				this.glob.lang.credits_remake[i][0],
+				[
+					this.text_rel_offset[0] + this.right_panel_offset[0],
+					this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line,
+				],
+				'#000000',
+				'#ffffff',
+				'left',
+			);
 			line++;
 			for (let j = 0; j < this.glob.lang.credits_remake[i][1].length; j++) {
-				write_text(this.glob.ctx, this.glob.lang.credits_remake[i][1][j], [this.text_rel_offset[0] + this.right_panel_offset[0] + 30, this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
+				write_text(
+					this.glob.ctx,
+					this.glob.lang.credits_remake[i][1][j],
+					[
+						this.text_rel_offset[0] + this.right_panel_offset[0] + 30,
+						this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line,
+					],
+					'#000000',
+					'#ffffff',
+					'left',
+				);
 				line++;
 			}
 		}
@@ -120,11 +199,9 @@ export class Credits implements Stage {
 		];
 	}
 
-	render() {
-	}
+	render() {}
 
-	update() {
-	}
+	update() {}
 
 	close() {
 		draw_rect(this.glob.ctx, this.close_offset, this.close_dim);

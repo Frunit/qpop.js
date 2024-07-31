@@ -1,5 +1,5 @@
-import { PLAYER_TYPE, SPECIES } from "./helper";
-import { Tuple } from "./types";
+import { PLAYER_TYPE, SPECIES } from './helper';
+import { Tuple } from './types';
 
 export class Player {
 	id: number;
@@ -19,6 +19,6 @@ export class Player {
 
 	constructor(num: number) {
 		this.id = num;
-		this.type = (num === SPECIES.PURPLUS) ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
+		this.type = num === SPECIES.PURPLUS ? PLAYER_TYPE.HUMAN : PLAYER_TYPE.COMPUTER;
 	}
 }

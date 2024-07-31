@@ -1,8 +1,7 @@
-import { Game } from "./game";
-import { draw_base, draw_inv_rect, draw_rect, subtitle } from "./helper";
-import { i18nStrings } from "./i18n";
-import { ClickArea, KeyType, Stage, TechGlobal } from "./types";
-
+import { Game } from './game';
+import { draw_base, draw_inv_rect, draw_rect, subtitle } from './helper';
+import { i18nStrings } from './i18n';
+import { ClickArea, KeyType, Stage, TechGlobal } from './types';
 
 export class Transition implements Stage {
 	id: number;
@@ -18,7 +17,12 @@ export class Transition implements Stage {
 	readonly pic_offset = [23, 42];
 	readonly subtitle_offset = [70, 420];
 
-	constructor(private game: Game, private glob: TechGlobal, pic: string, id: number) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+		pic: string,
+		id: number,
+	) {
 		this.id = id;
 		this.pic = this.glob.resources.get_image(pic);
 		this.lang_string = pic.split('/').pop()!.replace('.png', '') as keyof i18nStrings;
@@ -53,18 +57,15 @@ export class Transition implements Stage {
 			y1: this.pic_offset[1],
 			x2: this.pic_offset[0] + this.pic_dim[0],
 			y2: this.pic_offset[1] + this.pic_dim[1],
-			down: () => { },
+			down: () => {},
 			up: () => this.game.next_stage(),
-			blur: () => { }
+			blur: () => {},
 		});
 
-		this.keys = [
-			{ key: 'ENTER', action: () => this.game.next_stage(), reset: true },
-		];
+		this.keys = [{ key: 'ENTER', action: () => this.game.next_stage(), reset: true }];
 	}
 
-	render() {
-	}
+	render() {}
 
 	update() {
 		this.frame++;

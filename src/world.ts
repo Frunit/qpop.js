@@ -1,16 +1,32 @@
-import { Catastrophe } from "./catastrophe";
-import { worldmap_size } from "./consts";
-import { Game } from "./game";
-import { ATTR, DIR, PLAYER_TYPE, SCENE, WORLD_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, pop_random_element, random_element, random_int, shuffle, write_text } from "./helper";
-import { i18nStrings } from "./i18n";
-import { Player } from "./player";
-import { Sprite } from "./sprite";
-import { anim_delays } from "./sprite_positions";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, Tuple, TutorialType, WorldGlobal } from "./types";
+import { Catastrophe } from './catastrophe';
+import { worldmap_size } from './consts';
+import { Game } from './game';
+import {
+	ATTR,
+	DIR,
+	PLAYER_TYPE,
+	SCENE,
+	WORLD_MAP,
+	clamp,
+	draw_base,
+	draw_black_rect,
+	draw_rect,
+	open_popup,
+	pop_random_element,
+	random_element,
+	random_int,
+	shuffle,
+	write_text,
+} from './helper';
+import { i18nStrings } from './i18n';
+import { Player } from './player';
+import { Sprite } from './sprite';
+import { anim_delays } from './sprite_positions';
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, Tuple, TutorialType, WorldGlobal } from './types';
 
 // MAYBE: After a catastrophe, a symbol of the catastrophe could be shown in the lower right area. What to do with the avatar?
 
-export class World implements Stage{
+export class World implements Stage {
 	id = SCENE.WORLD;
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
@@ -72,12 +88,32 @@ export class World implements Stage{
 	readonly minispec_soffset: Point = [320, 16];
 
 	readonly bar_colors = ['#ff00ff', '#00ff7f', '#000082', '#ffffff', '#00ff00', '#820000'];
-	readonly calendar_soffsets: Point[] = [[0, 100], [60, 100]];
-	readonly hygro_soffsets: Point[] = [[0, 0], [40, 0]];
-	readonly temp_soffsets: Point[] = [[80, 0], [120, 0]];
-	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
+	readonly calendar_soffsets: Point[] = [
+		[0, 100],
+		[60, 100],
+	];
+	readonly hygro_soffsets: Point[] = [
+		[0, 0],
+		[40, 0],
+	];
+	readonly temp_soffsets: Point[] = [
+		[80, 0],
+		[120, 0],
+	];
+	readonly spec_soffsets: Point[] = [
+		[0, 0],
+		[64, 0],
+		[128, 0],
+		[192, 0],
+		[256, 0],
+		[320, 0],
+	];
 
-	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+		private world: WorldGlobal,
+	) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.map_pics = glob.resources.get_image('gfx/world.png');
 		this.spec_pics = glob.resources.get_image('gfx/species.png');
@@ -85,10 +121,10 @@ export class World implements Stage{
 
 		this.tutorials = [
 			{
-				'name': 'wm_units',
-				'pos': [75, 155],
-				'arrows': [{ dir: DIR.E, offset: 130 }],
-				'highlight': [0, 0, 640, 480],
+				name: 'wm_units',
+				pos: [75, 155],
+				arrows: [{ dir: DIR.E, offset: 130 }],
+				highlight: [0, 0, 640, 480],
 			},
 		];
 	}
@@ -100,16 +136,21 @@ export class World implements Stage{
 
 		if (this.world.turn === 1) {
 			this.tutorials.push({
-				'name': 'wm_shadows',
-				'pos': [80, 205],
-				'arrows': [{ dir: DIR.E, offset: 130 }],
-				'highlight': [this.right_rect_offset[0], this.tomove_offset[1] - 3, 640, this.tomove_offset[1] + this.tile_dim[1] + 3],
+				name: 'wm_shadows',
+				pos: [80, 205],
+				arrows: [{ dir: DIR.E, offset: 130 }],
+				highlight: [this.right_rect_offset[0], this.tomove_offset[1] - 3, 640, this.tomove_offset[1] + this.tile_dim[1] + 3],
 			});
 			this.tutorials.push({
-				'name': 'wm_rightclick',
-				'pos': [80, 50],
-				'arrows': [{ dir: DIR.E, offset: 50 }],
-				'highlight': [this.spec_offset[0], this.spec_offset[1], this.spec_offset[0] + this.spec_dim[0], this.spec_offset[1] + this.spec_dim[1]],
+				name: 'wm_rightclick',
+				pos: [80, 50],
+				arrows: [{ dir: DIR.E, offset: 50 }],
+				highlight: [
+					this.spec_offset[0],
+					this.spec_offset[1],
+					this.spec_offset[0] + this.spec_dim[0],
+					this.spec_offset[1] + this.spec_dim[1],
+				],
 			});
 		}
 
@@ -148,7 +189,7 @@ export class World implements Stage{
 			y2: this.next_offset[1] + this.next_dim[1],
 			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim),
 		});
 
 		// Black border around world
@@ -165,7 +206,7 @@ export class World implements Stage{
 			up: () => this.wm_clickup(),
 			blur: () => this.wm_clickup(),
 			move: (x: number, y: number) => this.wm_move(x, y),
-			default_pointer: true
+			default_pointer: true,
 		});
 
 		this.rightclickareas.push({
@@ -176,16 +217,22 @@ export class World implements Stage{
 			down: (x: number, y: number) => this.wm_rightclick(x, y),
 			up: () => this.wm_rightclickup(),
 			blur: () => this.wm_rightclickup(),
-			move: (x: number, y: number) => this.wm_rightmove(x, y)
+			move: (x: number, y: number) => this.wm_rightmove(x, y),
 		});
 
 		// Calendar
-		const soffset = (this.world.turn === 0) ? this.calendar_soffsets[1] : this.calendar_soffsets[0];
-		this.glob.ctx.drawImage(this.gui_pics,
-			soffset[0], soffset[1],
-			this.calendar_dim[0], this.calendar_dim[1],
-			this.calendar_offset[0], this.calendar_offset[1],
-			this.calendar_dim[0], this.calendar_dim[1]);
+		const soffset = this.world.turn === 0 ? this.calendar_soffsets[1] : this.calendar_soffsets[0];
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			soffset[0],
+			soffset[1],
+			this.calendar_dim[0],
+			this.calendar_dim[1],
+			this.calendar_offset[0],
+			this.calendar_offset[1],
+			this.calendar_dim[0],
+			this.calendar_dim[1],
+		);
 
 		if (this.world.turn > 0) {
 			this.glob.ctx.save();
@@ -193,8 +240,7 @@ export class World implements Stage{
 			this.glob.ctx.textAlign = 'center';
 			if (this.world.turn !== this.world.max_turns) {
 				this.glob.ctx.fillStyle = '#000000';
-			}
-			else {
+			} else {
 				this.glob.ctx.fillStyle = '#ff0000';
 			}
 			this.glob.ctx.fillText(this.world.turn.toString(), this.calendar_text_offset[0], this.calendar_text_offset[1]);
@@ -202,11 +248,17 @@ export class World implements Stage{
 		}
 
 		// Humidity
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.hygro_soffsets[0][0], this.hygro_soffsets[0][1],
-			this.hygro_dim[0], this.hygro_dim[1],
-			this.hygro_offset[0], this.hygro_offset[1],
-			this.hygro_dim[0], this.hygro_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.hygro_soffsets[0][0],
+			this.hygro_soffsets[0][1],
+			this.hygro_dim[0],
+			this.hygro_dim[1],
+			this.hygro_offset[0],
+			this.hygro_offset[1],
+			this.hygro_dim[0],
+			this.hygro_dim[1],
+		);
 
 		this.glob.ctx.save();
 		this.glob.ctx.fillStyle = '#0000ff';
@@ -215,18 +267,30 @@ export class World implements Stage{
 		this.glob.ctx.fillRect(this.hygro_bar_offset[0], this.hygro_bar_offset[1] - height, this.hygro_bar_dim[0], height);
 		this.glob.ctx.restore();
 
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.hygro_soffsets[1][0], this.hygro_soffsets[1][1],
-			this.hygro_dim[0], this.hygro_dim[1],
-			this.hygro_offset[0], this.hygro_offset[1],
-			this.hygro_dim[0], this.hygro_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.hygro_soffsets[1][0],
+			this.hygro_soffsets[1][1],
+			this.hygro_dim[0],
+			this.hygro_dim[1],
+			this.hygro_offset[0],
+			this.hygro_offset[1],
+			this.hygro_dim[0],
+			this.hygro_dim[1],
+		);
 
 		// Temperature
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.temp_soffsets[0][0], this.temp_soffsets[0][1],
-			this.temp_dim[0], this.temp_dim[1],
-			this.temp_offset[0], this.temp_offset[1],
-			this.temp_dim[0], this.temp_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.temp_soffsets[0][0],
+			this.temp_soffsets[0][1],
+			this.temp_dim[0],
+			this.temp_dim[1],
+			this.temp_offset[0],
+			this.temp_offset[1],
+			this.temp_dim[0],
+			this.temp_dim[1],
+		);
 
 		this.glob.ctx.save();
 		this.glob.ctx.fillStyle = '#ff0000';
@@ -235,11 +299,17 @@ export class World implements Stage{
 		this.glob.ctx.fillRect(this.temp_bar_offset[0], this.temp_bar_offset[1] - height, this.temp_bar_dim[0], height);
 		this.glob.ctx.restore();
 
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.temp_soffsets[1][0], this.temp_soffsets[1][1],
-			this.temp_dim[0], this.temp_dim[1],
-			this.temp_offset[0], this.temp_offset[1],
-			this.temp_dim[0], this.temp_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.temp_soffsets[1][0],
+			this.temp_soffsets[1][1],
+			this.temp_dim[0],
+			this.temp_dim[1],
+			this.temp_offset[0],
+			this.temp_offset[1],
+			this.temp_dim[0],
+			this.temp_dim[1],
+		);
 
 		// Picture of current species
 		this.draw_avatar();
@@ -259,9 +329,7 @@ export class World implements Stage{
 		// Individuals to place and move
 		this.draw_minispec();
 
-		this.keys = [
-			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
-		];
+		this.keys = [{ key: 'ENTER', action: () => this.next(), reset: true }];
 	}
 
 	render() {
@@ -269,7 +337,10 @@ export class World implements Stage{
 			for (const pos of this.animation_pos) {
 				this.draw_wm_part(pos[0], pos[1], false);
 			}
-			this.animation.render(this.glob.ctx, [this.map_offset[0] + this.animation_pos[0][0] * this.tile_dim[0], this.map_offset[1] + this.animation_pos[0][1] * this.tile_dim[1]]);
+			this.animation.render(this.glob.ctx, [
+				this.map_offset[0] + this.animation_pos[0][0] * this.tile_dim[0],
+				this.map_offset[1] + this.animation_pos[0][1] * this.tile_dim[1],
+			]);
 		}
 	}
 
@@ -279,13 +350,9 @@ export class World implements Stage{
 			if (this.animation.finished && this.animation.callback !== undefined) {
 				this.animation.callback();
 			}
-		}
-
-		else if (this.ai_active) {
+		} else if (this.ai_active) {
 			this.ai_step();
-		}
-
-		else if (this.catastrophe_status === 1) {
+		} else if (this.catastrophe_status === 1) {
 			this.catastrophe_exec();
 		}
 	}
@@ -299,12 +366,17 @@ export class World implements Stage{
 
 		if (this.catastrophe_status === 3 || this.world.current_player.toplace === 0) {
 			this.next_popup(1);
-		}
-		else if (this.world.current_player.individuals === 0) {
+		} else if (this.world.current_player.individuals === 0) {
 			open_popup(this.game, 'dino', this.glob.lang.where_to_live, null, this.glob.lang.next);
-		}
-		else {
-			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+		} else {
+			open_popup(
+				this.game,
+				'chuck_berry',
+				this.glob.lang.turn_finished,
+				(x: number) => this.next_popup(x),
+				this.glob.lang.no,
+				this.glob.lang.yes,
+			);
 		}
 	}
 
@@ -331,11 +403,9 @@ export class World implements Stage{
 					const p = this.world.players[scores[i][0]];
 					if (p.is_dead || p.type === PLAYER_TYPE.NOBODY) {
 						p.evo_score = 0;
-					}
-					else if (scores[i - 1][1] === scores[i][1]) {
+					} else if (scores[i - 1][1] === scores[i][1]) {
 						p.evo_score = this.world.players[scores[i - 1][0]].evo_score;
-					}
-					else {
+					} else {
 						p.evo_score = this.game.evo_points[i];
 					}
 				}
@@ -373,7 +443,8 @@ export class World implements Stage{
 				this.world.humid += 10;
 				this.catastrophe_finish();
 				break;
-			case 2: { // Comet
+			case 2: {
+				// Comet
 				this.world.temp -= 10;
 				this.world.water_level -= 3;
 
@@ -398,12 +469,32 @@ export class World implements Stage{
 				}
 
 				// Big Explosion
-				this.animation = new Sprite(this.map_pics, [0, 32],
-					[[0, 0], [48, 0], [96, 0], [144, 0], [192, 0], [240, 0], [288, 0], [336, 0], [384, 0], [432, 0], [480, 0], [528, 0]], anim_delays.world, [48, 48],
-					true, () => this.comet_finish());
+				this.animation = new Sprite(
+					this.map_pics,
+					[0, 32],
+					[
+						[0, 0],
+						[48, 0],
+						[96, 0],
+						[144, 0],
+						[192, 0],
+						[240, 0],
+						[288, 0],
+						[336, 0],
+						[384, 0],
+						[432, 0],
+						[480, 0],
+						[528, 0],
+					],
+					anim_delays.world,
+					[48, 48],
+					true,
+					() => this.comet_finish(),
+				);
 				break;
 			}
-			case 3: { // Plague
+			case 3: {
+				// Plague
 				const creatures = [];
 				for (let x = 3; x <= 24; x++) {
 					for (let y = 3; y <= 24; y++) {
@@ -427,7 +518,8 @@ export class World implements Stage{
 				this.catastrophe_finish();
 				break;
 			}
-			case 4: { // Volcano
+			case 4: {
+				// Volcano
 				const volcanos: Point[] = [];
 				for (let x = 3; x <= 24; x++) {
 					for (let y = 3; y <= 24; y++) {
@@ -448,7 +540,8 @@ export class World implements Stage{
 				this.world.height_map = create_height_map();
 				this.catastrophe_finish();
 				break;
-			case 7: { // Humans
+			case 7: {
+				// Humans
 				const land: Point[] = [];
 				for (let x = 10; x <= 18; x++) {
 					for (let y = 10; y <= 18; y++) {
@@ -462,12 +555,28 @@ export class World implements Stage{
 				const [x, y] = random_element(land);
 				this.animation_pos = [[x, y]];
 
-				this.animation = new Sprite(this.map_pics, [512, 16],
-					[[0, 0], [16, 0], [32, 0], [48, 0], [0, 0], [16, 0], [32, 0], [48, 0]], anim_delays.world, [16, 16],
-					true, () => this.humans_finish());
+				this.animation = new Sprite(
+					this.map_pics,
+					[512, 16],
+					[
+						[0, 0],
+						[16, 0],
+						[32, 0],
+						[48, 0],
+						[0, 0],
+						[16, 0],
+						[32, 0],
+						[48, 0],
+					],
+					anim_delays.world,
+					[16, 16],
+					true,
+					() => this.humans_finish(),
+				);
 				break;
 			}
-			case 8: { // Cosmic rays
+			case 8: {
+				// Cosmic rays
 				for (const player of this.world.players) {
 					if (player.type !== PLAYER_TYPE.NOBODY && !player.is_dead) {
 						const stats: Tuple<number, 13> = [...player.stats];
@@ -480,8 +589,7 @@ export class World implements Stage{
 			}
 			default:
 				console.warn(this.catastrophe_type);
-				open_popup(this.game, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
-					null, 'Oh no!');
+				open_popup(this.game, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!', null, 'Oh no!');
 		}
 	}
 
@@ -492,11 +600,21 @@ export class World implements Stage{
 			this.world.water_level = clamp(this.world.water_level, 0, 100);
 
 			this.animation = null;
-			this.world.world_map = create_world_map(this.catastrophe_type === 6 ? null : this.world.world_map, this.world.height_map, this.world.water_level, this.world.mountain_level, this.world.temp, this.world.humid);
+			this.world.world_map = create_world_map(
+				this.catastrophe_type === 6 ? null : this.world.world_map,
+				this.world.height_map,
+				this.world.water_level,
+				this.world.mountain_level,
+				this.world.temp,
+				this.world.humid,
+			);
 
 			for (let y = 1; y < worldmap_size[1] - 1; y++) {
 				for (let x = 1; x < worldmap_size[0] - 1; x++) {
-					if (this.world.map_positions[y][x] >= 0 && (this.world.world_map[y][x] === WORLD_MAP.WATER || this.world.world_map[y][x] >= WORLD_MAP.MOUNTAIN)) {
+					if (
+						this.world.map_positions[y][x] >= 0 &&
+						(this.world.world_map[y][x] === WORLD_MAP.WATER || this.world.world_map[y][x] >= WORLD_MAP.MOUNTAIN)
+					) {
 						this.kill_individual(x, y);
 					}
 				}
@@ -572,9 +690,24 @@ export class World implements Stage{
 			}
 		}
 
-		this.animation = new Sprite(this.map_pics, [512, 16],
-			[[0, 0], [16, 0], [32, 0], [48, 0], [0, 0], [16, 0], [32, 0], [48, 0]], anim_delays.world, [16, 16],
-			true, () => this.volcano_step(volcanos_left - 1, positions));
+		this.animation = new Sprite(
+			this.map_pics,
+			[512, 16],
+			[
+				[0, 0],
+				[16, 0],
+				[32, 0],
+				[48, 0],
+				[0, 0],
+				[16, 0],
+				[32, 0],
+				[48, 0],
+			],
+			anim_delays.world,
+			[16, 16],
+			true,
+			() => this.volcano_step(volcanos_left - 1, positions),
+		);
 		this.animation_pos = [[x, y]];
 	}
 
@@ -597,16 +730,39 @@ export class World implements Stage{
 	}
 
 	fight(x: number, y: number) {
-		const attack = this.world.current_player.stats[ATTR.ATTACK] + this.world.current_player.stats[ATTR.INTELLIGENCE] / 2 + this.world.current_player.experience * 10 + this.world.current_player.stats[this.world.world_map[y][x] - WORLD_MAP.RANGONES];
+		const attack =
+			this.world.current_player.stats[ATTR.ATTACK] +
+			this.world.current_player.stats[ATTR.INTELLIGENCE] / 2 +
+			this.world.current_player.experience * 10 +
+			this.world.current_player.stats[this.world.world_map[y][x] - WORLD_MAP.RANGONES];
 
 		const enemy = this.world.players[this.world.map_positions[y][x]];
-		const defense = enemy.stats[ATTR.DEFENSE] + enemy.stats[ATTR.INTELLIGENCE] / 2 + enemy.experience * 10 + enemy.stats[this.world.world_map[y][x] - WORLD_MAP.RANGONES];
+		const defense =
+			enemy.stats[ATTR.DEFENSE] +
+			enemy.stats[ATTR.INTELLIGENCE] / 2 +
+			enemy.experience * 10 +
+			enemy.stats[this.world.world_map[y][x] - WORLD_MAP.RANGONES];
 
-		const winner = (attack + random_int(0, attack) > defense + random_int(0, defense)) ? this.world.current_player.id : enemy.id;
+		const winner = attack + random_int(0, attack) > defense + random_int(0, defense) ? this.world.current_player.id : enemy.id;
 
-		this.animation = new Sprite(this.map_pics, [512, 16],
-			[[0, 0], [16, 0], [32, 0], [48, 0], [0, 0], [16, 0], [32, 0], [48, 0]], anim_delays.world, [16, 16],
-			true, () => this.fight_end(winner, enemy, x, y));
+		this.animation = new Sprite(
+			this.map_pics,
+			[512, 16],
+			[
+				[0, 0],
+				[16, 0],
+				[32, 0],
+				[48, 0],
+				[0, 0],
+				[16, 0],
+				[32, 0],
+				[48, 0],
+			],
+			anim_delays.world,
+			[16, 16],
+			true,
+			() => this.fight_end(winner, enemy, x, y),
+		);
 
 		this.animation_pos = [[x, y]];
 
@@ -716,16 +872,22 @@ export class World implements Stage{
 		// Clicked on own individual -> take it
 		if (this.world.map_positions[y][x] === this.world.current_player.id) {
 			// But only, if you still can move individuals
-			if (this.world.current_player.tomove && this.world.current_player.toplace < 20 && this.world.current_player.individuals > 1 && this.wm_set_mode !== 1) {
+			if (
+				this.world.current_player.tomove &&
+				this.world.current_player.toplace < 20 &&
+				this.world.current_player.individuals > 1 &&
+				this.wm_set_mode !== 1
+			) {
 				this.take_individual(x, y);
 				this.wm_set_mode = 2;
 			}
-		}
-		else if (this.world.current_player.toplace &&
+		} else if (
+			this.world.current_player.toplace &&
 			this.world.world_map[y][x] >= WORLD_MAP.RANGONES &&
 			this.world.world_map[y][x] <= WORLD_MAP.DESERT &&
 			this.is_neighbour(this.world.current_player.id, x, y) &&
-			this.wm_set_mode !== 2) {
+			this.wm_set_mode !== 2
+		) {
 			this.set_individual(x, y);
 			this.wm_set_mode = 1;
 		}
@@ -760,11 +922,13 @@ export class World implements Stage{
 		// neighbored.
 		// This function is only called for land and the world border consists of
 		// water, so I don't need the check if x or y +/-1 exist
-		return (this.world.current_player.individuals === 0 ||
+		return (
+			this.world.current_player.individuals === 0 ||
 			this.world.map_positions[y][x - 1] === num ||
 			this.world.map_positions[y][x + 1] === num ||
 			this.world.map_positions[y - 1][x] === num ||
-			this.world.map_positions[y + 1][x] === num);
+			this.world.map_positions[y + 1][x] === num
+		);
 	}
 
 	ai() {
@@ -806,7 +970,7 @@ export class World implements Stage{
 			}
 
 			// Only use shadows (movements) if no individuals for placement are left
-			if(this.ai_own_individuals.length) {
+			if (this.ai_own_individuals.length) {
 				const to_remove = pop_random_element(this.ai_own_individuals);
 				this.take_individual(to_remove[0], to_remove[1]);
 			}
@@ -837,8 +1001,7 @@ export class World implements Stage{
 		const was_set = this.set_individual(best_move[0], best_move[1]);
 		if (was_set) {
 			this.ai_own_individuals.push(best_move);
-		}
-		else {
+		} else {
 			this.ai_fights[best_move[1]][best_move[0]]++;
 		}
 	}
@@ -876,25 +1039,25 @@ export class World implements Stage{
 				// Not too close to water to protect from catastrophes
 				if (this.world.world_map[yy][xx] === WORLD_MAP.WATER) {
 					value -= 20 * weight;
-				}
-				else if (this.world.map_positions[yy][xx] >= 0 && this.world.map_positions[yy][xx] !== this.world.current_player.id) {
+				} else if (this.world.map_positions[yy][xx] >= 0 && this.world.map_positions[yy][xx] !== this.world.current_player.id) {
 					// In the first turn, the players should be placed with some distance to each other
 					if (this.world.turn === 0) {
 						value -= 100 * weight;
-					}
-					else {
+					} else {
 						const player = this.world.current_player;
 						const enemy = this.world.players[this.world.map_positions[yy][xx]];
-						const winning_chance = player.stats[this.world.world_map[yy][xx] - WORLD_MAP.RANGONES] +
-							player.stats[ATTR.ATTACK] + player.stats[ATTR.INTELLIGENCE] / 4 -
+						const winning_chance =
+							player.stats[this.world.world_map[yy][xx] - WORLD_MAP.RANGONES] +
+							player.stats[ATTR.ATTACK] +
+							player.stats[ATTR.INTELLIGENCE] / 4 -
 							enemy.stats[this.world.world_map[yy][xx] - WORLD_MAP.RANGONES] -
-							enemy.stats[ATTR.DEFENSE] - enemy.stats[ATTR.INTELLIGENCE] / 4;
+							enemy.stats[ATTR.DEFENSE] -
+							enemy.stats[ATTR.INTELLIGENCE] / 4;
 						value += winning_chance * weight;
 						// Discourage fights that were fought before
 						value -= this.ai_fights[yy][xx] * 100 * weight;
 					}
-				}
-				else if (this.world.world_map[yy][xx] >= WORLD_MAP.RANGONES && this.world.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
+				} else if (this.world.world_map[yy][xx] >= WORLD_MAP.RANGONES && this.world.world_map[yy][xx] <= WORLD_MAP.FIREGRASS) {
 					value += this.world.players[this.world.current_player.id].stats[this.world.world_map[yy][xx] - WORLD_MAP.RANGONES] * weight;
 				}
 			}
@@ -908,21 +1071,34 @@ export class World implements Stage{
 		if (individuals.length === 0) {
 			for (let x = 1; x < worldmap_size[0] - 1; x++) {
 				for (let y = 1; y < worldmap_size[1] - 1; y++) {
-					if (this.world.map_positions[y][x] === -1 && this.world.world_map[y][x] >= WORLD_MAP.RANGONES && this.world.world_map[y][x] <= WORLD_MAP.DESERT) {
+					if (
+						this.world.map_positions[y][x] === -1 &&
+						this.world.world_map[y][x] >= WORLD_MAP.RANGONES &&
+						this.world.world_map[y][x] <= WORLD_MAP.DESERT
+					) {
 						possible_moves.push([x, y]);
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			for (const ind of individuals) {
 				const x = ind[0];
 				const y = ind[1];
-				const four_moves: Point[] = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+				const four_moves: Point[] = [
+					[x - 1, y],
+					[x + 1, y],
+					[x, y - 1],
+					[x, y + 1],
+				];
 				for (const pos of four_moves) {
 					const xx = pos[0];
 					const yy = pos[1];
-					if (possible_moves.indexOf(pos) === -1 && this.world.map_positions[yy][xx] !== this.world.current_player.id && this.world.world_map[yy][xx] >= WORLD_MAP.RANGONES && this.world.world_map[yy][xx] <= WORLD_MAP.DESERT) {
+					if (
+						possible_moves.indexOf(pos) === -1 &&
+						this.world.map_positions[yy][xx] !== this.world.current_player.id &&
+						this.world.world_map[yy][xx] >= WORLD_MAP.RANGONES &&
+						this.world.world_map[yy][xx] <= WORLD_MAP.DESERT
+					) {
 						possible_moves.push(pos);
 					}
 				}
@@ -935,27 +1111,45 @@ export class World implements Stage{
 	draw_avatar() {
 		const soffset = this.spec_soffsets[this.world.current_player.id];
 
-		this.glob.ctx.drawImage(this.bg_pic,
-			this.spec_offset[0], this.spec_offset[1],
-			this.spec_dim[0], this.spec_dim[1],
-			this.spec_offset[0], this.spec_offset[1],
-			this.spec_dim[0], this.spec_dim[1]);
+		this.glob.ctx.drawImage(
+			this.bg_pic,
+			this.spec_offset[0],
+			this.spec_offset[1],
+			this.spec_dim[0],
+			this.spec_dim[1],
+			this.spec_offset[0],
+			this.spec_offset[1],
+			this.spec_dim[0],
+			this.spec_dim[1],
+		);
 
-		this.glob.ctx.drawImage(this.spec_pics,
-			soffset[0], soffset[1],
-			this.spec_dim[0], this.spec_dim[1],
-			this.spec_offset[0], this.spec_offset[1],
-			this.spec_dim[0], this.spec_dim[1]);
+		this.glob.ctx.drawImage(
+			this.spec_pics,
+			soffset[0],
+			soffset[1],
+			this.spec_dim[0],
+			this.spec_dim[1],
+			this.spec_offset[0],
+			this.spec_offset[1],
+			this.spec_dim[0],
+			this.spec_dim[1],
+		);
 	}
 
 	draw_bar() {
 		const w = this.bar_offset[0] - this.bar_icon_offset[0] + this.bar_dim[0];
 		const h = this.bar_dy * this.world.players.length;
-		this.glob.ctx.drawImage(this.bg_pic,
-			this.bar_icon_offset[0], this.bar_icon_offset[1],
-			w, h,
-			this.bar_icon_offset[0], this.bar_icon_offset[1],
-			w, h);
+		this.glob.ctx.drawImage(
+			this.bg_pic,
+			this.bar_icon_offset[0],
+			this.bar_icon_offset[1],
+			w,
+			h,
+			this.bar_icon_offset[0],
+			this.bar_icon_offset[1],
+			w,
+			h,
+		);
 
 		let max_individuals = 0;
 		for (const player of this.world.players) {
@@ -965,17 +1159,28 @@ export class World implements Stage{
 		}
 
 		for (let i = 0; i < this.world.players.length; i++) {
-			this.glob.ctx.drawImage(this.map_pics,
-				this.minispec_soffset[0] + 16 * i, this.minispec_soffset[1],
-				this.tile_dim[0], this.tile_dim[1],
-				this.bar_icon_offset[0], this.bar_icon_offset[1] + this.bar_dy * i,
-				this.tile_dim[0], this.tile_dim[1]);
+			this.glob.ctx.drawImage(
+				this.map_pics,
+				this.minispec_soffset[0] + 16 * i,
+				this.minispec_soffset[1],
+				this.tile_dim[0],
+				this.tile_dim[1],
+				this.bar_icon_offset[0],
+				this.bar_icon_offset[1] + this.bar_dy * i,
+				this.tile_dim[0],
+				this.tile_dim[1],
+			);
 
 			if (max_individuals) {
 				this.glob.ctx.save();
 				this.glob.ctx.beginPath();
 				this.glob.ctx.fillStyle = this.bar_colors[i];
-				this.glob.ctx.fillRect(this.bar_offset[0], this.bar_offset[1] + this.bar_dy * i, this.bar_dim[0] * this.world.players[i].individuals / max_individuals, this.bar_dim[1]);
+				this.glob.ctx.fillRect(
+					this.bar_offset[0],
+					this.bar_offset[1] + this.bar_dy * i,
+					(this.bar_dim[0] * this.world.players[i].individuals) / max_individuals,
+					this.bar_dim[1],
+				);
 				this.glob.ctx.restore();
 			}
 		}
@@ -984,26 +1189,44 @@ export class World implements Stage{
 	draw_minispec() {
 		const w = this.minispec_delta[0] * 10;
 		const h = this.tomove_offset[1] - this.toplace_offset[1] + this.minispec_delta[1] * 3;
-		this.glob.ctx.drawImage(this.bg_pic,
-			this.toplace_offset[0], this.toplace_offset[1],
-			w, h,
-			this.toplace_offset[0], this.toplace_offset[1],
-			w, h);
+		this.glob.ctx.drawImage(
+			this.bg_pic,
+			this.toplace_offset[0],
+			this.toplace_offset[1],
+			w,
+			h,
+			this.toplace_offset[0],
+			this.toplace_offset[1],
+			w,
+			h,
+		);
 
 		for (let i = 0; i < this.world.current_player.toplace; i++) {
-			this.glob.ctx.drawImage(this.map_pics,
-				this.minispec_soffset[0] + this.tile_dim[0] * this.world.current_player.id, this.minispec_soffset[1],
-				this.tile_dim[0], this.tile_dim[1],
-				this.toplace_offset[0] + this.minispec_delta[0] * (i % 10), this.toplace_offset[1] + this.minispec_delta[1] * Math.floor(i / 10),
-				this.tile_dim[0], this.tile_dim[1]);
+			this.glob.ctx.drawImage(
+				this.map_pics,
+				this.minispec_soffset[0] + this.tile_dim[0] * this.world.current_player.id,
+				this.minispec_soffset[1],
+				this.tile_dim[0],
+				this.tile_dim[1],
+				this.toplace_offset[0] + this.minispec_delta[0] * (i % 10),
+				this.toplace_offset[1] + this.minispec_delta[1] * Math.floor(i / 10),
+				this.tile_dim[0],
+				this.tile_dim[1],
+			);
 		}
 
 		for (let i = 0; i < this.world.current_player.tomove; i++) {
-			this.glob.ctx.drawImage(this.map_pics,
-				this.minispec_soffset[0] + this.tile_dim[0] * (this.world.current_player.id + 6), this.minispec_soffset[1],
-				this.tile_dim[0], this.tile_dim[1],
-				this.tomove_offset[0] + this.minispec_delta[0] * (i % 10), this.tomove_offset[1] + this.minispec_delta[1] * Math.floor(i / 10),
-				this.tile_dim[0], this.tile_dim[1]);
+			this.glob.ctx.drawImage(
+				this.map_pics,
+				this.minispec_soffset[0] + this.tile_dim[0] * (this.world.current_player.id + 6),
+				this.minispec_soffset[1],
+				this.tile_dim[0],
+				this.tile_dim[1],
+				this.tomove_offset[0] + this.minispec_delta[0] * (i % 10),
+				this.tomove_offset[1] + this.minispec_delta[1] * Math.floor(i / 10),
+				this.tile_dim[0],
+				this.tile_dim[1],
+			);
 		}
 	}
 
@@ -1019,18 +1242,23 @@ export class World implements Stage{
 		let tile = 0;
 		if (this.world.world_map[y][x] === WORLD_MAP.WATER) {
 			tile = this.coast_tile(x, y);
-		}
-		else {
+		} else {
 			tile = this.world.world_map[y][x] + 46;
 		}
 
 		const soffset = [(tile % 37) * this.tile_dim[0], Math.floor(tile / 37) * this.tile_dim[0]];
 
-		this.glob.ctx.drawImage(this.map_pics,
-			soffset[0], soffset[1],
-			this.tile_dim[0], this.tile_dim[1],
-			this.map_offset[0] + x * this.tile_dim[0], this.map_offset[1] + y * this.tile_dim[1],
-			this.tile_dim[0], this.tile_dim[1]);
+		this.glob.ctx.drawImage(
+			this.map_pics,
+			soffset[0],
+			soffset[1],
+			this.tile_dim[0],
+			this.tile_dim[1],
+			this.map_offset[0] + x * this.tile_dim[0],
+			this.map_offset[1] + y * this.tile_dim[1],
+			this.tile_dim[0],
+			this.tile_dim[1],
+		);
 
 		if (show_spec && this.world.map_positions[y][x] >= 0) {
 			const shadow_offset = shadow ? 6 : 0;
@@ -1038,11 +1266,17 @@ export class World implements Stage{
 			this.glob.ctx.save();
 			this.glob.ctx.globalAlpha = shadow ? 0.3 : 1;
 
-			this.glob.ctx.drawImage(this.map_pics,
-				this.minispec_soffset[0] + this.tile_dim[0] * (this.world.map_positions[y][x] + shadow_offset), this.minispec_soffset[1],
-				this.tile_dim[0], this.tile_dim[1],
-				this.map_offset[0] + x * this.tile_dim[0], this.map_offset[1] + y * this.tile_dim[1],
-				this.tile_dim[0], this.tile_dim[1]);
+			this.glob.ctx.drawImage(
+				this.map_pics,
+				this.minispec_soffset[0] + this.tile_dim[0] * (this.world.map_positions[y][x] + shadow_offset),
+				this.minispec_soffset[1],
+				this.tile_dim[0],
+				this.tile_dim[1],
+				this.map_offset[0] + x * this.tile_dim[0],
+				this.map_offset[1] + y * this.tile_dim[1],
+				this.tile_dim[0],
+				this.tile_dim[1],
+			);
 
 			this.glob.ctx.restore();
 		}
@@ -1080,7 +1314,16 @@ export class World implements Stage{
 	}
 }
 
-const correct_coast_tile = [0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20, 18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21, 23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34, 25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46];
+const correct_coast_tile = [
+	0, 30, 2, 30, 29, 38, 29, 38, 1, 21, 8, 21, 29, 38, 29, 38, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 4, 20, 5, 20,
+	18, 34, 18, 34, 7, 26, 14, 26, 18, 34, 18, 34, 28, 40, 17, 40, 37, 44, 37, 44, 28, 40, 17, 40, 37, 44, 37, 44, 31, 39, 22, 39, 41, 45, 41,
+	45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19,
+	35, 27, 35, 41, 45, 41, 45, 36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 3, 30, 9, 30, 23, 38, 23, 38, 6, 21, 13, 21,
+	23, 38, 23, 38, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 10, 20, 11, 20, 25, 34, 25, 34, 12, 26, 15, 26, 25, 34,
+	25, 34, 16, 40, 24, 40, 33, 44, 33, 44, 16, 40, 24, 40, 33, 44, 33, 44, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45,
+	36, 42, 32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46, 31, 39, 22, 39, 41, 45, 41, 45, 19, 35, 27, 35, 41, 45, 41, 45, 36, 42,
+	32, 42, 43, 46, 43, 46, 36, 42, 32, 42, 43, 46, 43, 46,
+];
 
 export function create_height_map(): number[][] {
 	const map: number[][] = Array.from(Array(worldmap_size[1]), () => Array(worldmap_size[0]).fill(0));
@@ -1121,15 +1364,21 @@ export function create_height_map(): number[][] {
 	return map;
 }
 
-export function create_world_map(world_map: number[][] | null, height_map: number[][], water_level: number, mountain_level: number, temp: number, humid: number): number[][] {
+export function create_world_map(
+	world_map: number[][] | null,
+	height_map: number[][],
+	water_level: number,
+	mountain_level: number,
+	temp: number,
+	humid: number,
+): number[][] {
 	const map: number[][] = Array.from(Array(worldmap_size[1]), () => Array(worldmap_size[0]).fill(0));
 
 	for (let y = 0; y < worldmap_size[1]; y++) {
 		for (let x = 0; x < worldmap_size[0]; x++) {
 			if (world_map === null || world_map[y][x] <= WORLD_MAP.MOUNTAIN) {
 				map[y][x] = find_tile(height_map[y][x], y, water_level, mountain_level, temp, humid);
-			}
-			else {
+			} else {
 				map[y][x] = world_map[y][x];
 			}
 		}
@@ -1141,7 +1390,14 @@ export function create_world_map(world_map: number[][] | null, height_map: numbe
 function find_tile(height: number, y: number, water_level: number, mountain_level: number, temp: number, humid: number): number {
 	// [Ideal_Humid, Ideal_Temp] for Rangones, Blueleaf, ...
 	// TODO: Should be a Map or an object
-	const ideal: [number, number][] = [[65, 60], [72, 50], [85, 90], [50, 30], [70, 75], [40, 40]];
+	const ideal: [number, number][] = [
+		[65, 60],
+		[72, 50],
+		[85, 90],
+		[50, 30],
+		[70, 75],
+		[40, 40],
+	];
 
 	if (height <= water_level) {
 		return WORLD_MAP.WATER;

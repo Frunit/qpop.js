@@ -1,6 +1,6 @@
-import { Game } from "./game";
-import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, open_popup, write_text } from "./helper";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
+import { Game } from './game';
+import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, open_popup, write_text } from './helper';
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from './types';
 
 export class Init implements Stage {
 	id = SCENE.INIT;
@@ -32,40 +32,80 @@ export class Init implements Stage {
 	readonly line_from_to: Point = [157, 297];
 	readonly panel_soffset: Point = [0, 0];
 
-	readonly panel_offsets: Point[] = [[8, 27], [322, 27], [8, 169], [322, 169], [8, 311], [322, 311]];
-	readonly type_soffsets: Point[] = [[0, 0], [309, 65], [309, 1], [373, 1]];
-	readonly iq_soffsets: Point[] = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
-	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
+	readonly panel_offsets: Point[] = [
+		[8, 27],
+		[322, 27],
+		[8, 169],
+		[322, 169],
+		[8, 311],
+		[322, 311],
+	];
+	readonly type_soffsets: Point[] = [
+		[0, 0],
+		[309, 65],
+		[309, 1],
+		[373, 1],
+	];
+	readonly iq_soffsets: Point[] = [
+		[387, 65],
+		[373, 65],
+		[373, 78],
+		[373, 91],
+		[373, 104],
+	];
+	readonly spec_soffsets: Point[] = [
+		[0, 0],
+		[64, 0],
+		[128, 0],
+		[192, 0],
+		[256, 0],
+		[320, 0],
+	];
 
-	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+		private world: WorldGlobal,
+	) {
 		this.bg = glob.resources.get_image('gfx/init.png');
 		this.spec_pics = glob.resources.get_image('gfx/species.png');
 
 		this.tutorials = [
 			{
-				'name': 'welcome',
-				'pos': [140, 150],
-				'arrows': [],
-				'highlight': [160, 160, 161, 161],
+				name: 'welcome',
+				pos: [140, 150],
+				arrows: [],
+				highlight: [160, 160, 161, 161],
 			},
 			{
-				'name': 'change_language',
-				'pos': [278, 45],
-				'arrows': [{ dir: DIR.N, offset: 275 }, { dir: DIR.N, offset: 340 }],
-				'highlight': [545, 0, 640, 21],
+				name: 'change_language',
+				pos: [278, 45],
+				arrows: [
+					{ dir: DIR.N, offset: 275 },
+					{ dir: DIR.N, offset: 340 },
+				],
+				highlight: [545, 0, 640, 21],
 			},
 			{
-				'name': 'player_select',
-				'pos': [35, 190],
-				'arrows': [{ dir: DIR.N, offset: 80 }, { dir: DIR.N, offset: 128 }],
-				'highlight': [8, 27, 316, 167],
+				name: 'player_select',
+				pos: [35, 190],
+				arrows: [
+					{ dir: DIR.N, offset: 80 },
+					{ dir: DIR.N, offset: 128 },
+				],
+				highlight: [8, 27, 316, 167],
 			},
 			{
-				'name': 'next',
-				'pos': [278, 435],
-				'low_anchor': true,
-				'arrows': [{ dir: DIR.S, offset: 290 }],
-				'highlight': [this.next_offset[0], this.next_offset[1], this.next_offset[0] + this.next_dim[0], this.next_offset[1] + this.next_dim[1]],
+				name: 'next',
+				pos: [278, 435],
+				low_anchor: true,
+				arrows: [{ dir: DIR.S, offset: 290 }],
+				highlight: [
+					this.next_offset[0],
+					this.next_offset[1],
+					this.next_offset[0] + this.next_dim[0],
+					this.next_offset[1] + this.next_dim[1],
+				],
 			},
 		];
 	}
@@ -97,7 +137,7 @@ export class Init implements Stage {
 			y2: this.load_offset[1] + this.load_dim[1],
 			down: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim, true, true),
 			up: () => this.load_game(),
-			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim)
+			blur: () => draw_rect(this.glob.ctx, this.load_offset, this.load_dim),
 		});
 
 		this.clickareas.push({
@@ -107,7 +147,7 @@ export class Init implements Stage {
 			y2: this.next_offset[1] + this.next_dim[1],
 			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim),
 		});
 
 		// Lengths of lines around iq title
@@ -117,42 +157,84 @@ export class Init implements Stage {
 
 		for (let playernum = 0; playernum < this.panel_offsets.length; playernum++) {
 			const panel_offset = this.panel_offsets[playernum];
-			this.glob.ctx.drawImage(this.bg,
-				this.panel_soffset[0], this.panel_soffset[1],
-				this.panel_dim[0], this.panel_dim[1],
-				panel_offset[0], panel_offset[1],
-				this.panel_dim[0], this.panel_dim[1]);
-
+			this.glob.ctx.drawImage(
+				this.bg,
+				this.panel_soffset[0],
+				this.panel_soffset[1],
+				this.panel_dim[0],
+				this.panel_dim[1],
+				panel_offset[0],
+				panel_offset[1],
+				this.panel_dim[0],
+				this.panel_dim[1],
+			);
 
 			let soffset = this.iq_soffsets[this.world.players[playernum].iq];
-			this.glob.ctx.drawImage(this.bg,
-				soffset[0], soffset[1],
-				this.iq_dim[0], this.iq_dim[1],
+			this.glob.ctx.drawImage(
+				this.bg,
+				soffset[0],
+				soffset[1],
+				this.iq_dim[0],
+				this.iq_dim[1],
 				panel_offset[0] + this.iq_offset[0],
 				panel_offset[1] + this.iq_offset[1] - this.iq_dy * (this.world.players[playernum].iq - 1),
-				this.iq_dim[0], this.iq_dim[1]);
+				this.iq_dim[0],
+				this.iq_dim[1],
+			);
 
 			soffset = this.type_soffsets[this.world.players[playernum].type];
-			this.glob.ctx.drawImage(this.bg,
-				soffset[0], soffset[1],
-				this.type_dim[0], this.type_dim[1],
-				panel_offset[0] + this.type_offset[0], panel_offset[1] + this.type_offset[1],
-				this.type_dim[0], this.type_dim[1]);
+			this.glob.ctx.drawImage(
+				this.bg,
+				soffset[0],
+				soffset[1],
+				this.type_dim[0],
+				this.type_dim[1],
+				panel_offset[0] + this.type_offset[0],
+				panel_offset[1] + this.type_offset[1],
+				this.type_dim[0],
+				this.type_dim[1],
+			);
 
 			soffset = this.spec_soffsets[playernum];
-			this.glob.ctx.drawImage(this.spec_pics,
-				soffset[0], soffset[1],
-				this.type_dim[0], this.type_dim[1],
-				panel_offset[0] + this.spec_offset[0], panel_offset[1] + this.spec_offset[1],
-				this.type_dim[0], this.type_dim[1]);
+			this.glob.ctx.drawImage(
+				this.spec_pics,
+				soffset[0],
+				soffset[1],
+				this.type_dim[0],
+				this.type_dim[1],
+				panel_offset[0] + this.spec_offset[0],
+				panel_offset[1] + this.spec_offset[1],
+				this.type_dim[0],
+				this.type_dim[1],
+			);
 
-			write_text(this.glob.ctx, this.glob.lang.player.replace('{num}', (playernum + 1).toString()), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
+			write_text(
+				this.glob.ctx,
+				this.glob.lang.player.replace('{num}', (playernum + 1).toString()),
+				[Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15],
+				'black',
+				'white',
+			);
 
 			write_text(this.glob.ctx, this.glob.lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
 
-			write_text(this.glob.ctx, this.glob.lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', undefined, 'center');
+			write_text(
+				this.glob.ctx,
+				this.glob.lang.iq,
+				[panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]],
+				'#000000',
+				undefined,
+				'center',
+			);
 			for (let iq = 0; iq < 4; iq++) {
-				write_text(this.glob.ctx, this.glob.lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq], '#000000', undefined, 'left');
+				write_text(
+					this.glob.ctx,
+					this.glob.lang.iqs[iq],
+					[panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq],
+					'#000000',
+					undefined,
+					'left',
+				);
 			}
 
 			// Draw Line around IQ title   (------ IQ ------)
@@ -174,9 +256,9 @@ export class Init implements Stage {
 				y1: panel_offset[1] + this.type_offset[1],
 				x2: panel_offset[0] + this.type_offset[0] + this.type_dim[0],
 				y2: panel_offset[1] + this.type_offset[1] + this.type_dim[1],
-				down: () => { },
+				down: () => {},
 				up: () => this.change_type(playernum, 0),
-				blur: () => { }
+				blur: () => {},
 			});
 
 			// RichtClick areas for Type change (human, computer, inactive)
@@ -185,9 +267,9 @@ export class Init implements Stage {
 				y1: panel_offset[1] + this.type_offset[1],
 				x2: panel_offset[0] + this.type_offset[0] + this.type_dim[0],
 				y2: panel_offset[1] + this.type_offset[1] + this.type_dim[1],
-				down: () => { },
+				down: () => {},
 				up: () => this.change_type(playernum, 1),
-				blur: () => { }
+				blur: () => {},
 			});
 
 			// Click areas for IQ change
@@ -197,33 +279,35 @@ export class Init implements Stage {
 					y1: panel_offset[1] + this.iq_offset[1] - this.iq_dy * iq,
 					x2: panel_offset[0] + this.iq_offset[0] + this.iq_text_dim[0],
 					y2: panel_offset[1] + this.iq_offset[1] - this.iq_dy * iq + this.iq_text_dim[1],
-					down: () => { },
+					down: () => {},
 					up: () => this.change_iq(playernum, iq + 1),
-					blur: () => { }
+					blur: () => {},
 				});
 			}
 		}
 
-		this.keys = [
-			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
-		];
+		this.keys = [{ key: 'ENTER', action: () => this.next(), reset: true }];
 	}
 
-	render() {
-	}
+	render() {}
 
-	update() {
-	}
+	update() {}
 
 	change_type(player_num: number, value: number) {
-		this.world.players[player_num].type = (this.world.players[player_num].type + value) % 3 + 1;
+		this.world.players[player_num].type = ((this.world.players[player_num].type + value) % 3) + 1;
 		const soffset = this.type_soffsets[this.world.players[player_num].type];
 		const panel_offset = this.panel_offsets[player_num];
-		this.glob.ctx.drawImage(this.bg,
-			soffset[0], soffset[1],
-			this.type_dim[0], this.type_dim[1],
-			panel_offset[0] + this.type_offset[0], panel_offset[1] + this.type_offset[1],
-			this.type_dim[0], this.type_dim[1]);
+		this.glob.ctx.drawImage(
+			this.bg,
+			soffset[0],
+			soffset[1],
+			this.type_dim[0],
+			this.type_dim[1],
+			panel_offset[0] + this.type_offset[0],
+			panel_offset[1] + this.type_offset[1],
+			this.type_dim[0],
+			this.type_dim[1],
+		);
 	}
 
 	change_iq(player_num: number, iq: number) {
@@ -231,12 +315,18 @@ export class Init implements Stage {
 		const panel_offset = this.panel_offsets[player_num];
 
 		for (let i = 1; i <= 4; i++) {
-			const soffset = (i === iq) ? this.iq_soffsets[iq] : this.iq_soffsets[0];
-			this.glob.ctx.drawImage(this.bg,
-				soffset[0], soffset[1],
-				this.iq_dim[0], this.iq_dim[1],
-				panel_offset[0] + this.iq_offset[0], panel_offset[1] + this.iq_offset[1] - (i - 1) * this.iq_dy,
-				this.iq_dim[0], this.iq_dim[1]);
+			const soffset = i === iq ? this.iq_soffsets[iq] : this.iq_soffsets[0];
+			this.glob.ctx.drawImage(
+				this.bg,
+				soffset[0],
+				soffset[1],
+				this.iq_dim[0],
+				this.iq_dim[1],
+				panel_offset[0] + this.iq_offset[0],
+				panel_offset[1] + this.iq_offset[1] - (i - 1) * this.iq_dy,
+				this.iq_dim[0],
+				this.iq_dim[1],
+			);
 		}
 	}
 

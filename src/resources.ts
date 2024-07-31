@@ -1,13 +1,13 @@
-import { ResourceLoader } from "./loader";
-import { ResourceElement } from "./types";
+import { ResourceLoader } from './loader';
+import { ResourceElement } from './types';
 
 export class ResourceManager {
-	private image_cache: {[key: string]: true | HTMLImageElement} = {};
-	private audio_cache: {[key: string]: true | AudioBuffer} = {};
+	private image_cache: { [key: string]: true | HTMLImageElement } = {};
+	private audio_cache: { [key: string]: true | AudioBuffer } = {};
 	private ready_callback: (self: ResourceLoader) => void = () => {};
 	private ready_param?: ResourceLoader;
 	private loading: string[] = [];
-	private load_status: {[key: string]: number} = {};
+	private load_status: { [key: string]: number } = {};
 	private loaded = 0;
 	private audio_enabled = true;
 	private initial_play = true;
@@ -16,8 +16,8 @@ export class ResourceManager {
 	private context: AudioContext;
 	private music_node: GainNode;
 	private sound_node: GainNode;
-	private musics: {[key: string]: AudioBufferSourceNode} = {};
-	private sounds: {[key: string]: AudioBufferSourceNode} = {};
+	private musics: { [key: string]: AudioBufferSourceNode } = {};
+	private sounds: { [key: string]: AudioBufferSourceNode } = {};
 	private currently_playing_music = '';
 	private currently_playing_sounds: Set<string> = new Set();
 
@@ -26,7 +26,6 @@ export class ResourceManager {
 		this.music_node = this.context.createGain();
 		this.sound_node = this.context.createGain();
 	}
-
 
 	// Load an array of resources
 	// Format: [url, type, name]. Name is optional. Type must be "audio" or "image". The suffix for "audio" will be appended, so give the url without suffix for audio.
@@ -37,22 +36,21 @@ export class ResourceManager {
 			const name = resource.name ? resource.name : url;
 
 			// determine audio format. If no audio is possible, load nothing.
-			if(type === 'audio') {
-				if(this.best_audio_suffix === null || !this.audio_enabled) {
+			if (type === 'audio') {
+				if (this.best_audio_suffix === null || !this.audio_enabled) {
 					continue;
 				}
 
 				url += this.best_audio_suffix;
 				this._load_audio(url, name);
-			}
-			else {
+			} else {
 				this._load_image(url, name);
 			}
 		}
 	}
 
 	private _load_audio(url: string, name: string) {
-		if(this.audio_cache[name]) {
+		if (this.audio_cache[name]) {
 			return;
 		}
 		this.loading.push(name);
@@ -64,29 +62,33 @@ export class ResourceManager {
 
 		this.load_status[name] = 0;
 
-		request.addEventListener('load',
-			(event) => {
-				this.context.decodeAudioData(request.response, (buffer) => {
+		request.addEventListener('load', (event) => {
+			this.context.decodeAudioData(
+				request.response,
+				(buffer) => {
 					this.audio_cache[name] = buffer;
 					this.loaded++;
 					this._update_load_status(name, event.loaded);
 
-					if(this._is_ready() && this.ready_param) {
+					if (this._is_ready() && this.ready_param) {
 						this.ready_callback(this.ready_param);
 					}
-				}, (e) => {console.warn(`${e.name}: ${e.message}`);});
-			}
-		);
+				},
+				(e) => {
+					console.warn(`${e.name}: ${e.message}`);
+				},
+			);
+		});
 
-		request.addEventListener('progress',
-			(event) => {this._update_load_status(name, event.loaded);}
-		);
+		request.addEventListener('progress', (event) => {
+			this._update_load_status(name, event.loaded);
+		});
 
 		request.send();
 	}
-	
+
 	private _load_image(url: string, name: string) {
-		if(this.image_cache[name]) {
+		if (this.image_cache[name]) {
 			return;
 		}
 		this.loading.push(name);
@@ -98,26 +100,24 @@ export class ResourceManager {
 
 		this.load_status[name] = 0;
 
-		request.addEventListener('load',
-			(event) => {
-				const img = new Image();
-				const blob = new Blob([request.response]);
-				img.src = window.URL.createObjectURL(blob);
-				this.image_cache[name] = img;
-				window.URL.revokeObjectURL(img.src);
+		request.addEventListener('load', (event) => {
+			const img = new Image();
+			const blob = new Blob([request.response]);
+			img.src = window.URL.createObjectURL(blob);
+			this.image_cache[name] = img;
+			window.URL.revokeObjectURL(img.src);
 
-				this.loaded++;
-				this._update_load_status(name, event.loaded);
+			this.loaded++;
+			this._update_load_status(name, event.loaded);
 
-				if(this._is_ready() && this.ready_param) {
-					this.ready_callback(this.ready_param);
-				}
+			if (this._is_ready() && this.ready_param) {
+				this.ready_callback(this.ready_param);
 			}
-		);
+		});
 
-		request.addEventListener('progress',
-			(event) => {this._update_load_status(name, event.loaded);}
-		);
+		request.addEventListener('progress', (event) => {
+			this._update_load_status(name, event.loaded);
+		});
 
 		request.send();
 	}
@@ -127,11 +127,11 @@ export class ResourceManager {
 	}
 
 	get_suffix() {
-		if(!this.audio_enabled) {
+		if (!this.audio_enabled) {
 			return '';
 		}
 
-		if(this.best_audio_suffix === null) {
+		if (this.best_audio_suffix === null) {
 			const mimes = [
 				['.mp3', 'audio/mp3; codecs="mp3"'],
 				['.mp3', 'audio/mp4; codecs="mp3"'],
@@ -143,13 +143,13 @@ export class ResourceManager {
 
 			const audio_elem = document.createElement('audio');
 			for (const mime of mimes) {
-				if(audio_elem.canPlayType(mime[1]) === 'probably') {
+				if (audio_elem.canPlayType(mime[1]) === 'probably') {
 					this.best_audio_suffix = mime[0];
 					break;
 				}
 			}
 
-			if(this.best_audio_suffix === null) {
+			if (this.best_audio_suffix === null) {
 				return '';
 			}
 		}
@@ -184,23 +184,23 @@ export class ResourceManager {
 
 	get_status() {
 		let bytes = 0;
-		for(const value of Object.values(this.load_status)) {
+		for (const value of Object.values(this.load_status)) {
 			bytes += value;
 		}
 		return bytes;
 	}
 
 	play_music(name: string) {
-		if(this.initial_play) {
+		if (this.initial_play) {
 			this.initial_play = false;
 
-			if(this.context.state === 'suspended') {
+			if (this.context.state === 'suspended') {
 				this.context.resume();
 			}
 		}
 
-		if(this.currently_playing_music) {
-			if(this.currently_playing_music === name) {
+		if (this.currently_playing_music) {
+			if (this.currently_playing_music === name) {
 				return;
 			}
 
@@ -217,16 +217,16 @@ export class ResourceManager {
 		this.currently_playing_music = name;
 	}
 
-	play_sound(name: string, loop=false) {
-		if(this.initial_play) {
+	play_sound(name: string, loop = false) {
+		if (this.initial_play) {
 			this.initial_play = false;
 
-			if(this.context.state === 'suspended') {
+			if (this.context.state === 'suspended') {
 				this.context.resume();
 			}
 		}
 
-		if(this.currently_playing_sounds.has(name)) {
+		if (this.currently_playing_sounds.has(name)) {
 			this.sounds[name].stop();
 			this.currently_playing_sounds.delete(name);
 		}
@@ -234,9 +234,9 @@ export class ResourceManager {
 		this.sounds[name] = this.context.createBufferSource();
 		this.sounds[name].connect(this.sound_node).connect(this.context.destination);
 		this.sounds[name].buffer = this.get_audio(name);
-		this.sounds[name].addEventListener('ended',
-			() => {this.currently_playing_sounds.delete(name);}
-		);
+		this.sounds[name].addEventListener('ended', () => {
+			this.currently_playing_sounds.delete(name);
+		});
 		this.sounds[name].loop = loop;
 		this.sounds[name].start(0, 0);
 
@@ -244,20 +244,19 @@ export class ResourceManager {
 	}
 
 	stop_music() {
-		if(this.currently_playing_music) {
+		if (this.currently_playing_music) {
 			this.musics[this.currently_playing_music].stop();
 			this.currently_playing_music = '';
 		}
 	}
 
 	stop_sound(name = '') {
-		if(name === '') {
+		if (name === '') {
 			for (const elem of this.currently_playing_sounds) {
 				this.sounds[elem].stop();
 			}
 			this.currently_playing_sounds.clear();
-		}
-		else if(this.sounds[name]) {
+		} else if (this.sounds[name]) {
 			this.sounds[name].stop();
 			this.currently_playing_sounds.delete(name);
 		}
@@ -272,13 +271,13 @@ export class ResourceManager {
 	}
 
 	pause() {
-		if(this.context.state === 'running') {
+		if (this.context.state === 'running') {
 			this.context.suspend();
 		}
 	}
 
 	unpause() {
-		if(this.context.state === 'suspended' && this.audio_enabled) {
+		if (this.context.state === 'suspended' && this.audio_enabled) {
 			this.context.resume();
 		}
 	}

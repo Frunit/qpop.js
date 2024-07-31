@@ -1,12 +1,27 @@
-import { Electro, Feeding, Fight, IAction, Love, Quicksand, Waiting } from "./actions";
-import { Camera } from "./camera";
-import { survivalmap_size } from "./consts";
-import { Game } from "./game";
-import { ATTR, DIR, PLAYER_TYPE, PRED, SCENE, SURV_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, random_element, random_int, write_text } from "./helper";
-import { Enemy, Female, ISurvivalCharacter, Level, Predator } from "./level";
-import { Sprite } from "./sprite";
-import { anim_delays } from "./sprite_positions";
-import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from "./types";
+import { Electro, Feeding, Fight, IAction, Love, Quicksand, Waiting } from './actions';
+import { Camera } from './camera';
+import { survivalmap_size } from './consts';
+import { Game } from './game';
+import {
+	ATTR,
+	DIR,
+	PLAYER_TYPE,
+	PRED,
+	SCENE,
+	SURV_MAP,
+	clamp,
+	draw_base,
+	draw_black_rect,
+	draw_rect,
+	open_popup,
+	random_element,
+	random_int,
+	write_text,
+} from './helper';
+import { Enemy, Female, ISurvivalCharacter, Level, Predator } from './level';
+import { Sprite } from './sprite';
+import { anim_delays } from './sprite_positions';
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType, WorldGlobal } from './types';
 
 export class Survival implements Stage {
 	id = SCENE.SURVIVAL;
@@ -78,7 +93,11 @@ export class Survival implements Stage {
 	readonly max_time = 54;
 	readonly speed = 8;
 
-	constructor(private game: Game, private glob: TechGlobal, private world: WorldGlobal) {
+	constructor(
+		private game: Game,
+		private glob: TechGlobal,
+		private world: WorldGlobal,
+	) {
 		this.bg_pic = glob.resources.get_image('gfx/dark_bg.png');
 		this.gui_pics = glob.resources.get_image('gfx/survival_gui.png');
 		this.time = this.max_time;
@@ -88,28 +107,46 @@ export class Survival implements Stage {
 
 		this.tutorials = [
 			{
-				'name': 'survival_start',
-				'pos': [275, 100],
-				'arrows': [{ dir: DIR.W, offset: 140 }],
-				'highlight': [this.camera_offset[0], this.camera_offset[1], this.camera_offset[0] + this.camera_dim[0], this.camera_offset[1] + this.camera_dim[1]],
+				name: 'survival_start',
+				pos: [275, 100],
+				arrows: [{ dir: DIR.W, offset: 140 }],
+				highlight: [
+					this.camera_offset[0],
+					this.camera_offset[1],
+					this.camera_offset[0] + this.camera_dim[0],
+					this.camera_offset[1] + this.camera_dim[1],
+				],
 			},
 			{
-				'name': 'survival_goals',
-				'pos': [275, 100],
-				'arrows': [],
-				'highlight': [this.camera_offset[0], this.camera_offset[1], this.camera_offset[0] + this.camera_dim[0], this.camera_offset[1] + this.camera_dim[1]],
+				name: 'survival_goals',
+				pos: [275, 100],
+				arrows: [],
+				highlight: [
+					this.camera_offset[0],
+					this.camera_offset[1],
+					this.camera_offset[0] + this.camera_dim[0],
+					this.camera_offset[1] + this.camera_dim[1],
+				],
 			},
 			{
-				'name': 'survival_time',
-				'pos': [85, 140],
-				'arrows': [{ dir: DIR.E, offset: 68 }, { dir: DIR.E, offset: 106 }],
-				'highlight': [this.right_rect_offset[0], this.steps_offset[1] - 3, 640, this.time_offset[1] + this.time_dim[1] + 3],
+				name: 'survival_time',
+				pos: [85, 140],
+				arrows: [
+					{ dir: DIR.E, offset: 68 },
+					{ dir: DIR.E, offset: 106 },
+				],
+				highlight: [this.right_rect_offset[0], this.steps_offset[1] - 3, 640, this.time_offset[1] + this.time_dim[1] + 3],
 			},
 			{
-				'name': 'survival_radar',
-				'pos': [85, 30],
-				'arrows': [{ dir: DIR.E, offset: 70 }],
-				'highlight': [this.minimap_offset[0], this.minimap_offset[1], this.minimap_offset[0] + this.minimap_dim[0], this.minimap_offset[1] + this.minimap_dim[1]],
+				name: 'survival_radar',
+				pos: [85, 30],
+				arrows: [{ dir: DIR.E, offset: 70 }],
+				highlight: [
+					this.minimap_offset[0],
+					this.minimap_offset[1],
+					this.minimap_offset[0] + this.minimap_dim[0],
+					this.minimap_offset[1] + this.minimap_dim[1],
+				],
 			},
 		];
 	}
@@ -126,7 +163,6 @@ export class Survival implements Stage {
 		}
 
 		this.glob.resources.play_music(`spec${this.world.current_player.id}`);
-
 
 		this.player_started = false;
 		this.time = this.max_time;
@@ -159,11 +195,15 @@ export class Survival implements Stage {
 			y2: this.next_offset[1] + this.next_dim[1],
 			down: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim, true, true),
 			up: () => this.next(),
-			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim)
+			blur: () => draw_rect(this.glob.ctx, this.next_offset, this.next_dim),
 		});
 
 		// Black border around camera
-		draw_black_rect(this.glob.ctx, [this.camera_offset[0] - 1, this.camera_offset[1] - 1], [this.camera_dim[0] + 1, this.camera_dim[1] + 1]);
+		draw_black_rect(
+			this.glob.ctx,
+			[this.camera_offset[0] - 1, this.camera_offset[1] - 1],
+			[this.camera_dim[0] + 1, this.camera_dim[1] + 1],
+		);
 
 		// Click on camera:
 		// Arrows override click
@@ -180,7 +220,7 @@ export class Survival implements Stage {
 			up: () => this.cam_click(-1, -1),
 			blur: () => this.cam_click(-1, -1),
 			move: (x: number, y: number) => this.cam_click(x, y),
-			default_pointer: true
+			default_pointer: true,
 		});
 
 		this.rightclickareas.push({
@@ -190,27 +230,39 @@ export class Survival implements Stage {
 			y2: this.camera_offset[1] + this.camera_dim[1],
 			down: (x: number, y: number) => this.cam_rightclickup(x, y),
 			up: (x: number, y: number) => this.cam_rightclickup(x, y),
-			blur: () => { },
-			move: () => { }
+			blur: () => {},
+			move: () => {},
 		});
 
 		// Minimap
 		this.draw_minimap();
 
 		// Steps
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.icon_steps_soffset[0], this.icon_steps_soffset[1],
-			this.icon_dim[0], this.icon_dim[1],
-			this.icon_steps_offset[0], this.icon_steps_offset[1],
-			this.icon_dim[0], this.icon_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.icon_steps_soffset[0],
+			this.icon_steps_soffset[1],
+			this.icon_dim[0],
+			this.icon_dim[1],
+			this.icon_steps_offset[0],
+			this.icon_steps_offset[1],
+			this.icon_dim[0],
+			this.icon_dim[1],
+		);
 		this.draw_steps();
 
 		// Time
-		this.glob.ctx.drawImage(this.gui_pics,
-			this.icon_time_soffset[0], this.icon_time_soffset[1],
-			this.icon_dim[0], this.icon_dim[1],
-			this.icon_time_offset[0], this.icon_time_offset[1],
-			this.icon_dim[0], this.icon_dim[1]);
+		this.glob.ctx.drawImage(
+			this.gui_pics,
+			this.icon_time_soffset[0],
+			this.icon_time_soffset[1],
+			this.icon_dim[0],
+			this.icon_dim[1],
+			this.icon_time_offset[0],
+			this.icon_time_offset[1],
+			this.icon_dim[0],
+			this.icon_dim[1],
+		);
 		this.draw_time();
 
 		// Symbols
@@ -220,8 +272,8 @@ export class Survival implements Stage {
 		this.camera.render(true);
 
 		this.keys = [
-			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
-			{ 'key': 'ESCAPE', 'action': () => this.suicide(), 'reset': true },
+			{ key: 'ENTER', action: () => this.next(), reset: true },
+			{ key: 'ESCAPE', action: () => this.suicide(), reset: true },
 		];
 	}
 
@@ -239,7 +291,6 @@ export class Survival implements Stage {
 		for (let y = -10; y < 10; y++) {
 			const real_y = clamp(this.level.character.tile[1] + y, 0, survivalmap_size[1] - 1);
 			for (let x = -10; x < 10; x++) {
-
 				// If the range is too low, don't show anything here
 				if (radar_range <= Math.sqrt(y ** 2 + x ** 2) * 10 - 30) {
 					continue;
@@ -250,8 +301,7 @@ export class Survival implements Stage {
 
 				if (x === 0 && y === 0) {
 					sym = MM_PLAYER;
-				}
-				else if (this.level.mobmap[real_y][real_x] !== null) {
+				} else if (this.level.mobmap[real_y][real_x] !== null) {
 					switch ((this.level.mobmap[real_y][real_x] as ISurvivalCharacter).type) {
 						case SURV_MAP.PREDATOR:
 							sym = MM_PREDATOR;
@@ -263,8 +313,7 @@ export class Survival implements Stage {
 							sym = MM_LOVE;
 							break;
 					}
-				}
-				else if (this.level.map[real_y][real_x] < 36) {
+				} else if (this.level.map[real_y][real_x] < 36) {
 					let threshold;
 					switch (this.level.map[real_y][real_x] % 6) {
 						case 3:
@@ -288,20 +337,24 @@ export class Survival implements Stage {
 				}
 
 				if (sym >= 0) {
-					this.glob.ctx.drawImage(this.gui_pics,
+					this.glob.ctx.drawImage(
+						this.gui_pics,
 						this.minimap_sym_soffset[0] + sym * this.minimap_sym_dim[0],
 						this.minimap_sym_soffset[1],
-						this.minimap_sym_dim[0], this.minimap_sym_dim[1],
+						this.minimap_sym_dim[0],
+						this.minimap_sym_dim[1],
 						this.minimap_offset[0] + (this.minimap_center + x) * this.minimap_sym_dim[0],
 						this.minimap_offset[1] + (this.minimap_center + y) * this.minimap_sym_dim[1],
-						this.minimap_sym_dim[0], this.minimap_sym_dim[1]);
+						this.minimap_sym_dim[0],
+						this.minimap_sym_dim[1],
+					);
 				}
 			}
 		}
 	}
 
 	draw_steps() {
-		const width = Math.ceil((this.steps_dim[0] - 1) * this.steps / this.max_steps);
+		const width = Math.ceil(((this.steps_dim[0] - 1) * this.steps) / this.max_steps);
 
 		this.glob.ctx.save();
 		this.glob.ctx.fillStyle = '#c3c3c3';
@@ -314,7 +367,7 @@ export class Survival implements Stage {
 	}
 
 	draw_time() {
-		const width = Math.ceil((this.time_dim[0] - 1) * this.time / this.max_time);
+		const width = Math.ceil(((this.time_dim[0] - 1) * this.time) / this.max_time);
 
 		this.glob.ctx.save();
 		this.glob.ctx.fillStyle = '#c3c3c3';
@@ -330,46 +383,76 @@ export class Survival implements Stage {
 		// Delete earlier drawings
 		const w = this.sym_dx * 10;
 		const h = this.sym_won_offset[1] - this.sym_food_offset[1] + this.sym_dim[1];
-		this.glob.ctx.drawImage(this.bg_pic,
-			this.sym_food_offset[0], this.sym_food_offset[1],
-			w, h,
-			this.sym_food_offset[0], this.sym_food_offset[1],
-			w, h);
+		this.glob.ctx.drawImage(
+			this.bg_pic,
+			this.sym_food_offset[0],
+			this.sym_food_offset[1],
+			w,
+			h,
+			this.sym_food_offset[0],
+			this.sym_food_offset[1],
+			w,
+			h,
+		);
 
 		// Food
 		for (let i = 0; i < Math.floor(this.world.current_player.eaten / this.eating_div); i++) {
-			this.glob.ctx.drawImage(this.gui_pics,
-				this.sym_food_soffset[0], this.sym_food_soffset[1],
-				this.sym_dim[0], this.sym_dim[1],
-				this.sym_food_offset[0] + this.sym_food_delta[0] * (i % 20), this.sym_food_offset[1] + this.sym_food_delta[1] * Math.floor(i / 20),
-				this.sym_dim[0], this.sym_dim[1]);
+			this.glob.ctx.drawImage(
+				this.gui_pics,
+				this.sym_food_soffset[0],
+				this.sym_food_soffset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+				this.sym_food_offset[0] + this.sym_food_delta[0] * (i % 20),
+				this.sym_food_offset[1] + this.sym_food_delta[1] * Math.floor(i / 20),
+				this.sym_dim[0],
+				this.sym_dim[1],
+			);
 		}
 
 		// Love
 		for (let i = 0; i < this.world.current_player.loved; i++) {
-			this.glob.ctx.drawImage(this.gui_pics,
-				this.sym_love_soffset[0], this.sym_love_soffset[1],
-				this.sym_dim[0], this.sym_dim[1],
-				this.sym_love_offset[0] + this.sym_dx * i, this.sym_love_offset[1],
-				this.sym_dim[0], this.sym_dim[1]);
+			this.glob.ctx.drawImage(
+				this.gui_pics,
+				this.sym_love_soffset[0],
+				this.sym_love_soffset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+				this.sym_love_offset[0] + this.sym_dx * i,
+				this.sym_love_offset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+			);
 		}
 
 		// Deaths
 		for (let i = 0; i < this.world.current_player.deaths; i++) {
-			this.glob.ctx.drawImage(this.gui_pics,
-				this.sym_dead_soffset[0], this.sym_dead_soffset[1],
-				this.sym_dim[0], this.sym_dim[1],
-				this.sym_dead_offset[0] + this.sym_dx * i, this.sym_dead_offset[1],
-				this.sym_dim[0], this.sym_dim[1]);
+			this.glob.ctx.drawImage(
+				this.gui_pics,
+				this.sym_dead_soffset[0],
+				this.sym_dead_soffset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+				this.sym_dead_offset[0] + this.sym_dx * i,
+				this.sym_dead_offset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+			);
 		}
 
 		// Wins
 		for (let i = 0; i < this.level.character.victories.length; i++) {
-			this.glob.ctx.drawImage(this.gui_pics,
-				this.sym_won_soffset[0] + this.sym_dim[0] * this.level.character.victories[i], this.sym_won_soffset[1],
-				this.sym_dim[0], this.sym_dim[1],
-				this.sym_won_offset[0] + this.sym_dx * i, this.sym_won_offset[1],
-				this.sym_dim[0], this.sym_dim[1]);
+			this.glob.ctx.drawImage(
+				this.gui_pics,
+				this.sym_won_soffset[0] + this.sym_dim[0] * this.level.character.victories[i],
+				this.sym_won_soffset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+				this.sym_won_offset[0] + this.sym_dx * i,
+				this.sym_won_offset[1],
+				this.sym_dim[0],
+				this.sym_dim[1],
+			);
 		}
 	}
 
@@ -393,7 +476,13 @@ export class Survival implements Stage {
 		for (let x = 1; x <= 26; x++) {
 			for (let y = 1; y <= 26; y++) {
 				if (this.world.map_positions[y][x] === this.world.current_player.id) {
-					food += (20 + iq * 20 + this.world.current_player.stats[ATTR.PERCEPTION] / 5 + this.world.current_player.stats[ATTR.INTELLIGENCE] / 10) * this.world.current_player.stats[this.world.world_map[y][x] - 1] / 3;
+					food +=
+						((20 +
+							iq * 20 +
+							this.world.current_player.stats[ATTR.PERCEPTION] / 5 +
+							this.world.current_player.stats[ATTR.INTELLIGENCE] / 10) *
+							this.world.current_player.stats[this.world.world_map[y][x] - 1]) /
+						3;
 				}
 			}
 		}
@@ -408,11 +497,13 @@ export class Survival implements Stage {
 		const deaths = Math.floor(random_int(0, this.world.current_player.individuals - 1) / 10) + 5;
 		let saved = 0;
 		for (let i = 0; i < deaths; i++) {
-			if (random_int(0, 600) < this.world.current_player.stats[ATTR.SPEED] ||
+			if (
+				random_int(0, 600) < this.world.current_player.stats[ATTR.SPEED] ||
 				random_int(0, 300) < this.world.current_player.stats[ATTR.CAMOUFLAGE] ||
 				random_int(0, 1000) < this.world.current_player.stats[ATTR.INTELLIGENCE] ||
 				random_int(0, 600) < this.world.current_player.stats[ATTR.DEFENSE] ||
-				random_int(0, 6) < iq) {
+				random_int(0, 6) < iq
+			) {
 				saved++;
 			}
 		}
@@ -453,8 +544,7 @@ export class Survival implements Stage {
 			if (adjacent !== null) {
 				if (isFemale(adjacent)) {
 					this.action = new Love(dir, char, adjacent, () => this.finish_love(adjacent), this.glob.resources);
-				}
-				else {
+				} else {
 					assertIsPredatorOrEnemy(adjacent);
 					const player_wins = this.does_player_win(adjacent);
 					this.action = new Fight(dir, char, adjacent, player_wins, () => this.finish_fight(player_wins, adjacent), this.glob.resources);
@@ -486,8 +576,8 @@ export class Survival implements Stage {
 
 	update_environment_sound() {
 		const current_sounds = this.level.get_sounds();
-		const to_start = [...current_sounds].filter(x => !this.active_sounds.has(x));
-		const to_stop = [...this.active_sounds].filter(x => !current_sounds.has(x));
+		const to_start = [...current_sounds].filter((x) => !this.active_sounds.has(x));
+		const to_stop = [...this.active_sounds].filter((x) => !current_sounds.has(x));
 
 		for (const sound of to_stop) {
 			this.glob.resources.stop_sound(sound);
@@ -502,9 +592,11 @@ export class Survival implements Stage {
 
 	does_player_win(opponent: Enemy | Predator) {
 		// The player wins if the character is invincible, fights against an enemy, or has a high defense.
-		return this.level.character.invincible ||
+		return (
+			this.level.character.invincible ||
 			opponent.type === SURV_MAP.ENEMY ||
-			random_int(0, (opponent as Predator).attack) <= this.world.current_player.stats[ATTR.DEFENSE];
+			random_int(0, (opponent as Predator).attack) <= this.world.current_player.stats[ATTR.DEFENSE]
+		);
 	}
 
 	finish_feeding(food: number) {
@@ -553,8 +645,8 @@ export class Survival implements Stage {
 			if (this.level.character.victories.length < 10) {
 				if (opponent.type === SURV_MAP.ENEMY) {
 					this.level.character.victories.push(opponent.species);
-				}
-				else if (this.glob.options.show_predators) { // Predator
+				} else if (this.glob.options.show_predators) {
+					// Predator
 					this.level.character.victories.push(opponent.species + 6);
 				}
 			}
@@ -571,8 +663,7 @@ export class Survival implements Stage {
 			}
 			this.draw_symbols();
 			this.finish_movement();
-		}
-		else {
+		} else {
 			opponent.sprite = new Sprite(opponent.pic, opponent.anims.still.soffset, opponent.anims.still.frames);
 			this.player_death();
 		}
@@ -633,13 +724,13 @@ export class Survival implements Stage {
 				char.tile[0]--;
 				char.rel_pos = [this.tile_dim[0], 0];
 				break;
-			case DIR.X: { // Feeding/waiting
+			case DIR.X: {
+				// Feeding/waiting
 				const ground_type = this.level.map[char.tile[1]][char.tile[0]];
 				if (this.level.edible[ground_type] === '1') {
 					this.action = new Feeding(char, this.level, ground_type, () => this.finish_feeding(ground_type), this.glob.resources);
 					this.delay = anim_delays.feeding;
-				}
-				else {
+				} else {
 					this.action = new Waiting(char, () => this.finish_feeding(100));
 				}
 				char.hidden = true;
@@ -691,8 +782,7 @@ export class Survival implements Stage {
 
 			if (obj.type === SURV_MAP.PLAYER) {
 				this.finish_movement();
-			}
-			else {
+			} else {
 				obj.sprite = new Sprite(obj.pic, obj.anims.still.soffset, obj.anims.still.frames);
 			}
 		}
@@ -701,7 +791,10 @@ export class Survival implements Stage {
 	start_predator_movement() {
 		const player_pos = this.level.character.tile;
 		const anim_delay = 0;
-		const evasion = this.world.current_player.stats[ATTR.CAMOUFLAGE] * 4 + this.world.current_player.stats[ATTR.SPEED] * 2 + this.world.current_player.stats[ATTR.INTELLIGENCE];
+		const evasion =
+			this.world.current_player.stats[ATTR.CAMOUFLAGE] * 4 +
+			this.world.current_player.stats[ATTR.SPEED] * 2 +
+			this.world.current_player.stats[ATTR.INTELLIGENCE];
 
 		this.moving_predators = [];
 
@@ -718,10 +811,17 @@ export class Survival implements Stage {
 			let scent_chance;
 
 			switch (dist) {
-				case 1: scent_chance = -1; break;
-				case 2: scent_chance = 10; break;
-				case 3: scent_chance = 5; break;
-				default: scent_chance = 0;
+				case 1:
+					scent_chance = -1;
+					break;
+				case 2:
+					scent_chance = 10;
+					break;
+				case 3:
+					scent_chance = 5;
+					break;
+				default:
+					scent_chance = 0;
 			}
 			scent_chance *= predator.scent;
 
@@ -743,15 +843,13 @@ export class Survival implements Stage {
 			else if (scent_chance < 0 || (scent_chance > 0 && random_int(0, scent_chance - 1) > evasion)) {
 				if (pos[1] - player_pos[1] > 0) {
 					target_dirs[0] = DIR.N;
-				}
-				else {
+				} else {
 					target_dirs[0] = DIR.S;
 				}
 
 				if (pos[0] - player_pos[0] > 0) {
 					target_dirs[1] = DIR.W;
-				}
-				else {
+				} else {
 					target_dirs[1] = DIR.E;
 				}
 
@@ -761,11 +859,9 @@ export class Survival implements Stage {
 
 				if (dirs.includes(target_dirs[0])) {
 					predator.movement = target_dirs[0];
-				}
-				else if (dirs.includes(target_dirs[1])) {
+				} else if (dirs.includes(target_dirs[1])) {
 					predator.movement = target_dirs[1];
-				}
-				else {
+				} else {
 					predator.movement = DIR.X;
 					predator.last_movement = DIR.X;
 				}
@@ -775,8 +871,7 @@ export class Survival implements Stage {
 			else {
 				if (dirs.length) {
 					predator.movement = random_element(dirs);
-				}
-				else {
+				} else {
 					predator.movement = DIR.X;
 					predator.last_movement = DIR.X;
 					continue;
@@ -823,8 +918,7 @@ export class Survival implements Stage {
 			if (dist > 5) {
 				predator.last_movement = predator.movement;
 				predator.movement = 0;
-			}
-			else {
+			} else {
 				this.moving_predators.push(predator);
 			}
 		}
@@ -835,7 +929,18 @@ export class Survival implements Stage {
 			return;
 		}
 
-		open_popup(this.game, 'chuck_berry', this.glob.lang.suicide, (x: number) => { if (x === 1) { this.player_death(true); } }, this.glob.lang.no, this.glob.lang.yes);
+		open_popup(
+			this.game,
+			'chuck_berry',
+			this.glob.lang.suicide,
+			(x: number) => {
+				if (x === 1) {
+					this.player_death(true);
+				}
+			},
+			this.glob.lang.no,
+			this.glob.lang.yes,
+		);
 	}
 
 	player_death(delete_sprite = false) {
@@ -871,32 +976,30 @@ export class Survival implements Stage {
 
 			// Test for Quicksand
 			// The player must stand on one of the empty tiles
-			if (Math.random() <= 0.000055 &&
-				[0, 12, 18, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 119, 121].includes(this.level.map[char.tile[1]][char.tile[0]])) {
+			if (
+				Math.random() <= 0.000055 &&
+				[0, 12, 18, 65, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 119, 121].includes(this.level.map[char.tile[1]][char.tile[0]])
+			) {
 				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 				this.action = new Quicksand(char, () => this.player_death(true), this.glob.resources);
 			}
 
 			// Test for Electro flower
 			// The field left or right must be empty (tile 65) and no unit may be on it
-			else if (Math.random() <= 0.000055 &&
-				((this.level.map[char.tile[1]][char.tile[0] - 1] === 65 &&
-					this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) ||
-					(this.level.map[char.tile[1]][char.tile[0] + 1] === 65 &&
-						this.level.mobmap[char.tile[1]][char.tile[0] + 1] === null))) {
+			else if (
+				Math.random() <= 0.000055 &&
+				((this.level.map[char.tile[1]][char.tile[0] - 1] === 65 && this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) ||
+					(this.level.map[char.tile[1]][char.tile[0] + 1] === 65 && this.level.mobmap[char.tile[1]][char.tile[0] + 1] === null))
+			) {
 				this.level.mobmap[char.tile[1]][char.tile[0]] = null;
 
 				// If the left (western) field is empty, use that. Otherwise use the right field.
-				if (this.level.map[char.tile[1]][char.tile[0] - 1] === 65 &&
-					this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) {
+				if (this.level.map[char.tile[1]][char.tile[0] - 1] === 65 && this.level.mobmap[char.tile[1]][char.tile[0] - 1] === null) {
 					this.action = new Electro(DIR.E, char, () => this.player_death(true), this.glob.resources);
-				}
-				else {
+				} else {
 					this.action = new Electro(DIR.W, char, () => this.player_death(true), this.glob.resources);
 				}
-			}
-
-			else if (this.player_started) {
+			} else if (this.player_started) {
 				this.time--;
 
 				if (this.time <= 0) {
@@ -924,8 +1027,7 @@ export class Survival implements Stage {
 		if (this.action !== null) {
 			if (this.action.finished) {
 				this.action.callback();
-			}
-			else {
+			} else {
 				this.action.update();
 			}
 		}
@@ -942,8 +1044,7 @@ export class Survival implements Stage {
 			return;
 		}
 
-		if (x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 &&
-			y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
+		if (x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 && y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
 			this.clickdir = DIR.X;
 			return;
 		}
@@ -954,25 +1055,20 @@ export class Survival implements Stage {
 
 		if (y < 0 && Math.abs(y) >= Math.abs(x)) {
 			this.clickdir = DIR.N;
-		}
-		else if (y > 0 && Math.abs(y) >= Math.abs(x)) {
+		} else if (y > 0 && Math.abs(y) >= Math.abs(x)) {
 			this.clickdir = DIR.S;
-		}
-		else if (x < 0 && Math.abs(x) > Math.abs(y)) {
+		} else if (x < 0 && Math.abs(x) > Math.abs(y)) {
 			this.clickdir = DIR.W;
-		}
-		else if (x > 0 && Math.abs(x) > Math.abs(y)) {
+		} else if (x > 0 && Math.abs(x) > Math.abs(y)) {
 			this.clickdir = DIR.E;
 		}
-
 	}
 
 	cam_rightclickup(x: number, y: number) {
 		x -= this.camera_offset[0];
 		y -= this.camera_offset[1];
 
-		if (x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 &&
-			y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
+		if (x >= this.tile_dim[0] * 3 && x < this.tile_dim[0] * 4 && y >= this.tile_dim[1] * 3 && y < this.tile_dim[1] * 4) {
 			this.suicide();
 		}
 	}
@@ -984,29 +1080,17 @@ export class Survival implements Stage {
 
 		if (this.glob.input.isDown('DOWN') && this.level.is_unblocked(this.level.character.tile, DIR.S)) {
 			this.start_movement(DIR.S);
-		}
-
-		else if (this.glob.input.isDown('UP') && this.level.is_unblocked(this.level.character.tile, DIR.N)) {
+		} else if (this.glob.input.isDown('UP') && this.level.is_unblocked(this.level.character.tile, DIR.N)) {
 			this.start_movement(DIR.N);
-		}
-
-		else if (this.glob.input.isDown('LEFT') && this.level.is_unblocked(this.level.character.tile, DIR.W)) {
+		} else if (this.glob.input.isDown('LEFT') && this.level.is_unblocked(this.level.character.tile, DIR.W)) {
 			this.start_movement(DIR.W);
-		}
-
-		else if (this.glob.input.isDown('RIGHT') && this.level.is_unblocked(this.level.character.tile, DIR.E)) {
+		} else if (this.glob.input.isDown('RIGHT') && this.level.is_unblocked(this.level.character.tile, DIR.E)) {
 			this.start_movement(DIR.E);
-		}
-
-		else if (this.glob.input.isDown('SPACE')) {
+		} else if (this.glob.input.isDown('SPACE')) {
 			this.start_movement(DIR.X);
-		}
-
-		else if (this.clickdir === 0 || (this.clickdir > 0 && this.level.is_unblocked(this.level.character.tile, this.clickdir))) {
+		} else if (this.clickdir === 0 || (this.clickdir > 0 && this.level.is_unblocked(this.level.character.tile, this.clickdir))) {
 			this.start_movement(this.clickdir);
-		}
-
-		else {
+		} else {
 			return false;
 		}
 
@@ -1016,7 +1100,7 @@ export class Survival implements Stage {
 	calc_outcome() {
 		let death_prob = this.world.current_player.deaths * 0.05;
 		if (this.world.current_player.eaten < 20 * this.eating_div) {
-			death_prob += (20 * this.eating_div - this.world.current_player.eaten) * 0.05 / this.eating_div;
+			death_prob += ((20 * this.eating_div - this.world.current_player.eaten) * 0.05) / this.eating_div;
 		}
 		if (death_prob > 0.9) {
 			death_prob = 0.9;
@@ -1037,7 +1121,7 @@ export class Survival implements Stage {
 			loved += Math.floor((this.world.current_player.eaten - 20 * this.eating_div) / (this.eating_div * 10));
 		}
 
-		this.world.current_player.toplace = Math.floor(loved * this.world.current_player.stats[ATTR.REPRODUCTION] / 20);
+		this.world.current_player.toplace = Math.floor((loved * this.world.current_player.stats[ATTR.REPRODUCTION]) / 20);
 		this.world.current_player.toplace = clamp(this.world.current_player.toplace, loved, 20);
 
 		this.world.current_player.tomove = Math.floor(this.world.current_player.stats[ATTR.SPEED] / 5);
@@ -1051,9 +1135,15 @@ export class Survival implements Stage {
 		}
 
 		if (this.steps > 0) {
-			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
-		}
-		else {
+			open_popup(
+				this.game,
+				'chuck_berry',
+				this.glob.lang.turn_finished,
+				(x: number) => this.next_popup(x),
+				this.glob.lang.no,
+				this.glob.lang.yes,
+			);
+		} else {
 			this.next_popup(1);
 		}
 	}
@@ -1063,9 +1153,14 @@ export class Survival implements Stage {
 			this.calc_outcome();
 			if (this.world.current_player.individuals === 0 && !this.world.current_player.is_dead) {
 				this.world.current_player.is_dead = true;
-				open_popup(this.game, this.world.current_player.id.toString(), this.glob.lang.dead, () => this.game.next_stage(), this.glob.lang.next);
-			}
-			else {
+				open_popup(
+					this.game,
+					this.world.current_player.id.toString(),
+					this.glob.lang.dead,
+					() => this.game.next_stage(),
+					this.glob.lang.next,
+				);
+			} else {
 				this.glob.resources.stop_sound();
 				this.game.next_stage();
 			}
