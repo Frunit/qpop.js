@@ -7,12 +7,20 @@
   "type": "module",
   "homepage": "https://frunit.itch.io/q-pop",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/Frunit/qpop.js.git"
+    "type": "git",
+    "url": "https://github.com/Frunit/qpop.js.git"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "lint": "eslint src/*",
+    "build": "node esbuild.mjs"
   },
   "devDependencies": {
-    "bun-types": "^1.0.14",
-    "eslint": "^8.54.0",
-    "typescript": "^5.3.2"
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "esbuild": "^0.23.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.18.0"
   }
 }
