@@ -8,7 +8,7 @@ import { AnimationFrames, NamedAnimationFrames, Point, SixNumbers, WorldGlobal }
 export class Level {
 	character: Character;
 	bg_sprites: (ISprite | null)[][] = Array.from(Array(survivalmap_size[0]), () => Array(survivalmap_size[0]).fill(null));
-	mobmap: (ISurvivalCharacter | null)[][];
+	mobmap: (ISurvivalCharacter | null)[][] = Array.from(Array(survivalmap_size[1]), () => Array(survivalmap_size[0]).fill(null));
 	map: number[][];
 	edible = '011111011111011111011111011111011111000000000000000000000000000000000000000000000000000001111110000000000000000000000010100000000000000';
 	predators: Predator[] = [];
@@ -30,7 +30,7 @@ export class Level {
 		this.character = new Character(resources, world.current_player.id, [49, 49]);
 
 		this.map = this.generate_map();
-		this.mobmap = this.populate();
+		this.populate();
 	}
 
 	list_to_map(mainpart: number[], border: number[]): number[][] {
@@ -309,7 +309,7 @@ export class Level {
 		return map;
 	}
 
-	populate(): (ISurvivalCharacter | null)[][] {
+	populate() {
 		// More predators for higher difficulty and more individuals on world map.
 		// (More individuals attract more predators.)
 		let num_predators = 30 + this.world.current_player.iq * this.individuals;
@@ -330,13 +330,12 @@ export class Level {
 			num_enemies = 100;
 		}
 
-		const mobmap: (ISurvivalCharacter | null)[][] = Array.from(Array(survivalmap_size[1]), () => Array(survivalmap_size[0]).fill(null));
-		let pos;
+		let pos: Point;
 
 		// Place the player somewhere around the center
 		this.place_player([49, 49]);
 
-		let free_tiles = this.find_free_tiles();
+		const free_tiles = this.find_free_tiles();
 
 		for (let i = 0; i < num_predators; i++) {
 			// Predators may not be placed within 2 fields of the player
@@ -345,7 +344,7 @@ export class Level {
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 2 && Math.abs(pos[1] - this.character.tile[1]) <= 2);
 			const species = random_int(0, this.world.humans_present ? 2 : 1);
 			const pred = new Predator(this.resources, species, pos);
-			mobmap[pos[1]][pos[0]] = pred
+			this.mobmap[pos[1]][pos[0]] = pred
 			this.predators.push(pred);
 		}
 
@@ -355,7 +354,7 @@ export class Level {
 				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
-			mobmap[pos[1]][pos[0]] = new Female(this.resources, this.world.current_player.id, pos);
+			this.mobmap[pos[1]][pos[0]] = new Female(this.resources, this.world.current_player.id, pos);
 		}
 
 		for (let i = 0; i < num_enemies; i++) {
@@ -364,10 +363,8 @@ export class Level {
 				pos = free_tiles.splice(free_tiles.length * Math.random() | 0, 1)[0];
 			} while (Math.abs(pos[0] - this.character.tile[0]) <= 3 && Math.abs(pos[1] - this.character.tile[1]) <= 3);
 			const species = random_element(this.enemies);
-			mobmap[pos[1]][pos[0]] = new Enemy(this.resources, species, pos);
+			this.mobmap[pos[1]][pos[0]] = new Enemy(this.resources, species, pos);
 		}
-
-		return mobmap;
 	}
 
 	place_player(ideal_pos: Point): void {

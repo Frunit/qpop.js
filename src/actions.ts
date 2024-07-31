@@ -8,7 +8,7 @@ import { Dimension, Point } from "./types";
 export interface IAction {
 	finished: boolean;
 	tiles: Point[];
-	callback: Function; // TODO
+	callback: () => void;
 	offspring_sprite?: ISprite;
 	final_opponent_sprite?: ISprite;
 	update: () => void;
@@ -28,7 +28,7 @@ export class Love implements IAction {
 	offspring_sprite: ISprite;
 	tiles: Point[];
 
-	constructor(private dir: DIR, private character: Character, private partner: Female, public callback: Function, private resources: ResourceManager) {
+	constructor(private dir: DIR, private character: Character, private partner: Female, public callback: () => void, private resources: ResourceManager) {
 		if (character.species === SPECIES.PURPLUS) {
 			this.offspring_sprite = new RandomSprite(partner.pic, partner.anims.offspring.soffset, purplus_special_animations.offspring.frames, purplus_special_animations.offspring.transitions, anim_delays.offspring);
 		}
@@ -142,7 +142,7 @@ export class Fight implements IAction {
 	private dir: DIR;
 	private character: Character;
 	private opponent: Enemy | Predator;
-	callback: Function; // TODO
+	callback: () => void;
 	finished = false;
 	private delay = anim_delays.winner;
 	private delay_counter = 0;
@@ -156,7 +156,7 @@ export class Fight implements IAction {
 	tiles: Point[];
 	private cloud_sprite: Sprite;
 
-	constructor(dir: DIR, character: Character, opponent: Enemy | Predator, player_wins: boolean, callback: Function, private resources: ResourceManager) {
+	constructor(dir: DIR, character: Character, opponent: Enemy | Predator, player_wins: boolean, callback: () => void, private resources: ResourceManager) {
 		this.dir = dir;
 		this.character = character;
 		this.opponent = opponent;
@@ -315,7 +315,7 @@ export class Fight implements IAction {
 export class Feeding implements IAction {
 	private character: Character;
 	private level: Level;
-	callback: Function; // TODO
+	callback: () => void;
 	finished = false;
 	private food_type: number;
 	private delay = anim_delays.feeding;
@@ -327,7 +327,7 @@ export class Feeding implements IAction {
 	tiles: Point[];
 	private sprite: Sprite;
 
-	constructor(character: Character, level: Level, food_type: number, callback: Function, private resources: ResourceManager) {
+	constructor(character: Character, level: Level, food_type: number, callback: () => void, private resources: ResourceManager) {
 		this.character = character;
 		this.level = level;
 		this.food_type = food_type;
@@ -416,7 +416,7 @@ export class Feeding implements IAction {
 
 export class Quicksand implements IAction {
 	private character: Character;
-	callback: Function;
+	callback: () => void;
 	finished = false;
 	private delay: number;
 	private delay_counter = 0;
@@ -425,7 +425,7 @@ export class Quicksand implements IAction {
 	tiles: Point[];
 	private sprite: Sprite;
 
-	constructor(character: Character, callback: Function, resources: ResourceManager) {
+	constructor(character: Character, callback: () => void, resources: ResourceManager) {
 		this.character = character;
 		this.callback = callback;
 		this.delay = this.character.species === SPECIES.PESCIODYPHUS ?
@@ -503,7 +503,7 @@ export class Quicksand implements IAction {
 
 
 export class Waiting implements IAction {
-	callback: Function;
+	callback: () => void;
 	finished = false;
 	private delay = anim_delays.movement;
 	private delay_counter = 0;
@@ -511,7 +511,7 @@ export class Waiting implements IAction {
 	tiles: Point[];
 	private sprite: Sprite;
 
-	constructor(character: Character, callback: Function) {
+	constructor(character: Character, callback: () => void) {
 		this.callback = callback;
 		this.tiles = [character.tile];
 
@@ -544,7 +544,7 @@ export class Waiting implements IAction {
 export class Electro implements IAction {
 	private dir: DIR;
 	private character: Character;
-	callback: Function;
+	callback: () => void;
 	finished = false;
 	private delay = anim_delays.electro;
 	private delay_counter = 0;
@@ -552,7 +552,7 @@ export class Electro implements IAction {
 	tiles: Point[];
 	private sprites: Sprite[];
 
-	constructor(dir: DIR, character: Character, callback: Function, private resources: ResourceManager) {
+	constructor(dir: DIR, character: Character, callback: () => void, private resources: ResourceManager) {
 		this.dir = dir;
 		this.character = character;
 		this.callback = callback;

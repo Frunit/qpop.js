@@ -7,7 +7,7 @@ export class Tutorial implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	
+
 	private game: Game;
 	private glob: TechGlobal;
 
@@ -43,7 +43,7 @@ export class Tutorial implements Stage {
 		this.textname = tut.name;
 		this.offset = tut.pos;
 		this.arrows = tut.arrows;
-		this.low_anchor = tut.low_anchor;
+		this.low_anchor = tut.low_anchor ?? false;
 	}
 
 	initialize() {
@@ -51,7 +51,8 @@ export class Tutorial implements Stage {
 	}
 
 	redraw() {
-		const text = multiline(this.glob.lang.tutorial[this.textname], this.max_text_width);
+		const ctx = this.glob.ctx;
+		const text = multiline(ctx, this.glob.lang.tutorial[this.textname], this.max_text_width);
 		this.dim[1] = 2 * this.title_dim[1] + 2 * this.continue_dim[1] + Math.max(text.length * this.line_height, this.spec_dim[1]);
 
 		if (this.low_anchor) {
@@ -59,23 +60,23 @@ export class Tutorial implements Stage {
 			this.low_anchor = false; // Otherwise, the operation is rerun when redrawing
 		}
 
-		this.glob.ctx.drawImage(this.bg,
+		ctx.drawImage(this.bg,
 			0, 0,
 			this.dim[0], this.dim[1],
 			this.offset[0], this.offset[1],
 			this.dim[0], this.dim[1]);
 
-		draw_rect([this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] - this.continue_dim[1] + 2], true);
+		draw_rect(ctx, [this.offset[0], this.offset[1] + this.title_dim[1] - 1], [this.dim[0], this.dim[1] - this.title_dim[1] - this.continue_dim[1] + 2], true);
 
 		this.clickareas = [];
 
 		// Title
-		draw_rect([this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
-		write_text(this.glob.lang.tutorial_title, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
+		draw_rect(ctx, [this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
+		write_text(ctx, this.glob.lang.tutorial_title, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
 
 		// Text
 		for (let i = 0; i < text.length; i++) {
-			write_text(text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] + this.line_height * i], 'white', 'black', 'left');
+			write_text(ctx, text[i], [this.offset[0] + this.text_offset[0], this.offset[1] + this.text_offset[1] + this.line_height * i], 'white', 'black', 'left');
 		}
 
 		// Species image
@@ -86,29 +87,29 @@ export class Tutorial implements Stage {
 			this.spec_dim[0], this.spec_dim[1]);
 
 		// Abort
-		draw_rect([this.offset[0] + this.abort_offset[0], this.offset[1] + this.dim[1] - this.abort_dim[1]], this.abort_dim);
-		write_text(this.glob.lang.tutorial_abort, [this.offset[0] + this.abort_offset[0] + this.abort_dim[0] / 2, this.offset[1] + this.dim[1] - this.abort_dim[1] + 15], 'white', 'black');
+		draw_rect(ctx, [this.offset[0] + this.abort_offset[0], this.offset[1] + this.dim[1] - this.abort_dim[1]], this.abort_dim);
+		write_text(ctx, this.glob.lang.tutorial_abort, [this.offset[0] + this.abort_offset[0] + this.abort_dim[0] / 2, this.offset[1] + this.dim[1] - this.abort_dim[1] + 15], 'white', 'black');
 
 		this.clickareas.push({
 			x1: this.offset[0] + this.abort_offset[0],
 			y1: this.offset[1] + this.dim[1] - this.abort_dim[1],
 			x2: this.offset[0] + this.abort_offset[0] + this.abort_dim[0],
 			y2: this.offset[1] + this.dim[1],
-			down: () => draw_rect([this.offset[0] + this.abort_offset[0], this.offset[1] + this.dim[1] - this.abort_dim[1]], this.abort_dim, true, true),
+			down: () => draw_rect(ctx, [this.offset[0] + this.abort_offset[0], this.offset[1] + this.dim[1] - this.abort_dim[1]], this.abort_dim, true, true),
 			up: () => this.next(true),
 			blur: () => this.redraw()
 		});
 
 		// Continue
-		draw_rect([this.offset[0] + this.continue_offset[0], this.offset[1] + this.dim[1] - this.continue_dim[1]], this.continue_dim);
-		write_text(this.glob.lang.next, [this.offset[0] + this.continue_offset[0] + this.continue_dim[0] / 2, this.offset[1] + this.dim[1] - this.continue_dim[1] + 15], 'white', 'black');
+		draw_rect(ctx, [this.offset[0] + this.continue_offset[0], this.offset[1] + this.dim[1] - this.continue_dim[1]], this.continue_dim);
+		write_text(ctx, this.glob.lang.next, [this.offset[0] + this.continue_offset[0] + this.continue_dim[0] / 2, this.offset[1] + this.dim[1] - this.continue_dim[1] + 15], 'white', 'black');
 
 		this.clickareas.push({
 			x1: this.offset[0] + this.continue_offset[0],
 			y1: this.offset[1] + this.dim[1] - this.continue_dim[1],
 			x2: this.offset[0] + this.continue_offset[0] + this.continue_dim[0],
 			y2: this.offset[1] + this.dim[1],
-			down: () => draw_rect([this.offset[0] + this.continue_offset[0], this.offset[1] + this.dim[1] - this.continue_dim[1]], this.continue_dim, true, true),
+			down: () => draw_rect(ctx, [this.offset[0] + this.continue_offset[0], this.offset[1] + this.dim[1] - this.continue_dim[1]], this.continue_dim, true, true),
 			up: () => this.next(),
 			blur: () => this.redraw()
 		});
@@ -161,8 +162,8 @@ export class Tutorial implements Stage {
 			this.glob.options.tutorial = false;
 			local_save('tutorial', false);
 		}
-		game.stage = game.backstage.pop();
-		game.stage.redraw();
-		game.tutorial();
+		this.game.stage = this.game.backstage.pop()!;
+		this.game.stage.redraw();
+		this.game.tutorial();
 	}
 }

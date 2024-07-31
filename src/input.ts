@@ -9,18 +9,19 @@ export class InputManager {
 	private rightClickPos: Point | null = null;
 	static #instance: InputManager | null = null;
 
-	constructor(private canvasPos: DOMRect) {
+	constructor(canvas: HTMLCanvasElement, private canvasPos: DOMRect) {
 		if (InputManager.#instance !== null) {
 			throw new Error("InputManager can't be instantiated more than once.")
-		  }
-		  InputManager.#instance = this;
+		}
+		InputManager.#instance = this;
+		this.setListeners(canvas);
 	}
 
 	getMousePos(): Point {
 		return this.mousePos;
 	}
 
-	getClickPos(right: boolean = false): Point | null {
+	getClickPos(): Point | null {
 		return this.clickPos;
 	}
 

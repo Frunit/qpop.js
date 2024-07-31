@@ -8,9 +8,6 @@ export class ResourceLoader implements Stage {
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
 
-	private glob: TechGlobal;
-	private game: Game;
-
 	private bg_pic: HTMLImageElement | null = null;
 	private header_pic: HTMLImageElement | null = null;
 	private bar_pic: HTMLImageElement | null = null;
@@ -44,9 +41,7 @@ export class ResourceLoader implements Stage {
 	readonly ogg_size = 12314468;
 	readonly m4a_size = 8839096;
 
-	constructor(game: Game, glob: TechGlobal) {
-		this.game = game;
-		this.glob = glob;
+	constructor(private game: Game, private glob: TechGlobal) {
 	}
 
 	initialize() {
@@ -70,7 +65,7 @@ export class ResourceLoader implements Stage {
 			this.game.disable_audio();
 		}
 
-		this.glob.resources.on_ready(this.finished_preloading, this);
+		this.glob.resources.on_ready(this.finished_preloading.bind(this), this);
 		this.glob.resources.load([
 			{url: 'gfx/dark_bg.png', type: 'image'},
 			{url: 'gfx/mutations.png', type: 'image'},
@@ -247,7 +242,7 @@ export class ResourceLoader implements Stage {
 
 		self.redraw();
 
-		this.glob.resources.on_ready(self.finished_loading, self);
+		this.glob.resources.on_ready(self.finished_loading.bind(self), self);
 		this.glob.resources.load([
 			{url: 'gfx/background.png', type: 'image'},
 			{url: 'gfx/clouds.png', type: 'image'},
@@ -355,7 +350,7 @@ export class ResourceLoader implements Stage {
 
 		self.redraw();
 
-		this.glob.resources.on_ready(self.finished_postloading, self);
+		this.glob.resources.on_ready(self.finished_postloading.bind(self), self);
 		this.glob.resources.load([
 			{url: 'sfx/catastrophe', type: 'audio', name: 'catastrophe'},
 			{url: 'sfx/outro', type: 'audio', name: 'outro'},

@@ -3,16 +3,16 @@ import { Dimension, Point } from "./types";
 export interface ISprite {
 	finished: boolean;
 	offset?: Point;
-	callback: Function | null;
-	update: Function;
-	reset: Function;
-	is_new_frame: Function;
-	render: Function;
+	callback?: () => void;
+	update: () => void;
+	reset: () => void;
+	is_new_frame: () => boolean;
+	render: (ctx: CanvasRenderingContext2D, pos: Point) => void;
 }
 
 export class Sprite implements ISprite {
 	finished: boolean
-	callback: Function | null;
+	callback?: () => void;
 	delay: number;
 	offset: Point;
 
@@ -26,7 +26,7 @@ export class Sprite implements ISprite {
 	private delay_counter = 0;
 
 
-	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[] = [[0, 0]], delay = 0, size: Dimension = [64, 64], once = false, callback: Function | null = null) {
+	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[] = [[0, 0]], delay = 0, size: Dimension = [64, 64], once = false, callback?: () => void) {
 		this.pic = pic;
 		this.offset = offset;
 		this.size = size;
@@ -87,7 +87,7 @@ export class Sprite implements ISprite {
 
 export class RandomSprite implements ISprite {
 	finished = false;
-	callback = null;
+	callback = undefined;
 
 	private transitions: number[][];
 	private sprites: Sprite[] = [];

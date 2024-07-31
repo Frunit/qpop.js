@@ -2,6 +2,7 @@ import { Catastrophe } from "./catastrophe";
 import { worldmap_size } from "./consts";
 import { Game } from "./game";
 import { ATTR, DIR, PLAYER_TYPE, SCENE, WORLD_MAP, clamp, draw_base, draw_black_rect, draw_rect, open_popup, pop_random_element, random_element, random_int, shuffle, write_text } from "./helper";
+import { i18nStrings } from "./i18n";
 import { Player } from "./player";
 import { Sprite } from "./sprite";
 import { anim_delays } from "./sprite_positions";
@@ -275,7 +276,7 @@ export class World implements Stage{
 	update() {
 		if (this.animation) {
 			this.animation.update();
-			if (this.animation.finished && this.animation.callback !== null) {
+			if (this.animation.finished && this.animation.callback !== undefined) {
 				this.animation.callback();
 			}
 		}
@@ -300,7 +301,7 @@ export class World implements Stage{
 			this.next_popup(1);
 		}
 		else if (this.world.current_player.individuals === 0) {
-			open_popup(this.game, 'dino', this.glob.lang.where_to_live, () => { }, this.glob.lang.next);
+			open_popup(this.game, 'dino', this.glob.lang.where_to_live, null, this.glob.lang.next);
 		}
 		else {
 			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
@@ -480,7 +481,7 @@ export class World implements Stage{
 			default:
 				console.warn(this.catastrophe_type);
 				open_popup(this.game, 'dino_cries', 'Wrong catastrophe code. This should never ever happen!',
-					() => { }, 'Oh no!');
+					null, 'Oh no!');
 		}
 	}
 
@@ -524,7 +525,7 @@ export class World implements Stage{
 
 		if (!this.game.seen_tutorials.has(`catastrophe${this.catastrophe_type}`)) {
 			this.tutorials.push({
-				name: `catastrophe${this.catastrophe_type}`,
+				name: `catastrophe${this.catastrophe_type}` as keyof i18nStrings['tutorial'],
 				pos: [140, 110],
 				arrows: [],
 				highlight: [0, 0, 640, 480],
@@ -630,7 +631,7 @@ export class World implements Stage{
 
 		if (enemy.individuals === 0) {
 			enemy.is_dead = true;
-			open_popup(this.game, enemy.id.toString(), this.glob.lang.dead, () => { }, this.glob.lang.next);
+			open_popup(this.game, enemy.id.toString(), this.glob.lang.dead, null, this.glob.lang.next);
 		}
 	}
 

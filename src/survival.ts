@@ -405,7 +405,7 @@ export class Survival implements Stage {
 		}
 		this.world.current_player.eaten = food;
 
-		let deaths = Math.floor(random_int(0, this.world.current_player.individuals - 1) / 10) + 5;
+		const deaths = Math.floor(random_int(0, this.world.current_player.individuals - 1) / 10) + 5;
 		let saved = 0;
 		for (let i = 0; i < deaths; i++) {
 			if (random_int(0, 600) < this.world.current_player.stats[ATTR.SPEED] ||
@@ -1051,7 +1051,7 @@ export class Survival implements Stage {
 		}
 
 		if (this.steps > 0) {
-			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
+			open_popup(this.game, 'chuck_berry', this.glob.lang.turn_finished, (x: number) => this.next_popup(x), this.glob.lang.no, this.glob.lang.yes);
 		}
 		else {
 			this.next_popup(1);

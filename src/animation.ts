@@ -42,7 +42,7 @@ export class Animation {
 		this.glob.ctx.translate(this.offset[0] + this.animation.size[0] / 2, this.offset[1] + this.animation.size[1] / 2);
 
 		for (const img of this.to_render) {
-			this.glob.ctx.drawImage(...img);
+			this.glob.ctx.drawImage(...img as [HTMLImageElement, number, number]); // Type might not be correct, but the union type doesn't work.
 		}
 
 		this.glob.ctx.restore();
@@ -86,9 +86,9 @@ export class Animation {
 		// - active or not (active)
 		// - delay (delay)
 		for (let seqnum = 0; seqnum < this.animation.seqs.length; seqnum++) {
-			let seq = this.animation.seqs[seqnum];
+			const seq = this.animation.seqs[seqnum];
 			if (seq.active) {
-				let move = seq.moves[seq.pos];
+				const move = seq.moves[seq.pos];
 
 				num_of_active++;
 

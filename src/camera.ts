@@ -4,7 +4,7 @@ import { survivalmap_size } from "./consts";
 import { DIR, SURV_MAP, range } from "./helper";
 import { ISurvivalCharacter, Level } from "./level";
 import { Survival } from "./survival";
-import { Dimension, Point, SixNumbers } from "./types";
+import { Dimension, Point } from "./types";
 
 
 export class Camera {

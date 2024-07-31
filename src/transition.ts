@@ -1,5 +1,6 @@
 import { Game } from "./game";
 import { draw_base, draw_inv_rect, draw_rect, subtitle } from "./helper";
+import { i18nStrings } from "./i18n";
 import { ClickArea, KeyType, Stage, TechGlobal } from "./types";
 
 
@@ -10,17 +11,17 @@ export class Transition implements Stage {
 	keys: KeyType[] = [];
 
 	private pic: HTMLImageElement;
-	private lang_string: string;
+	private lang_string: keyof i18nStrings;
 	private frame = 0;
 
 	readonly pic_dim = [595, 415];
 	readonly pic_offset = [23, 42];
 	readonly subtitle_offset = [70, 420];
 
-	constructor(private game: Game, private glob: TechGlobal, pic: any, id: number) {
+	constructor(private game: Game, private glob: TechGlobal, pic: string, id: number) {
 		this.id = id;
 		this.pic = this.glob.resources.get_image(pic);
-		this.lang_string = pic.split('/').pop().replace('.png', '');
+		this.lang_string = pic.split('/').pop()!.replace('.png', '') as keyof i18nStrings;
 	}
 
 	initialize() {
@@ -41,7 +42,7 @@ export class Transition implements Stage {
 		this.glob.ctx.drawImage(this.pic, this.pic_offset[0], this.pic_offset[1]);
 
 		if (this.glob.lang[this.lang_string]) {
-			subtitle(this.glob.ctx, this.subtitle_offset[0], this.subtitle_offset[1], this.glob.lang[this.lang_string]);
+			subtitle(this.glob.ctx, this.subtitle_offset[0], this.subtitle_offset[1], this.glob.lang[this.lang_string] as string);
 		}
 
 		this.clickareas = this.glob.clickareas.slice();

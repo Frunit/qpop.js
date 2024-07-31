@@ -15,9 +15,9 @@ export class Popup implements Stage {
 
 	private bg: HTMLImageElement;
 	private text: string[];
-	private callback: Function; // TODO
+	private callback: ((x: number) => void) | null;
 	private right_answer: string;
-	private left_answer: string;
+	private left_answer: string | undefined;
 	private sprite: Sprite;
 
 	readonly line_height = 18;
@@ -48,7 +48,7 @@ export class Popup implements Stage {
 	readonly left_answer_offset: Point = [0, 128];
 	readonly right_answer_offset: Point = [179, 128];
 
-	constructor(game: Game, image: string, callback: Function, text: string, right_answer: string, left_answer: string) {
+	constructor(game: Game, image: string, callback: ((x: number) => void) | null, text: string, right_answer: string, left_answer?: string) {
 		this.game = game;
 		this.glob = game.glob;
 		this.text = multiline(this.glob.ctx, text, this.max_text_width);
@@ -89,7 +89,7 @@ export class Popup implements Stage {
 		}
 
 		// Left answer (button) if present
-		if (this.left_answer !== null) {
+		if (this.left_answer) {
 			draw_rect(this.glob.ctx, [this.offset[0] + this.left_answer_offset[0], this.offset[1] + this.left_answer_offset[1]], this.left_answer_dim);
 			write_text(this.glob.ctx, this.left_answer, [this.offset[0] + this.left_answer_offset[0] + this.left_answer_dim[0] / 2, this.offset[1] + this.left_answer_offset[1] + 15], 'white', 'black');
 
@@ -119,7 +119,7 @@ export class Popup implements Stage {
 		});
 
 		// Grey border
-		if (this.left_answer === null) {
+		if (!this.left_answer) {
 			draw_upper_left_border(this.glob.ctx, [this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
 		}
 		else {
@@ -134,7 +134,7 @@ export class Popup implements Stage {
 		}
 
 		this.keys = [
-			{ 'key': 'ENTER', 'action': () => this.clicked(this.left_answer !== null ? 1 : 0), 'reset': true },
+			{ 'key': 'ENTER', 'action': () => this.clicked(this.left_answer ? 1 : 0), 'reset': true },
 			{ 'key': 'ESCAPE', 'action': () => this.clicked(0), 'reset': true },
 		];
 	}
@@ -155,8 +155,10 @@ export class Popup implements Stage {
 		this.sprite.update();
 	}
 
-	clicked(answer: unknown) {
+	clicked(answer: number) {
 		this.game.get_last_stage();
-		this.callback(answer);
+		if (this.callback) {
+			this.callback(answer);
+		}
 	}
 }

@@ -13,7 +13,7 @@ export class Turnselection implements Stage {
 
 	private bg: HTMLImageElement;
 	private pics: HTMLImageElement;
-	private animations: Sprite[] | null = null;
+	private animations: Sprite[] = [];
 	private turn_index = 0;
 
 	readonly turns = [5, 10, 20, 255];
@@ -70,7 +70,7 @@ export class Turnselection implements Stage {
 			this.anim_offset[0], this.anim_offset[1],
 			this.anim_dim[0], this.anim_dim[1]);
 
-			this.glob.ctx.drawImage(this.pics,
+		this.glob.ctx.drawImage(this.pics,
 			this.bar_soffset[0], this.bar_soffset[1],
 			this.bar_dim[0], this.bar_dim[1],
 			this.bar_offset[0], this.bar_offset[1],
@@ -79,21 +79,21 @@ export class Turnselection implements Stage {
 		write_text(this.glob.ctx, this.glob.lang.turns[this.turn_index], this.bar_text_offset, 'black', '');
 
 		if (this.turn_index === 3) {
-			if (this.animations === null) {
+			if (this.animations.length === 0) {
 				if (random_int(0, 1)) {
 					// Amorph splatters
-					this.animations = [new Sprite(this.pics, [420, 450], [[0, 0], [0, 90]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation())];
+					this.animations = [new Sprite(this.pics, [420, 450], [[0, 0], [0, 90]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(true))];
 				}
 				else {
 					// Chuckberry stumbles
-					this.animations = [new Sprite(this.pics, [0, 270], [[0, 0], [0, 90], [0, 180], [0, 270]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(true))];
+					this.animations = [new Sprite(this.pics, [0, 270], [[0, 0], [0, 90], [0, 180], [0, 270]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(false))];
 				}
 			}
 
 			this.render();
 		}
 		else {
-			this.animations = null;
+			this.animations = [];
 
 			this.glob.ctx.drawImage(this.pics,
 				this.anim_soffsets[this.turn_index][0], this.anim_soffsets[this.turn_index][1],
@@ -173,7 +173,7 @@ export class Turnselection implements Stage {
 	}
 
 	render() {
-		if (this.animations) {
+		if (this.animations.length > 0) {
 			this.glob.ctx.drawImage(this.bg,
 				this.anim_offset[0] - this.panel_offsets[0][0], this.anim_offset[1] - this.panel_offsets[0][1],
 				this.anim_dim[0], this.anim_dim[1],
@@ -199,25 +199,23 @@ export class Turnselection implements Stage {
 	}
 
 	update() {
-		if (this.animations) {
-			if (this.animations.length === 1) {
-				this.animations[0].update();
-				if (this.animations[0].finished && this.animations[0].callback !== null) {
-					this.animations[0].callback();
-				}
+		if (this.animations.length === 1) {
+			this.animations[0].update();
+			if (this.animations[0].finished && this.animations[0].callback) {
+				this.animations[0].callback();
 			}
-			else {
-				for (const anim of this.animations) {
-					anim.update();
-					if (anim.finished && anim.callback !== null) {
-						anim.callback();
-					}
+		}
+		else if (this.animations.length > 1) {
+			for (const anim of this.animations) {
+				anim.update();
+				if (anim.finished && anim.callback) {
+					anim.callback();
 				}
 			}
 		}
 	}
 
-	end_animation(not_stumbling = false) {
+	end_animation(not_stumbling: boolean) {
 		if (not_stumbling) {
 			// Amorph splatters
 			this.animations = [
@@ -228,7 +226,7 @@ export class Turnselection implements Stage {
 				new Sprite(this.pics, [420, 360], [[120, 0], [180, 0], [0, 0], [60, 0]], anim_delays.turn_selection, this.anim_part_dim),
 
 				// Amorph
-				new Sprite(this.pics, [660, 270], [[0, 0], [60, 0], [120, 0]], this.anim_part_dim, anim_delays.turn_selection * 4, true, () => this.amorph_eye())
+				new Sprite(this.pics, [660, 270], [[0, 0], [60, 0], [120, 0]], anim_delays.turn_selection * 4, this.anim_part_dim, true, () => this.amorph_eye())
 			];
 		}
 		else {

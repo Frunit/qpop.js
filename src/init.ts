@@ -146,7 +146,7 @@ export class Init implements Stage {
 				panel_offset[0] + this.spec_offset[0], panel_offset[1] + this.spec_offset[1],
 				this.type_dim[0], this.type_dim[1]);
 
-			write_text(this.glob.ctx, this.glob.lang.player.replace('{num}', (playernum + 1)), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
+			write_text(this.glob.ctx, this.glob.lang.player.replace('{num}', (playernum + 1).toString()), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
 
 			write_text(this.glob.ctx, this.glob.lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
 
@@ -258,7 +258,7 @@ export class Init implements Stage {
 		}
 
 		if (no_human) {
-			open_popup(this.game, 'dino', this.glob.lang.who_plays, () => { }, this.glob.lang.next);
+			open_popup(this.game, 'dino', this.glob.lang.who_plays, null, this.glob.lang.next);
 			return;
 		}
 

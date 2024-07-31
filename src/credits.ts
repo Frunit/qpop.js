@@ -104,7 +104,7 @@ export class Credits implements Stage {
 
 		// Credits for remake
 		line = 1;
-		write_text(this.glob.ctx, '2020', [this.right_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.right_panel_offset[1]], '#000000', '#ffffff', 'right');
+		write_text(this.glob.ctx, '2020-2024', [this.right_panel_offset[0] + this.lower_panel_dim[0] - 8, this.text_rel_offset[1] + this.right_panel_offset[1]], '#000000', '#ffffff', 'right');
 		for (let i = 0; i < this.glob.lang.credits_remake.length; i++) {
 			write_text(this.glob.ctx, this.glob.lang.credits_remake[i][0], [this.text_rel_offset[0] + this.right_panel_offset[0], this.text_rel_offset[1] + this.right_panel_offset[1] + this.line_height * line], '#000000', '#ffffff', 'left');
 			line++;

@@ -1,10 +1,11 @@
+import { ResourceLoader } from "./loader";
 import { ResourceElement } from "./types";
 
 export class ResourceManager {
 	private image_cache: {[key: string]: true | HTMLImageElement} = {};
 	private audio_cache: {[key: string]: true | AudioBuffer} = {};
-	private ready_callback: Function = () => {};
-	private ready_param: unknown = null;
+	private ready_callback: (self: ResourceLoader) => void = () => {};
+	private ready_param?: ResourceLoader;
 	private loading: string[] = [];
 	private load_status: {[key: string]: number} = {};
 	private loaded = 0;
@@ -70,7 +71,7 @@ export class ResourceManager {
 					this.loaded++;
 					this._update_load_status(name, event.loaded);
 
-					if(this._is_ready()) {
+					if(this._is_ready() && this.ready_param) {
 						this.ready_callback(this.ready_param);
 					}
 				}, (e) => {console.warn(`${e.name}: ${e.message}`);});
@@ -108,7 +109,7 @@ export class ResourceManager {
 				this.loaded++;
 				this._update_load_status(name, event.loaded);
 
-				if(this._is_ready()) {
+				if(this._is_ready() && this.ready_param) {
 					this.ready_callback(this.ready_param);
 				}
 			}
@@ -176,7 +177,7 @@ export class ResourceManager {
 		return this.loaded === this.loading.length;
 	}
 
-	on_ready(func: Function, param?: unknown) {
+	on_ready(func: (self: ResourceLoader) => void, param?: ResourceLoader) {
 		this.ready_callback = func;
 		this.ready_param = param;
 	}

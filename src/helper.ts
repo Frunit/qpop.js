@@ -19,7 +19,7 @@ export const enum WORLD_MAP {
 	MOUNTAIN =   8,
 	CRATER =     9,
 	HUMANS =    10,
-};
+}
 
 // Attribute
 export const enum ATTR {
@@ -36,7 +36,7 @@ export const enum ATTR {
 	SPEED =        10,
 	PERCEPTION =   11,
 	INTELLIGENCE = 12,
-};
+}
 
 // Directions
 export const enum DIR {
@@ -45,21 +45,21 @@ export const enum DIR {
 	E = 2,
 	S = 3,
 	W = 4,
-};
+}
 
 // Player types
 export const enum PLAYER_TYPE {
 	HUMAN =    1,
 	COMPUTER = 2,
 	NOBODY =   3,
-};
+}
 
 // Predators
 export const enum PRED {
 	DINO =     0,
 	MUSHROOM = 1,
 	HUMAN =    2,
-};
+}
 
 // Predators
 export const enum SPECIES {
@@ -69,7 +69,7 @@ export const enum SPECIES {
 	ISNOBUG =      3,
 	AMORPH =       4,
 	CHUCKBERRY =   5,
-};
+}
 
 // Living objects on survival map
 export const enum SURV_MAP {
@@ -78,8 +78,7 @@ export const enum SURV_MAP {
 	ENEMY =        3,
 	FEMALE =       4,
 	UNRESPONSIVE = 5, // For defeated entities, offspring, etc.
-};
-
+}
 
 export const enum SCENE {
 	LOADING =         1,
@@ -100,7 +99,7 @@ export const enum SCENE {
 	CREDITS =        30,
 	OPTIONS =        31,
 	LOAD_GAME =      32,
-};
+}
 
 
 /**
@@ -152,7 +151,7 @@ export function random_int(min: number, max: number): number {
  *
  * @param arr - the array to shuffle
  */
-export function shuffle(arr: any[]): void {
+export function shuffle<T>(arr: T[]): void {
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[arr[i], arr[j]] = [arr[j], arr[i]];
@@ -281,7 +280,7 @@ export function draw_base(glob: TechGlobal, stage_id: SCENE) {
 	glob.ctx.stroke();
 	glob.ctx.restore();
 
-	// Info
+	// Info/Credits
 	draw_rect(glob.ctx, [0, 0], [22, 21]);
 	if(stage_id === SCENE.CREDITS) {
 		glob.ctx.drawImage(gui, 12, 0, 12, 12, 5, 4, 12, 12);
@@ -474,7 +473,7 @@ export function subtitle(ctx: CanvasRenderingContext2D, x: number, y: number, te
 }
 
 
-export function open_popup(game: Game, image: string, text: string, callback: (x: number) => void | (() => void), right_answer: string, left_answer = '') {
+export function open_popup(game: Game, image: string, text: string, callback: ((x: number) => void) | null, right_answer: string, left_answer?: string) {
 	// The callback export function will be invoked with 1 when the *left* button was clicked and with 0 when the *right* button was clicked.
 	game.backstage.push(game.stage);
 	game.stage = new Popup(game, image, callback, text, right_answer, left_answer);
@@ -533,6 +532,8 @@ export function local_load(key: string): unknown {
 			return JSON.parse(item);
 		}
 	}
-	catch (e) {}
+	catch (error) {
+		console.warn(`Got error ${error} while retrieving ${key}.`);
+	}
 	return null;
 }

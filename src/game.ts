@@ -1,6 +1,6 @@
 import { worldmap_size } from "./consts";
 import { Credits } from "./credits";
-import { ATTR, PLAYER_TYPE, SCENE, WORLD_MAP, download, draw_checkbox, draw_rect, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
+import { ATTR, PLAYER_TYPE, SCENE, download, draw_checkbox, draw_rect, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
 import { i18n } from "./i18n";
 import { Init } from "./init";
 import { InputManager } from "./input";
@@ -15,26 +15,26 @@ import { ResourceManager } from "./resources";
 import { Survival } from "./survival";
 import { Transition } from "./transition";
 import { Turnselection } from "./turnselection";
-import { ClickArea, LANG_EN, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
+import { ClickArea, GameOptions, SixNumbers, Stage, TechGlobal, Tuple, WorldGlobal } from "./types";
 import { version } from "./version";
 import { World, create_height_map, create_world_map } from "./world";
 
-const options = {
-	language: LANG_EN, // Language of the game
-	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
-	wm_ai_delay: 4, // How many frames between two moves of the AI
-	wm_ai_auto_continue: true, // After the AI finished, shall the "continue" button be pressed automatically?
-	wm_click_and_hold: true, // Enable click and hold to place/remove units from world map
-	plant_distribtion: true, // Show plant distribution on mutation screen
-	show_predators: true, // Show vanquished predators in survival
-	tutorial: true, // Show the tutorial
-	transition_delay: 36, // How many frames to show the transition screens
+const options: GameOptions = {
+	language: 'EN',
+	wm_ai_delay_idx: 3,
+	wm_ai_delay: 4,
+	wm_ai_auto_continue: true,
+	wm_click_and_hold: true,
+	plant_distribtion: true,
+	show_predators: true,
+	tutorial: true,
+	transition_delay: 36,
 	music_on: true,
-	music: 100, // Music volume (0 - 100)
+	music: 100,
 	sound_on: true,
-	sound: 100, // Sound volume (0 - 100)
+	sound: 100,
 	audio_enabled: true,
-	update_freq: 1/18, // Screen update frequency
+	update_freq: 1/18,
 };
 
 
@@ -115,7 +115,6 @@ export class Game {
 
 	private initialize(): TechGlobal {
 		const resources = new ResourceManager();
-		const input = new InputManager(this.glob.canvas_pos);
 
 		// GET parameter handling
 		const search_params = new URL(document.location.href.toLowerCase()).searchParams;
@@ -136,20 +135,20 @@ export class Game {
 		options.language = search_params.get('lang') || search_params.get('language') || local_load('language') as string | null || navigator.language;
 		options.language = options.language.substring(0, 2).toUpperCase();
 		if(!(options.language in Object.keys(i18n))) {
-			options.language = LANG_EN;
+			options.language = 'EN';
 		}
 
 		const lang = i18n[options.language as keyof typeof i18n];
 
 		for (const option of Object.keys(options)) {
 			if (local_load(option) === null) {
-				local_save(option, options[option as keyof typeof options]);
+				local_save(option, options[option as keyof GameOptions]);
 			}
 
 			// language and seen_tutorials are handled above and below, respectively
 			else if (option !== 'language' && option !== 'seen_tutorials') {
 				// Weird type casting necessary?!?
-				(options[option as keyof typeof options] as any) = local_load(option) as any;
+				(options[option as keyof GameOptions] as any) = local_load(option) as any;
 			}
 		}
 
@@ -203,6 +202,8 @@ export class Game {
 
 		document.addEventListener('visibilitychange', () => { this.toggle_pause(document.hidden); });
 		const [clickareas, rightclickareas] = this.init_clickareas();
+
+		const input = new InputManager(canvas, canvas_pos);
 
 		const glob: TechGlobal = {
 			canvas,
@@ -328,7 +329,7 @@ export class Game {
 			else if (this.glob.input.isDown('CLICKUP')) {
 				this.glob.input.reset('CLICKUP');
 				if (this.clicked_element) {
-					this.clicked_element.up();
+					this.clicked_element.up(NaN, NaN);
 					this.clicked_element = null;
 				}
 			}
@@ -347,7 +348,7 @@ export class Game {
 			else if (this.glob.input.isDown('RCLICKUP')) {
 				this.glob.input.reset('RCLICKUP');
 				if (this.right_clicked_element) {
-					this.right_clicked_element.up();
+					this.right_clicked_element.up(NaN, NaN);
 					this.right_clicked_element = null;
 				}
 			}
@@ -522,7 +523,7 @@ export class Game {
 	}
 
 	load_locally(num: number) {
-		let save_array = local_load('save') as any[] | null; // TODO
+		const save_array = local_load('save') as any[] | null; // TODO
 		if (save_array === null) {
 			return;
 		}
@@ -663,7 +664,7 @@ export class Game {
 			mp = 10;
 		}
 		else {
-			open_popup(this, 'dino_cries', this.glob.lang.not_a_savegame, () => { }, this.glob.lang.next);
+			open_popup(this, 'dino_cries', this.glob.lang.not_a_savegame, null, this.glob.lang.next);
 			return;
 		}
 
@@ -842,7 +843,7 @@ export class Game {
 			default:
 				// This should never happen
 				console.warn(this.stage);
-				open_popup(this, 'dino_cries', `Wrong scene code: ${this.stage.id}. This should never ever happen!`, () => { }, 'Oh no!');
+				open_popup(this, 'dino_cries', `Wrong scene code: ${this.stage.id}. This should never ever happen!`, null, 'Oh no!');
 		}
 	}
 
@@ -924,7 +925,7 @@ export class Game {
 		}
 		else {
 			this.stage.redraw();
-			open_popup(this, 'dino', this.glob.lang.sound_disabled, () => { }, this.glob.lang.close);
+			open_popup(this, 'dino', this.glob.lang.sound_disabled, null, this.glob.lang.close);
 		}
 	}
 
@@ -944,7 +945,7 @@ export class Game {
 		}
 		else {
 			this.stage.redraw();
-			open_popup(this, 'dino', this.glob.lang.sound_disabled, () => { }, this.glob.lang.close);
+			open_popup(this, 'dino', this.glob.lang.sound_disabled, null, this.glob.lang.close);
 		}
 	}
 
