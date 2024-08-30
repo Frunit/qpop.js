@@ -179,26 +179,19 @@ function clamp(num, min, max) {
 function download(data, filename, type) {
 	// https://stackoverflow.com/a/30832210
 
-	console.log('03 Initializing download');
-
 	const file = new Blob([data], {type: type});
 	if(window.navigator.msSaveOrOpenBlob) { // IE10+
-		console.log('04 IE download');
 		window.navigator.msSaveOrOpenBlob(file, filename);
 	}
 	else { // Other browsers
-		console.log('04 non-IE download');
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(file);
 		a.download = filename;
 		document.body.appendChild(a);
-		console.log('05 Link created');
 		a.click();
-		console.log('06 Link clicked');
 		setTimeout(function() {
 			document.body.removeChild(a);
 			window.URL.revokeObjectURL(file);
-			console.log('07 Link removed');
 		}, 0);
 	}
 }
@@ -211,8 +204,11 @@ function multiline(text, maxwidth) {
 	const lines = [];
 	let line = words[0];
 
+	// Japanese does not use spaces
+	const space = options.language === 'JA' ? '' : ' ';
+
 	for(let n = 1; n < words.length; n++) {
-		const test_line = line + ' ' + words[n];
+		const test_line = line + space + words[n];
 		const width = ctx.measureText(test_line).width;
 		if(width > maxwidth) {
 			lines.push(line);
@@ -233,6 +229,11 @@ function multiline(text, maxwidth) {
 
 
 function write_text(text, pos, fg='#000000', bg='#ffffff', align='center') {
+	if (options.language === 'JA') {
+		// Special rule for Japanese, that doesn't really use spaces, but I added
+		// spaces to have some clear indicators for where a line break would be possible
+		text = text.replaceAll(' ', '');
+	}
 	ctx.save();
 	ctx.textAlign = align;
 	if(bg) {
@@ -317,7 +318,7 @@ function draw_black_rect(pos, dim, fill=false) {
 function draw_rect(pos, dim, black_line=true, clicked=false, light=false) {
 	dim = [dim[0] - 1, dim[1] - 1];
 	ctx.save();
-	ctx.translate(0.5, 0.5);
+	ctx.translate(1, 1);
 	ctx.lineWidth = 1;
 	if(black_line) {
 		ctx.strokeStyle = '#000000';
