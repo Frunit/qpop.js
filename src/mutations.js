@@ -204,7 +204,16 @@ Mutations.prototype.redraw = function() {
 			blur: () => this.redraw()
 		});
 	}
-	write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
+
+	const evo_score = multiline(lang.evo_score, this.evobar_offset[0] - this.evo_pts_text_offset[0] - 5);
+	console.log(evo_score);
+	if (evo_score.length === 1) {
+		write_text(lang.evo_score, this.evo_pts_text_offset, 'white', 'black', 'left');
+	}
+	else { // never more than 2 lines
+		write_text(evo_score[0], [this.evo_pts_text_offset[0], this.evo_pts_text_offset[1] - this.line_height], 'white', 'black', 'left');
+		write_text(evo_score[1], this.evo_pts_text_offset, 'white', 'black', 'left');
+	}
 
 	this.draw_avatar();
 	this.draw_evo_score();
@@ -326,7 +335,7 @@ Mutations.prototype.draw_evo_score = function() {
 		this.evo_pts_numdel_offset[0], this.evo_pts_numdel_offset[1],
 		this.evo_pts_numdel_dim[0], this.evo_pts_numdel_dim[1]);
 
-	write_text(game.current_player.evo_score, this.evo_pts_num_offset, 'white', 'black', 'left');
+	write_text(game.current_player.evo_score.toString(), this.evo_pts_num_offset, 'white', 'black', 'left');
 
 	// Bar
 	ctx.drawImage(this.pics,

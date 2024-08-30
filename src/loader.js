@@ -10,14 +10,14 @@ function Loader() {
 	// CONST_START
 	this.header_dim = [236, 78];
 	this.bar_dim = [300, 16];
-	this.start_dim = [200, 50];
+	this.start_dim = [260, 50];
 	this.x_dim = [12, 12];
 
 	this.header_offset = [202, 50];
 	this.subtitle_offset = [320, 190];
 	this.bar_offset = [170, 350];
 	this.percent_offset = [320, 362];
-	this.start_offset = [220, 250];
+	this.start_offset = [190, 250];
 	this.emptybar_soffset = [300, 80];
 
 	this.checkbox_x = 30;
