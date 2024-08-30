@@ -1,5 +1,5 @@
 
-export const anims_players = Object.freeze([
+export const anims_players = [
 	{   // Purplus
 		still: {
 			soffset: [0, 0],
@@ -432,9 +432,9 @@ export const anims_players = Object.freeze([
 			frames: [[0, 0], [64, 0], [128, 0], [192, 0]],
 					},
 	},
-]);
+];
 
-export const anims_predators = Object.freeze([
+export const anims_predators = [
 	{   // Dino
 		still: {
 			soffset: [0, 0],
@@ -567,9 +567,9 @@ export const anims_predators = Object.freeze([
 			},
 		],
 	},
-]);
+];
 
-export const anims_clouds = Object.freeze({
+export const anims_clouds = {
 	fight_hor: {
 		size: [100, 64],
 		offset: [14, 0],
@@ -594,9 +594,9 @@ export const anims_clouds = Object.freeze({
 		soffset: [0, 356],
 		frames: [[64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [0, 0], [320, 0], [384, 0]], // 234512345167
 	},
-});
+};
 
-export const anim_ranking = Object.freeze({
+export const anim_ranking = {
 	walking: [
 		{
 			offset: [128, 0],
@@ -650,9 +650,9 @@ export const anim_ranking = Object.freeze({
 			frames: [[0, 0], [64, 0]],
 		},
 	],
-});
+};
 
-export const anim_delays = Object.freeze({
+export const anim_delays = {
 	movement: 2,
 	electro: 3,
 	feeding: 3,
@@ -670,9 +670,9 @@ export const anim_delays = Object.freeze({
 	cloud: 6,
 	quicksand: 6,
 	popups: 12,
-});
+};
 
-export const survival_background = Object.freeze({
+export const survival_background = {
 	36: [[384, 192], [448, 192], [512, 192], [576, 192], [0, 256], [64, 256], [128, 256], [192, 256]], // Swamp
 	44: [[256, 256], [320, 256], [384, 256], [448, 256], [512, 256], [576, 256], [320, 256], [256, 256]], // Volcano
 	66: [[384, 384], [448, 384], [512, 384], [576, 384], [576, 384], [512, 384], [448, 384], [384, 384]], // Snail
@@ -685,4 +685,4 @@ export const survival_background = Object.freeze({
 	125: [[320, 768], [384, 768], [448, 768], [512, 768], [576, 768], [512, 768], [576, 768], [512, 768]], // Single whip plant
 	130: [[0, 832], [64, 832], [128, 832], [192, 832], [256, 832], [192, 832], [256, 832], [192, 832]], // Tripple whip plant
 
-});
+};

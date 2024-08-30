@@ -1,55 +1,69 @@
+import { SCENE, draw_rect, draw_upper_left_border, multiline, write_text } from "./helper";
+import { Sprite } from "./sprite";
+import { anim_delays } from "./sprite_positions";
+import { ClickArea, KeyType, Point, Stage, TechGlobal } from "./types";
 
-export class Popup {
-	constructor(title, image, callback, text, right_answer, left_answer) {
-		this.id = SCENE.POPUP;
-		this.bg = resources.get('gfx/dark_bg.png');
+export class Popup implements Stage {
+	id = SCENE.POPUP;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	glob: TechGlobal;
 
-		// CONST_START
-		this.line_height = 18;
-		this.max_text_width = 260;
+	private bg: HTMLImageElement;
+	private title: string;
+	private text: string[];
+	private callback: Function; // TODO
+	private right_answer: string;
+	private left_answer: string;
+	private sprite: Sprite;
 
-		this.dim = [360, 150];
-		this.title_dim = [360, 21];
-		this.spec_dim = [64, 64];
-		this.left_answer_dim = [180, 22];
-		this.right_answer_dim = [181, 22];
+	readonly line_height = 18;
+	readonly max_text_width = 260;
 
-		this.offset = [140, 165];
-		this.title_offset = [0, 0];
-		this.spec_offset = [21, 42];
-		this.text_offset = [219, 80];
-		this.left_answer_offset = [0, 128];
-		this.right_answer_offset = [179, 128];
-		// CONST_END
+	readonly dim: Point = [360, 150];
+	readonly title_dim: Point = [360, 21];
+	readonly spec_dim: Point = [64, 64];
+	readonly left_answer_dim: Point = [180, 22];
+	readonly right_answer_dim: Point = [181, 22];
+
+	readonly spec_positions: {[key: string]: Point[]} = {
+		0: [[0, 0]],
+		1: [[64, 0]],
+		2: [[128, 0]],
+		3: [[192, 0]],
+		4: [[256, 0]],
+		5: [[320, 0]],
+		dino: [[0, 64], [64, 64]],
+		chuck_berry: [[128, 64], [192, 64]],
+		dino_cries: [[256, 64], [320, 64]],
+	};
+
+	readonly offset: Point = [140, 165];
+	readonly title_offset: Point = [0, 0];
+	readonly spec_offset: Point = [21, 42];
+	readonly text_offset: Point = [219, 80];
+	readonly left_answer_offset: Point = [0, 128];
+	readonly right_answer_offset: Point = [179, 128];
+
+	constructor(glob: TechGlobal, title:string, image: string, callback: Function, text: string, right_answer: string, left_answer: string) {
+		this.glob = glob;
 		this.title = title;
 		this.text = multiline(text, this.max_text_width);
 		this.right_answer = right_answer;
 		this.left_answer = left_answer;
 		this.callback = callback;
 
-		this.spec_positions = {
-			0: [[0, 0]],
-			1: [[64, 0]],
-			2: [[128, 0]],
-			3: [[192, 0]],
-			4: [[256, 0]],
-			5: [[320, 0]],
-			dino: [[0, 64], [64, 64]],
-			chuck_berry: [[128, 64], [192, 64]],
-			dino_cries: [[256, 64], [320, 64]],
-		};
-
-		this.sprite = new Sprite('gfx/species.png', [0, 0], this.spec_positions[image], anim_delays.popups);
-
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
+		this.bg = this.glob.resources.get_image('gfx/dark_bg.png');
+		this.sprite = new Sprite(glob, 'gfx/species.png', [0, 0], this.spec_positions[image], anim_delays.popups);
 	}
+
 	initialize() {
 		this.redraw();
 	}
+
 	redraw() {
-		ctx.drawImage(this.bg,
+		this.glob.ctx.drawImage(this.bg,
 			0, 0,
 			this.dim[0], this.dim[1],
 			this.offset[0], this.offset[1],
@@ -64,7 +78,7 @@ export class Popup {
 		write_text(this.title, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
 
 		// Species image
-		this.sprite.render(ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
+		this.sprite.render(this.glob.ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
 
 		// Text
 		const line_correction = this.line_height * this.text.length / 2;
@@ -107,14 +121,14 @@ export class Popup {
 			draw_upper_left_border([this.offset[0] + this.right_answer_offset[0], this.offset[1] + this.right_answer_offset[1]], this.right_answer_dim);
 		}
 		else {
-			ctx.save();
-			ctx.lineWidth = 2;
-			ctx.strokeStyle = '#828282';
-			ctx.beginPath();
-			ctx.moveTo(this.offset[0] + this.left_answer_offset[0] + 1, this.offset[1] + this.left_answer_offset[1] - 1);
-			ctx.lineTo(this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0] - 1, this.offset[1] + this.right_answer_offset[1] - 1);
-			ctx.stroke();
-			ctx.restore();
+			this.glob.ctx.save();
+			this.glob.ctx.lineWidth = 2;
+			this.glob.ctx.strokeStyle = '#828282';
+			this.glob.ctx.beginPath();
+			this.glob.ctx.moveTo(this.offset[0] + this.left_answer_offset[0] + 1, this.offset[1] + this.left_answer_offset[1] - 1);
+			this.glob.ctx.lineTo(this.offset[0] + this.right_answer_offset[0] + this.right_answer_dim[0] - 1, this.offset[1] + this.right_answer_offset[1] - 1);
+			this.glob.ctx.stroke();
+			this.glob.ctx.restore();
 		}
 
 		this.keys = [
@@ -122,21 +136,24 @@ export class Popup {
 			{ 'key': 'ESCAPE', 'action': () => this.clicked(0), 'reset': true },
 		];
 	}
+
 	render() {
 		if (this.sprite.is_new_frame()) {
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				this.spec_offset[0], this.spec_offset[1],
 				this.spec_dim[0], this.spec_dim[1],
 				this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1],
 				this.spec_dim[0], this.spec_dim[1]);
 
-			this.sprite.render(ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
+			this.sprite.render(this.glob.ctx, [this.offset[0] + this.spec_offset[0], this.offset[1] + this.spec_offset[1]]);
 		}
 	}
+
 	update() {
 		this.sprite.update();
 	}
-	clicked(answer) {
+
+	clicked(answer: unknown) {
 		game.stage = game.backstage.pop();
 		game.stage.redraw();
 		this.callback(answer);

@@ -1,28 +1,35 @@
 import { ResourceElement } from "./types";
 
-(function() {
-	const resource_cache: {[key: string]: boolean | AudioBuffer | HTMLImageElement} = {};
-	let ready_callback = () => {};
-	let ready_param = null;
-	const loading = [];
-	const load_status: {[key: string]: number} = {};
-	let loaded = 0;
-	let audio_enabled = true;
-	let initial_play = true;
+export class ResourceManager {
+	private image_cache: {[key: string]: true | HTMLImageElement} = {};
+	private audio_cache: {[key: string]: true | AudioBuffer} = {};
+	private ready_callback: Function = () => {};
+	private ready_param: unknown = null;
+	private loading: string[] = [];
+	private load_status: {[key: string]: number} = {};
+	private loaded = 0;
+	private audio_enabled = true;
+	private initial_play = true;
 
-	let best_audio_suffix: string | null = null;
-	const context = new AudioContext();
-	const music_node = context.createGain();
-	const sound_node = context.createGain();
-	const musics: {[key: string]: AudioBufferSourceNode} = {};
-	const sounds = {};
-	let currently_playing_music = '';
-	const currently_playing_sounds = new Set();
+	private best_audio_suffix: string | null = null;
+	private context: AudioContext;
+	private music_node: GainNode;
+	private sound_node: GainNode;
+	private musics: {[key: string]: AudioBufferSourceNode} = {};
+	private sounds: {[key: string]: AudioBufferSourceNode} = {};
+	private currently_playing_music = '';
+	private currently_playing_sounds: Set<string> = new Set();
+
+	constructor() {
+		this.context = new AudioContext();
+		this.music_node = this.context.createGain();
+		this.sound_node = this.context.createGain();
+	}
 
 
 	// Load an array of resources
 	// Format: [url, type, name]. Name is optional. Type must be "audio" or "image". The suffix for "audio" will be appended, so give the url without suffix for audio.
-	function load(resources: ResourceElement[]) {
+	load(resources: ResourceElement[]) {
 		for(let resource of resources) {
 			let url = resource.url;
 			const type = resource.type;
@@ -30,80 +37,100 @@ import { ResourceElement } from "./types";
 
 			// determine audio format. If no audio is possible, load nothing.
 			if(type === 'audio') {
-				if(best_audio_suffix === null || !audio_enabled) {
+				if(this.best_audio_suffix === null || !this.audio_enabled) {
 					continue;
 				}
 
-				url += best_audio_suffix;
+				url += this.best_audio_suffix;
+				this._load_audio(url, name);
 			}
-
-			_load(url, name, type);
+			else {
+				this._load_image(url, name);
+			}
 		}
 	}
 
-	function _load(url: string, name: string, type: string) {
-		if(!resource_cache[name]) {
-			loading.push(name);
-			resource_cache[name] = true;
-
-			const request = new XMLHttpRequest();
-			request.open('GET', url, true);
-			request.responseType = 'arraybuffer';
-
-			load_status[name] = 0;
-
-			if(type === 'audio') {
-				request.addEventListener('load',
-					(event) => {
-						context.decodeAudioData(request.response, (buffer) => {
-							resource_cache[name] = buffer;
-							loaded++;
-							_update_load_status(name, event.loaded);
-
-							if(_is_ready()) {
-								ready_callback(ready_param);
-							}
-						}, (e) => {console.warn(`Error: ${e.err}`);});
-					}
-				);
-			}
-			else { // image
-				request.addEventListener('load',
-					(event) => {
-						const img = new Image();
-						const blob = new Blob([request.response]);
-						img.src = window.URL.createObjectURL(blob);
-						resource_cache[name] = img;
-						window.URL.revokeObjectURL(blob);
-
-						loaded++;
-						_update_load_status(name, event.loaded);
-
-						if(_is_ready()) {
-							ready_callback(ready_param);
-						}
-					}
-				);
-			}
-
-			request.addEventListener('progress',
-				(event) => {_update_load_status(name, event.loaded);}
-			);
-
-			request.send();
+	private _load_audio(url: string, name: string) {
+		if(this.audio_cache[name]) {
+			return;
 		}
+		this.loading.push(name);
+		this.audio_cache[name] = true;
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+
+		this.load_status[name] = 0;
+
+		request.addEventListener('load',
+			(event) => {
+				this.context.decodeAudioData(request.response, (buffer) => {
+					this.audio_cache[name] = buffer;
+					this.loaded++;
+					this._update_load_status(name, event.loaded);
+
+					if(this._is_ready()) {
+						this.ready_callback(this.ready_param);
+					}
+				}, (e) => {console.warn(`${e.name}: ${e.message}`);});
+			}
+		);
+
+		request.addEventListener('progress',
+			(event) => {this._update_load_status(name, event.loaded);}
+		);
+
+		request.send();
+	}
+	
+	private _load_image(url: string, name: string) {
+		if(this.image_cache[name]) {
+			return;
+		}
+		this.loading.push(name);
+		this.image_cache[name] = true;
+
+		const request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+
+		this.load_status[name] = 0;
+
+		request.addEventListener('load',
+			(event) => {
+				const img = new Image();
+				const blob = new Blob([request.response]);
+				img.src = window.URL.createObjectURL(blob);
+				this.image_cache[name] = img;
+				window.URL.revokeObjectURL(img.src);
+
+				this.loaded++;
+				this._update_load_status(name, event.loaded);
+
+				if(this._is_ready()) {
+					this.ready_callback(this.ready_param);
+				}
+			}
+		);
+
+		request.addEventListener('progress',
+			(event) => {this._update_load_status(name, event.loaded);}
+		);
+
+		request.send();
 	}
 
-	function _update_load_status(name: string, bytes: number) {
-		load_status[name] = bytes;
+	private _update_load_status(name: string, bytes: number) {
+		this.load_status[name] = bytes;
 	}
 
-	function get_suffix() {
-		if(!audio_enabled) {
+	get_suffix() {
+		if(!this.audio_enabled) {
 			return '';
 		}
 
-		if(best_audio_suffix === null) {
+		if(this.best_audio_suffix === null) {
 			const mimes = [
 				['.mp3', 'audio/mp3; codecs="mp3"'],
 				['.mp3', 'audio/mp4; codecs="mp3"'],
@@ -116,155 +143,146 @@ import { ResourceElement } from "./types";
 			const audio_elem = document.createElement('audio');
 			for(let mime of mimes) {
 				if(audio_elem.canPlayType(mime[1]) === 'probably') {
-					best_audio_suffix = mime[0];
+					this.best_audio_suffix = mime[0];
 					break;
 				}
 			}
 
-			if(best_audio_suffix === null) {
+			if(this.best_audio_suffix === null) {
 				return '';
 			}
 		}
 
-		return best_audio_suffix;
+		return this.best_audio_suffix;
 	}
 
-	function get(name: string) {
-		return resource_cache[name];
+	get_audio(name: string): AudioBuffer {
+		const result = this.audio_cache[name];
+		if (result === true) {
+			throw new Error(`Audio file ${name} has not finished loading!`);
+		}
+		return result;
 	}
 
-	function _is_ready() {
-		return loaded === loading.length;
+	get_image(name: string): HTMLImageElement {
+		const result = this.image_cache[name];
+		if (result === true) {
+			throw new Error(`Image file ${name} has not finished loading!`);
+		}
+		return result;
 	}
 
-	function on_ready(func, param) {
-		ready_callback = func;
-		ready_param = param;
+	private _is_ready() {
+		return this.loaded === this.loading.length;
 	}
 
-	function get_status() {
+	on_ready(func: Function, param?: unknown) {
+		this.ready_callback = func;
+		this.ready_param = param;
+	}
+
+	get_status() {
 		let bytes = 0;
-		for(const value of Object.values(load_status)) {
+		for(const value of Object.values(this.load_status)) {
 			bytes += value;
 		}
 		return bytes;
 	}
 
-	function play_music(name: string) {
-		if(initial_play) {
-			initial_play = false;
+	play_music(name: string) {
+		if(this.initial_play) {
+			this.initial_play = false;
 
-			if(context.state === 'suspended') {
-				context.resume();
+			if(this.context.state === 'suspended') {
+				this.context.resume();
 			}
 		}
 
-		if(currently_playing_music) {
-			if(currently_playing_music === name) {
+		if(this.currently_playing_music) {
+			if(this.currently_playing_music === name) {
 				return;
 			}
 
-			musics[currently_playing_music].stop();
+			this.musics[this.currently_playing_music].stop();
 		}
 
-		musics[name] = context.createBufferSource();
-		musics[name].connect(music_node).connect(context.destination);
-		musics[name].loop = true;
-		musics[name].buffer = get(name);
+		this.musics[name] = this.context.createBufferSource();
+		this.musics[name].connect(this.music_node).connect(this.context.destination);
+		this.musics[name].loop = true;
+		this.musics[name].buffer = this.get_audio(name);
 
-		musics[name].start(0, 0);
+		this.musics[name].start(0, 0);
 
-		currently_playing_music = name;
+		this.currently_playing_music = name;
 	}
 
-	function play_sound(name, loop=false) {
-		if(initial_play) {
-			initial_play = false;
+	play_sound(name: string, loop=false) {
+		if(this.initial_play) {
+			this.initial_play = false;
 
-			if(context.state === 'suspended') {
-				context.resume();
+			if(this.context.state === 'suspended') {
+				this.context.resume();
 			}
 		}
 
-		if(currently_playing_sounds.has(name)) {
-			sounds[name].stop();
-			currently_playing_sounds.delete(name);
+		if(this.currently_playing_sounds.has(name)) {
+			this.sounds[name].stop();
+			this.currently_playing_sounds.delete(name);
 		}
 
-		sounds[name] = context.createBufferSource();
-		sounds[name].connect(sound_node).connect(context.destination);
-		sounds[name].buffer = get(name);
-		sounds[name].addEventListener('ended',
-			() => {currently_playing_sounds.delete(name);}
+		this.sounds[name] = this.context.createBufferSource();
+		this.sounds[name].connect(this.sound_node).connect(this.context.destination);
+		this.sounds[name].buffer = this.get_audio(name);
+		this.sounds[name].addEventListener('ended',
+			() => {this.currently_playing_sounds.delete(name);}
 		);
-		sounds[name].loop = loop;
-		sounds[name].start(0, 0);
+		this.sounds[name].loop = loop;
+		this.sounds[name].start(0, 0);
 
-		currently_playing_sounds.add(name);
+		this.currently_playing_sounds.add(name);
 	}
 
-	function stop_music() {
-		if(currently_playing_music) {
-			musics[currently_playing_music].stop();
-			currently_playing_music = '';
+	stop_music() {
+		if(this.currently_playing_music) {
+			this.musics[this.currently_playing_music].stop();
+			this.currently_playing_music = '';
 		}
 	}
 
-	function stop_sound(name=null) {
+	stop_sound(name=null) {
 		if(name === null) {
-			for(let elem of currently_playing_sounds) {
-				sounds[elem].stop();
+			for(let elem of this.currently_playing_sounds) {
+				this.sounds[elem].stop();
 			}
-			currently_playing_sounds.clear();
+			this.currently_playing_sounds.clear();
 		}
-
-		if(sounds[name]) {
-			sounds[name].stop();
-			currently_playing_sounds.delete(name);
-		}
-	}
-
-	function set_music_volume(volume) {
-		music_node.gain.value = volume;
-	}
-
-	function set_sound_volume(volume) {
-		sound_node.gain.value = volume;
-	}
-
-	function pause() {
-		if(context.state === 'running') {
-			context.suspend();
+		else if(this.sounds[name]) {
+			this.sounds[name].stop();
+			this.currently_playing_sounds.delete(name);
 		}
 	}
 
-	function unpause() {
-		if(context.state === 'suspended' && audio_enabled) {
-			context.resume();
+	set_music_volume(volume: number) {
+		this.music_node.gain.value = volume;
+	}
+
+	set_sound_volume(volume: number) {
+		this.sound_node.gain.value = volume;
+	}
+
+	pause() {
+		if(this.context.state === 'running') {
+			this.context.suspend();
 		}
 	}
 
-	function disable_audio() {
-		audio_enabled = false;
+	unpause() {
+		if(this.context.state === 'suspended' && this.audio_enabled) {
+			this.context.resume();
+		}
 	}
 
-	window.resources = {
-		load: load,
-		get: get,
-		on_ready: on_ready,
-		get_status: get_status,
-	};
-
-	window.audio = {
-		play_music: play_music,
-		play_sound: play_sound,
-		stop_music: stop_music,
-		stop_sound: stop_sound,
-		pause: pause,
-		unpause: unpause,
-		set_music_volume: set_music_volume,
-		set_sound_volume: set_sound_volume,
-		get_suffix: get_suffix,
-		disable_audio: disable_audio,
-	};
-})();
+	disable_audio() {
+		this.audio_enabled = false;
+	}
+}

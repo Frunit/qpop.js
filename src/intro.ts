@@ -10,7 +10,6 @@ export class Intro implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
 	private num: number = 0;
@@ -24,7 +23,7 @@ export class Intro implements Stage {
 	}
 
 	initialize() {
-		audio.play_music('intro');
+		this.glob.resources.play_music('intro');
 		this.glob.canvas.style.cursor = 'default';
 		this.animation = new Animation(intro_frames[this.num], this.anim_offset);
 		this.redraw();

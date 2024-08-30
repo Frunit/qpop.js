@@ -6,12 +6,11 @@ export class ResourceLoader implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
-	private bg_pic = null;
-	private header_pic = null;
-	private bar_pic = null;
+	private bg_pic: HTMLImageElement | null = null;
+	private header_pic: HTMLImageElement | null = null;
+	private bar_pic: HTMLImageElement | null = null;
 	private max_size = 0;
 	private suffix = '.mp3';
 	private phase = 0;
@@ -52,7 +51,7 @@ export class ResourceLoader implements Stage {
 		this.percentage = 0;
 		this.redraw();
 
-		this.suffix = audio.get_suffix();
+		this.suffix = this.glob.resources.get_suffix();
 		this.max_size = this.img_size;
 		if (this.suffix === '.m4a') {
 			this.max_size += this.m4a_size;
@@ -67,8 +66,8 @@ export class ResourceLoader implements Stage {
 			game.disable_audio();
 		}
 
-		resources.on_ready(this.finished_preloading, this);
-		resources.load([
+		this.glob.resources.on_ready(this.finished_preloading, this);
+		this.glob.resources.load([
 			{url: 'gfx/dark_bg.png', type: 'image'},
 			{url: 'gfx/mutations.png', type: 'image'},
 			{url: 'gfx/header.png', type: 'image'},
@@ -236,16 +235,16 @@ export class ResourceLoader implements Stage {
 		write_text(`${this.percentage.toFixed(2)}%`, [this.percent_offset[0], this.percent_offset[1]]);
 	}
 
-	finished_preloading(self) {
-		self.bg_pic = resources.get('gfx/dark_bg.png');
-		self.header_pic = resources.get('gfx/header.png');
-		self.bar_pic = resources.get('gfx/mutations.png');
+	finished_preloading(self: ResourceLoader) {
+		self.bg_pic = this.glob.resources.get_image('gfx/dark_bg.png');
+		self.header_pic = this.glob.resources.get_image('gfx/header.png');
+		self.bar_pic = this.glob.resources.get_image('gfx/mutations.png');
 		self.phase = 1;
 
 		self.redraw();
 
-		resources.on_ready(self.finished_loading, self);
-		resources.load([
+		this.glob.resources.on_ready(self.finished_loading, self);
+		this.glob.resources.load([
 			{url: 'gfx/background.png', type: 'image'},
 			{url: 'gfx/clouds.png', type: 'image'},
 			{url: 'gfx/electro.png', type: 'image'},
@@ -347,13 +346,13 @@ export class ResourceLoader implements Stage {
 		]);
 	}
 
-	finished_loading(self) {
+	finished_loading(self: ResourceLoader) {
 		self.phase = 2;
 
 		self.redraw();
 
-		resources.on_ready(self.finished_postloading, self);
-		resources.load([
+		this.glob.resources.on_ready(self.finished_postloading, self);
+		this.glob.resources.load([
 			{url: 'sfx/catastrophe', type: 'audio', name: 'catastrophe'},
 			{url: 'sfx/outro', type: 'audio', name: 'outro'},
 			{url: 'anim_gfx/amoegro.png', type: 'image'},
@@ -453,18 +452,18 @@ export class ResourceLoader implements Stage {
 		});
 	}
 
-	finished_postloading(self) {
+	finished_postloading(self: ResourceLoader) {
 		if (game.stage.id === SCENE.LOADING) {
 			self.phase = 3;
 			self.percentage = 100;
-			if (resources.get_status() - self.max_size !== 0) {
-				console.warn(`Expected size not real size. Diff is ${resources.get_status() - self.max_size} Bytes`);
+			if (this.glob.resources.get_status() - self.max_size !== 0) {
+				console.warn(`Expected size not real size. Diff is ${this.glob.resources.get_status() - self.max_size} Bytes`);
 			}
 
 			self.redraw();
 		}
 
-		resources.on_ready(() => { });
+		this.glob.resources.on_ready(() => { });
 	}
 
 	render() {
@@ -481,7 +480,7 @@ export class ResourceLoader implements Stage {
 
 	update() {
 		if (this.phase < 3) {
-			this.percentage = (resources.get_status() / this.max_size) * 100;
+			this.percentage = (this.glob.resources.get_status() / this.max_size) * 100;
 		}
 	}
 

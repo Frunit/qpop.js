@@ -7,7 +7,6 @@ export class Transition implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
 	private pic: any; // TODO!!!
@@ -21,12 +20,12 @@ export class Transition implements Stage {
 	constructor(glob: TechGlobal, pic: any, id: number) {
 		this.glob = glob;
 		this.id = id;
-		this.pic = resources.get(pic);
+		this.pic = this.glob.resources.get_image(pic);
 		this.lang_string = pic.split('/').pop().replace('.png', '');
 	}
 
 	initialize() {
-		audio.stop_music(); // MAYBE: Fade out
+		this.glob.resources.stop_music(); // MAYBE: Fade out
 		this.glob.canvas.style.cursor = 'default';
 		this.redraw();
 	}

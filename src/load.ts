@@ -1,43 +1,50 @@
+import { SCENE, draw_rect, draw_upper_left_border, init_upload, local_load, multiline, write_text } from "./helper";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal } from "./types";
 
-export class Load {
-	constructor() {
-		this.id = SCENE.LOAD_GAME;
-		this.bg = resources.get('gfx/dark_bg.png');
+export class Load implements Stage {
+	id = SCENE.LOAD_GAME;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	glob: TechGlobal;
 
-		// CONST_START
-		this.dim = [400, 386];
-		this.title_dim = [400, 21];
-		this.abort_dim = [181, 22];
-		this.button_dim = [90, 22];
-		this.upload_dim = [90, 66];
-		this.upload_area_dim = [400, 82];
-		this.upload_text_dim = [290, 66];
-		this.browser_area_dim = [400, 286];
+	private bg: HTMLImageElement;
 
-		this.offset = [120, 65];
-		this.title_offset = [0, 0];
-		this.abort_offset = [219, 365];
-		this.saves_offset = [8, 109];
-		this.upload_area_offset = [0, 20];
-		this.upload_offset = [8, 28];
-		this.upload_text_offset = [105, 65];
-		this.browser_area_offset = [0, 101];
-		this.browser_text_offset = [105, 109];
+	readonly dim: Dimension = [400, 386];
+	readonly title_dim: Dimension = [400, 21];
+	readonly abort_dim: Dimension = [181, 22];
+	readonly button_dim: Dimension = [90, 22];
+	readonly upload_dim: Dimension = [90, 66];
+	readonly upload_area_dim: Dimension = [400, 82];
+	readonly upload_text_dim: Dimension = [290, 66];
+	readonly browser_area_dim: Dimension = [400, 286];
 
-		this.button_y_dist = 25;
-		this.line_height = 18;
-		// CONST_END
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
+	readonly offset: Point = [120, 65];
+	readonly title_offset: Point = [0, 0];
+	readonly abort_offset: Point = [219, 365];
+	readonly saves_offset: Point = [8, 109];
+	readonly upload_area_offset: Point = [0, 20];
+	readonly upload_offset: Point = [8, 28];
+	readonly upload_text_offset: Point = [105, 65];
+	readonly browser_area_offset: Point = [0, 101];
+	readonly browser_text_offset: Point = [105, 109];
+
+	readonly button_y_dist = 25;
+	readonly line_height = 18;
+
+	constructor(glob: TechGlobal) {
+		this.glob = glob;
+		this.bg = this.glob.resources.get_image('gfx/dark_bg.png');
 	}
+
 	initialize() {
 		this.redraw();
 
-		canvas.addEventListener('mouseup', init_upload);
+		this.glob.canvas.addEventListener('mouseup', init_upload);
 	}
+
 	redraw() {
-		ctx.drawImage(this.bg,
+		this.glob.ctx.drawImage(this.bg,
 			0, 0,
 			this.dim[0], this.dim[1],
 			this.offset[0], this.offset[1],
@@ -49,21 +56,21 @@ export class Load {
 
 		// Title
 		draw_rect([this.offset[0] + this.title_offset[0], this.offset[1] + this.title_offset[1]], this.title_dim);
-		write_text(lang.load_game, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
+		write_text(this.glob.lang.load_game, [this.offset[0] + this.title_offset[0] + this.title_dim[0] / 2, this.offset[1] + this.title_offset[1] + 15], 'white', 'black');
 
 		// Upload area
 		draw_rect([this.offset[0] + this.upload_area_offset[0], this.offset[1] + this.upload_area_offset[1]], this.upload_area_dim);
 
 		// Upload button
 		draw_rect([this.offset[0] + this.upload_offset[0], this.offset[1] + this.upload_offset[1]], this.upload_dim);
-		let lines = multiline(lang.upload, this.upload_dim[0] - 10);
+		let lines = multiline(this.glob.lang.upload, this.upload_dim[0] - 10);
 		let line_correction = this.line_height * (lines.length - 1) / 2;
 		for (let i = 0; i < lines.length; i++) {
 			write_text(lines[i], [this.offset[0] + this.upload_offset[0] + this.upload_dim[0] / 2, this.offset[1] + this.upload_text_offset[1] - line_correction + this.line_height * i], 'white', 'black');
 		}
 
 		// Upload description text
-		lines = multiline(lang.upload_description, this.upload_text_dim[0]);
+		lines = multiline(this.glob.lang.upload_description, this.upload_text_dim[0]);
 		line_correction = this.line_height * (lines.length - 1) / 2;
 		for (let i = 0; i < lines.length; i++) {
 			write_text(lines[i], [this.offset[0] + this.upload_text_offset[0], this.offset[1] + this.upload_text_offset[1] - line_correction + this.line_height * i], 'white', 'black', 'left');
@@ -83,7 +90,7 @@ export class Load {
 		draw_rect([this.offset[0] + this.browser_area_offset[0], this.offset[1] + this.browser_area_offset[1]], this.browser_area_dim);
 		const save_array = local_load('save');
 		if (!Array.isArray(save_array) || save_array[0] === null) {
-			const lines = multiline(lang.no_local_saves, this.upload_text_dim[0]);
+			const lines = multiline(this.glob.lang.no_local_saves, this.upload_text_dim[0]);
 			const line_correction = this.line_height * (lines.length - 1) / 2;
 			for (let i = 0; i < lines.length; i++) {
 				write_text(lines[i], [this.offset[0] + this.dim[0] / 2, this.offset[1] + this.browser_area_offset[1] + this.browser_area_dim[1] / 2 - line_correction + this.button_dim[1] * i], 'white', 'black');
@@ -96,10 +103,10 @@ export class Load {
 				}
 				// Button
 				draw_rect([this.offset[0] + this.saves_offset[0], this.offset[1] + this.saves_offset[1] + this.button_y_dist * i], this.button_dim);
-				write_text(lang.load, [this.offset[0] + this.saves_offset[0] + this.button_dim[0] / 2, this.offset[1] + this.saves_offset[1] + this.button_y_dist * i + 15], 'white', 'black');
+				write_text(this.glob.lang.load, [this.offset[0] + this.saves_offset[0] + this.button_dim[0] / 2, this.offset[1] + this.saves_offset[1] + this.button_y_dist * i + 15], 'white', 'black');
 
 				// Description
-				write_text(`${(new Date(save_array[i].datetime)).toLocaleString()} - ${lang.turn} ${save_array[i].turn}`, [this.offset[0] + this.browser_text_offset[0], this.offset[1] + this.browser_text_offset[1] + this.button_y_dist * i + 15], 'white', 'black', 'left');
+				write_text(`${(new Date(save_array[i].datetime)).toLocaleString()} - ${this.glob.lang.turn} ${save_array[i].turn}`, [this.offset[0] + this.browser_text_offset[0], this.offset[1] + this.browser_text_offset[1] + this.button_y_dist * i + 15], 'white', 'black', 'left');
 
 				this.clickareas.push({
 					x1: this.offset[0] + this.saves_offset[0],
@@ -115,7 +122,7 @@ export class Load {
 
 		// Abort button
 		draw_rect([this.offset[0] + this.abort_offset[0], this.offset[1] + this.abort_offset[1]], this.abort_dim);
-		write_text(lang.close, [this.offset[0] + this.abort_offset[0] + this.abort_dim[0] / 2, this.offset[1] + this.abort_offset[1] + 15], 'white', 'black');
+		write_text(this.glob.lang.close, [this.offset[0] + this.abort_offset[0] + this.abort_dim[0] / 2, this.offset[1] + this.abort_offset[1] + 15], 'white', 'black');
 
 		this.clickareas.push({
 			x1: this.offset[0] + this.abort_offset[0],
@@ -135,17 +142,21 @@ export class Load {
 			{ 'key': 'ESCAPE', 'action': () => this.close(), 'reset': true },
 		];
 	}
+
 	render() {
 	}
+
 	update() {
 	}
-	load(num) {
-		canvas.removeEventListener('mouseup', init_upload);
+
+	load(num: number) {
+		this.glob.canvas.removeEventListener('mouseup', init_upload);
 		game.backstage = [];
 		game.load_locally(num);
 	}
+
 	close() {
-		canvas.removeEventListener('mouseup', init_upload);
+		this.glob.canvas.removeEventListener('mouseup', init_upload);
 		game.stage = game.backstage.pop();
 		game.stage.redraw();
 	}

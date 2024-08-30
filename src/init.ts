@@ -1,37 +1,46 @@
+import { DIR, PLAYER_TYPE, SCENE, draw_base, draw_rect, draw_upper_left_border, init_upload, local_load, multiline, open_load_dialog, open_popup, write_text } from "./helper";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType } from "./types";
 
-export class Init {
-	constructor() {
-		this.id = SCENE.INIT;
-		this.bg = resources.get('gfx/init.png');
-		this.spec_pics = resources.get('gfx/species.png');
+export class Init implements Stage {
+	id = SCENE.INIT;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	tutorials: TutorialType[];
+	glob: TechGlobal;
 
-		// CONST_START
-		this.panel_dim = [308, 140];
-		this.type_dim = [63, 63];
-		this.iq_dim = [12, 11];
-		this.iq_text_dim = [140, 11];
-		this.load_dim = [230, 22];
-		this.next_dim = [181, 22];
+	private bg: HTMLImageElement;
+	private spec_pics: HTMLImageElement;
 
-		this.spec_offset = [8, 31];
-		this.type_offset = [83, 32];
-		this.load_offset = [0, 458];
-		this.next_offset = [459, 458];
-		this.iq_offset = [158, 115];
-		this.text_iq_offset = [216, 38];
-		this.text_iqs_offset = [179, 58];
+	readonly panel_dim: Dimension = [308, 140];
+	readonly type_dim: Dimension = [63, 63];
+	readonly iq_dim: Dimension = [12, 11];
+	readonly iq_text_dim: Dimension = [140, 11];
+	readonly load_dim: Dimension = [230, 22];
+	readonly next_dim: Dimension = [181, 22];
 
-		this.iq_dy = 22;
-		this.line_y = 34;
-		this.line_from_to = [157, 297];
+	readonly spec_offset: Point = [8, 31];
+	readonly type_offset: Point = [83, 32];
+	readonly load_offset: Point = [0, 458];
+	readonly next_offset: Point = [459, 458];
+	readonly iq_offset: Point = [158, 115];
+	readonly text_iq_offset: Point = [216, 38];
+	readonly text_iqs_offset: Point = [179, 58];
 
-		this.panel_soffset = [0, 0];
-		// CONST_END
-		this.panel_offsets = [[8, 27], [322, 27], [8, 169], [322, 169], [8, 311], [322, 311]];
+	readonly iq_dy = 22;
+	readonly line_y = 34;
+	readonly line_from_to: Point = [157, 297];
+	readonly panel_soffset: Point = [0, 0];
 
-		this.type_soffsets = [[0, 0], [309, 65], [309, 1], [373, 1]];
-		this.iq_soffsets = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
-		this.spec_soffsets = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
+	readonly panel_offsets: Point[] = [[8, 27], [322, 27], [8, 169], [322, 169], [8, 311], [322, 311]];
+	readonly type_soffsets: Point[] = [[0, 0], [309, 65], [309, 1], [373, 1]];
+	readonly iq_soffsets: Point[] = [[387, 65], [373, 65], [373, 78], [373, 91], [373, 104]];
+	readonly spec_soffsets: Point[] = [[0, 0], [64, 0], [128, 0], [192, 0], [256, 0], [320, 0]];
+
+	constructor(glob: TechGlobal) {
+		this.glob = glob;
+		this.bg = glob.resources.get_image('gfx/init.png');
+		this.spec_pics = glob.resources.get_image('gfx/species.png');
 
 		this.tutorials = [
 			{
@@ -60,29 +69,27 @@ export class Init {
 				'highlight': [this.next_offset[0], this.next_offset[1], this.next_offset[0] + this.next_dim[0], this.next_offset[1] + this.next_dim[1]],
 			},
 		];
-
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
 	}
+
 	initialize() {
-		audio.play_music('intro');
+		this.glob.resources.play_music('intro');
 		game.reset();
 		this.redraw();
 		game.tutorial();
 	}
+
 	redraw() {
 		draw_base();
 
 		draw_rect([0, 20], [640, 439]); // Main rectangle
 		draw_rect(this.load_offset, this.load_dim); // Load
-		write_text(lang.load_game, [115, 473], 'white', 'black');
+		write_text(this.glob.lang.load_game, [115, 473], 'white', 'black');
 		draw_rect([229, 458], [231, 22]); // Bottom middle
 		draw_rect(this.next_offset, this.next_dim); // Continue
-		write_text(lang.next, [549, 473], 'white', 'black');
+		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
 
-		this.clickareas = game.clickareas.slice();
-		this.rightclickareas = game.rightclickareas.slice();
+		this.clickareas = this.glob.clickareas.slice();
+		this.rightclickareas = this.glob.rightclickareas.slice();
 
 		this.clickareas.push({
 			x1: this.load_offset[0],
@@ -105,13 +112,13 @@ export class Init {
 		});
 
 		// Lengths of lines around iq title
-		const distance = Math.ceil(ctx.measureText(lang.iq).width / 2) + 5;
+		const distance = Math.ceil(this.glob.ctx.measureText(this.glob.lang.iq).width / 2) + 5;
 		const left_line_to = this.text_iq_offset[0] - distance;
 		const right_line_from = this.text_iq_offset[0] + distance;
 
 		for (let playernum = 0; playernum < this.panel_offsets.length; playernum++) {
 			const panel_offset = this.panel_offsets[playernum];
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				this.panel_soffset[0], this.panel_soffset[1],
 				this.panel_dim[0], this.panel_dim[1],
 				panel_offset[0], panel_offset[1],
@@ -119,7 +126,7 @@ export class Init {
 
 
 			let soffset = this.iq_soffsets[game.players[playernum].iq];
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				soffset[0], soffset[1],
 				this.iq_dim[0], this.iq_dim[1],
 				panel_offset[0] + this.iq_offset[0],
@@ -127,40 +134,40 @@ export class Init {
 				this.iq_dim[0], this.iq_dim[1]);
 
 			soffset = this.type_soffsets[game.players[playernum].type];
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				soffset[0], soffset[1],
 				this.type_dim[0], this.type_dim[1],
 				panel_offset[0] + this.type_offset[0], panel_offset[1] + this.type_offset[1],
 				this.type_dim[0], this.type_dim[1]);
 
 			soffset = this.spec_soffsets[playernum];
-			ctx.drawImage(this.spec_pics,
+			this.glob.ctx.drawImage(this.spec_pics,
 				soffset[0], soffset[1],
 				this.type_dim[0], this.type_dim[1],
 				panel_offset[0] + this.spec_offset[0], panel_offset[1] + this.spec_offset[1],
 				this.type_dim[0], this.type_dim[1]);
 
-			write_text(lang.player.replace('{num}', (playernum + 1)), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
+			write_text(this.glob.lang.player.replace('{num}', (playernum + 1)), [Math.floor(this.panel_dim[0] / 2) + panel_offset[0], panel_offset[1] + 15], 'black', 'white');
 
-			write_text(lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
+			write_text(this.glob.lang.species[playernum], [panel_offset[0] + 77, panel_offset[1] + 121], 'black', 'white');
 
-			write_text(lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', null, 'center');
+			write_text(this.glob.lang.iq, [panel_offset[0] + this.text_iq_offset[0], panel_offset[1] + this.text_iq_offset[1]], '#000000', undefined, 'center');
 			for (let iq = 0; iq < 4; iq++) {
-				write_text(lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq], '#000000', null, 'left');
+				write_text(this.glob.lang.iqs[iq], [panel_offset[0] + this.text_iqs_offset[0], panel_offset[1] + this.text_iqs_offset[1] + this.iq_dy * iq], '#000000', undefined, 'left');
 			}
 
 			// Draw Line around IQ title   (------ IQ ------)
-			ctx.save();
-			ctx.translate(0.5, 0.5);
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(panel_offset[0] + this.line_from_to[0], panel_offset[1] + this.line_y);
-			ctx.lineTo(panel_offset[0] + left_line_to, panel_offset[1] + this.line_y);
-			ctx.moveTo(panel_offset[0] + right_line_from, panel_offset[1] + this.line_y);
-			ctx.lineTo(panel_offset[0] + this.line_from_to[1], panel_offset[1] + this.line_y);
-			ctx.strokeStyle = '#000000';
-			ctx.stroke();
-			ctx.restore();
+			this.glob.ctx.save();
+			this.glob.ctx.translate(0.5, 0.5);
+			this.glob.ctx.lineWidth = 1;
+			this.glob.ctx.beginPath();
+			this.glob.ctx.moveTo(panel_offset[0] + this.line_from_to[0], panel_offset[1] + this.line_y);
+			this.glob.ctx.lineTo(panel_offset[0] + left_line_to, panel_offset[1] + this.line_y);
+			this.glob.ctx.moveTo(panel_offset[0] + right_line_from, panel_offset[1] + this.line_y);
+			this.glob.ctx.lineTo(panel_offset[0] + this.line_from_to[1], panel_offset[1] + this.line_y);
+			this.glob.ctx.strokeStyle = '#000000';
+			this.glob.ctx.stroke();
+			this.glob.ctx.restore();
 
 			// Click areas for Type change (human, computer, inactive)
 			this.clickareas.push({
@@ -202,33 +209,38 @@ export class Init {
 			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
 		];
 	}
+
 	render() {
 	}
+
 	update() {
 	}
-	change_type(num, value) {
-		game.players[num].type = (game.players[num].type + value) % 3 + 1;
-		const soffset = this.type_soffsets[game.players[num].type];
-		const panel_offset = this.panel_offsets[num];
-		ctx.drawImage(this.bg,
+
+	change_type(player_num: number, value: number) {
+		game.players[player_num].type = (game.players[player_num].type + value) % 3 + 1;
+		const soffset = this.type_soffsets[game.players[player_num].type];
+		const panel_offset = this.panel_offsets[player_num];
+		this.glob.ctx.drawImage(this.bg,
 			soffset[0], soffset[1],
 			this.type_dim[0], this.type_dim[1],
 			panel_offset[0] + this.type_offset[0], panel_offset[1] + this.type_offset[1],
 			this.type_dim[0], this.type_dim[1]);
 	}
-	change_iq(num, iq) {
-		game.players[num].iq = iq;
-		const panel_offset = this.panel_offsets[num];
+
+	change_iq(player_num: number, iq: number) {
+		game.players[player_num].iq = iq;
+		const panel_offset = this.panel_offsets[player_num];
 
 		for (let i = 1; i <= 4; i++) {
 			const soffset = (i === iq) ? this.iq_soffsets[iq] : this.iq_soffsets[0];
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				soffset[0], soffset[1],
 				this.iq_dim[0], this.iq_dim[1],
 				panel_offset[0] + this.iq_offset[0], panel_offset[1] + this.iq_offset[1] - (i - 1) * this.iq_dy,
 				this.iq_dim[0], this.iq_dim[1]);
 		}
 	}
+
 	next() {
 		draw_rect(this.next_offset, this.next_dim);
 		let no_human = true;
@@ -247,12 +259,13 @@ export class Init {
 		}
 
 		if (no_human) {
-			open_popup(lang.popup_title, 'dino', lang.who_plays, () => { }, lang.next);
+			open_popup(this.glob.lang.popup_title, 'dino', this.glob.lang.who_plays, () => { }, this.glob.lang.next);
 			return;
 		}
 
 		game.next_stage();
 	}
+
 	load_game() {
 		draw_rect(this.load_offset, this.load_dim);
 		open_load_dialog();

@@ -1,7 +1,23 @@
+import { Dimension, Point, TechGlobal } from "./types";
 
 export class Sprite {
-	constructor(url, offset = [0, 0], frames = [[0, 0]], delay = 0, size = [64, 64], once = false, callback = null) {
-		this.pic = resources.get(url);
+	finished: boolean
+	callback: Function | null;
+
+	private pic: HTMLImageElement;
+	private offset: Point;
+	private size: Dimension;
+	private delay: number;
+	private frames: Point[];
+	private once: boolean;
+
+	private idx = 0;
+	private fresh = true;
+	private delay_counter = 0;
+
+
+	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[] = [[0, 0]], delay = 0, size: Dimension = [64, 64], once = false, callback: Function | null = null) {
+		this.pic = pic;
 		this.offset = offset;
 		this.size = size;
 		this.delay = delay;
@@ -13,6 +29,7 @@ export class Sprite {
 		this.fresh = true;
 		this.finished = frames.length === 1; // true for one-frame Sprites; false for others
 	}
+
 	update() {
 		if (!this.finished) {
 			this.delay_counter++;
@@ -28,12 +45,14 @@ export class Sprite {
 			}
 		}
 	}
+
 	reset() {
 		this.idx = 0;
 		this.delay_counter = 0;
 		this.fresh = true;
 		this.finished = this.frames.length === 1;
 	}
+
 	is_new_frame() {
 		if (this.fresh) {
 			this.fresh = false;
@@ -42,7 +61,8 @@ export class Sprite {
 
 		return this.delay_counter === 0 && !this.finished;
 	}
-	render(ctx, pos) {
+
+	render(ctx: CanvasRenderingContext2D, pos: Point) {
 		const real_idx = this.idx % this.frames.length;
 		const frame = this.frames[real_idx];
 
@@ -56,16 +76,20 @@ export class Sprite {
 
 
 export class RandomSprite {
-	constructor(url, offset = [0, 0], frames = [[[0, 0]]], transitions = [[1]], delay = 0, size = [64, 64]) {
+	private transitions: number[][];
+	private sprites: Sprite[] = [];
+	private current_sprite: Sprite;
+
+	private current_idx = 0;
+
+	constructor(pic: HTMLImageElement, offset: Point = [0, 0], frames: Point[][] = [[[0, 0]]], transitions: number[][] = [[1]], delay = 0, size: Dimension = [64, 64]) {
 		this.transitions = transitions;
-		this.finished = false;
-		this.current_idx = 0;
-		this.sprites = [];
 		for (let sprite_frames of frames) {
-			this.sprites.push(new Sprite(url, offset, sprite_frames, delay, size, true));
+			this.sprites.push(new Sprite(pic, offset, sprite_frames, delay, size, true));
 		}
 		this.current_sprite = this.sprites[this.current_idx];
 	}
+
 	update() {
 		this.current_sprite.update();
 		if (this.current_sprite.finished) {
@@ -81,13 +105,16 @@ export class RandomSprite {
 			}
 		}
 	}
+
 	reset() {
 		this.current_sprite.reset();
 	}
+
 	is_new_frame() {
 		return this.current_sprite.is_new_frame();
 	}
-	render(ctx, pos) {
+
+	render(ctx: CanvasRenderingContext2D, pos: Point) {
 		this.current_sprite.render(ctx, pos);
 	}
 }

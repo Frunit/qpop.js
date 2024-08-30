@@ -179,31 +179,25 @@ export function clamp(num: number, min: number, max: number): number {
 }
 
 
-export function download(data, filename, type) {
+export function download(data: ArrayBuffer, filename: string, type: string = 'application/octet-stream') {
 	// https://stackoverflow.com/a/30832210
 
 	console.log('03 Initializing download');
 
 	const file = new Blob([data], {type: type});
-	if(window.navigator.msSaveOrOpenBlob) { // IE10+
-		console.log('04 IE download');
-		window.navigator.msSaveOrOpenBlob(file, filename);
-	}
-	else { // Other browsers
-		console.log('04 non-IE download');
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(file);
-		a.download = filename;
-		document.body.appendChild(a);
-		console.log('05 Link created');
-		a.click();
-		console.log('06 Link clicked');
-		setTimeout(function() {
-			document.body.removeChild(a);
-			window.URL.revokeObjectURL(file);
-			console.log('07 Link removed');
-		}, 0);
-	}
+	console.log('04 non-IE download');
+	const a = document.createElement('a');
+	a.href = URL.createObjectURL(file);
+	a.download = filename;
+	document.body.appendChild(a);
+	console.log('05 Link created');
+	a.click();
+	console.log('06 Link clicked');
+	setTimeout(function() {
+		document.body.removeChild(a);
+		window.URL.revokeObjectURL(a.href);
+		console.log('07 Link removed');
+	}, 0);
 }
 
 

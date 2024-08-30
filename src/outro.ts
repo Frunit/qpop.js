@@ -12,7 +12,6 @@ export class Outro implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
 	private winner: number;
@@ -27,7 +26,7 @@ export class Outro implements Stage {
 	}
 
 	initialize() {
-		audio.play_music('outro');
+		this.glob.resources.play_music('outro');
 		this.glob.canvas.style.cursor = 'default';
 		const num = (this.winner >= 0) ? this.winner : 6;
 		this.animation = new Animation(outro_frames[num], this.anim_offset);

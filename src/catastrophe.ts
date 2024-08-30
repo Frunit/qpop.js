@@ -9,10 +9,9 @@ export class Catastrophe implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
-	private bg: any; // TODO
+	private bg: HTMLImageElement;
 	private callback: (type: number) => void;
 	private animation: Animation | null = null;
 	private type: number;
@@ -28,13 +27,13 @@ export class Catastrophe implements Stage {
 		this.glob = glob;
 		this.callback = callback;
 
-		this.bg = resources.get('gfx/dark_bg.png');
+		this.bg = this.glob.resources.get_image('gfx/dark_bg.png');
 
 		this.type = random_int(0, 8);
 	}
 
 	initialize() {
-		audio.play_music('catastrophe');
+		this.glob.resources.play_music('catastrophe');
 		this.glob.canvas.style.cursor = 'default';
 		this.animation = new Animation(catastrophe_frames[this.type], this.anim_offset);
 		this.redraw();

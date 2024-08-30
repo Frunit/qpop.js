@@ -2,6 +2,7 @@ import { Credits } from "./credits";
 import { ATTR, PLAYER_TYPE, SCENE, WORLD_MAP, download, draw_checkbox, draw_rect, handle_visibility_change, local_load, local_save, open_popup, open_tutorial, parse_bool } from "./helper";
 import { i18n } from "./i18n";
 import { Init } from "./init";
+import { InputManager } from "./input";
 import { Intro } from "./intro";
 import { ResourceLoader } from "./loader";
 import { Mutations } from "./mutations";
@@ -9,6 +10,7 @@ import { Options } from "./options";
 import { Outro } from "./outro";
 import { Player } from "./player";
 import { Ranking } from "./ranking";
+import { ResourceManager } from "./resources";
 import { Survival } from "./survival";
 import { Transition } from "./transition";
 import { Turnselection } from "./turnselection";
@@ -17,7 +19,7 @@ import { version } from "./version";
 import { World } from "./world";
 
 const options = {
-	language: 'EN', // Language of the game. Currently one of ['DE', 'EN']
+	language: LANG_EN, // Language of the game
 	wm_ai_delay_idx: 3, // Internal index of wm_ai_delay
 	wm_ai_delay: 4, // How many frames between two moves of the AI
 	wm_ai_auto_continue: true, // After the AI finished, shall the "continue" button be pressed automatically?
@@ -52,7 +54,7 @@ class Game {
 		this.glob = this.initialize();
 		this.world = this.reset();
 		this.init_clickareas();
-		this.stage = new ResourceLoader();
+		this.stage = new ResourceLoader(this.glob);
 		this.stage.initialize();
 	}
 
@@ -105,6 +107,9 @@ class Game {
 	}
 
 	initialize(): TechGlobal {
+		const resources = new ResourceManager();
+		const input = new InputManager(this.glob.canvas_pos);
+
 		// GET parameter handling
 		const search_params = new URL(document.location.href.toLowerCase()).searchParams;
 
@@ -149,17 +154,17 @@ class Game {
 		}
 
 		if (options.music_on) {
-			audio.set_music_volume(options.music / 100);
+			resources.set_music_volume(options.music / 100);
 		}
 		else {
-			audio.set_music_volume(0);
+			resources.set_music_volume(0);
 		}
 
 		if (options.sound_on) {
-			audio.set_sound_volume(options.sound / 100);
+			resources.set_sound_volume(options.sound / 100);
 		}
 		else {
-			audio.set_sound_volume(0);
+			resources.set_sound_volume(0);
 		}
 
 		// Create the canvas
@@ -200,6 +205,8 @@ class Game {
 			rightclickareas,
 			options,
 			next_stage: this.next_stage.bind(this),
+			resources,
+			input,
 		};
 
 		return glob;
@@ -261,13 +268,8 @@ class Game {
 	}
 
 	handle_input() {
-		if (window.input === undefined) {
-			// Input may be uninitialized because it might still be loading
-			return;
-		}
-
-		if (input.isDown('MOVE')) {
-			const pos = input.mousePos();
+		if (this.glob.input.isDown('MOVE')) {
+			const pos = this.glob.input.getMousePos();
 			if (game.clicked_element || game.right_clicked_element) {
 				const area = game.clicked_element || game.right_clicked_element as ClickArea;
 				if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
@@ -302,11 +304,11 @@ class Game {
 			}
 		}
 
-		if (input.isDown('MOUSE')) {
-			input.reset('MOUSE');
-			if (input.isDown('CLICK')) {
-				input.reset('CLICK');
-				const pos = input.mousePos();
+		if (this.glob.input.isDown('MOUSE')) {
+			this.glob.input.reset('MOUSE');
+			if (this.glob.input.getClickPos()) {
+				this.glob.input.resetClickPos();
+				const pos = this.glob.input.getMousePos();
 				for (let area of game.stage.clickareas) {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
@@ -316,16 +318,16 @@ class Game {
 					}
 				}
 			}
-			else if (input.isDown('CLICKUP')) {
-				input.reset('CLICKUP');
+			else if (this.glob.input.isDown('CLICKUP')) {
+				this.glob.input.reset('CLICKUP');
 				if (game.clicked_element) {
 					game.clicked_element.up();
 					game.clicked_element = null;
 				}
 			}
-			else if (input.isDown('RCLICK')) {
-				input.reset('RCLICK');
-				const pos = input.mousePos();
+			else if (this.glob.input.getRightClickPos()) {
+				this.glob.input.resetRightClickPos();
+				const pos = this.glob.input.getMousePos();
 				for (let area of game.stage.rightclickareas) {
 					if (pos[0] >= area.x1 && pos[0] <= area.x2 &&
 						pos[1] >= area.y1 && pos[1] <= area.y2) {
@@ -335,15 +337,15 @@ class Game {
 					}
 				}
 			}
-			else if (input.isDown('RCLICKUP')) {
-				input.reset('RCLICKUP');
+			else if (this.glob.input.isDown('RCLICKUP')) {
+				this.glob.input.reset('RCLICKUP');
 				if (game.right_clicked_element) {
 					game.right_clicked_element.up();
 					game.right_clicked_element = null;
 				}
 			}
-			else if (input.isDown('BLUR')) {
-				input.reset('BLUR');
+			else if (this.glob.input.isDown('BLUR')) {
+				this.glob.input.reset('BLUR');
 				if (game.clicked_element) {
 					game.clicked_element.blur();
 					game.clicked_element = null;
@@ -355,15 +357,15 @@ class Game {
 			}
 		}
 
-		if (input.isDown('PAUSE')) {
-			input.reset('PAUSE');
+		if (this.glob.input.isDown('PAUSE')) {
+			this.glob.input.reset('PAUSE');
 			this.toggle_pause();
 		}
 
 		for (let key of game.stage.keys) {
-			if (input.isDown(key.key)) {
+			if (this.glob.input.isDown(key.key)) {
 				if (key.reset) {
-					input.reset(key.key);
+					this.glob.input.reset(key.key);
 				}
 				key.action();
 			}
@@ -465,7 +467,7 @@ class Game {
 
 		const scores = [];
 		for (let i of selection) {
-			scores.push([i, game.players[i].total_score, game.players[i].individuals]);
+			scores.push([i, game.world.players[i].total_score, game.world.players[i].individuals]);
 		}
 
 		scores.sort(sortme);
@@ -487,17 +489,17 @@ class Game {
 
 	save_locally() {
 		const save = {
-			'players': game.players,
-			'world_map': game.world_map,
-			'height_map': game.height_map,
-			'map_positions': game.map_positions,
-			'turn': game.turn,
-			'max_turns': game.max_turns,
-			'humans_present': game.humans_present,
-			'water_level': game.water_level,
-			'humid': game.humid,
-			'temp': game.temp,
-			'infinite_game': game.infinite_game,
+			'players': game.world.players,
+			'world_map': game.world.world_map,
+			'height_map': game.world.height_map,
+			'map_positions': game.world.map_positions,
+			'turn': game.world.turn,
+			'max_turns': game.world.max_turns,
+			'humans_present': game.world.humans_present,
+			'water_level': game.world.water_level,
+			'humid': game.world.humid,
+			'temp': game.world.temp,
+			'infinite_game': game.world.infinite_game,
 			'datetime': (new Date()).toISOString(),
 		};
 
@@ -524,17 +526,17 @@ class Game {
 
 		const save = save_array[num];
 
-		game.players = save.players;
-		game.world_map = save.world_map;
-		game.height_map = save.height_map;
-		game.map_positions = save.map_positions;
-		game.turn = save.turn;
-		game.max_turns = save.max_turns;
-		game.humans_present = save.humans_present;
-		game.water_level = save.water_level;
-		game.humid = save.humid;
-		game.temp = save.temp;
-		game.infinite_game = save.infinite_game;
+		game.world.players = save.players;
+		game.world.world_map = save.world_map;
+		game.world.height_map = save.height_map;
+		game.world.map_positions = save.map_positions;
+		game.world.turn = save.turn;
+		game.world.max_turns = save.max_turns;
+		game.world.humans_present = save.humans_present;
+		game.world.water_level = save.water_level;
+		game.world.humid = save.humid;
+		game.world.temp = save.temp;
+		game.world.infinite_game = save.infinite_game;
 
 		this.select_evo_points();
 
@@ -557,8 +559,8 @@ class Game {
 		content.setUint8(0x12, options.sound_on ? 1 : 0);
 		content.setUint8(0x13, options.sound);
 
-		for (let i = 0; i < game.players.length; i++) {
-			const p = game.players[i];
+		for (let i = 0; i < game.world.players.length; i++) {
+			const p = game.world.players[i];
 			content.setUint8(0x14 + 2 * i, p.type);
 			// In original Q-Pop: iq 1 = best;  iq 4 = worst
 			// This remake:       iq 1 = worst; iq 4 = best
@@ -592,12 +594,12 @@ class Game {
 			content.setUint8(0x1042 + i, p.is_dead ? 1 : 0);
 		}
 
-		content.setUint16(0xaa, game.turn, true);
-		content.setUint8(0xac, game.max_turns);
-		content.setUint8(0xad, game.humans_present ? 1 : 0);
-		content.setUint16(0xb1, game.water_level, true);
-		content.setUint16(0xb3, game.humid, true);
-		content.setUint16(0xb5, game.temp, true);
+		content.setUint16(0xaa, game.world.turn, true);
+		content.setUint8(0xac, game.world.max_turns);
+		content.setUint8(0xad, game.world.humans_present ? 1 : 0);
+		content.setUint16(0xb1, game.world.water_level, true);
+		content.setUint16(0xb3, game.world.humid, true);
+		content.setUint16(0xb5, game.world.temp, true);
 
 		const size = 28;
 
@@ -606,25 +608,25 @@ class Game {
 				const i = x + y * size;
 				const j = y + x * size; // x and y are exchanged in the heightmap for some reason
 
-				content.setUint8(0xb7 + i, game.world_map[y][x]);
-				content.setUint8(0x3c7 + j, game.height_map[y][x]);
-				content.setUint8(0x6d7 + i, game.map_positions[y][x] + 1);
+				content.setUint8(0xb7 + i, game.world.world_map[y][x]);
+				content.setUint8(0x3c7 + j, game.world.height_map[y][x]);
+				content.setUint8(0x6d7 + i, game.world.map_positions[y][x] + 1);
 			}
 		}
 
-		content.setUint8(0x1049, game.infinite_game ? 1 : 0);
+		content.setUint8(0x1049, game.world.infinite_game ? 1 : 0);
 
 		// Determination whether only a single human player without any others is playing
 		let single = 0;
-		if (game.infinite_game) {
+		if (game.world.infinite_game) {
 			single = 1;
 		}
 		else {
 			for (let i = 0; i < 6; i++) {
-				if (game.players[i].type === PLAYER_TYPE.HUMAN) {
+				if (game.world.players[i].type === PLAYER_TYPE.HUMAN) {
 					single += 1;
 				}
-				else if (game.players[i].type === PLAYER_TYPE.COMPUTER) {
+				else if (game.world.players[i].type === PLAYER_TYPE.COMPUTER) {
 					single = 0;
 					break;
 				}
@@ -639,7 +641,7 @@ class Game {
 
 		console.log('02 Save game content created');
 
-		download(save_file, 'qpop_save.qpp', 'application/octet-stream');
+		download(save_file, 'qpop_save.qpp');
 	}
 
 	load_game(save_file) {
@@ -661,8 +663,8 @@ class Game {
 		}
 
 		// This version deliberatly does not load the audio settings from the save file
-		for (let i = 0; i < game.players.length; i++) {
-			const p = game.players[i];
+		for (let i = 0; i < game.world.players.length; i++) {
+			const p = game.world.players[i];
 			p.type = content.getUint8(0x14 + 2 * i + mp);
 			// In original Q-Pop: iq 1 = best;  iq 4 = worst
 			// This remake:       iq 1 = worst; iq 4 = best
@@ -693,41 +695,41 @@ class Game {
 			p.individuals = 0;
 		}
 
-		game.turn = content.getUint16(0xaa + mp, true);
+		game.world.turn = content.getUint16(0xaa + mp, true);
 		if (mp) {
 			// Magnetic Planet has always “infinite” turns and no humans
-			game.max_turns = 255;
-			game.humans_present = false;
+			game.world.max_turns = 255;
+			game.world.humans_present = false;
 			mp = 8;
 		}
 		else {
-			game.max_turns = content.getUint8(0xac);
-			game.humans_present = !!content.getUint8(0xad);
+			game.world.max_turns = content.getUint8(0xac);
+			game.world.humans_present = !!content.getUint8(0xad);
 		}
-		game.water_level = content.getUint16(0xb1 + mp, true);
-		game.humid = content.getUint16(0xb3 + mp, true);
-		game.temp = content.getUint16(0xb5 + mp, true);
+		game.world.water_level = content.getUint16(0xb1 + mp, true);
+		game.world.humid = content.getUint16(0xb3 + mp, true);
+		game.world.temp = content.getUint16(0xb5 + mp, true);
 
 		this.select_evo_points();
 
 		const size = 28;
 
-		game.world_map = Array.from(Array(size), () => Array(size).fill(0));
-		game.height_map = Array.from(Array(size), () => Array(size).fill(0));
-		game.map_positions = Array.from(Array(size), () => Array(size).fill(0));
+		game.world.world_map = Array.from(Array(size), () => Array(size).fill(0));
+		game.world.height_map = Array.from(Array(size), () => Array(size).fill(0));
+		game.world.map_positions = Array.from(Array(size), () => Array(size).fill(0));
 
 		for (let y = 0; y < size; y++) {
 			for (let x = 0; x < size; x++) {
 				const i = x + y * size;
 				const j = y + x * size; // x and y are exchanged in the heightmap for some reason
 
-				game.world_map[y][x] = content.getUint8(0xb7 + i + mp);
-				game.height_map[y][x] = content.getUint8(0x3c7 + j + mp);
+				game.world.world_map[y][x] = content.getUint8(0xb7 + i + mp);
+				game.world.height_map[y][x] = content.getUint8(0x3c7 + j + mp);
 
 				const map_pos = content.getUint8(0x6d7 + i + mp) - 1;
-				game.map_positions[y][x] = map_pos;
+				game.world.map_positions[y][x] = map_pos;
 				if (map_pos >= 0) {
-					game.players[map_pos].individuals++;
+					game.world.players[map_pos].individuals++;
 				}
 			}
 		}
@@ -736,7 +738,7 @@ class Game {
 			mp = 4;
 		}
 
-		game.infinite_game = !!(content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp));
+		game.world.infinite_game = !!(content.getUint8(0x1049 + mp) || content.getUint8(0x104a + mp));
 
 		game.stage = new Ranking(); // MAYBE: In the original, Ranking opens after loading, but it might be better to open World with mode "after catastrophe", so players can't do anything but see how the map looks.
 		game.stage.initialize(false);
@@ -750,7 +752,7 @@ class Game {
 			}
 
 			if (finished !== false) {
-				this.stage = new Outro(finished);
+				this.stage = new Outro(this.glob, finished);
 				this.stage.initialize();
 				return;
 			}
@@ -758,7 +760,7 @@ class Game {
 
 		switch (this.stage.id) {
 			case SCENE.LOADING: // Loader
-				this.stage = new Intro();
+				this.stage = new Intro(this.glob);
 				this.stage.initialize();
 				break;
 			case SCENE.INTRO: // Intro
@@ -771,7 +773,7 @@ class Game {
 				this.stage.initialize();
 				break;
 			case SCENE.TURN_SELECTION: // Choose game length
-				this.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
+				this.stage = new Transition(this.glob, 'gfx/transition_world.png', SCENE.TRANS_WORLD);
 				this.stage.initialize();
 				break;
 			case SCENE.TRANS_WORLD: // Transition screen
@@ -788,8 +790,8 @@ class Game {
 					this.stage.next_player();
 				}
 				else {
-					if (this.turn === 0) {
-						this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
+					if (this.world.turn === 0) {
+						this.stage = new Transition(this.glob, 'gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 						this.stage.initialize();
 					}
 					else {
@@ -798,16 +800,16 @@ class Game {
 				}
 				break;
 			case SCENE.RANKING: // Ranking
-				if (this.turn === this.max_turns) {
-					this.stage = new Outro(this.stage.winners[0]);
+				if (this.world.turn === this.world.max_turns) {
+					this.stage = new Outro(this.glob, this.stage.winners[0]);
 				}
 				else {
-					this.stage = new Transition('gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
+					this.stage = new Transition(this.glob, 'gfx/transition_mutations.png', SCENE.TRANS_MUTATION);
 				}
 				this.stage.initialize();
 				break;
 			case SCENE.TRANS_MUTATION: // Transition screen
-				this.turn++;
+				this.world.turn++;
 				this.set_to_first_player();
 				this.stage = new Mutations();
 				this.stage.initialize();
@@ -816,7 +818,7 @@ class Game {
 				if (this.set_to_next_player()) {
 					this.stage.next_player();
 				} else {
-					this.stage = new Transition('gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
+					this.stage = new Transition(this.glob, 'gfx/transition_survival.png', SCENE.TRANS_SURVIVAL);
 					this.stage.initialize();
 				}
 				break;
@@ -829,7 +831,7 @@ class Game {
 				if (this.set_to_next_player()) {
 					this.stage.initialize();
 				} else {
-					this.stage = new Transition('gfx/transition_world.png', SCENE.TRANS_WORLD);
+					this.stage = new Transition(this.glob, 'gfx/transition_world.png', SCENE.TRANS_WORLD);
 					this.stage.initialize();
 				}
 				break;
@@ -841,7 +843,7 @@ class Game {
 	}
 
 	tutorial() {
-		if (options.tutorial) {
+		if (options.tutorial && this.stage.tutorials) {
 			for (let tut of this.stage.tutorials) {
 				if (!this.seen_tutorials.has(tut.name)) {
 					this.seen_tutorials.add(tut.name);
@@ -859,10 +861,10 @@ class Game {
 		}
 
 		if (game.paused || force_pause === true) {
-			audio.pause();
+			this.glob.resources.pause();
 		}
 		else if (!game.paused) {
-			audio.unpause();
+			this.glob.resources.unpause();
 		}
 	}
 
@@ -912,7 +914,7 @@ class Game {
 		}
 		else {
 			game.stage.redraw();
-			open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => { }, lang.close);
+			open_popup(this.glob.lang.popup_title, 'dino', this.glob.lang.sound_disabled, () => { }, this.glob.lang.close);
 		}
 	}
 
@@ -920,10 +922,10 @@ class Game {
 		if (options.audio_enabled) {
 			options.music_on = !options.music_on;
 			if (options.music_on) {
-				audio.set_music_volume(options.music / 100);
+				this.glob.resources.set_music_volume(options.music / 100);
 			}
 			else {
-				audio.set_music_volume(0);
+				this.glob.resources.set_music_volume(0);
 			}
 
 			local_save('music_on', options.music_on);
@@ -932,7 +934,7 @@ class Game {
 		}
 		else {
 			game.stage.redraw();
-			open_popup(lang.popup_title, 'dino', lang.sound_disabled, () => { }, lang.close);
+			open_popup(this.glob.lang.popup_title, 'dino', this.glob.lang.sound_disabled, () => { }, this.glob.lang.close);
 		}
 	}
 
@@ -940,10 +942,10 @@ class Game {
 		// This does purposefully not change localStorage!
 		options.music_on = false;
 		options.sound_on = false;
-		audio.set_music_volume(0);
-		audio.set_sound_volume(0);
+		this.glob.resources.set_music_volume(0);
+		this.glob.resources.set_sound_volume(0);
 
-		audio.disable_audio();
+		this.glob.resources.disable_audio();
 		options.audio_enabled = false;
 
 		if (game.stage) {

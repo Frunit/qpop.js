@@ -1,41 +1,52 @@
+import { PLAYER_TYPE, SCENE, draw_base, draw_rect, open_load_dialog, random_int, write_text } from "./helper";
+import { Sprite } from "./sprite";
+import { anim_delays } from "./sprite_positions";
+import { ClickArea, Dimension, KeyType, Point, Stage, TechGlobal, TutorialType } from "./types";
 
-export class Turnselection {
-	constructor() {
+export class Turnselection implements Stage {
+	id = SCENE.TURN_SELECTION;
+	clickareas: ClickArea[] = [];
+	rightclickareas: ClickArea[] = [];
+	keys: KeyType[] = [];
+	tutorials: TutorialType[];
+	glob: TechGlobal;
+
+	private bg: HTMLImageElement;
+	private pics: HTMLImageElement;
+	private animations: any; // TODO
+	private turn_index = 0;
+
+	readonly turns = [5, 10, 20, 255];
+	readonly bar_soffset: Point = [86, 630];
+
+	readonly panel_dim: Dimension = [620, 211];
+	readonly anim_dim: Dimension = [420, 90];
+	readonly anim_part_dim: Dimension = [60, 90];
+	readonly button_dim: Dimension = [43, 43];
+	readonly bar_dim: Dimension = [357, 43];
+	readonly load_dim: Dimension = [230, 22];
+	readonly next_dim: Dimension = [181, 22];
+
+	readonly anim_offset: Point = [98, 87];
+	readonly bar_offset: Point = [138, 328];
+	readonly load_offset: Point = [0, 458];
+	readonly next_offset: Point = [459, 458];
+	readonly bar_text_offset: Point = [316, 354];
+
+	readonly anim_left_cb_offset: Point = [98, 87];
+	readonly anim_right_cb_offset: Point = [458, 87];
+	readonly anim_amorph_offset: Point = [278, 87];
+
+	readonly panel_offsets: Point[] = [[9, 27], [9, 241]];
+	readonly button_offsets: Point[] = [[95, 328], [495, 328]];
+	readonly anim_soffsets: Point[] = [[0, 0], [0, 90], [0, 180]];
+	readonly button_soffsets: Point[] = [[0, 630], [43, 630]];
+
+	constructor(glob: TechGlobal) {
+		this.glob = glob;
 		this.id = SCENE.TURN_SELECTION;
-		this.bg = resources.get('gfx/light_bg.png');
-		this.pics = resources.get('gfx/turns.png');
-
-		// CONST_START
-		this.pics_url = 'gfx/turns.png';
-
-		this.panel_dim = [620, 211];
-		this.anim_dim = [420, 90];
-		this.anim_part_dim = [60, 90];
-		this.button_dim = [43, 43];
-		this.bar_dim = [357, 43];
-		this.load_dim = [230, 22];
-		this.next_dim = [181, 22];
-
-		this.anim_offset = [98, 87];
-		this.bar_offset = [138, 328];
-		this.load_offset = [0, 458];
-		this.next_offset = [459, 458];
-		this.bar_text_offset = [316, 354];
-
-		this.anim_left_cb_offset = [98, 87];
-		this.anim_right_cb_offset = [458, 87];
-		this.anim_amorph_offset = [278, 87];
-
-		this.bar_soffset = [86, 630];
-		// CONST_END
-		this.panel_offsets = [[9, 27], [9, 241]];
-		this.button_offsets = [[95, 328], [495, 328]];
-
-		this.anim_soffsets = [[0, 0], [0, 90], [0, 180]];
-		this.button_soffsets = [[0, 630], [43, 630]];
-
-		this.turns = [5, 10, 20, 255];
-		this.turn_index = 0;
+		this.bg = this.glob.resources.get_image('gfx/light_bg.png');
+		this.pics = this.glob.resources.get_image('gfx/turns.png');
 
 		this.tutorials = [
 			{
@@ -46,42 +57,38 @@ export class Turnselection {
 				'highlight': [95, 328, 538, 371],
 			},
 		];
-
-		this.clickareas = [];
-		this.rightclickareas = [];
-		this.keys = [];
-
-		this.animations = null;
 	}
+
 	initialize() {
-		audio.play_music('intro');
+		this.glob.resources.play_music('intro');
 		this.redraw();
 		game.tutorial();
 	}
+
 	draw_turn_changed() {
-		ctx.drawImage(this.bg,
+		this.glob.ctx.drawImage(this.bg,
 			this.anim_offset[0] - this.panel_offsets[0][0], this.anim_offset[1] - this.panel_offsets[0][1],
 			this.anim_dim[0], this.anim_dim[1],
 			this.anim_offset[0], this.anim_offset[1],
 			this.anim_dim[0], this.anim_dim[1]);
 
-		ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 			this.bar_soffset[0], this.bar_soffset[1],
 			this.bar_dim[0], this.bar_dim[1],
 			this.bar_offset[0], this.bar_offset[1],
 			this.bar_dim[0], this.bar_dim[1]);
 
-		write_text(lang.turns[this.turn_index], this.bar_text_offset, 'black', false);
+		write_text(this.glob.lang.turns[this.turn_index], this.bar_text_offset, 'black', '');
 
 		if (this.turn_index === 3) {
 			if (this.animations === null) {
 				if (random_int(0, 1)) {
 					// Amorph splatters
-					this.animations = [new Sprite(this.pics_url, [420, 450], [[0, 0], [0, 90]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(1))];
+					this.animations = [new Sprite(this.pics, [420, 450], [[0, 0], [0, 90]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation())];
 				}
 				else {
 					// Chuckberry stumbles
-					this.animations = [new Sprite(this.pics_url, [0, 270], [[0, 0], [0, 90], [0, 180], [0, 270]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(0))];
+					this.animations = [new Sprite(this.pics, [0, 270], [[0, 0], [0, 90], [0, 180], [0, 270]], anim_delays.turn_selection, this.anim_dim, true, () => this.end_animation(true))];
 				}
 			}
 
@@ -90,25 +97,26 @@ export class Turnselection {
 		else {
 			this.animations = null;
 
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				this.anim_soffsets[this.turn_index][0], this.anim_soffsets[this.turn_index][1],
 				this.anim_dim[0], this.anim_dim[1],
 				this.anim_offset[0], this.anim_offset[1],
 				this.anim_dim[0], this.anim_dim[1]);
 		}
 	}
+
 	redraw() {
 		draw_base();
 
 		draw_rect([0, 20], [640, 439]); // Main rectangle
 		draw_rect(this.load_offset, this.load_dim); // Load
-		write_text(lang.load_game, [115, 473], 'white', 'black');
+		write_text(this.glob.lang.load_game, [115, 473], 'white', 'black');
 		draw_rect([229, 458], [231, 22]); // Bottom middle
 		draw_rect(this.next_offset, this.next_dim); // Continue
-		write_text(lang.next, [549, 473], 'white', 'black');
+		write_text(this.glob.lang.next, [549, 473], 'white', 'black');
 
-		this.clickareas = game.clickareas.slice();
-		this.rightclickareas = game.rightclickareas.slice();
+		this.clickareas = this.glob.clickareas.slice();
+		this.rightclickareas = this.glob.rightclickareas.slice();
 
 		this.clickareas.push({
 			x1: this.load_offset[0],
@@ -133,12 +141,12 @@ export class Turnselection {
 		for (let i = 0; i < 2; i++) {
 			// Background panels
 			draw_rect(this.panel_offsets[i], this.panel_dim, true, false, true);
-			ctx.drawImage(this.bg, this.panel_offsets[i][0] + 3, this.panel_offsets[i][1] + 3);
+			this.glob.ctx.drawImage(this.bg, this.panel_offsets[i][0] + 3, this.panel_offsets[i][1] + 3);
 		}
 
 		for (let i = 0; i < 2; i++) {
 			// Buttons
-			ctx.drawImage(this.pics,
+			this.glob.ctx.drawImage(this.pics,
 				this.button_soffsets[i][0], this.button_soffsets[i][1],
 				this.button_dim[0], this.button_dim[1],
 				this.button_offsets[i][0], this.button_offsets[i][1],
@@ -150,7 +158,7 @@ export class Turnselection {
 				x2: this.button_offsets[i][0] + this.button_dim[0],
 				y2: this.button_offsets[i][1] + this.button_dim[1],
 				down: () => draw_rect(this.button_offsets[i], this.button_dim, true, true),
-				up: () => this.change_turn(i),
+				up: () => this.change_turn(i >= 1),
 				blur: () => draw_rect(this.button_offsets[i], this.button_dim)
 			});
 		}
@@ -159,34 +167,35 @@ export class Turnselection {
 
 		this.keys = [
 			{ 'key': 'ENTER', 'action': () => this.next(), 'reset': true },
-			{ 'key': 'RIGHT', 'action': () => this.change_turn(1), 'reset': true },
-			{ 'key': 'UP', 'action': () => this.change_turn(1), 'reset': true },
-			{ 'key': 'LEFT', 'action': () => this.change_turn(0), 'reset': true },
-			{ 'key': 'DOWN', 'action': () => this.change_turn(0), 'reset': true },
+			{ 'key': 'RIGHT', 'action': () => this.change_turn(true), 'reset': true },
+			{ 'key': 'UP', 'action': () => this.change_turn(true), 'reset': true },
+			{ 'key': 'LEFT', 'action': () => this.change_turn(false), 'reset': true },
+			{ 'key': 'DOWN', 'action': () => this.change_turn(false), 'reset': true },
 		];
 	}
+
 	render() {
 		if (this.animations) {
-			ctx.drawImage(this.bg,
+			this.glob.ctx.drawImage(this.bg,
 				this.anim_offset[0] - this.panel_offsets[0][0], this.anim_offset[1] - this.panel_offsets[0][1],
 				this.anim_dim[0], this.anim_dim[1],
 				this.anim_offset[0], this.anim_offset[1],
 				this.anim_dim[0], this.anim_dim[1]);
 
 			if (this.animations.length === 1) {
-				this.animations[0].render(ctx, this.anim_offset);
+				this.animations[0].render(this.glob.ctx, this.anim_offset);
 			}
 			else {
-				ctx.drawImage(this.pics,
+				this.glob.ctx.drawImage(this.pics,
 					420, 540,
 					this.anim_dim[0], this.anim_dim[1],
 					this.anim_offset[0], this.anim_offset[1],
 					this.anim_dim[0], this.anim_dim[1]);
 
 				// Three animations when Amorph is ripped apart
-				this.animations[0].render(ctx, this.anim_left_cb_offset);
-				this.animations[1].render(ctx, this.anim_right_cb_offset);
-				this.animations[2].render(ctx, this.anim_amorph_offset);
+				this.animations[0].render(this.glob.ctx, this.anim_left_cb_offset);
+				this.animations[1].render(this.glob.ctx, this.anim_right_cb_offset);
+				this.animations[2].render(this.glob.ctx, this.anim_amorph_offset);
 			}
 		}
 	}
@@ -208,30 +217,33 @@ export class Turnselection {
 			}
 		}
 	}
-	end_animation(animation_type) {
-		if (animation_type) {
+
+	end_animation(not_stumbling = false) {
+		if (not_stumbling) {
 			// Amorph splatters
 			this.animations = [
 				// left Chuckberry
-				new Sprite(this.pics_url, [420, 270], [[120, 0], [180, 0], [0, 0], [60, 0]], anim_delays.turn_selection, this.anim_part_dim),
+				new Sprite(this.pics, [420, 270], [[120, 0], [180, 0], [0, 0], [60, 0]], anim_delays.turn_selection, this.anim_part_dim),
 
 				// right Chuckberry
-				new Sprite(this.pics_url, [420, 360], [[120, 0], [180, 0], [0, 0], [60, 0]], anim_delays.turn_selection, this.anim_part_dim),
+				new Sprite(this.pics, [420, 360], [[120, 0], [180, 0], [0, 0], [60, 0]], anim_delays.turn_selection, this.anim_part_dim),
 
 				// Amorph
-				new Sprite(this.pics_url, [660, 270], [[0, 0], [60, 0], [120, 0]], this.anim_part_dim, anim_delays.turn_selection * 4, true, () => this.amorph_eye())
+				new Sprite(this.pics, [660, 270], [[0, 0], [60, 0], [120, 0]], this.anim_part_dim, anim_delays.turn_selection * 4, true, () => this.amorph_eye())
 			];
 		}
 		else {
 			// Chuckberry stumbles
-			this.animations = [new Sprite(this.pics_url, [420, 0], [[0, 90], [0, 180], [0, 0]], anim_delays.turn_selection, this.anim_dim)];
+			this.animations = [new Sprite(this.pics, [420, 0], [[0, 90], [0, 180], [0, 0]], anim_delays.turn_selection, this.anim_dim)];
 		}
 	}
+
 	amorph_eye() {
-		this.animations[2] = new Sprite(this.pics_url, [660, 270], [[120, 0], [0, 90]], anim_delays.turn_selection * 4, this.anim_part_dim);
+		this.animations[2] = new Sprite(this.pics, [660, 270], [[120, 0], [0, 90]], anim_delays.turn_selection * 4, this.anim_part_dim);
 	}
-	change_turn(up) {
-		draw_rect(this.button_offsets[up], this.button_dim);
+
+	change_turn(up: boolean) {
+		draw_rect(this.button_offsets[up ? 1 : 0], this.button_dim);
 		if (up && this.turn_index < 3) {
 			this.turn_index++;
 		}
@@ -239,27 +251,29 @@ export class Turnselection {
 			this.turn_index--;
 		}
 
-		game.max_turns = this.turns[this.turn_index];
+		this.world.max_turns = this.turns[this.turn_index];
 
 		this.draw_turn_changed();
 	}
+
 	next() {
 		draw_rect(this.next_offset, this.next_dim);
 
 		let players_active = 0;
 		for (let i = 0; i < 6; i++) {
-			if (game.players[i].type !== PLAYER_TYPE.NOBODY) {
+			if (this.world.players[i].type !== PLAYER_TYPE.NOBODY) {
 				players_active++;
 			}
 		}
 
 		if (players_active === 1) {
-			game.infinite_game = true;
+			this.world.infinite_game = true;
 		}
 
 		game.select_evo_points();
 		game.next_stage();
 	}
+
 	load_game() {
 		draw_rect(this.load_offset, this.load_dim);
 		open_load_dialog();

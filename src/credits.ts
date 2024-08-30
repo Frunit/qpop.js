@@ -6,7 +6,6 @@ export class Credits implements Stage {
 	clickareas: ClickArea[] = [];
 	rightclickareas: ClickArea[] = [];
 	keys: KeyType[] = [];
-	tutorials = [];
 	glob: TechGlobal;
 
 	private bg: any; // TODO
@@ -27,8 +26,8 @@ export class Credits implements Stage {
 
 	constructor(glob: TechGlobal) {
 		this.glob = glob;
-		this.bg = resources.get('gfx/light_bg.png');
-		this.github = resources.get('gfx/github.png');
+		this.bg = this.glob.resources.get_image('gfx/light_bg.png');
+		this.github = this.glob.resources.get_image('gfx/github.png');
 	}
 
 	initialize() {

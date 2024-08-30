@@ -1,6 +1,7 @@
-import { SCENE } from "./helper";
-import { i18n } from "./i18n";
+import { DIR, SCENE } from "./helper";
+import { InputManager } from "./input";
 import { Player } from "./player";
+import { ResourceManager } from "./resources";
 
 export const LANG_DE = 'DE';
 export const LANG_EN = 'EN';
@@ -37,7 +38,7 @@ export type KeyType = {
 
 export interface Stage {
     id: SCENE;
-    tutorials: any[]; // TODO: Type of tutorials!!!
+    tutorials?: TutorialType[];
     initialize: (autosave?: boolean) => void;
     redraw: () => void;
     render: () => void;
@@ -77,6 +78,8 @@ export type TechGlobal = {
 	rightclickareas: ClickArea[];
     options: any, // TODO
     next_stage: Function, // TODO
+    resources: ResourceManager,
+    input: InputManager,
 };
 
 export type WorldGlobal = {
@@ -99,4 +102,17 @@ export type ResourceElement = {
     url: string,
     type: string,
     name?: string,
+};
+
+type TutorialArrow = {
+    dir: DIR,
+    offset: number,
+};
+
+export type TutorialType = {
+    name: string,
+    pos: Point,
+    arrows: TutorialArrow[],
+    low_anchor?: boolean,
+    highlight?: Tuple<number, 4>,
 };
