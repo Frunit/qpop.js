@@ -937,10 +937,9 @@ Game.prototype.disable_audio = function() {
 Game.prototype.next_language = function(direction) {
 	// direction is either 1 or -1
 	draw_rect([545, 0], [32, 21]);
-	const lang_list = Object.keys(i18n);
-	const current_lang = lang_list.indexOf(options.language);
+	const current_lang = languageKeys.indexOf(options.language);
 
-	options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
+	options.language = languageKeys[(current_lang + direction + languageKeys.length) % languageKeys.length];
 	local_save('language', options.language);
 	lang = i18n[options.language];
 	game.stage.redraw();
