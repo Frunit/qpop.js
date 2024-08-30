@@ -622,7 +622,7 @@ export class Female implements ISurvivalCharacter {
 		if (species === SPECIES.PURPLUS) {
 			this.sprite = new RandomSprite(
 				this.pic,
-				this.anims.female.soffset,
+				purplus_special_animations.female.soffset,
 				purplus_special_animations.female.frames,
 				purplus_special_animations.female.transitions,
 				anim_delays.female,

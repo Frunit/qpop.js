@@ -1,10 +1,29 @@
 import { Game } from './game';
+import { i18n } from './i18n';
 import { Load } from './load';
 import { Popup } from './popup';
 import type { ResourceManager } from './resources';
 import { Tutorial } from './tutorial';
-import { Dimension, Point, TechGlobal, TutorialType } from './types';
+import { Dimension, GameOptions, Point, TechGlobal, TutorialType } from './types';
 import { version } from './version';
+
+export const defaultOptions: GameOptions = {
+	language: 'EN',
+	wm_ai_delay_idx: 3,
+	wm_ai_delay: 4,
+	wm_ai_auto_continue: true,
+	wm_click_and_hold: true,
+	plant_distribtion: true,
+	show_predators: true,
+	tutorial: true,
+	transition_delay: 36,
+	music_on: true,
+	music: 100,
+	sound_on: true,
+	sound: 100,
+	audio_enabled: true,
+	update_freq: 1 / 18,
+};
 
 // World
 export const enum WORLD_MAP {
@@ -523,4 +542,33 @@ export function local_load(key: string): unknown {
 		console.warn(`Got error ${error} while retrieving ${key}.`);
 	}
 	return null;
+}
+
+export function shouldDisableAudio(search_params: URLSearchParams): boolean {
+	// If "audio" is defined and falseish, disable audio and prevent loading of audio files.
+	//   Also disable audio, if "noaudio" is defined (no matter what it is set to).
+	return search_params.has('noaudio') || (search_params.get('audio') !== null && !parse_bool(search_params.get('audio')));
+}
+
+/**
+ * If "lang[uage]" is defined and set to a supported language, use that language.
+ * Otherwise try to determine the browser language. Otherwise default to English.
+ */
+export function determineBestLanguage(search_params: URLSearchParams): string {
+	const preferredManual = search_params.get('lang') || search_params.get('language') || (local_load('language') as string | null);
+	const preferred = preferredManual ? [preferredManual] : navigator.languages;
+
+	const available = new Set(Object.keys(i18n));
+
+	for (const candidate of preferred) {
+		const upperCandidate = candidate.toUpperCase();
+		if (available.has(upperCandidate)) {
+			return upperCandidate;
+		}
+		if (available.has(upperCandidate.substring(0, 2))) {
+			return upperCandidate.substring(0, 2);
+		}
+	}
+
+	return 'EN';
 }

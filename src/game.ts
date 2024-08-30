@@ -4,6 +4,8 @@ import {
 	ATTR,
 	PLAYER_TYPE,
 	SCENE,
+	defaultOptions,
+	determineBestLanguage,
 	download,
 	draw_checkbox,
 	draw_rect,
@@ -11,9 +13,9 @@ import {
 	local_save,
 	open_popup,
 	open_tutorial,
-	parse_bool,
+	shouldDisableAudio,
 } from './helper';
-import { i18n } from './i18n';
+import { i18n, languageKeys } from './i18n';
 import { Init } from './init';
 import { InputManager } from './input';
 import { Intro } from './intro';
@@ -31,24 +33,6 @@ import { ClickArea, GameOptions, SixNumbers, Stage, TechGlobal, Tuple, WorldGlob
 import { version } from './version';
 import { World, create_height_map, create_world_map } from './world';
 
-const options: GameOptions = {
-	language: 'EN',
-	wm_ai_delay_idx: 3,
-	wm_ai_delay: 4,
-	wm_ai_auto_continue: true,
-	wm_click_and_hold: true,
-	plant_distribtion: true,
-	show_predators: true,
-	tutorial: true,
-	transition_delay: 36,
-	music_on: true,
-	music: 100,
-	sound_on: true,
-	sound: 100,
-	audio_enabled: true,
-	update_freq: 1 / 18,
-};
-
 export class Game {
 	private last_time = 0;
 	private time = 0;
@@ -63,7 +47,13 @@ export class Game {
 	world: WorldGlobal;
 
 	constructor() {
-		this.glob = this.initialize();
+		// GET parameter handling
+		const search_params = new URL(document.location.href.toLowerCase()).searchParams;
+		const disable_audio = shouldDisableAudio(search_params);
+		this.glob = this.initialize(structuredClone(defaultOptions), search_params, disable_audio);
+		if (disable_audio) {
+			this.disable_audio();
+		}
 		this.world = this.reset();
 		this.init_clickareas();
 		this.stage = new ResourceLoader(this, this.glob);
@@ -78,8 +68,8 @@ export class Game {
 
 		if (!this.paused) {
 			this.time += (now - this.last_time) / 1000;
-			if (this.time > options.update_freq) {
-				this.time %= options.update_freq;
+			if (this.time > this.glob.options.update_freq) {
+				this.time %= this.glob.options.update_freq;
 				this.stage.update();
 				this.stage.render();
 			}
@@ -124,33 +114,17 @@ export class Game {
 		this.main();
 	}
 
-	private initialize(): TechGlobal {
+	private initialize(options: GameOptions, search_params: URLSearchParams, disable_audio: boolean): TechGlobal {
 		const resources = new ResourceManager();
-
-		// GET parameter handling
-		const search_params = new URL(document.location.href.toLowerCase()).searchParams;
-
-		// If "audio" is defined and falseish, disable audio and prevent loading of audio files.
-		//   Also disable audio, if "noaudio" is defined (no matter what it is set to).
-		if (search_params.has('noaudio') || (search_params.get('audio') !== null && !parse_bool(search_params.get('audio')))) {
-			this.disable_audio();
-		}
 
 		// Save version in case I need to account for different versions later
 		if (JSON.stringify(local_load('version')) !== JSON.stringify(version)) {
 			local_save('version', version);
 		}
 
-		// If "lang[uage]" is defined and set to a supported language, use that language.
-		//   Otherwise try to determine the browser language. Otherwise default to English.
-		options.language =
-			search_params.get('lang') || search_params.get('language') || (local_load('language') as string | null) || navigator.language;
-		options.language = options.language.substring(0, 2).toUpperCase();
-		if (!(options.language in Object.keys(i18n))) {
-			options.language = 'EN';
-		}
+		options.language = determineBestLanguage(search_params);
 
-		const lang = i18n[options.language as keyof typeof i18n];
+		const lang = i18n[options.language];
 
 		for (const option of Object.keys(options)) {
 			if (local_load(option) === null) {
@@ -171,13 +145,13 @@ export class Game {
 			this.seen_tutorials = new Set();
 		}
 
-		if (options.music_on) {
+		if (options.music_on && !disable_audio) {
 			resources.set_music_volume(options.music / 100);
 		} else {
 			resources.set_music_volume(0);
 		}
 
-		if (options.sound_on) {
+		if (options.sound_on && !disable_audio) {
 			resources.set_sound_volume(options.sound / 100);
 		} else {
 			resources.set_sound_volume(0);
@@ -601,10 +575,10 @@ export class Game {
 			content.setUint8(i, qpopstring.charCodeAt(i));
 		}
 
-		content.setUint8(0x10, options.music_on ? 1 : 0);
-		content.setUint8(0x11, options.music);
-		content.setUint8(0x12, options.sound_on ? 1 : 0);
-		content.setUint8(0x13, options.sound);
+		content.setUint8(0x10, this.glob.options.music_on ? 1 : 0);
+		content.setUint8(0x11, this.glob.options.music);
+		content.setUint8(0x12, this.glob.options.sound_on ? 1 : 0);
+		content.setUint8(0x13, this.glob.options.sound);
 
 		for (let i = 0; i < this.world.players.length; i++) {
 			const p = this.world.players[i];
@@ -884,7 +858,7 @@ export class Game {
 	}
 
 	tutorial() {
-		if (options.tutorial && this.stage.tutorials) {
+		if (this.glob.options.tutorial && this.stage.tutorials) {
 			for (const tut of this.stage.tutorials) {
 				if (!this.seen_tutorials.has(tut.name)) {
 					this.seen_tutorials.add(tut.name);
@@ -935,15 +909,15 @@ export class Game {
 	}
 
 	toggle_sound() {
-		if (options.audio_enabled) {
-			options.sound_on = !options.sound_on;
-			if (options.sound_on) {
-				this.glob.resources.set_sound_volume(options.sound / 100);
+		if (this.glob.options.audio_enabled) {
+			this.glob.options.sound_on = !this.glob.options.sound_on;
+			if (this.glob.options.sound_on) {
+				this.glob.resources.set_sound_volume(this.glob.options.sound / 100);
 			} else {
 				this.glob.resources.set_sound_volume(0);
 			}
 
-			local_save('sound_on', options.sound_on);
+			local_save('sound_on', this.glob.options.sound_on);
 
 			this.stage.redraw();
 		} else {
@@ -953,15 +927,15 @@ export class Game {
 	}
 
 	toggle_music() {
-		if (options.audio_enabled) {
-			options.music_on = !options.music_on;
-			if (options.music_on) {
-				this.glob.resources.set_music_volume(options.music / 100);
+		if (this.glob.options.audio_enabled) {
+			this.glob.options.music_on = !this.glob.options.music_on;
+			if (this.glob.options.music_on) {
+				this.glob.resources.set_music_volume(this.glob.options.music / 100);
 			} else {
 				this.glob.resources.set_music_volume(0);
 			}
 
-			local_save('music_on', options.music_on);
+			local_save('music_on', this.glob.options.music_on);
 
 			this.stage.redraw();
 		} else {
@@ -972,13 +946,13 @@ export class Game {
 
 	disable_audio() {
 		// This does purposefully not change localStorage!
-		options.music_on = false;
-		options.sound_on = false;
+		this.glob.options.music_on = false;
+		this.glob.options.sound_on = false;
 		this.glob.resources.set_music_volume(0);
 		this.glob.resources.set_sound_volume(0);
 
 		this.glob.resources.disable_audio();
-		options.audio_enabled = false;
+		this.glob.options.audio_enabled = false;
 
 		if (this.stage) {
 			this.stage.redraw();
@@ -987,25 +961,24 @@ export class Game {
 
 	next_language(direction: 1 | -1) {
 		draw_rect(this.glob.ctx, [545, 0], [32, 21]);
-		const lang_list = Object.keys(i18n);
-		const current_lang = lang_list.indexOf(options.language);
+		const current_lang = languageKeys.indexOf(this.glob.options.language);
 
-		options.language = lang_list[(current_lang + direction + lang_list.length) % lang_list.length];
-		local_save('language', options.language);
-		this.glob.lang = i18n[options.language as keyof typeof i18n];
+		this.glob.options.language = languageKeys[(current_lang + direction + languageKeys.length) % languageKeys.length];
+		local_save('language', this.glob.options.language);
+		this.glob.lang = i18n[this.glob.options.language as keyof typeof i18n];
 		this.stage.redraw();
 	}
 
 	toggle_tutorial(checkbox_pos?: [number, number]) {
-		options.tutorial = !options.tutorial;
+		this.glob.options.tutorial = !this.glob.options.tutorial;
 		if (checkbox_pos !== undefined) {
-			draw_checkbox(this.glob.ctx, this.glob.resources, checkbox_pos, options.tutorial);
+			draw_checkbox(this.glob.ctx, this.glob.resources, checkbox_pos, this.glob.options.tutorial);
 		}
 
-		local_save('tutorial', options.tutorial);
+		local_save('tutorial', this.glob.options.tutorial);
 
 		// Reset seen tutorials when tutorials are switched on again
-		if (options.tutorial) {
+		if (this.glob.options.tutorial) {
 			this.seen_tutorials = new Set();
 			local_save('seen_tutorials', []);
 		}
