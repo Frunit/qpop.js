@@ -1131,6 +1131,120 @@ export const i18n: Record<string, i18nStrings> = {
 			'Intelligens forbedrer de fleste andre egenskaper med en liten mengde.', // Intelligence
 		],
 	},
+	PO: {
+		title: 'Q-POP',
+		subtitle: 'Ewolucja w kosmosie',
+		next: 'Kontynuuj',
+		yes: 'Tak',
+		no: 'Nie',
+		turn: 'Tura',
+		close: 'Zamknij',
+		load_game: 'Wczytaj grę',
+		save_game: 'Zapisz grę',
+		start_game: 'Rozpocznij grę',
+		loading: 'Ładowanie',
+		load: 'Wczytaj',
+		player: 'Gracz {num}',
+		species: ['Purplus', 'Kiwiopteryx', 'Pesciodyphus', 'Isnobug', 'Amorph', 'Chuckberry'],
+		iq: 'IQ',
+		iqs: ['Charles Darwin', 'Pomocnik Darwina', 'Ciotka Darwina', 'Pies Darwina'],
+		popup_title: 'Służby Bezpieczeństwa Q-POP',
+		catastrophe: 'Katastrofa',
+		turns: ['Krótka (5 tur)', 'Średnia (10 tur)', 'Długa (20 tur)', 'Do końca'],
+		turn_finished: 'Czy na pewno zakończyłeś swoją turę?',
+		dead: 'Przykro mi, ale to już koniec!\nTwoja gatunek wyginął...',
+		last_turn: 'Gong! Zaczyna się ostatnia tura!',
+		who_plays: 'Kto ma grać?\nNie wybrałeś gracza!',
+		continue_alone: 'Chcesz grać samodzielnie?',
+		where_to_live: 'Gdzie chcesz żyć? Nie umieściłeś swojego gatunku na mapie!',
+		suicide: 'Na pewno chcesz zabić tę jednostkę?',
+		game_over: 'KONIEC GRY!!\nWszyscy gracze zginęli, gra się zakończyła!',
+		evo_score: 'Wynik ewolucji',
+		traits: ['Adaptacja do Rangones', 'Adaptacja do Blueleaf', 'Adaptacja do Hushrooms', 'Adaptacja do Stinkballs', 'Adaptacja do Snakeroots', 'Adaptacja do Firegrass', 'Szybkość reprodukcji', 'Siła ataku', 'Siła obrony', 'Kamuflaż', 'Szybkość', 'Percepcja', 'Inteligencja'],
+		transition_mutations: 'Potwory i Mutanci',
+		transition_survival: 'Zjedz albo bądź zjedzony',
+		transition_world: 'Wojna gatunków',
+		upload_description: 'Tutaj możesz przesłać oryginalny lub pobrany zapis gry.',
+		upload: 'Prześlij plik qpp',
+		not_a_savegame: 'Plik nie jest poprawnym zapisem gry Q-Pop.',
+		no_local_saves: 'Nie znaleziono zapisanych gier w przeglądarce',
+		really_restart: 'Czy na pewno chcesz uruchomić grę ponownie?',
+		sound_disabled: 'Dźwięk został wyłączony. Wygląda na to, że przeglądarka nie może odtworzyć dźwięku.',
+		information: 'Ta gra jest remakiem oryginalnej gry Q-Pop, wydanej w Niemczech w 1995 roku przez von Wendt Konzept GmbH. Remake ma jak najwierniej odwzorować oryginał, z kilkoma dodatkowymi funkcjami wygody. Gra działa w nowoczesnych przeglądarkach z włączonym Javascript. Kod źródłowy jest dostępny na Githubie.',
+		credits_original: [
+			['Wydawca i deweloper', ['von Wendt Konzept GmbH']],
+			['Projekt gry', ['Karl-L. von Wendt']],
+			['Programowanie', ['Karl-L. von Wendt', 'Lars Hammer']],
+			['Grafika', ['Stefan Beyer']],
+			['Muzyka', ['Karl-L. von Wendt', 'Lars Hammer']],
+		],
+		credits_remake: [
+			['Programowanie', ['Mathias Bockwoldt']],
+			['Reverse engineering', ['Mathias Bockwoldt', 'Christian Klamt']],
+			['Nowa grafika', ['Eike Strathmann']],
+			['Polskie tłumaczenie', ['Mathias Bockwoldt (z ChatGPT)']],
+		],
+		options_music: 'Muzyka',
+		options_sound: 'Dźwięk',
+		options_lang: 'Język',
+		options_this_lang: 'PO Polski',
+		options_auto_continue: 'Auto kontynuacja po rozmieszczeniu AI na mapie',
+		options_click_hold: 'Kliknij i przytrzymaj, aby umieścić lub usunąć jednostki z mapy',
+		options_plants: 'Pokaż rozmieszczenie roślin na ekranie mutacji',
+		options_predators: 'Pokaż symbole pokonanych drapieżników w przetrwaniu',
+		options_tutorial: 'Pokaż samouczek gry (wyłącz i włącz, aby zresetować)',
+		options_ai_speed: 'Prędkość AI na mapie świata',
+		options_ai_speeds: ['bardzo wolna', 'wolna', 'średnia', 'szybka', 'natychmiastowa'],
+		options_transition: 'Czas trwania ekranu przejścia',
+		options_restart: 'Restart gry',
+		tutorial_title: 'Samouczek',
+		tutorial_abort: 'Przerwij',
+		tutorial: {
+			welcome: 'Witamy w Q-Pop! Ten samouczek pomoże ci zacząć. Więcej szczegółów znajdziesz w instrukcji poniżej gry. Możesz przerwać samouczek w dowolnym momencie, klikając przerwij.',
+			change_language: 'Możesz zmienić język i inne opcje za pomocą przycisków u góry.',
+			player_select: 'Wybierz gatunki, którymi ty i komputer będziecie grać. Kliknij na głowę lub komputer, aby wybrać rodzaj gracza. Dodatkowo wybierz poziom trudności (poziom IQ) dla każdego gatunku.',
+			next: 'Zawsze możesz kontynuować tutaj lub naciskając enter.',
+			turns: 'Wybierz, jak długą grę chcesz rozegrać. Na początek może wystarczyć pięć rund.',
+			wm_units: 'Umieść swoje jednostki na mapie świata. Po pierwszej jednostce możesz umieszczać kolejne tylko w pobliżu innych. Nie możesz umieszczać jednostek na górach ani w wodzie, więc uważaj, aby nie zablokować się blisko wybrzeża lub gór.',
+			wm_shadows: 'Możesz podnieść tyle jednostek, ile masz cieni. Dzięki temu możesz przesuwać jednostki po mapie świata. Możesz poprawić swoją cechę szybkości na ekranie mutacji, aby uzyskać więcej cieni. Od tej tury możesz walczyć z jednostkami innych gatunków, jeśli masz wolne jednostki.',
+			wm_rightclick: 'Aby zobaczyć, na jakich roślinach są twoje jednostki, możesz kliknąć prawym przyciskiem myszy na jednostkę, aby zobaczyć roślinę pod nią. Alternatywnie możesz kliknąć awatar poniżej kalendarza, aby wszystkie jednostki stały się półprzezroczyste.',
+			mutation_start: 'Rozdziel punkty ewolucji, aby poprawić cechy swojego gatunku. Na początku masz 100 punktów ewolucji, ale później w grze liczba ta zależy od twojego sukcesu. Kółka po prawej pokazują, które rośliny twoje gatunki zajmują na mapie świata. Możesz kliknąć plus lub minus, aby wykonać małe kroki lub bezpośrednio kliknąć pasek, aby wykonać duże kroki.',
+			mutation_plant: 'Na początku adaptacja do rośliny, którą zajmujesz najwięcej, powinna wynosić co najmniej 50%. Kliknij prawym przyciskiem myszy na dowolną cechę, aby dowiedzieć się więcej.',
+			survival_start: 'W tej części gry grasz jednym osobnikiem swojego gatunku w środowisku, które jest tworzone w zależności od pozycji, które zajmujesz na mapie świata. Poruszaj się, klikając na mapę przetrwania lub używając klawiszy strzałek lub WASD. Możesz jeść, klikając na osobnika lub naciskając spację. Jeśli znajdziesz się w beznadziejnej sytuacji, możesz kliknąć prawym przyciskiem myszy na osobnika lub nacisnąć escape, aby go zabić i rozpocząć od nowej pozycji.',
+			survival_goals: 'Staraj się zjeść jak najwięcej roślin. Rośliny, do których twój gatunek jest przystosowany, dają więcej pożywienia. Powinieneś zapełnić co najmniej jeden pasek żywności. Dodatkowo spróbuj się rozmnażać, chodząc obok samicy. Wreszcie, unikaj drapieżników.',
+			survival_time: 'Masz ograniczoną liczbę kroków i ograniczony czas na każdy krok. Jeśli zginiesz, będziesz kontynuować z innym osobnikiem, ale każda śmierć wpływa na rozmieszczenie twojego gatunku na mapie świata.',
+			survival_radar: 'Używaj zmysłów swojego gatunku, aby zobaczyć obiecujące pola z jedzeniem, partnerów do rozmnażania, inne roślinożercy i drapieżniki. Możesz zwiększyć zasięg zmysłów przez mutacje.',
+			catastrophe: 'Katastrofy zdarzają się co turę. Mogą zmienić różne aspekty świata. Powinieneś sprawdzić, czy twoje jednostki nadal zajmują te same rośliny, co wcześniej.',
+			catastrophe0: 'Oś planety przesunęła się, przesuwając kontynent bliżej równika. W konsekwencji średnia temperatura wzrasta, poziom morza spada, a opady są rzadsze.', // Warming
+			catastrophe1: 'Zmiany w obrocie planety powodują zimniejszy klimat i więcej opadów.', // Cooling
+			catastrophe2: 'Duży meteoryt uderzył w planetę. W pobliżu miejsca uderzenia następuje dewastacja. Miliony ton piasku i pyłu wzbija się do stratosfery, chłodząc klimat. Lodowe czapy polarne wiążą więcej wody, prowadząc do obniżenia poziomu morza.', // Comet
+			catastrophe3: 'Nowa, tajemnicza choroba pojawia się na określonym obszarze kontynentu, wpływając na wszystkie gatunki w tej strefie. Każdy osobnik w obszarze choroby ma pewną szansę na przetrwanie choroby.', // Plague
+			catastrophe4: 'Ogromne erupcje wulkaniczne niszczą całe życie zwierzęce na bezpośrednio sąsiadujących polach.', // Volcano
+			catastrophe5: 'Globalne ocieplenie doprowadziło do stopienia się lodowych czap polarnych, podnosząc poziom morza i zalewając nisko położone wybrzeża.', // Flood
+			catastrophe6: 'Silne trzęsienie ziemi zmienia całą powierzchnię planety. Jeziora mogą stać się górami i odwrotnie.', // Earthquake
+			catastrophe7: 'Ludzie wylądowali na planecie! W ich nieustannych wysiłkach, aby chronić zagrożoną przyrodę, budują stację badawczą na planecie i polują na zwierzęta do eksperymentów, „ratując je przed wyginięciem”. Ludzie zachowują się jak mięsożercy, ale trudniej ich spławić niż naturalnych wrogów.', // Humans
+			catastrophe8: 'Wzrost występowania promieniowania kosmicznego zmienia wszystkie gatunki przez mutacje. W rezultacie cechy każdego gatunku ulegają dramatycznym zmianom.', // Cosmic rays
+			ranking: 'Tutaj możesz zobaczyć swoją pozycję na świecie. Pierwsza to liczba osobników na mapie świata. Druga to ilość dostępnych punktów ewolucji w tej rundzie. To zależy od liczby osobników. Trzecia to punkty zwycięstwa, czyli wszystkie użyte i dostępne punkty ewolucji zsumowane.',
+			ranking_save: 'Gra jest automatycznie zapisywana w przeglądarce. Jeśli chcesz pobrać zapis gry, możesz to zrobić tutaj.',
+			ranking_no_save: 'Jeśli chcesz pobrać zapis gry, możesz to zrobić tutaj. Gra nie będzie zapisywana automatycznie.',
+			save: 'Zapis gry, który ci właśnie zaoferowano, można ponownie wczytać w tej grze. Jest on również kompatybilny z oryginalną grą!',
+		},
+		trait_hints: [
+			'Adaptacja do rangones poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach rangones na mapie świata.', // Rangones
+			'Adaptacja do blueleaf poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach blueleaf na mapie świata.', // Blueleaf
+			'Adaptacja do hushrooms poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach hushrooms na mapie świata.', // Hushrooms
+			'Adaptacja do stinkballs poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach stinkballs na mapie świata.', // Stinkballs
+			'Adaptacja do snakeroots poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach snakeroots na mapie świata.', // Snakeroot
+			'Adaptacja do firegrass poprawia wykorzystanie pożywienia z tej rośliny. Dodatkowo adaptacja jest przewagą w walce na polach firegrass na mapie świata.', // Firegrass
+			'Wskaźnik reprodukcji zwiększa efekt rozmnażania i karmienia, dając więcej jednostek na mapę świata.', // Reproduction
+			'Siła ataku zwiększa szanse agresora w walce na mapie świata.', // Attack
+			'Siła obrony zwiększa szanse obrońcy w walce na mapie świata. Dodatkowo zwiększa prawdopodobieństwo wygranej z drapieżnikami.', // Defense
+			'Kamuflaż zwiększa prawdopodobieństwo, że drapieżniki zgubią trop i nie będą ścigać gracza.', // Camouflage
+			'Szybkość daje więcej punktów ruchu na mapie świata. Dodatkowo szybkość zwiększa prawdopodobieństwo, że drapieżniki zgubią trop.', // Speed
+			'Percepcja poprawia zasięg mini mapy podczas przetrwania.', // Perception
+			'Inteligencja poprawia większość innych cech o niewielką ilość.', // Intelligence
+		],
+	},	
 	RU: {
 		title: 'Q-POP',
 		subtitle: 'Evolution in space',
