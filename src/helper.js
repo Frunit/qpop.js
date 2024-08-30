@@ -549,3 +549,27 @@ function handle_visibility_change() {
 	game.toggle_pause(document.hidden);
 
 }
+
+
+/**
+ * If "lang[uage]" is defined and set to a supported language, use that language.
+ * Otherwise try to determine the browser language. Otherwise default to English.
+ */
+function determineBestLanguage(search_params) {
+	const preferredManual = search_params.get('lang') || search_params.get('language') || local_load('language');
+	const preferred = preferredManual ? [preferredManual] : navigator.languages;
+
+	const available = new Set(Object.keys(i18n));
+
+	for (const candidate of preferred) {
+		const upperCandidate = candidate.toUpperCase();
+		if (available.has(upperCandidate)) {
+			return upperCandidate;
+		}
+		if (available.has(upperCandidate.substring(0, 2))) {
+			return upperCandidate.substring(0, 2);
+		}
+	}
+
+	return 'EN';
+}

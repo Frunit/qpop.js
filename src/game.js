@@ -162,18 +162,8 @@ Game.prototype.initialize = function() {
 		local_save('version', version);
 	}
 
-	// If "lang[uage]" is defined and set to a supported language, use that language.
-	//   Otherwise try to determine the browser language. Otherwise default to English.
-	options.language = search_params.get('lang') || search_params.get('language') || local_load('language') || navigator.language || navigator.userLanguage;
-	options.language = options.language.substring(0, 2).toUpperCase();
-
-	if(i18n.hasOwnProperty(options.language)) {
-		lang = i18n[options.language];
-	}
-	else {
-		lang = i18n.EN;
-		options.language = 'EN';
-	}
+	options.language = determineBestLanguage(search_params);
+	lang = i18n[options.language];
 
 	for(let option of Object.keys(options)) {
 		if(local_load(option) === null) {
@@ -1009,7 +999,7 @@ document.addEventListener('visibilitychange', handle_visibility_change);
 
 let lang = null;
 
-const version = [1, 0, 5];
+const version = [1, 1, 0];
 const game = new Game();
 game.initialize();
 game.start();

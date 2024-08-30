@@ -8,3 +8,8 @@ itch.io/
 *.txt
 *.csv
 *.py
+
+node_modules/
+out.js
+out.js.map
+tsconfig.tsbuildinfo
